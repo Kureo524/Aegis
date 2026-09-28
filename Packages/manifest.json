@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "ayellowpaper.serialized-dictionary": "https://github.com/ayellowpaper/SerializedDictionary.git",
     "com.unity.ai.navigation": "2.0.14",
     "com.unity.collab-proxy": "2.13.6",
     "com.unity.ide.rider": "3.0.40",
@@ -13,6 +14,7 @@
     "com.unity.toolchain.linux-x86_64-linux": "1.1.0",
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.12",
+    "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.19.0",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.adaptiveperformance": "1.0.0",
     "com.unity.modules.ai": "1.0.0",
