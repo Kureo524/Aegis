@@ -1,0 +1,7 @@
+:root {
+}
+
+.header {
+    font-size: 76px;
+    color: rgb(159, 159, 159);
+}
