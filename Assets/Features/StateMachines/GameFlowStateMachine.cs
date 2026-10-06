@@ -5,10 +5,5 @@ namespace Features.StateMachines {
     
     [Serializable] public enum GameState { Menu, Game, Pause, GameOver }
     
-    public class GameFlowStateMachine : GameStateMachine<GameState> {
-
-        public GameFlowStateMachine(State baseState) {
-            TryChange(baseState);
-        }
-    }
+    public class GameFlowStateMachine : GameStateMachine<GameState> { }
 }

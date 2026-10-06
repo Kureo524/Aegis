@@ -1,17 +1,22 @@
-using System;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.UIElements;
 
-public class OpenClosePanel : MonoBehaviour {
-    protected CanvasGroup CanvasGroup { get; set; }
+namespace Systems.UIManagement {
+    [RequireComponent(typeof(UIDocument))]
+    public abstract class OpenClosePanel : MonoBehaviour {
 
-    private void Start() {
-        if (TryGetComponent<CanvasGroup>(out var group)) CanvasGroup = group;
-        Assert.IsNotNull(CanvasGroup);
-    }
+        private void OnEnable() {
+            var rootElement = GetComponent<UIDocument>().rootVisualElement;
+            Assert.IsNotNull(rootElement);
+            SetupDocument(rootElement);
+        }
+        
+        protected abstract void SetupDocument(VisualElement document);
 
 #pragma warning disable CS1998
-    public async virtual Awaitable OpenPanel() { }
-    public async virtual Awaitable ClosePanel() { }
+        public virtual async Awaitable OpenPanel() { }
+        public virtual async Awaitable ClosePanel() { }
 #pragma warning restore CS1998
+    }
 }
