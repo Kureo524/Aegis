@@ -1,15 +1,15 @@
 using System;
+using Features.Events;
+using Systems.EventBusses;
 using Systems.UIManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using VContainer;
 
 namespace Features.UI.Panels {
     public class MainMenuPanel : OpenClosePanel {
 
-        public event Action PlayClicked;
-        public event Action SettingsClicked;
-        public event Action QuitClicked;
+        [Inject] private readonly IEventBus _eventBus;
         
         private const float Duration = 0.5f;
 
@@ -37,7 +37,7 @@ namespace Features.UI.Panels {
         
         private void OnPlay() {
             _play.SetEnabled(false);   // évite le double clic
-            PlayClicked?.Invoke();
+            _eventBus.Publish(new PlayRequestedEvent());
         }
 
         public override async Awaitable OpenPanel() {
@@ -58,8 +58,8 @@ namespace Features.UI.Panels {
             float end = Time.unscaledTime + seconds;
             while (Time.unscaledTime < end) await Awaitable.NextFrameAsync();
         }
-        
-        private void OnSettings() { Debug.Log("Settings"); SettingsClicked?.Invoke(); }
-        private void OnQuit()     { Debug.Log("Quit");     QuitClicked?.Invoke(); }
+
+        private void OnSettings() { Debug.Log("Settings"); }
+        private void OnQuit()     { Debug.Log("Quit"); _eventBus.Publish(new QuitRequestedEvent()); }
     }
 }

@@ -1,9 +1,11 @@
+using System;
 using AYellowpaper.SerializedCollections;
+using Features.Events;
 using Features.StateMachines;
-using NUnit.Framework;
-using Systems.StateMachine;
+using Systems.EventBusses;
 using Systems.UIManagement;
 using UnityEngine;
+using UnityEngine.Assertions;
 using VContainer;
 
 namespace Features.UI {
@@ -12,29 +14,29 @@ namespace Features.UI {
         [SerializedDictionary("StateType", "Panel")] 
         [SerializeField] private SerializedDictionary<GameState, OpenClosePanel> panels = new();
         
-        [Inject] public readonly GameFlowStateMachine StateMachine;
+        [Inject] private readonly IEventBus _eventBus;
+        private IDisposable _subscription;
 
         private void Start() {
-            Assert.IsNotNull(StateMachine);
-            StateMachine.Changed += TryUpdateUI;
+            Assert.IsNotNull(_eventBus);
+            _subscription = _eventBus.Subscribe<GameStateChangedEvent>(OnStateChanged);
         }
 
         private void OnDestroy() {
-            Assert.IsNotNull(StateMachine);
-            StateMachine.Changed -= TryUpdateUI;
+            _subscription?.Dispose();
         }
 
-        private async void TryUpdateUI(GameStateMachine<GameState>.State fromState, GameStateMachine<GameState>.State toState) {
+        private async void OnStateChanged(GameStateChangedEvent evt) {
             try {
-                if (panels.ContainsKey(fromState.Id)) {
-                    if (await PanelManager.TryOpenOrClosePanelAsync(panels[fromState.Id]))
-                        Debug.Log($"Panel {panels[fromState.Id]} closure encountered an error");
+                if (panels.ContainsKey(evt.From)) {
+                    if (!await PanelManager.TryOpenOrClosePanelAsync(panels[evt.From]))
+                        Debug.LogWarning($"Panel {panels[evt.From]} closure failed");
                 }
 
-                if (!panels.ContainsKey(toState.Id)) return;
+                if (!panels.ContainsKey(evt.To)) return;
                 
-                if (await PanelManager.TryOpenOrClosePanelAsync(panels[toState.Id]))
-                    Debug.Log($"Panel {panels[toState.Id]} opening encountered an error");
+                if (!await PanelManager.TryOpenOrClosePanelAsync(panels[evt.To]))
+                    Debug.LogWarning($"Panel {panels[evt.To]} opening failed");
             }
             catch (System.Exception e) {
                 Debug.LogException(e);
