@@ -1,5 +1,5 @@
+using Systems.Inputs.Events;
 using System;
-using Features.Events;
 using GameAssets.ActionMaps;
 using Systems.EventBusses;
 using UnityEngine;

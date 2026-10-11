@@ -102,7 +102,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d61e6a6be1834ebf8bb09850eb1b5214, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Systems.UI.ClickMarker
+  m_EditorClassIdentifier: Game.Systems::Systems.UI.ClickMarker
   lifetime: 0.5
   scaleSpeed: 5
   maxScale: 1.5

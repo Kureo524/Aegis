@@ -1,8 +1,8 @@
 using UnityEngine;
 using Systems.EventBusses;
 
-namespace Features.Events {
-    // [NEW] Input events published by InputReader, consumed by PlayerCommandInput / CameraController
+namespace Systems.Inputs.Events {
+    // Input events published by InputReader, consumed by PlayerCommandInput / CameraController
     
     public readonly struct PointerCommandEvent : IEvent {
         public readonly Vector2 ScreenPosition;
