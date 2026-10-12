@@ -266,6 +266,7 @@ GameObject:
   - component: {fileID: 1033432127841491160}
   - component: {fileID: 6418502472124908383}
   - component: {fileID: 658325328853462013}
+  - component: {fileID: 7238801159857588572}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -410,6 +411,22 @@ MonoBehaviour:
   repathInterval: 0.2
   scanInterval: 0.1
   muzzleHeight: 0.6
+--- !u!114 &7238801159857588572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8325014891196843132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76204b9b6981f677484e5571a08e4f2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellCaster
+  owner: {fileID: 6418502472124908383}
+  movement: {fileID: 1033432127841491160}
+  attacker: {fileID: 658325328853462013}
+  visual: {fileID: 2057097052179799622}
 --- !u!1 &8512342472237346293
 GameObject:
   m_ObjectHideFlags: 0

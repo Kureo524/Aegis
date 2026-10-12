@@ -271,3 +271,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Combat.Projectile
   hitDistance: 0.2
   trail: {fileID: 263590842421005717}
+  sprite: {fileID: 2318825429896132604}

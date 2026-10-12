@@ -111,11 +111,12 @@ Le prefab de base porte aussi `BasicAttacker` et une **barre de PV** (`HealthBar
 | **Maintenir Q** + **clic gauche** | *Attack-move* (§4.6) : affiche la portée d'attaque tant que Q est maintenu ; le clic lance la marche vers le point en attaquant ce qui croise sa route |
 | **A / Z / E** | Ajoute un stack de l'élément 1 / 2 / 3 (§7) |
 | **Ctrl + A / Z / E** | Dépense un point de compétence sur l'élément (le débloque au premier point, §7.8) ; aussi via le bouton « + » du HUD |
-| **R** | Lance le sort correspondant aux éléments actifs (visée puis clic gauche, §7.4) |
-| **F** | Compétence propre du personnage (visée puis clic gauche, §7.8) |
+| **R** | Lance le sort correspondant aux éléments actifs. Par défaut (**rapide avec indicateur**) : maintenir = portée et forme affichées, relâcher = lancer vers le curseur. Selon l'option : visée puis clic gauche (Normal), ou lancer immédiat (Rapide) (§7.4) |
+| **F** | Compétence propre du personnage, même mode de lancement que R (§7.8) |
 | **T** | Reset : vide la sélection d'éléments |
 | **S** | `StopCommand` (annule l'ordre en cours) |
 | **Échap / clic droit** pendant une visée | Annule la visée |
+| **Échap** sans visée | Pause (menu : Reprendre / Options / Menu principal / Quitter) ; dans la pause, Échap revient en arrière puis reprend |
 | **Espace** (ou clic molette) | Caméra **verrouillée / libre** (toggle, §4.8) |
 | **Molette** | Zoom caméra |
 | **Curseur au bord de l'écran** | Déplace la caméra quand elle est **libre** (edge scrolling façon LoL) |
@@ -217,7 +218,9 @@ Avec le **New Input System**, `<Keyboard>/q` désigne la touche à la **position
 
 **Rejeté** : les bindings par nom affiché (`<Keyboard>/#(a)`). Le player Linux ne remonte pas la disposition de l'OS (il retombe sur les noms QWERTY : en jeu, « Q » se retrouvait sur la touche A), et l'éditeur Linux segfault en `-batchmode -nographics` en les résolvant.
 
-À venir : le choix du joueur (`UserOptions`, JSON) par-dessus `ControlsSettings`, puis un **menu de rebind** complet.
+**Options du joueur** : `UserOptions` (Features/Options, root) garde les choix du joueur en JSON (`persistentDataPath/options.json`, `options.editor.json` dans l'éditeur pour ne jamais toucher aux choix de la build) par-dessus les valeurs par défaut de `ControlsSettings`. Chaque changement est sauvegardé aussitôt et publié (`UserOptionsChangedEvent`) ; les systèmes lisent la valeur au moment où ils en ont besoin. Option en place : **mode de lancement** de R / F (`CastMode` : `Normal`, `QuickWithIndicator`, `Quick` ; défaut `ControlsSettings.CastMode = QuickWithIndicator`). Écran d'options : `OptionsView` (UI Toolkit construit en code), dans le menu pause en jeu et dans `OptionsPanel` (bouton Paramètres du menu principal).
+
+À venir : la disposition clavier dans les options, puis un **menu de rebind** complet.
 
 > **Wrapper C#** : `GameActionMaps.cs` est **généré** par l'Input System depuis le `.inputactions`. Après toute modification des actions : *Tools > Regenerate Input Actions Code*, et committer les deux fichiers ensemble. (L'ancien fichier était un stub écrit à la main que Unity refusait d'écraser ; le `.meta` de l'importer avait aussi des noms de champs invalides, ce qui désactivait la génération.)
 
@@ -309,6 +312,8 @@ Final = (Base + ΣFlat) × (1 + ΣPercentAdd) × Π(1 + PercentMult)
 
 ### 5.4 Modificateurs temporaires
 `TimedModifier` / `StatusEffect` : applique un modificateur pendant X secondes, gère stack/refresh, retire proprement (via `Source`). Base des buffs, debuffs, ralentissements, upgrades de level-up et objets.
+
+> **En place** : `TimedModifiers` (`Character.Buffs`, tick chaque frame) : réappliquer depuis la même source sur la même stat **rafraîchit** (valeur + durée) au lieu de cumuler ; des sources différentes se cumulent. *Reste : CC (stun, root, silence…) et ténacité (§5.7).*
 
 ### 5.5 Croissance par niveau
 
@@ -511,7 +516,13 @@ La courbe croît plus vite que le nombre de stacks pour que chaque ajout coûte 
 - **Un seul mode de visée à la fois** : Q (attack-move), R (sort élémentaire) et F (compétence propre) sont exclusifs ; appuyer sur l'un remplace l'autre. A/Z/E/T ne sont pas des modes de visée, donc ne coupent pas Q ni F. La **compétence propre (F)** ne consomme ni ne vide la sélection d'éléments.
 - **Après un cast réussi** : la sélection est **vidée automatiquement** (`ClearAfterCast = true`).
 - **Pendant un cast** (windup) : le joueur peut déjà empiler pour le sort suivant, le sort en cours est figé.
-- **Quick cast** (option) : R lance directement vers le curseur sans passer par la visée.
+- **Mode de lancement** (option du joueur, menu Options, `CastMode`) :
+  - **Rapide avec indicateur** (défaut) : tant que R / F est **maintenu**, la portée et la forme du sort suivent le curseur ; au **relâchement**, le sort part vers le curseur. Clic gauche pendant le maintien : lance aussi. Échap / clic droit pendant le maintien : annule, le relâchement ne lance alors rien.
+  - **Normal** : R / F affichent la visée, le clic gauche lance (le relâchement ne fait rien).
+  - **Rapide** : R / F lancent tout de suite vers le curseur, sans rien afficher.
+  - Un sort ciblé sans ennemi à portée sous le curseur est refusé (« Aucune cible »), sans rien consommer ; au relâchement, la visée se termine.
+
+> **En place (phase 5c)** : `ElementCaster.TryCast` (R) vérifie sélection, sort, cooldown, mana et incantation, puis vise via `SpellTargeting` (ou lance aussitôt un sort `Self`). Clic gauche : le sort résolu **à cet instant** est lancé (il suit les éléments ajoutés pendant la visée), le mana est débité (refus + sélection conservée s'il manque), le cooldown démarre, la sélection est vidée. Clic droit / Échap : visée annulée, sélection conservée ; T : visée annulée et sélection vidée. Exclusivité Q / R / F par `AimModeEvent`. Pendant une incantation (`SpellCaster`, sauf `CanMoveWhileCasting`), les ordres de déplacement / attaque sont ignorés ; on peut empiler des éléments pour le sort suivant. Modes de lancement : `SpellTargeting.Aim` lit `UserOptions.CastMode` : `Quick` → `CastAtCursor` ; sinon visée, marquée « lancer au relâchement » en `QuickWithIndicator`. `InputReader` publie aussi le relâchement de R / F (`CastSpellEvent.Released`, `SignatureEvent.Released`) → `SpellTargeting.Release`. *Reste : buffer d'input, stun / silence.*
 
 ### 7.5 Résolution du sort et visée
 
@@ -543,6 +554,8 @@ if (ground.Raycast(ray, out float d)) targetPoint = ray.GetPoint(d);
 | `Cone` | secteur devant le perso | souffle |
 | `UnitTarget` | surligne l'ennemi sous le curseur | sort ciblé |
 
+> **En place** : `SpellTargeting` + `SpellIndicator` dessinent la portée et la forme sous le curseur (rectangle d'un skillshot, cercle d'une zone, secteur d'un cône, anneau sous la cible d'un sort ciblé ; « Aucune cible » / « Cible hors de portée » sinon). `SpellExecutor` applique l'effet selon `Targeting` : **skillshot** (`SkillshotProjectile` en ligne droite, s'arrête au premier ennemi ou traverse avec `Pierce`, peut rater), **zone** (tous les ennemis dans `Radius`), **cône**, **ciblé** (projectile à tête chercheuse), **Self** ; flash de forme au sol aux couleurs du sort (`SpellVfx`), projectiles teintés, tout est poolé (`PrefabPool`).
+
 ```csharp
 public struct CastContext {
     public Vector3 Origin;
@@ -573,6 +586,8 @@ public struct CastContext {
 - **Évolution avec le niveau des éléments** : la valeur d'un sort (dégâts, soin, valeur du buff, durée) vaut `Base + PerElementLevel × Σ (niveau − 1)` calculé sur les **éléments distincts** de sa recette, en plus du scaling sur les stats. **Un même élément compte une seule fois** par sort : Feu ×3 ne profite du niveau de Feu qu'une fois. Le niveau d'un élément vient des points de compétence (§7.8).
 - Un sort **mixte** (dégâts + buff) est possible : `SpellDefinition` peut porter une liste d'effets, mais le `Kind` principal décide du scaling.
 
+> **En place** : dégâts = `Scaling.Evaluate(Σ niveaux − 1 des éléments distincts)` + `MagicAttack` (ou `PhysicalAttack`) × `PowerRatio`, contre `MagicResist` (ou `Armor`) avec la pénétration du lanceur ; omnivamp oui, lifesteal non ; pas de crit (capacité `SpellCrit` à venir). Buffs : `BuffEffect` → `Character.Buffs` (Source = le sort, donc relancer rafraîchit). *Reste : soins et boucliers, buffs sur les alliés, valeurs de buff qui évoluent avec le niveau des éléments.* Les 19 sorts du perso de test ont des valeurs **provisoires** (Assets/Data/Spells) ; le héros a 40 de `MagicAttack` de base.
+
 ### 7.7 Cooldown, cast et ordres
 
 - **Cooldown par lancement** : après chaque cast de R, un **cooldown commun** à tous les sorts élémentaires démarre ; sa durée dépend du **nombre de stacks du sort lancé** : `CooldownByStacks = {2, 3.5, 5.5}` s (dans `SpellSettings`), donc un sort à 1 élément est rapide à relancer, un sort à 3 éléments beaucoup moins. Surcharge possible par sort (`CooldownOverride`). Réduit par `AbilityHaste` (§6).
@@ -580,6 +595,8 @@ public struct CastContext {
 - **Cast time** : windup avant l'effet ; interrompt le déplacement/l'attaque en cours sauf `CanMoveWhileCasting`. Après le cast, le perso redevient `Idle`.
 - **Les éléments restent modifiables pendant un cast** (préparation du sort suivant), mais le sort en cours est déjà résolu et figé.
 - Un **stun/silence** bloque R (pas A/Z/E).
+
+> **En place** : cooldown commun dans `ElementCaster` (`SpellSettings.CooldownByStacks` ou `CooldownOverride`, × 100 / (100 + `AbilityHaste`)) ; cooldown propre de F dans `SignatureAbility` ; `CooldownStartedEvent` → HUD (temps restant sur la ligne du sort, compte à rebours sur le slot F). *Reste : stun / silence (CC).*
 
 ### 7.8 Identité d'un personnage, points de compétence et éléments
 
@@ -616,9 +633,11 @@ public struct CastContext {
 
 **Compétence propre (F)** : une `SpellDefinition` **hors grimoire**, une par personnage, qui réutilise tout le pipeline (ciblage, `CastContext`, types Magic/Physical/Buff, indicateurs). Elle n'utilise **ni éléments ni stacks**, **cooldown uniquement, aucun coût en mana** (réduit par `AbilityHaste`). **Touche F**, même flux de visée que R. Bloquée par stun/silence comme R. Elle peut être **remplacée temporairement par un sort d'invocateur ramassé** (§9.5).
 
+> **En place** : `CharacterDefinition.SignatureAbility` + `SignatureAbility` (F) : même visée et même incantation que R, cooldown seul, aucun mana. `Spell_Flash` : `GroundPoint`, portée 4,5, `FixedRange` (le point est toujours à la portée complète dans la direction du curseur, `SpellMath.AimPoint`), `Blink` (`SpellExecutor.TryGetBlinkPoint` part de ce point et recule le long de la ligne par pas de `SpellSettings.BlinkTolerance` (0,5) jusqu'au premier point marchable ; téléport via `CharacterMovement.Teleport`). Refusé avec « Destination inaccessible », sans consommer le cooldown, seulement s'il ne reste que la position du perso ; 20 s. *Reste : sort d'invocateur ramassé qui remplace F (§9.5).*
+
 **Personnage de test**
 - **Éléments** : Feu, Électricité, Vent.
-- **Compétence propre : Flash**, sort `GroundPoint` : téléporte instantanément le perso vers le curseur, **clampé à la portée**. Comme dans LoL, **les murs au milieu ne bloquent pas** : le sort n'est refusé que si la **position d'arrivée est inatteignable** (hors NavMesh / dans un obstacle, test via `NavMesh.SamplePosition` avec une petite tolérance). **Cooldown : 20 s.**
+- **Compétence propre : Flash**, sort `GroundPoint` : téléporte instantanément le perso **toujours à la même distance (sa portée), dans la direction du curseur**, même si le curseur est tout près. **Les murs au milieu ne bloquent pas** ; si le point d'arrivée tombe dans un obstacle (hors NavMesh), le perso atterrit sur le **dernier point marchable** de la ligne avant lui. Refusé seulement s'il n'y en a aucun. **Cooldown : 20 s.**
 - **Passif (façon Veigar, « Mal phénoménal »)** : chaque **sort lancé qui touche** donne **1 stack** ; chaque stack donne **+1 `MagicAttack`**. Les stacks **persistent toute la run** (§8.1).
 
 **Attaque de base** : `BasicAttackDefinition` (§4.5) porte `Range`, `WindupPercent`, `ProjectilePrefab`, `DamageRatio` et `DamageType` (Physical par défaut, Magic possible pour un mage). La **vitesse d'attaque**, les **dégâts** et la **portée** effectifs viennent des stats, donc évoluent avec le niveau et les modificateurs.
@@ -871,7 +890,7 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 - **Solo uniquement**, un seul personnage modulable au prototype.
 
 ### 9.8 Technique & perf
-- **Object Pooling** : `UnityEngine.Pool.ObjectPool<T>` (intégré).
+- **Object Pooling** : `UnityEngine.Pool.ObjectPool<T>` (intégré), via `PrefabPool` (`Systems.Pooling`, service du `GameLifetimeScope` : un pool par prefab, instances créées par le conteneur). Utilisé par les projectiles et les VFX de sorts.
 - **Caméra** : `CameraController` maison, verrouillée / libre façon LoL (§4.8). Cinemachine reste une option si le besoin grossit.
 - **Détection de cibles** : `Physics.OverlapSphereNonAlloc` ou grille spatiale ; éviter `FindObjectsOfType` ; mettre en cache.
 - **Pas de `GetComponent` en boucle** : références mises en cache à l'`Init`.
@@ -927,7 +946,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **4** 🟡 | `Health`, `DamageInfo`, formules, régénération des PV, barres de PV, chiffres de dégâts ✅. *Reste : bouclier, CC et ténacité.* | Dégâts corrects |
 | **5** 🟡 | Clic droit sur ennemi, `BasicAttacker`, projectiles poolés, Q + clic gauche (attack-move) ✅, dummies d'entraînement (XP au kill). *Reste : `CommandController`.* | Attaque de base façon LoL |
 | **5b** ✅ | `ManaPool`, `ElementSelection` (A/Z/E, T reset), `SpellBook` + `SpellResolver`, coût en mana + UI, déblocage d'éléments par points (niv. 1/3/5, Ctrl + A/Z/E) | Éléments activables, coût affiché |
-| **5c** | R + visée + indicateurs, sorts Magic/Physical/Buff, niveaux d'éléments, cooldown par lancement, compétence propre F (Flash) | Sorts lancés à la souris |
+| **5c** ✅ | R + visée + indicateurs, sorts Magic/Physical/Buff, niveaux d'éléments, cooldown par lancement, compétence propre F (Flash) | Sorts lancés à la souris |
 | **6** | `EnemyDefinition`, `EnemyAI` (flow field + NavMesh pour élites), mana TFT + sort spécial, spawner, XP/gold au kill | Un combat complet avec des hordes |
 | **7** | `RunDirector` (timer + quota, fin de vague = timer ET quota, vies), `Wallet`, `Inventory` (6 slots), `WaveRewardSchedule`, boutiques, enclumes, élixirs, items | Boucle de run + économie |
 | **8** | `CharacterEvents`, passifs (`StackCounter`), capacités, augments (4 slots, rerolls), loot | Builds variés |
@@ -1002,7 +1021,8 @@ Instance unique sur le **prefab `RootLifetimeScope`** (règles éditées là, ou
 - `PlayRequestedEvent` → `Loading` → chargement **Single** de `GameFlowSettings.GameScene` (aujourd'hui `TestScene`).
 - Chaque scène déclare l'état qu'elle représente via un **`SceneEntryPoint`** enregistré par son scope (`MenuLifetimeScope` → `Menu`, `GameLifetimeScope` → `Game`). Ainsi **n'importe quelle scène peut être lancée directement** depuis l'éditeur et passe quand même par la state machine.
 - Retour à `Menu` (depuis `Pause`, `Win`, `GameOver`) → chargement Single de `GameFlowSettings.MenuScene`.
-- `QuitRequestedEvent` (bouton Quitter du menu, bouton Quit de debug) → `Application.Quit` (arrêt du Play mode dans l'éditeur).
+- `QuitRequestedEvent` (bouton Quitter du menu, bouton Quit de debug, menu pause) → `Application.Quit` (arrêt du Play mode dans l'éditeur).
+- **Pause** : Échap en jeu (`CancelEvent`) annule d'abord la visée en cours ; sans visée, `PauseInput` (scope Game) publie `PauseRequestedEvent` → `Pause` (`TimeScaleService` met le temps à 0, `InputMapSwitcher` passe sur la map UI). `PauseMenu` (UIDocument au-dessus du HUD) : Reprendre (`ResumeRequestedEvent` → `Game`), Options, Menu principal (`MainMenuRequestedEvent` → `Menu`), Quitter. Échap dans la pause (`UiCancelEvent`, map UI) : retour depuis les options, sinon reprise.
 
 **Machine de run `RunStateMachine`** (active pendant `Game`, pilotée par `RunDirector`, §9.1) :
 
@@ -1095,7 +1115,9 @@ public sealed class EventBus : IEventBus {
 | `ElementLevelUpRequestedEvent` | bouton « + » du HUD | `ElementCaster` |
 | `GameplayFeedbackEvent` (message) | `ElementCaster` (plus tard : sorts, boutiques…) | `PlayerHud` |
 | `PlayerManaChangedEvent` | `Character` joueur | `PlayerHud` |
-| `SpellCastEvent`, `SpellHitEvent` | `ElementCaster`, `Spell` | passifs, audio, VFX |
+| `SpellCastEvent` (sort, lancé par le joueur ?) | `SpellExecutor` | plus tard : passifs, audio |
+| `AimModeEvent` (None / AttackMove / Spell / Signature) | `PlayerCommandInput`, `SpellTargeting` | les mêmes (une seule visée à la fois) |
+| `CooldownStartedEvent` (Elemental / Signature, durée), `SignatureAssignedEvent` | `ElementCaster`, `SignatureAbility` | `PlayerHud` |
 | `GoldChangedEvent`, `ItemPurchasedEvent`, `AugmentChosenEvent` | `Wallet`, `Shop`, `AugmentController` | HUD, `PassiveController` |
 
 ### 14.4 Injection de dépendances (VContainer)
@@ -1104,9 +1126,9 @@ public sealed class EventBus : IEventBus {
 
 | Scope | Durée de vie | Contenu |
 |---|---|---|
-| `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
-| `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `SceneEntryPoint(Menu)` |
-| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `ProjectileLauncher`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
+| `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, `UserOptions`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
+| `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `OptionsPanel` (UIDocument « OptionsPanel », au-dessus du menu), `SceneEntryPoint(Menu)` |
+| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `PrefabPool`, `ProjectileLauncher`, `SpellExecutor`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PauseMenu` (UIDocument « PauseMenu ») et `PauseInput`, `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
 
 VContainer crée le root **une fois**, avant le premier scope de scène, et le garde entre les chargements (`DontDestroyOnLoad`) ; un scope de scène sans `parentReference` en devient automatiquement l'enfant. Les services du root **ne doivent jamais être ré-enregistrés** dans un scope de scène (sinon deux `EventBus` coexistent et les événements se perdent).
 
@@ -1154,36 +1176,39 @@ Assets/
 ├── Systems/                 Game.Systems — infrastructure, ne connaît pas le jeu
 │   ├── StateMachine/        GameStateMachine<TId>
 │   ├── EventBusses/         IEvent, IEventBus, EventBus, DisposableBag
+│   ├── Pooling/             PrefabPool
 │   ├── Inputs/              InputReader, Events/ (événements d'input)
 │   └── UIManagement/        IPanelManager, PanelManager, OpenClosePanel
 ├── Features/                Game.Features — le jeu
 │   ├── Flow/                GameFlowController, GameFlowSettings (SO), SceneEntryPoint,
-│   │                        InputMapSwitcher, TimeScaleService, CursorConfinement
+│   │                        InputMapSwitcher, TimeScaleService, CursorConfinement, PauseInput
+│   ├── Options/             UserOptions (choix du joueur, JSON)
 │   ├── StateMachines/       GameState, GameFlowStateMachine
-│   ├── Events/              GameStateChangedEvent, PlayRequested/QuitRequested, StatChangedEvent
+│   ├── Events/              GameStateChangedEvent, requêtes de flux (Play/Pause/Resume/MainMenu/Quit, Options), StatChangedEvent
 │   ├── CameraControl/       CameraController, CameraSettings (SO), Billboard
 │   ├── Characters/          Character, CharacterDefinition / EnemyDefinition (SO), CharacterVisual, Faction,
 │   │                        PlayerSpawner, EnemySpawner, RespawnOnDeath
 │   ├── Progression/         CharacterLevel, StatGrowth (SO), ExperienceCurve (SO)
 │   ├── Combat/              BasicAttacker, BasicAttackDefinition (SO), DamageInfo, DamageCalculator, Health, ManaPool, DamageType,
-│   │                        Projectile, ProjectileLauncher, ITargetSelector / NearestTargetSelector
+│   │                        Projectile, SkillshotProjectile, ProjectileLauncher, TargetPicker, ITargetSelector
 │   ├── Spells/              ElementDefinition, SpellDefinition, SpellBook, SpellSettings (SO), ElementSelection,
-│   │                        SpellResolver, ElementLevels, ElementCaster
+│   │                        SpellResolver, ElementLevels, ElementCaster, SpellMath, SpellCaster, SpellExecutor,
+│   │                        SpellTargeting, SpellIndicator, SignatureAbility, SpellVfx
 │   ├── Movement/            CharacterMovement
 │   ├── Controls/            PlayerCommandInput, ClickMarker, RangeIndicator
-│   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO)…
+│   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO), TimedModifiers…
 │   └── UI/                  PlayerHud, ElementBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
-│                            Panels/MainMenuPanel, DebugTools/CharacterDebugPanel
+│                            Panels/ (MainMenuPanel, PauseMenu, OptionsPanel, OptionsView), DebugTools/CharacterDebugPanel
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
 ├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, TestSceneSetup, BuildScript
 ├── Data/                    Settings/ (GameFlowSettings, CameraSettings, ControlsSettings, SpellSettings, VContainerSettings),
-│                            Elements/ (Elem_Fire…), Spells/FireElectricityWind/ (19 Spell_…, SpellBook_…),
+│                            Elements/ (Elem_Fire…), Spells/FireElectricityWind/ (19 Spell_…, SpellBook_…), Spells/Signature/Spell_Flash,
 │                            Progression/ExperienceCurve, Characters/TestHero/ (Char_TestHero…),
 │                            Characters/TrainingDummy/ (Enemy_TrainingDummy : 1000 PV, 30 armure/RM, 150 XP)
 ├── GameAssets/ActionMaps/   Game.Input — GameActionMaps (.inputactions + C# généré)
 ├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy),
-│                            Combat/Projectile_ArcaneBolt
-├── GraphicAssets/           Sprites/ (Characters/…, Elements/…, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
+│                            Combat/ (Projectile_ArcaneBolt, Projectile_Skillshot, Vfx_SpellShape)
+├── GraphicAssets/           Sprites/ (Characters/…, Elements/…, Spells/Spell_Flash, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
 ├── Scenes/                  Releases/Menu, Tests/TestScene (+ Releases/Game : ancienne scène WASD, hors build)
 ├── Tests/                   EditMode/, PlayMode/
 └── UI Toolkit/   Settings/
@@ -1249,7 +1274,7 @@ Points restants (connus) :
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
 - *Tools > Build Linux (Test Scene)* / *(Game)* : builds standalone.
 - *Tools > Regenerate Input Actions Code* : régénère `GameActionMaps.cs` (§4.7).
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset).
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, quick cast avec indicateur (maintien → visée, relâchement → lancer, Échap pendant le maintien, mode Normal), Flash à distance fixe puis en cooldown, Flash dans un mur, Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (mode de lancement par défaut, sauvegarde / rechargement JSON) et le point visé à portée fixe en EditMode.
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 
@@ -1263,8 +1288,8 @@ Map **Gameplay** (les actions `Move`, `Look`, `Jump`… du template ne sont plus
 | `Cancel` | Button | Échap (annule la visée, sinon ouvre la pause) |
 | `AttackMove` | Button | Q (maintenu ; `AttackMoveEvent.Pressed` vrai à l'appui, faux au relâchement) |
 | `Element1`, `Element2`, `Element3` | Button | A, Z, E |
-| `CastSpell` | Button | R |
-| `Signature` | Button | F |
+| `CastSpell` | Button | R (appui et relâchement) |
+| `Signature` | Button | F (appui et relâchement) |
 | `ResetElements` | Button | T |
 | `Stop` | Button | S |
 | `LevelUpModifier` | Button | Ctrl gauche / droit (maintenu avec A/Z/E : dépense un point) |

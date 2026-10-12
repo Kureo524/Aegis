@@ -13,6 +13,7 @@ using Systems.Inputs;
 using Features.Flow;
 using Features.StateMachines;
 using Features.UI;
+using Features.UI.Panels;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -43,6 +44,8 @@ namespace EditorTools {
         private const string SpellsDir = "Assets/Data/Spells/FireElectricityWind";
         public const string TestSpellBookPath = SpellsDir + "/SpellBook_FireElectricityWind.asset";
         private const string ElementIconsDir = "Assets/GraphicAssets/Sprites/Elements";
+        public const string FlashPath = "Assets/Data/Spells/Signature/Spell_Flash.asset";
+        private const string FlashIconPath = "Assets/GraphicAssets/Sprites/Spells/Spell_Flash.png";
         private const string VContainerSettingsPath = SettingsDir + "/VContainerSettings.asset";
         private const string RootPrefabPath = "Assets/Prefabs/RootLifetimeScope.prefab";
         private const string ExperienceCurvePath = "Assets/Data/Progression/ExperienceCurve.asset";
@@ -76,11 +79,14 @@ namespace EditorTools {
             var controlsSettings = LoadOrCreate<ControlsSettings>(ControlsSettingsPath);
             var spellSettings = LoadOrCreate<SpellSettings>(SpellSettingsPath);
             CreateTestElementsAndSpells();
+            ConfigureTestSpells();
+            AssignSpellPrefabs(spellSettings);
             CreateTestHero();
             Character playerPrefab = CharacterPrefabSetup.CreatePlayerPrefab();
             AssignMissingHeroSprite();
             AssignMissingHeroProjectile();
             AssignMissingHeroElements();
+            AssignMissingHeroSignature();
             CreateTrainingDummy();
             Character dummyPrefab = CharacterPrefabSetup.CreateDummyPrefab();
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
@@ -245,6 +251,133 @@ namespace EditorTools {
             bookSo.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        // ---- Phase 5c: what each test spell does (placeholder balance, tuned in the assets) ----
+        private struct SpellSetup {
+            public TargetingType Targeting;
+            public float Range, Radius, Cone, CastTime, Ratio, Base, PerLevel, Speed;
+            public bool Pierce;
+            public (StatType stat, ModifierType type, float value, float duration)[] Buffs;
+        }
+
+        private static SpellSetup Shot(float range, float halfWidth, float speed, float ratio, float b, float perLevel, float cast, bool pierce = false) =>
+            new() { Targeting = TargetingType.Skillshot, Range = range, Radius = halfWidth, Speed = speed, Ratio = ratio, Base = b, PerLevel = perLevel, CastTime = cast, Pierce = pierce };
+        private static SpellSetup Zone(float range, float radius, float ratio, float b, float perLevel, float cast) =>
+            new() { Targeting = TargetingType.GroundPoint, Range = range, Radius = radius, Ratio = ratio, Base = b, PerLevel = perLevel, CastTime = cast };
+        private static SpellSetup Cone(float range, float angle, float ratio, float b, float perLevel, float cast) =>
+            new() { Targeting = TargetingType.Cone, Range = range, Cone = angle, Ratio = ratio, Base = b, PerLevel = perLevel, CastTime = cast };
+        private static SpellSetup Unit(float range, float speed, float ratio, float b, float perLevel, float cast) =>
+            new() { Targeting = TargetingType.UnitTarget, Range = range, Speed = speed, Ratio = ratio, Base = b, PerLevel = perLevel, CastTime = cast };
+        private static SpellSetup Buff(params (StatType, ModifierType, float, float)[] buffs) =>
+            new() { Targeting = TargetingType.Self, Radius = 1.5f, Buffs = buffs };
+
+        private static readonly Dictionary<string, SpellSetup> TestSpellSetups = new() {
+            ["Boule de feu"]        = Shot(9f, 0.6f, 18f, 0.6f, 60f, 15f, 0.15f),
+            ["Étincelle"]           = Unit(7f, 30f, 0.5f, 45f, 12f, 0.1f),
+            ["Rafale"]              = Cone(4.5f, 60f, 0.7f, 50f, 12f, 0.1f),
+            ["Grande boule de feu"] = Shot(10f, 1f, 16f, 0.8f, 110f, 20f, 0.25f),
+            ["Arc électrique"]      = Shot(12f, 0.4f, 35f, 0.7f, 90f, 18f, 0.15f, pierce: true),
+            ["Bourrasque"]          = Buff((StatType.MoveSpeed, ModifierType.PercentAdd, 0.3f, 4f), (StatType.AttackSpeed, ModifierType.PercentAdd, 0.25f, 4f)),
+            ["Plasma"]              = Zone(8f, 2f, 0.8f, 120f, 20f, 0.3f),
+            ["Tornade de feu"]      = Cone(6f, 50f, 0.7f, 100f, 18f, 0.2f),
+            ["Orage"]               = Zone(9f, 3f, 0.6f, 90f, 16f, 0.4f),
+            ["Météore"]             = Zone(10f, 3f, 1.1f, 220f, 35f, 0.6f),
+            ["Foudre"]              = Unit(9f, 45f, 1f, 200f, 30f, 0.3f),
+            ["Cyclone"]             = Zone(6f, 3.5f, 1f, 160f, 25f, 0.3f),
+            ["Lance de plasma"]     = Shot(14f, 0.8f, 30f, 0.9f, 170f, 28f, 0.35f, pierce: true),
+            ["Tempête de feu"]      = Cone(7f, 70f, 0.9f, 180f, 28f, 0.35f),
+            ["Surcharge"]           = Buff((StatType.MagicAttack, ModifierType.PercentAdd, 0.3f, 6f), (StatType.AttackSpeed, ModifierType.PercentAdd, 0.4f, 6f)),
+            ["Tempête électrique"]  = Zone(8f, 4f, 0.8f, 150f, 25f, 0.5f),
+            ["Souffle ardent"]      = Cone(6f, 90f, 0.8f, 150f, 25f, 0.25f),
+            ["Ouragan statique"]    = Buff((StatType.MoveSpeed, ModifierType.PercentAdd, 0.4f, 5f), (StatType.Armor, ModifierType.Flat, 30f, 5f)),
+            ["Cataclysme"]          = Zone(9f, 5f, 1.3f, 280f, 40f, 0.8f),
+        };
+
+        // Fills the 5c fields of the generated test spells, once: a spell still at the class defaults
+        // (scaling 50 / 10, ratio 0.5) has never been configured; anything else was tuned by hand.
+        private static void ConfigureTestSpells() {
+            var book = AssetDatabase.LoadAssetAtPath<SpellBook>(TestSpellBookPath);
+            if (book == null) return;
+            foreach (SpellDefinition spell in book.Spells) {
+                if (spell == null || !TestSpellSetups.TryGetValue(spell.DisplayName, out SpellSetup setup)) continue;
+                if (!(Mathf.Approximately(spell.Scaling.Base, 50f) && Mathf.Approximately(spell.Scaling.PerElementLevel, 10f)
+                      && Mathf.Approximately(spell.PowerRatio, 0.5f))) continue;
+
+                var so = new SerializedObject(spell);
+                so.FindProperty("targeting").enumValueIndex = (int)setup.Targeting;
+                so.FindProperty("range").floatValue = setup.Range;
+                so.FindProperty("radius").floatValue = setup.Radius;
+                if (setup.Cone > 0f) so.FindProperty("coneAngle").floatValue = setup.Cone;
+                so.FindProperty("castTime").floatValue = setup.CastTime;
+                so.FindProperty("canMoveWhileCasting").boolValue = setup.Targeting == TargetingType.Self;
+                so.FindProperty("powerRatio").floatValue = setup.Ratio;
+                so.FindProperty("scaling").FindPropertyRelative("Base").floatValue = setup.Base;
+                so.FindProperty("scaling").FindPropertyRelative("PerElementLevel").floatValue = setup.PerLevel;
+                if (setup.Speed > 0f) so.FindProperty("projectileSpeed").floatValue = setup.Speed;
+                so.FindProperty("pierce").boolValue = setup.Pierce;
+                so.FindProperty("color").colorValue = DominantColor(spell);
+                var buffs = setup.Buffs ?? System.Array.Empty<(StatType, ModifierType, float, float)>();
+                SerializedProperty list = so.FindProperty("buffs");
+                list.arraySize = buffs.Length;
+                for (int i = 0; i < buffs.Length; i++) {
+                    SerializedProperty b = list.GetArrayElementAtIndex(i);
+                    b.FindPropertyRelative("Stat").enumValueIndex = (int)buffs[i].Item1;
+                    b.FindPropertyRelative("Type").enumValueIndex = (int)buffs[i].Item2;
+                    b.FindPropertyRelative("Value").floatValue = buffs[i].Item3;
+                    b.FindPropertyRelative("Duration").floatValue = buffs[i].Item4;
+                }
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        // Color of the element with the most stacks in the recipe (VFX, projectile, indicator).
+        private static Color DominantColor(SpellDefinition spell) {
+            ElementCount best = default;
+            foreach (ElementCount e in spell.Recipe) if (e.Count > best.Count) best = e;
+            return best.Element != null ? best.Element.Color : Color.white;
+        }
+
+        private static void AssignSpellPrefabs(SpellSettings settings) {
+            var so = new SerializedObject(settings);
+            void Fill(string field, Object value) {
+                SerializedProperty p = so.FindProperty(field);
+                if (p.objectReferenceValue == null) p.objectReferenceValue = value;
+            }
+            Fill("homingProjectile", CharacterPrefabSetup.CreateArcaneBoltPrefab());
+            Fill("skillshotProjectile", CharacterPrefabSetup.CreateSkillshotPrefab());
+            Fill("shapeVfx", CharacterPrefabSetup.CreateShapeVfxPrefab());
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Flash (design doc §7.8): fixed-length blink towards the cursor. Created once.
+        private static SpellDefinition CreateFlash() {
+            var flash = AssetDatabase.LoadAssetAtPath<SpellDefinition>(FlashPath);
+            if (flash != null) return flash;
+            flash = CreateAsset<SpellDefinition>(FlashPath);
+            var so = new SerializedObject(flash);
+            so.FindProperty("displayName").stringValue = "Flash";
+            so.FindProperty("icon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(FlashIconPath);
+            so.FindProperty("color").colorValue = new Color(1f, 0.9f, 0.4f);
+            so.FindProperty("targeting").enumValueIndex = (int)TargetingType.GroundPoint;
+            so.FindProperty("range").floatValue = 4.5f;
+            so.FindProperty("radius").floatValue = 0.5f;
+            so.FindProperty("castTime").floatValue = 0f;
+            so.FindProperty("canMoveWhileCasting").boolValue = true;
+            so.FindProperty("cooldownOverride").floatValue = 20f;
+            so.FindProperty("kind").enumValueIndex = (int)SpellKind.Buff;
+            so.FindProperty("blink").boolValue = true;
+            so.FindProperty("fixedRange").boolValue = true;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return flash;
+        }
+
+        private static void AssignMissingHeroSignature() {
+            var hero = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath);
+            if (hero == null || hero.SignatureAbility != null) return;
+            var so = new SerializedObject(hero);
+            so.FindProperty("signatureAbility").objectReferenceValue = CreateFlash();
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         // Only fills empty slots: never replaces elements or a spell book chosen by hand.
         private static void AssignMissingHeroElements() {
             var hero = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath);
@@ -363,12 +496,22 @@ namespace EditorTools {
         }
 
         // The Menu scene used to hold its own GameFlowStateMachine; it now lives on the root prefab.
+        // It also gets the options screen (Settings button) above the main menu.
         private static void MigrateMenuScene() {
             var scene = EditorSceneManager.OpenScene(MenuScenePath, OpenSceneMode.Single);
             bool dirty = false;
             foreach (GameObject go in scene.GetRootGameObjects()) {
                 if (go.GetComponent<GameFlowStateMachine>() == null) continue;
                 Object.DestroyImmediate(go);
+                dirty = true;
+            }
+
+            var scope = Object.FindFirstObjectByType<MenuLifetimeScope>();
+            if (scope != null && scope.optionsPanel == null) {
+                var options = Object.FindFirstObjectByType<OptionsPanel>();
+                if (options == null) options = TestSceneSetup.CreateOverlayDocument<OptionsPanel>("OptionsPanel");
+                scope.optionsPanel = options;
+                EditorUtility.SetDirty(scope);
                 dirty = true;
             }
             if (dirty) EditorSceneManager.SaveScene(scene);

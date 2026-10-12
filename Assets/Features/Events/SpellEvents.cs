@@ -69,3 +69,43 @@ namespace Features.Events {
         public GameplayFeedbackEvent(string message) => Message = message;
     }
 }
+
+namespace Features.Events {
+    /// <summary>Which aiming mode the player is in: Q, R and F aims are exclusive (design doc §7.4).</summary>
+    public enum AimMode { None, AttackMove, Spell, Signature }
+
+    public readonly struct AimModeEvent : Systems.EventBusses.IEvent {
+        public readonly AimMode Mode;
+        public AimModeEvent(AimMode mode) => Mode = mode;
+    }
+
+    public enum CooldownSlot { Elemental, Signature }
+
+    /// <summary>A player cooldown started (HUD counts down from Duration).</summary>
+    public readonly struct CooldownStartedEvent : Systems.EventBusses.IEvent {
+        public readonly CooldownSlot Slot;
+        public readonly float Duration;
+
+        public CooldownStartedEvent(CooldownSlot slot, float duration) {
+            Slot = slot;
+            Duration = duration;
+        }
+    }
+
+    /// <summary>The player's signature ability (F), for the HUD.</summary>
+    public readonly struct SignatureAssignedEvent : Systems.EventBusses.IEvent {
+        public readonly Spells.SpellDefinition Spell;
+        public SignatureAssignedEvent(Spells.SpellDefinition spell) => Spell = spell;
+    }
+
+    /// <summary>A spell took effect (design doc §14.3): passives, audio, VFX.</summary>
+    public readonly struct SpellCastEvent : Systems.EventBusses.IEvent {
+        public readonly Spells.SpellDefinition Spell;
+        public readonly bool ByPlayer;
+
+        public SpellCastEvent(Spells.SpellDefinition spell, bool byPlayer) {
+            Spell = spell;
+            ByPlayer = byPlayer;
+        }
+    }
+}

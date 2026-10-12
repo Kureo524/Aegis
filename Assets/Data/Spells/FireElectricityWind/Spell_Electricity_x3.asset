@@ -14,7 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
   displayName: Foudre
   icon: {fileID: 0}
-  kind: 0
+  color: {r: 1, g: 0.88, b: 0.25, a: 1}
   recipe:
   - Element: {fileID: 11400000, guid: 98103e74f2cbae5ca997b11d08750fe1, type: 2}
     Count: 3
+  targeting: 4
+  range: 9
+  radius: 0
+  coneAngle: 60
+  castTime: 0.3
+  canMoveWhileCasting: 0
+  cooldownOverride: 0
+  kind: 0
+  powerRatio: 1
+  scaling:
+    Base: 200
+    PerElementLevel: 30
+  buffs: []
+  projectileSpeed: 45
+  pierce: 0
+  blink: 0

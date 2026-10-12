@@ -44,12 +44,15 @@ namespace Systems.Inputs {
             g.Element2.performed        += OnElement2;
             g.Element3.performed        += OnElement3;
             g.CastSpell.performed       += OnCastSpell;
+            g.CastSpell.canceled        += OnCastSpell;
             g.Signature.performed       += OnSignature;
+            g.Signature.canceled        += OnSignature;
             g.ResetElements.performed   += OnResetElements;
             g.Stop.performed            += OnStop;
             g.CameraLock.performed      += OnCameraLock;
             g.Zoom.performed            += OnZoom;
             g.Zoom.canceled             += OnZoom;
+            _input.UI.Cancel.performed  += OnUiCancel;
 
             _input.Disable();
         }
@@ -83,12 +86,15 @@ namespace Systems.Inputs {
             g.Element2.performed        -= OnElement2;
             g.Element3.performed        -= OnElement3;
             g.CastSpell.performed       -= OnCastSpell;
+            g.CastSpell.canceled        -= OnCastSpell;
             g.Signature.performed       -= OnSignature;
+            g.Signature.canceled        -= OnSignature;
             g.ResetElements.performed   -= OnResetElements;
             g.Stop.performed            -= OnStop;
             g.CameraLock.performed      -= OnCameraLock;
             g.Zoom.performed            -= OnZoom;
             g.Zoom.canceled             -= OnZoom;
+            _input.UI.Cancel.performed  -= OnUiCancel;
 
             _input.Disable();
             // The generated Dispose() uses Object.Destroy, which is refused outside Play mode (tests)
@@ -111,11 +117,12 @@ namespace Systems.Inputs {
         private void OnElement3(InputAction.CallbackContext ctx)       => PublishElementKey(2);
         private void PublishElementKey(int slot) =>
             _eventBus.Publish(new ElementKeyEvent(slot, levelUp: _input.Gameplay.LevelUpModifier.IsPressed()));
-        private void OnCastSpell(InputAction.CallbackContext ctx)      => _eventBus.Publish(new CastSpellEvent());
-        private void OnSignature(InputAction.CallbackContext ctx)      => _eventBus.Publish(new SignatureEvent());
+        private void OnCastSpell(InputAction.CallbackContext ctx)      => _eventBus.Publish(new CastSpellEvent(released: ctx.canceled));
+        private void OnSignature(InputAction.CallbackContext ctx)      => _eventBus.Publish(new SignatureEvent(released: ctx.canceled));
         private void OnResetElements(InputAction.CallbackContext ctx)  => _eventBus.Publish(new ResetElementsEvent());
         private void OnStop(InputAction.CallbackContext ctx)           => _eventBus.Publish(new StopEvent());
         private void OnCameraLock(InputAction.CallbackContext ctx)     => _eventBus.Publish(new CameraLockEvent());
+        private void OnUiCancel(InputAction.CallbackContext ctx)       => _eventBus.Publish(new UiCancelEvent());
         /// <summary>Moves every single-letter keyboard binding to where that letter is on <paramref name="layout"/>.</summary>
         public static void ApplyKeyboardLayout(InputActionAsset asset, KeyboardLayout layout) {
             const string prefix = "<Keyboard>/";

@@ -30,6 +30,8 @@ namespace EditorTools {
         public const string PlaceholderSpritePath = "Assets/GraphicAssets/Sprites/Characters/Placeholder_Hero.png";
         public const string WhiteSpritePath = "Assets/GraphicAssets/Sprites/UI/White.png";
         public const string ArcaneBoltPrefabPath = "Assets/Prefabs/Combat/Projectile_ArcaneBolt.prefab";
+        public const string SkillshotPrefabPath = "Assets/Prefabs/Combat/Projectile_Skillshot.prefab";
+        public const string ShapeVfxPrefabPath = "Assets/Prefabs/Combat/Vfx_SpellShape.prefab";
         private const string ArcaneBoltSpritePath = "Assets/GraphicAssets/Sprites/VFX/Arcane_Bolt.png";
         private const string UnlitMaterialPath = "Assets/GraphicAssets/Materials/Unlit_Sprite.mat";
         private const string ClickMarkerPath = "Assets/Prefabs/ClickMarker.prefab";
@@ -68,6 +70,20 @@ namespace EditorTools {
                 RangeIndicator indicator = root.GetComponentInChildren<RangeIndicator>(true);
                 if (indicator == null) indicator = CreateRangeIndicator(root.transform);
                 input.rangeIndicator = indicator;
+
+                var character = root.GetComponent<Character>();
+                var spellCaster = root.GetComponent<SpellCaster>();
+                input.spellCaster = spellCaster;
+
+                SpellIndicator shape = root.GetComponentInChildren<SpellIndicator>(true);
+                if (shape == null) shape = CreateSpellIndicator(root.transform);
+
+                if (!root.TryGetComponent(out SpellTargeting targeting)) targeting = root.AddComponent<SpellTargeting>();
+                SetRefs(targeting, ("owner", character), ("indicator", shape), ("rangeIndicator", indicator));
+                SetRefs(caster, ("owner", character), ("targeting", targeting), ("caster", spellCaster));
+
+                if (!root.TryGetComponent(out SignatureAbility signature)) signature = root.AddComponent<SignatureAbility>();
+                SetRefs(signature, ("owner", character), ("targeting", targeting), ("caster", spellCaster));
             });
             return AssetDatabase.LoadAssetAtPath<Character>(PlayerPrefabPath);
         }
@@ -105,11 +121,93 @@ namespace EditorTools {
                 HealthBarView bar = root.GetComponentInChildren<HealthBarView>(true);
                 if (bar == null) bar = CreateHealthBar(root.transform);
 
+                if (!root.TryGetComponent(out SpellCaster spellCaster)) spellCaster = root.AddComponent<SpellCaster>();
+                var casterSo = new SerializedObject(spellCaster);
+                casterSo.FindProperty("owner").objectReferenceValue = character;
+                casterSo.FindProperty("movement").objectReferenceValue = movement;
+                casterSo.FindProperty("attacker").objectReferenceValue = attacker;
+                casterSo.FindProperty("visual").objectReferenceValue = visual;
+                casterSo.ApplyModifiedPropertiesWithoutUndo();
+
                 var characterSo = new SerializedObject(character);
                 characterSo.FindProperty("attacker").objectReferenceValue = attacker;
                 characterSo.FindProperty("healthBar").objectReferenceValue = bar;
                 characterSo.ApplyModifiedPropertiesWithoutUndo();
             });
+        }
+
+        private static void SetRefs(Object target, params (string field, Object value)[] refs) {
+            var so = new SerializedObject(target);
+            foreach (var (field, value) in refs) so.FindProperty(field).objectReferenceValue = value;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static SpellIndicator CreateSpellIndicator(Transform parent) {
+            var go = new GameObject("SpellIndicator");
+            go.transform.SetParent(parent, false);
+            var line = go.AddComponent<LineRenderer>();
+            line.sharedMaterial = UnlitMaterial();
+            line.widthMultiplier = 0.08f;
+            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            line.receiveShadows = false;
+            line.sortingOrder = 51;
+            var indicator = go.AddComponent<SpellIndicator>();
+            go.SetActive(false);
+            return indicator;
+        }
+
+        /// <summary>Straight spell projectile (skillshots): same look as the arcane bolt, tinted per spell.</summary>
+        public static SkillshotProjectile CreateSkillshotPrefab() {
+            if (!File.Exists(SkillshotPrefabPath)) {
+                GameObject root = BuildBoltVisuals("Projectile_Skillshot", out SpriteRenderer sprite, out TrailRenderer trail);
+                trail.widthCurve = AnimationCurve.Linear(0f, 0.35f, 1f, 0f);
+                trail.time = 0.18f;
+                sprite.transform.localScale = Vector3.one * 1.4f;
+                var projectile = root.AddComponent<SkillshotProjectile>();
+                SetRefs(projectile, ("sprite", sprite), ("trail", trail));
+                PrefabUtility.SaveAsPrefabAsset(root, SkillshotPrefabPath);
+                Object.DestroyImmediate(root);
+            }
+            return AssetDatabase.LoadAssetAtPath<SkillshotProjectile>(SkillshotPrefabPath);
+        }
+
+        /// <summary>Ground shape flash of spells (rings, cones).</summary>
+        public static SpellVfx CreateShapeVfxPrefab() {
+            if (!File.Exists(ShapeVfxPrefabPath)) {
+                Directory.CreateDirectory(Path.GetDirectoryName(ShapeVfxPrefabPath)!);
+                var root = new GameObject("Vfx_SpellShape");
+                var line = root.AddComponent<LineRenderer>();
+                line.sharedMaterial = UnlitMaterial();
+                line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                line.receiveShadows = false;
+                line.sortingOrder = 52;
+                root.AddComponent<SpellVfx>();
+                PrefabUtility.SaveAsPrefabAsset(root, ShapeVfxPrefabPath);
+                Object.DestroyImmediate(root);
+            }
+            return AssetDatabase.LoadAssetAtPath<SpellVfx>(ShapeVfxPrefabPath);
+        }
+
+        private static GameObject BuildBoltVisuals(string name, out SpriteRenderer sprite, out TrailRenderer trail) {
+            Directory.CreateDirectory(Path.GetDirectoryName(ArcaneBoltPrefabPath)!);
+            var root = new GameObject(name);
+
+            var visual = new GameObject("Visual");
+            visual.transform.SetParent(root.transform, false);
+            sprite = visual.AddComponent<SpriteRenderer>();
+            sprite.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ArcaneBoltSpritePath);
+            sprite.sortingOrder = 60;
+            visual.AddComponent<Billboard>();
+
+            trail = root.AddComponent<TrailRenderer>();
+            trail.sharedMaterial = UnlitMaterial();
+            trail.time = 0.12f;
+            trail.minVertexDistance = 0.05f;
+            trail.widthCurve = AnimationCurve.Linear(0f, 0.22f, 1f, 0f);
+            trail.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            trail.receiveShadows = false;
+            trail.sortingOrder = 59;
+            return root;
         }
 
         private static RangeIndicator CreateRangeIndicator(Transform parent) {
@@ -161,6 +259,10 @@ namespace EditorTools {
                 PrefabUtility.SaveAsPrefabAsset(root, ArcaneBoltPrefabPath);
                 Object.DestroyImmediate(root);
             }
+            EditPrefab(ArcaneBoltPrefabPath, root => {
+                var projectile = root.GetComponent<Projectile>();
+                SetRefs(projectile, ("sprite", root.GetComponentInChildren<SpriteRenderer>(true)));
+            });
             return AssetDatabase.LoadAssetAtPath<Projectile>(ArcaneBoltPrefabPath);
         }
 

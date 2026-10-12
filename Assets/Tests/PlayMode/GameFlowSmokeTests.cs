@@ -295,6 +295,237 @@ namespace Game.Tests.PlayMode {
             }
         }
 
+        private static Vector2 ScreenOf(Vector3 world) =>
+            Object.FindFirstObjectByType<CameraController>().GetComponent<Camera>().WorldToScreenPoint(world);
+
+        [UnityTest]
+        public IEnumerator Fireball_HitsTheAimedDummy_PaysMana_StartsTheCooldown_ClearsTheSelection() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var dummy = FindDummy(player);
+            var caster = player.GetComponent<Features.Spells.ElementCaster>();
+            var bus = Root.Resolve<IEventBus>();
+
+            bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0, levelUp: true));   // unlock Fire
+            bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));                  // A
+            Assert.AreEqual("Boule de feu", caster.ResolvedSpell.DisplayName);
+            float manaBefore = player.Mana.Current;
+            float cost = caster.CurrentManaCost;
+
+            bus.Publish(new Systems.Inputs.Events.CastSpellEvent());                     // R: aim
+            var targeting = player.GetComponent<Features.Spells.SpellTargeting>();
+            Assert.IsTrue(targeting.IsAiming);
+            bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(dummy.transform.position)));   // left click on it
+            Assert.IsFalse(targeting.IsAiming);
+
+            yield return new WaitForSeconds(1f);
+            Assert.Less(dummy.Health.Current, dummy.Health.Max, "Fireball hit the dummy");
+            Assert.AreEqual(manaBefore - cost, player.Mana.Current, 2.5f, "mana paid (plus ~1 s of regen at 1.5/s)");
+            Assert.AreEqual(0, caster.Selection.Total, "selection cleared after the cast");
+            Assert.Greater(caster.CooldownRemaining, 0f, "shared elemental cooldown");
+
+            string feedback = null;
+            using (bus.Subscribe<Features.Events.GameplayFeedbackEvent>(e => feedback = e.Message)) {
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));
+                bus.Publish(new Systems.Inputs.Events.CastSpellEvent());
+            }
+            Assert.IsFalse(targeting.IsAiming, "on cooldown: no aim");
+            StringAssert.Contains("recharge", feedback);
+        }
+
+        [UnityTest]
+        public IEnumerator SelfBuff_IsCastAtOnce_AndWearsOff() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var bus = Root.Resolve<IEventBus>();
+            float speed = player.Stats.Value(Features.Stats.StatType.MoveSpeed);
+
+            bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(2, levelUp: true));   // unlock Wind
+            bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(2));
+            bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(2));                  // Wind x2 = Bourrasque (Self)
+            bus.Publish(new Systems.Inputs.Events.CastSpellEvent());
+
+            Assert.IsFalse(player.GetComponent<Features.Spells.SpellTargeting>().IsAiming, "Self spell: no aim");
+            Assert.AreEqual(speed * 1.3f, player.Stats.Value(Features.Stats.StatType.MoveSpeed), 1e-3f, "+30% move speed");
+            yield return new WaitForSeconds(4.3f);
+            Assert.AreEqual(speed, player.Stats.Value(Features.Stats.StatType.MoveSpeed), 1e-3f, "buff expired");
+        }
+
+        [UnityTest]
+        public IEnumerator Flash_AlwaysBlinksItsFullRange_TowardsTheCursor_ThenGoesOnCooldown() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var bus = Root.Resolve<IEventBus>();
+            var signature = player.GetComponent<Features.Spells.SignatureAbility>();
+            Vector3 start = player.transform.position;
+
+            bus.Publish(new Systems.Inputs.Events.SignatureEvent());                     // F: aim
+            bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(start + new Vector3(-1.5f, 0f, 0f))));   // cursor close by
+            yield return null;
+
+            Vector3 moved = player.transform.position - start;
+            moved.y = 0f;
+            Assert.AreEqual(signature.Spell.Range, moved.magnitude, 0.3f, "full Flash range, however close the cursor");
+            Assert.Less(moved.x, -4f, "towards the cursor");
+            Assert.Greater(signature.CooldownRemaining, 19f);
+
+            bus.Publish(new Systems.Inputs.Events.SignatureEvent());
+            Assert.IsFalse(player.GetComponent<Features.Spells.SpellTargeting>().IsAiming, "on cooldown");
+        }
+
+        [UnityTest]
+        public IEnumerator Flash_IntoAWall_LandsOnTheLastWalkableSpot() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var bus = Root.Resolve<IEventBus>();
+            // Wall_Front spans z 5.5..6.5: from z = 1.5 a full Flash (4.5) would end inside it.
+            player.GetComponent<Features.Movement.CharacterMovement>().Teleport(new Vector3(0f, 0f, 1.5f));
+            yield return null;
+            Vector3 start = player.transform.position;
+
+            bus.Publish(new Systems.Inputs.Events.SignatureEvent());
+            bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(start + new Vector3(0f, 0f, 2f))));
+            yield return null;
+
+            float z = player.transform.position.z;
+            Assert.Less(z, 5.5f, "not inside the wall");
+            Assert.Greater(z, 4f, "went as far as it could");
+            Assert.Greater(player.GetComponent<Features.Spells.SignatureAbility>().CooldownRemaining, 19f);
+        }
+
+        [UnityTest]
+        public IEnumerator QuickCast_CastsAtOnceTowardsTheCursor() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var options = Root.Resolve<Features.Options.UserOptions>();
+            Systems.Inputs.CastMode previous = options.CastMode;
+            options.CastMode = Systems.Inputs.CastMode.Quick;
+            try {
+                var player = FindPlayer();
+                var dummy = FindDummy(player);
+                var caster = player.GetComponent<Features.Spells.ElementCaster>();
+                var bus = Root.Resolve<IEventBus>();
+
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0, levelUp: true));
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));
+                float manaBefore = player.Mana.Current;
+                float cost = caster.CurrentManaCost;
+                bus.Publish(new Systems.Inputs.Events.PointerPositionEvent(ScreenOf(dummy.transform.position)));
+                bus.Publish(new Systems.Inputs.Events.CastSpellEvent());                 // R: no aim, cast now
+
+                Assert.IsFalse(player.GetComponent<Features.Spells.SpellTargeting>().IsAiming, "quick cast: no aiming");
+                Assert.AreEqual(manaBefore - cost, player.Mana.Current, 0.5f, "mana paid at once");
+                Assert.Greater(caster.CooldownRemaining, 0f);
+                yield return new WaitForSeconds(1f);
+                Assert.Less(dummy.Health.Current, dummy.Health.Max, "Fireball hit the dummy under the cursor");
+            }
+            finally {
+                options.CastMode = previous;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator QuickCastWithIndicator_AimsWhileHeld_CastsOnRelease() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var options = Root.Resolve<Features.Options.UserOptions>();
+            Systems.Inputs.CastMode previous = options.CastMode;
+            options.CastMode = Systems.Inputs.CastMode.QuickWithIndicator;
+            try {
+                var player = FindPlayer();
+                var dummy = FindDummy(player);
+                var caster = player.GetComponent<Features.Spells.ElementCaster>();
+                var targeting = player.GetComponent<Features.Spells.SpellTargeting>();
+                var signature = player.GetComponent<Features.Spells.SignatureAbility>();
+                var bus = Root.Resolve<IEventBus>();
+
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0, levelUp: true));
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));
+                float manaBefore = player.Mana.Current;
+                bus.Publish(new Systems.Inputs.Events.PointerPositionEvent(ScreenOf(dummy.transform.position)));
+
+                bus.Publish(new Systems.Inputs.Events.CastSpellEvent());                 // R held: range shown
+                Assert.IsTrue(targeting.IsAiming, "aiming while R is held");
+                yield return null;
+                Assert.Less(manaBefore - player.Mana.Current, 1f, "nothing paid while held");
+                bus.Publish(new Systems.Inputs.Events.CastSpellEvent(released: true));   // R released: cast
+                Assert.IsFalse(targeting.IsAiming);
+                Assert.Greater(caster.CooldownRemaining, 0f, "cast on release");
+                yield return new WaitForSeconds(1f);
+                Assert.Less(dummy.Health.Current, dummy.Health.Max, "Fireball hit the dummy under the cursor");
+
+                // Escape while holding F: releasing it afterwards casts nothing
+                bus.Publish(new Systems.Inputs.Events.SignatureEvent());
+                bus.Publish(new Systems.Inputs.Events.CancelEvent());
+                bus.Publish(new Systems.Inputs.Events.SignatureEvent(released: true));
+                Assert.AreEqual(0f, signature.CooldownRemaining, "cancelled: no Flash");
+
+                // Normal mode: releasing the key keeps the aim, the left click casts
+                options.CastMode = Systems.Inputs.CastMode.Normal;
+                bus.Publish(new Systems.Inputs.Events.SignatureEvent());
+                bus.Publish(new Systems.Inputs.Events.SignatureEvent(released: true));
+                Assert.IsTrue(targeting.IsAiming, "Normal: still aiming after the release");
+                targeting.Cancel();
+            }
+            finally {
+                options.CastMode = previous;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Escape_CancelsTheAimFirst_ThenPauses_AndThePauseMenuLeadsBackOrToTheMenu() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var machine = Root.Resolve<GameFlowStateMachine>();
+            var bus = Root.Resolve<IEventBus>();
+            var player = FindPlayer();
+            var pauseMenu = Object.FindFirstObjectByType<Features.UI.Panels.PauseMenu>();
+            Assert.IsNotNull(pauseMenu);
+
+            bus.Publish(new Systems.Inputs.Events.SignatureEvent());                     // F: aim
+            bus.Publish(new Systems.Inputs.Events.CancelEvent());
+            Assert.IsFalse(player.GetComponent<Features.Spells.SpellTargeting>().IsAiming, "aim cancelled");
+            Assert.AreEqual(GameState.Game, machine.CurrentState, "Escape with an aim does not pause");
+
+            yield return null;
+            bus.Publish(new Systems.Inputs.Events.CancelEvent());
+            Assert.AreEqual(GameState.Pause, machine.CurrentState);
+            Assert.AreEqual(0f, Time.timeScale);
+            Assert.IsTrue(pauseMenu.IsOpen);
+
+            pauseMenu.ShowOptions(true);
+            bus.Publish(new Systems.Inputs.Events.UiCancelEvent());                      // back from the options
+            Assert.IsFalse(pauseMenu.OptionsOpen);
+            Assert.AreEqual(GameState.Pause, machine.CurrentState);
+            bus.Publish(new Systems.Inputs.Events.UiCancelEvent());                      // resume
+            Assert.AreEqual(GameState.Game, machine.CurrentState);
+            Assert.AreEqual(1f, Time.timeScale);
+            Assert.IsFalse(pauseMenu.IsOpen);
+
+            bus.Publish(new PauseRequestedEvent());
+            bus.Publish(new MainMenuRequestedEvent());
+            yield return WaitFor(() => machine.CurrentState == GameState.Menu && SceneManager.GetActiveScene().name == MenuScene);
+            Assert.AreEqual(1f, Time.timeScale);
+        }
+
+        [UnityTest]
+        public IEnumerator MainMenu_SettingsButton_OpensTheOptions_EscapeClosesThem() {
+            yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
+            var machine = Root.Resolve<GameFlowStateMachine>();
+            yield return WaitFor(() => machine.HasState && machine.CurrentState == GameState.Menu);
+            var panel = Object.FindFirstObjectByType<Features.UI.Panels.OptionsPanel>();
+            Assert.IsNotNull(panel, "OptionsPanel in the Menu scene");
+
+            Root.Resolve<IEventBus>().Publish(new OptionsRequestedEvent());
+            Assert.IsTrue(panel.IsOpen);
+            Root.Resolve<IEventBus>().Publish(new Systems.Inputs.Events.UiCancelEvent());
+            Assert.IsFalse(panel.IsOpen);
+        }
+
         [UnityTest]
         public IEnumerator Menu_Play_LoadsGameScene() {
             yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);

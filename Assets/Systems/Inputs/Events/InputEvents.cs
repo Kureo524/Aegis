@@ -30,6 +30,9 @@ namespace Systems.Inputs.Events {
     }
     
     public readonly struct CancelEvent : IEvent { }
+
+    /// <summary>Escape while a menu has the input (UI map): back / close.</summary>
+    public readonly struct UiCancelEvent : IEvent { }
     
     /// <summary>Attack-move key (Q) pressed or released: aiming lasts while it is held.</summary>
     public readonly struct AttackMoveEvent : IEvent {
@@ -48,9 +51,17 @@ namespace Systems.Inputs.Events {
         }
     }
     
-    public readonly struct CastSpellEvent : IEvent { }
+    /// <summary>R pressed, or released (Released: casts in the "quick cast with indicator" mode).</summary>
+    public readonly struct CastSpellEvent : IEvent {
+        public readonly bool Released;
+        public CastSpellEvent(bool released) => Released = released;
+    }
     
-    public readonly struct SignatureEvent : IEvent { }
+    /// <summary>F pressed, or released (see <see cref="CastSpellEvent"/>).</summary>
+    public readonly struct SignatureEvent : IEvent {
+        public readonly bool Released;
+        public SignatureEvent(bool released) => Released = released;
+    }
     
     public readonly struct ResetElementsEvent : IEvent { }
     

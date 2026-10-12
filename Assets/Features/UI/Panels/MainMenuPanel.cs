@@ -85,7 +85,7 @@ namespace Features.UI.Panels {
             _eventBus.Publish(new PlayRequestedEvent());
         }
 
-        private void OnSettings() { }   // Settings screen not implemented yet
+        private void OnSettings() => _eventBus.Publish(new OptionsRequestedEvent());
 
         private void OnQuit() => _eventBus.Publish(new QuitRequestedEvent());
 

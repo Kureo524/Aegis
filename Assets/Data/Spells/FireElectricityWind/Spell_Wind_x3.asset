@@ -14,7 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
   displayName: Cyclone
   icon: {fileID: 0}
-  kind: 1
+  color: {r: 0.55, g: 0.95, b: 0.9, a: 1}
   recipe:
   - Element: {fileID: 11400000, guid: d5eff05456af63b8e8b1123fe0fbe3f9, type: 2}
     Count: 3
+  targeting: 2
+  range: 6
+  radius: 3.5
+  coneAngle: 60
+  castTime: 0.3
+  canMoveWhileCasting: 0
+  cooldownOverride: 0
+  kind: 1
+  powerRatio: 1
+  scaling:
+    Base: 160
+    PerElementLevel: 25
+  buffs: []
+  projectileSpeed: 18
+  pierce: 0
+  blink: 0

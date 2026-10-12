@@ -1,6 +1,8 @@
 using Features.Characters;
 using Features.Combat;
+using Features.Events;
 using Features.Movement;
+using Features.Spells;
 using Features.Stats;
 using Systems.EventBusses;
 using Systems.Inputs.Events;
@@ -29,6 +31,7 @@ namespace Features.Controls {
         [Tooltip("Attack-move: an enemy this close to the clicked point becomes the first target.")]
         [SerializeField] public float attackMoveSelectRadius = 2f;
         [SerializeField] public RangeIndicator rangeIndicator;
+        [SerializeField] public SpellCaster spellCaster;
         [SerializeField] public GameObject clickMarkerPrefab;   // must carry a ClickMarker
 
         private IEventBus _eventBus;
@@ -36,6 +39,7 @@ namespace Features.Controls {
         private Camera _camera;
         private readonly DisposableBag _subscriptions = new();
         private bool _aimingAttackMove;
+        private bool _otherAimActive;   // R / F aiming: right click belongs to it
         private ClickMarker _currentMarker;
         private Plane _groundPlane;
         private readonly RaycastHit[] _rayHits = new RaycastHit[16];
@@ -60,12 +64,17 @@ namespace Features.Controls {
             }));
             _subscriptions.Add(_eventBus.Subscribe<ConfirmEvent>(OnConfirm));
             _subscriptions.Add(_eventBus.Subscribe<CancelEvent>(_ => StopAiming()));
+            _subscriptions.Add(_eventBus.Subscribe<AimModeEvent>(e => {
+                _otherAimActive = e.Mode is AimMode.Spell or AimMode.Signature;
+                if (_otherAimActive && _aimingAttackMove) StopAiming();
+            }));
         }
 
         private void OnDestroy() => _subscriptions.Dispose();
 
         private void StartAimingAttackMove() {
             if (!character.IsAlive) return;
+            _eventBus.Publish(new AimModeEvent(AimMode.AttackMove));   // cancels an R / F aim
             _aimingAttackMove = true;
             if (rangeIndicator != null) rangeIndicator.Show(character.Stats.Value(StatType.AttackRange));
         }
@@ -76,7 +85,7 @@ namespace Features.Controls {
         }
 
         private void OnConfirm(ConfirmEvent evt) {
-            if (!_aimingAttackMove) return;
+            if (!_aimingAttackMove || OrdersBlocked) return;
             if (!TryGetGroundPoint(evt.ScreenPosition, out Ray _, out Vector3 point)) return;
 
             Character preferred = ClosestEnemy(point, attackMoveSelectRadius);
@@ -94,11 +103,12 @@ namespace Features.Controls {
         private void OnPointerCommand(PointerCommandEvent evt) {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
 
-            // Right click while aiming only cancels the aim (§4.6)
+            // Right click while aiming only cancels the aim (§4.6); during an R / F aim it belongs to it
             if (_aimingAttackMove) {
                 StopAiming();
                 return;
             }
+            if (_otherAimActive || OrdersBlocked) return;
 
             if (!TryGetGroundPoint(evt.ScreenPosition, out Ray ray, out Vector3 worldPoint)) return;
 
@@ -113,37 +123,15 @@ namespace Features.Controls {
             ShowMarker(worldPoint, Color.green);
         }
 
+        // A cast in progress (without CanMoveWhileCasting) freezes the character's orders
+        private bool OrdersBlocked => spellCaster != null && spellCaster.BlocksOrders;
+
         // Enemy under the cursor, else the closest one within pickRadius of the clicked point (§4.3).
-        private Character PickEnemy(Ray ray, Vector3 groundPoint) {
-            Character best = null;
-            float bestDistance = float.MaxValue;
+        private Character PickEnemy(Ray ray, Vector3 groundPoint) =>
+            TargetPicker.EnemyUnderCursor(character, ray, groundPoint, pickRadius, _rayHits, _overlapHits);
 
-            int count = Physics.RaycastNonAlloc(ray, _rayHits, 500f);
-            for (int i = 0; i < count; i++) {
-                Character c = _rayHits[i].collider.GetComponentInParent<Character>();
-                if (!IsTargetable(c) || _rayHits[i].distance >= bestDistance) continue;
-                best = c;
-                bestDistance = _rayHits[i].distance;
-            }
-            return best != null ? best : ClosestEnemy(groundPoint, pickRadius);
-        }
-
-        private Character ClosestEnemy(Vector3 groundPoint, float radius) {
-            Character best = null;
-            float bestDistance = float.MaxValue;
-            int count = Physics.OverlapSphereNonAlloc(groundPoint, radius, _overlapHits);
-            for (int i = 0; i < count; i++) {
-                Character c = _overlapHits[i].GetComponentInParent<Character>();
-                if (!IsTargetable(c)) continue;
-                float d = Vector3.Distance(groundPoint, c.transform.position);
-                if (d >= bestDistance) continue;
-                best = c;
-                bestDistance = d;
-            }
-            return best;
-        }
-
-        private bool IsTargetable(Character c) => c != null && c.IsAlive && character.IsHostileTo(c);
+        private Character ClosestEnemy(Vector3 groundPoint, float radius) =>
+            TargetPicker.ClosestEnemy(character, groundPoint, radius, _overlapHits);
 
         private void ShowMarker(Vector3 position, Color color) {
             if (clickMarkerPrefab == null) return;

@@ -25,3 +25,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d5eff05456af63b8e8b1123fe0fbe3f9, type: 2}
   elementUnlockLevels: 010000000300000005000000
   spellBook: {fileID: 11400000, guid: 160ee35b4f843680c9479b45e1e6931f, type: 2}
+  signatureAbility: {fileID: 11400000, guid: 686457718ecb8036f934c742aac8362a, type: 2}

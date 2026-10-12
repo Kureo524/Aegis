@@ -14,9 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
   displayName: Souffle ardent
   icon: {fileID: 0}
-  kind: 0
+  color: {r: 0.55, g: 0.95, b: 0.9, a: 1}
   recipe:
   - Element: {fileID: 11400000, guid: 285e684a3b80006cd82825202311105a, type: 2}
     Count: 1
   - Element: {fileID: 11400000, guid: d5eff05456af63b8e8b1123fe0fbe3f9, type: 2}
     Count: 2
+  targeting: 3
+  range: 6
+  radius: 0
+  coneAngle: 90
+  castTime: 0.25
+  canMoveWhileCasting: 0
+  cooldownOverride: 0
+  kind: 0
+  powerRatio: 0.8
+  scaling:
+    Base: 150
+    PerElementLevel: 25
+  buffs: []
+  projectileSpeed: 18
+  pierce: 0
+  blink: 0

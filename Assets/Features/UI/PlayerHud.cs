@@ -9,7 +9,8 @@ namespace Features.UI {
     /// <summary>
     /// Bottom-center player HUD (UI Toolkit), fed only by bus events:
     /// feedback line, resolved spell + mana cost, element slots (ElementBarView), level badge,
-    /// HP bar, mana bar with the cost of the current selection previewed on it (§7.3), XP bar.
+    /// HP bar, mana bar with the cost of the current selection previewed on it (§7.3), XP bar,
+    /// signature ability slot (F) and spell cooldowns (§7.9).
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class PlayerHud : MonoBehaviour {
@@ -24,6 +25,10 @@ namespace Features.UI {
         private Label _hpText, _manaText, _level, _spell, _feedback;
         private ElementBarView _elements;
         private float _feedbackUntil;
+        private VisualElement _signatureSlot, _signatureIcon, _signatureShade;
+        private Label _signatureCooldown;
+        private float _elementalReadyAt, _signatureReadyAt;
+        private Spells.SpellDefinition _signature;
 
         // Last known values: events can arrive before the UI is built
         private float _hp, _hpMax, _mana, _manaMax;
@@ -51,6 +56,12 @@ namespace Features.UI {
                 Refresh();
             }));
             _subscriptions.Add(eventBus.Subscribe<GameplayFeedbackEvent>(e => ShowFeedback(e.Message)));
+            _subscriptions.Add(eventBus.Subscribe<SignatureAssignedEvent>(e => { _signature = e.Spell; RefreshSignature(); }));
+            _subscriptions.Add(eventBus.Subscribe<CooldownStartedEvent>(e => {
+                float readyAt = Time.time + e.Duration;
+                if (e.Slot == CooldownSlot.Elemental) _elementalReadyAt = readyAt;
+                else _signatureReadyAt = readyAt;
+            }));
         }
 
         private void Start() {
@@ -71,6 +82,7 @@ namespace Features.UI {
             _elements = new ElementBarView();
             _elements.Root.style.marginBottom = 8;
             _elements.LevelUpClicked += slot => _eventBus.Publish(new ElementLevelUpRequestedEvent(slot));
+            _elements.Root.Add(BuildSignatureSlot());
 
             var row = new VisualElement { pickingMode = PickingMode.Ignore };
             row.style.flexDirection = FlexDirection.Row;
@@ -116,11 +128,58 @@ namespace Features.UI {
             if (_levels.HasValue) _elements.SetLevels(_levels.Value);
             _elements.SetSelection(_selection);
             ShowElements();
+            RefreshSignature();
             Refresh();
         }
 
+        private VisualElement BuildSignatureSlot() {
+            _signatureSlot = new VisualElement { pickingMode = PickingMode.Ignore };
+            _signatureSlot.style.width = _signatureSlot.style.height = 44;
+            _signatureSlot.style.marginLeft = 14;
+            _signatureSlot.style.alignSelf = Align.FlexEnd;
+            _signatureSlot.style.marginBottom = 9;
+            _signatureSlot.style.backgroundColor = new Color(0.08f, 0.08f, 0.12f, 0.9f);
+            UiStyles.Border(_signatureSlot, 2, new Color(0.85f, 0.70f, 0.30f), 22);
+
+            _signatureIcon = new VisualElement { pickingMode = PickingMode.Ignore };
+            UiStyles.Fill(_signatureIcon);
+            _signatureIcon.style.left = _signatureIcon.style.right = _signatureIcon.style.top = _signatureIcon.style.bottom = 6;
+            _signatureIcon.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+            _signatureSlot.Add(_signatureIcon);
+
+            _signatureShade = new VisualElement { pickingMode = PickingMode.Ignore };
+            UiStyles.Fill(_signatureShade);
+            _signatureShade.style.backgroundColor = new Color(0f, 0f, 0f, 0.6f);
+            UiStyles.Border(_signatureShade, 0, Color.clear, 22);
+            _signatureSlot.Add(_signatureShade);
+
+            _signatureCooldown = UiStyles.Text("", 15, Color.white);
+            UiStyles.Fill(_signatureCooldown);
+            _signatureCooldown.style.unityTextAlign = TextAnchor.MiddleCenter;
+            _signatureSlot.Add(_signatureCooldown);
+
+            var key = UiStyles.Text("F", 11, Color.white);
+            key.style.position = Position.Absolute;
+            key.style.right = 2;
+            key.style.bottom = 0;
+            _signatureSlot.Add(key);
+            return _signatureSlot;
+        }
+
+        private void RefreshSignature() {
+            if (_signatureSlot == null) return;
+            _signatureSlot.style.display = _signature != null ? DisplayStyle.Flex : DisplayStyle.None;
+            if (_signature != null && _signature.Icon != null) _signatureIcon.style.backgroundImage = new StyleBackground(_signature.Icon);
+        }
+
         private void Update() {
-            if (_feedback != null && _feedback.text.Length > 0 && Time.unscaledTime >= _feedbackUntil) _feedback.text = "";
+            if (_feedback == null) return;
+            if (_feedback.text.Length > 0 && Time.unscaledTime >= _feedbackUntil) _feedback.text = "";
+
+            float signatureLeft = _signatureReadyAt - Time.time;
+            _signatureShade.style.display = signatureLeft > 0f ? DisplayStyle.Flex : DisplayStyle.None;
+            _signatureCooldown.text = signatureLeft > 0f ? Mathf.CeilToInt(signatureLeft).ToString() : "";
+            if (_elementalReadyAt > 0f) Refresh();   // spell line shows the elemental cooldown
         }
 
         private void OnDestroy() => _subscriptions.Dispose();
@@ -159,8 +218,13 @@ namespace Features.UI {
 
             if (_selection.Total == 0) _spell.text = "";
             else if (_selection.Spell == null) _spell.text = "Aucun sort pour cette combinaison";
-            else _spell.text = $"{_selection.Spell.DisplayName}  ·  {Mathf.CeilToInt(cost)} mana";
-            _spell.style.color = affordable ? Color.white : new Color(1f, 0.45f, 0.4f);
+            else {
+                float cooldown = _elementalReadyAt - Time.time;
+                string ready = cooldown > 0f ? $"  ·  {cooldown:0.0} s" : "";
+                _spell.text = $"{_selection.Spell.DisplayName}  ·  {Mathf.CeilToInt(cost)} mana{ready}";
+            }
+            bool onCooldown = _elementalReadyAt - Time.time > 0f;
+            _spell.style.color = !affordable ? new Color(1f, 0.45f, 0.4f) : onCooldown ? new Color(0.7f, 0.7f, 0.75f) : Color.white;
 
             _xpFill.style.width = _xp.XpToNext > 0 ? Length.Percent(Mathf.Clamp01((float)_xp.Xp / _xp.XpToNext) * 100f) : Length.Percent(100f);
             _level.text = Math.Max(_xp.Level, 1).ToString();

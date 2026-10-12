@@ -12,6 +12,7 @@ namespace Features.Combat {
         [Tooltip("Hit when this close to the aim point.")]
         [SerializeField] private float hitDistance = 0.2f;
         [SerializeField] private TrailRenderer trail;
+        [SerializeField] private SpriteRenderer sprite;
 
         private Character _target;
         private DamageInfo _damage;
@@ -20,7 +21,7 @@ namespace Features.Combat {
         private Action<Character, float> _onHit;
 
         public void Launch(Vector3 from, Character target, in DamageInfo damage, float speed,
-                           Action<Character, float> onHit, Action<Projectile> release) {
+                           Action<Character, float> onHit, Action<Projectile> release, Color? tint = null) {
             transform.position = from;
             _target = target;
             _damage = damage;
@@ -28,6 +29,7 @@ namespace Features.Combat {
             _onHit = onHit;
             _release = release;
             if (trail != null) trail.Clear();
+            ProjectileTint.Apply(sprite, trail, tint ?? Color.white);
         }
 
         private void Update() {

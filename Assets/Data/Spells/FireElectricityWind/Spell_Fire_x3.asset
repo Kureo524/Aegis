@@ -14,7 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
   displayName: "M\xE9t\xE9ore"
   icon: {fileID: 0}
-  kind: 0
+  color: {r: 1, g: 0.45, b: 0.15, a: 1}
   recipe:
   - Element: {fileID: 11400000, guid: 285e684a3b80006cd82825202311105a, type: 2}
     Count: 3
+  targeting: 2
+  range: 10
+  radius: 3
+  coneAngle: 60
+  castTime: 0.6
+  canMoveWhileCasting: 0
+  cooldownOverride: 0
+  kind: 0
+  powerRatio: 1.1
+  scaling:
+    Base: 220
+    PerElementLevel: 35
+  buffs: []
+  projectileSpeed: 18
+  pierce: 0
+  blink: 0

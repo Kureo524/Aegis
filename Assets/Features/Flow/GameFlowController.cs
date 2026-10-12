@@ -19,8 +19,7 @@ namespace Features.Flow {
         private readonly GameFlowStateMachine _machine;
         private readonly GameFlowSettings _settings;
         private readonly IEventBus _eventBus;
-        private IDisposable _playSubscription;
-        private IDisposable _quitSubscription;
+        private readonly DisposableBag _subscriptions = new();
 
         public GameFlowController(GameFlowStateMachine machine, GameFlowSettings settings, IEventBus eventBus) {
             _machine = machine;
@@ -32,17 +31,17 @@ namespace Features.Flow {
         // entry point can request a state, so no transition is ever missed.
         public void Initialize() {
             _machine.Changed += OnStateChanged;
-            _playSubscription = _eventBus.Subscribe<PlayRequestedEvent>(_ => OnPlayRequested());
-            _quitSubscription = _eventBus.Subscribe<QuitRequestedEvent>(_ => Quit());
+            _subscriptions.Add(_eventBus.Subscribe<PlayRequestedEvent>(_ => _machine.TryChange(GameState.Loading)));
+            _subscriptions.Add(_eventBus.Subscribe<PauseRequestedEvent>(_ => _machine.TryChange(GameState.Pause)));
+            _subscriptions.Add(_eventBus.Subscribe<ResumeRequestedEvent>(_ => _machine.TryChange(GameState.Game)));
+            _subscriptions.Add(_eventBus.Subscribe<MainMenuRequestedEvent>(_ => _machine.TryChange(GameState.Menu)));
+            _subscriptions.Add(_eventBus.Subscribe<QuitRequestedEvent>(_ => Quit()));
         }
 
         public void Dispose() {
             _machine.Changed -= OnStateChanged;
-            _playSubscription?.Dispose();
-            _quitSubscription?.Dispose();
+            _subscriptions.Dispose();
         }
-
-        private void OnPlayRequested() => _machine.TryChange(GameState.Loading);
 
         private void OnStateChanged(GameState? from, GameState to) {
             _eventBus.Publish(new GameStateChangedEvent(from, to));
