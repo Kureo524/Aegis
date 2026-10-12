@@ -111,11 +111,12 @@ Le prefab de base porte aussi `BasicAttacker` et une **barre de PV** (`HealthBar
 | **Maintenir Q** + **clic gauche** | *Attack-move* (§4.6) : affiche la portée d'attaque tant que Q est maintenu ; le clic lance la marche vers le point en attaquant ce qui croise sa route |
 | **A / Z / E** | Ajoute un stack de l'élément 1 / 2 / 3 (§7) |
 | **Ctrl + A / Z / E** | Dépense un point de compétence sur l'élément (le débloque au premier point, §7.8) ; aussi via le bouton « + » du HUD |
-| **R** | Lance le sort correspondant aux éléments actifs (visée puis clic gauche, §7.4) |
-| **F** | Compétence propre du personnage (visée puis clic gauche, §7.8) |
+| **R** | Lance le sort correspondant aux éléments actifs (visée puis clic gauche, ou tout de suite vers le curseur en quick cast, §7.4) |
+| **F** | Compétence propre du personnage (visée puis clic gauche, ou quick cast, §7.8) |
 | **T** | Reset : vide la sélection d'éléments |
 | **S** | `StopCommand` (annule l'ordre en cours) |
 | **Échap / clic droit** pendant une visée | Annule la visée |
+| **Échap** sans visée | Pause (menu : Reprendre / Options / Menu principal / Quitter) ; dans la pause, Échap revient en arrière puis reprend |
 | **Espace** (ou clic molette) | Caméra **verrouillée / libre** (toggle, §4.8) |
 | **Molette** | Zoom caméra |
 | **Curseur au bord de l'écran** | Déplace la caméra quand elle est **libre** (edge scrolling façon LoL) |
@@ -217,7 +218,9 @@ Avec le **New Input System**, `<Keyboard>/q` désigne la touche à la **position
 
 **Rejeté** : les bindings par nom affiché (`<Keyboard>/#(a)`). Le player Linux ne remonte pas la disposition de l'OS (il retombe sur les noms QWERTY : en jeu, « Q » se retrouvait sur la touche A), et l'éditeur Linux segfault en `-batchmode -nographics` en les résolvant.
 
-À venir : le choix du joueur (`UserOptions`, JSON) par-dessus `ControlsSettings`, puis un **menu de rebind** complet.
+**Options du joueur** : `UserOptions` (Features/Options, root) garde les choix du joueur en JSON (`persistentDataPath/options.json`, `options.editor.json` dans l'éditeur pour ne jamais toucher aux choix de la build) par-dessus les valeurs par défaut de `ControlsSettings`. Chaque changement est sauvegardé aussitôt et publié (`UserOptionsChangedEvent`) ; les systèmes lisent la valeur au moment où ils en ont besoin. Option en place : **quick cast** (défaut `ControlsSettings.QuickCast = false`). Écran d'options : `OptionsView` (UI Toolkit construit en code), dans le menu pause en jeu et dans `OptionsPanel` (bouton Paramètres du menu principal).
+
+À venir : la disposition clavier dans les options, puis un **menu de rebind** complet.
 
 > **Wrapper C#** : `GameActionMaps.cs` est **généré** par l'Input System depuis le `.inputactions`. Après toute modification des actions : *Tools > Regenerate Input Actions Code*, et committer les deux fichiers ensemble. (L'ancien fichier était un stub écrit à la main que Unity refusait d'écraser ; le `.meta` de l'importer avait aussi des noms de champs invalides, ce qui désactivait la génération.)
 
@@ -513,9 +516,9 @@ La courbe croît plus vite que le nombre de stacks pour que chaque ajout coûte 
 - **Un seul mode de visée à la fois** : Q (attack-move), R (sort élémentaire) et F (compétence propre) sont exclusifs ; appuyer sur l'un remplace l'autre. A/Z/E/T ne sont pas des modes de visée, donc ne coupent pas Q ni F. La **compétence propre (F)** ne consomme ni ne vide la sélection d'éléments.
 - **Après un cast réussi** : la sélection est **vidée automatiquement** (`ClearAfterCast = true`).
 - **Pendant un cast** (windup) : le joueur peut déjà empiler pour le sort suivant, le sort en cours est figé.
-- **Quick cast** (option) : R lance directement vers le curseur sans passer par la visée.
+- **Quick cast** (option du joueur, menu Options) : R et F lancent directement vers le curseur sans passer par la visée ni le clic gauche. Un sort ciblé sans ennemi à portée sous le curseur est refusé (« Aucune cible »), sans rien consommer.
 
-> **En place (phase 5c)** : `ElementCaster.TryCast` (R) vérifie sélection, sort, cooldown, mana et incantation, puis vise via `SpellTargeting` (ou lance aussitôt un sort `Self`). Clic gauche : le sort résolu **à cet instant** est lancé (il suit les éléments ajoutés pendant la visée), le mana est débité (refus + sélection conservée s'il manque), le cooldown démarre, la sélection est vidée. Clic droit / Échap : visée annulée, sélection conservée ; T : visée annulée et sélection vidée. Exclusivité Q / R / F par `AimModeEvent`. Pendant une incantation (`SpellCaster`, sauf `CanMoveWhileCasting`), les ordres de déplacement / attaque sont ignorés ; on peut empiler des éléments pour le sort suivant. *Reste : quick cast, buffer d'input, stun / silence.*
+> **En place (phase 5c)** : `ElementCaster.TryCast` (R) vérifie sélection, sort, cooldown, mana et incantation, puis vise via `SpellTargeting` (ou lance aussitôt un sort `Self`). Clic gauche : le sort résolu **à cet instant** est lancé (il suit les éléments ajoutés pendant la visée), le mana est débité (refus + sélection conservée s'il manque), le cooldown démarre, la sélection est vidée. Clic droit / Échap : visée annulée, sélection conservée ; T : visée annulée et sélection vidée. Exclusivité Q / R / F par `AimModeEvent`. Pendant une incantation (`SpellCaster`, sauf `CanMoveWhileCasting`), les ordres de déplacement / attaque sont ignorés ; on peut empiler des éléments pour le sort suivant. Quick cast : `SpellTargeting.Aim` lit `UserOptions.QuickCast` et, s'il est actif, construit le contexte depuis le curseur et lance aussitôt (`CastAtCursor`). *Reste : quick cast avec indicateur (visée tant que la touche est tenue), buffer d'input, stun / silence.*
 
 ### 7.5 Résolution du sort et visée
 
@@ -1014,7 +1017,8 @@ Instance unique sur le **prefab `RootLifetimeScope`** (règles éditées là, ou
 - `PlayRequestedEvent` → `Loading` → chargement **Single** de `GameFlowSettings.GameScene` (aujourd'hui `TestScene`).
 - Chaque scène déclare l'état qu'elle représente via un **`SceneEntryPoint`** enregistré par son scope (`MenuLifetimeScope` → `Menu`, `GameLifetimeScope` → `Game`). Ainsi **n'importe quelle scène peut être lancée directement** depuis l'éditeur et passe quand même par la state machine.
 - Retour à `Menu` (depuis `Pause`, `Win`, `GameOver`) → chargement Single de `GameFlowSettings.MenuScene`.
-- `QuitRequestedEvent` (bouton Quitter du menu, bouton Quit de debug) → `Application.Quit` (arrêt du Play mode dans l'éditeur).
+- `QuitRequestedEvent` (bouton Quitter du menu, bouton Quit de debug, menu pause) → `Application.Quit` (arrêt du Play mode dans l'éditeur).
+- **Pause** : Échap en jeu (`CancelEvent`) annule d'abord la visée en cours ; sans visée, `PauseInput` (scope Game) publie `PauseRequestedEvent` → `Pause` (`TimeScaleService` met le temps à 0, `InputMapSwitcher` passe sur la map UI). `PauseMenu` (UIDocument au-dessus du HUD) : Reprendre (`ResumeRequestedEvent` → `Game`), Options, Menu principal (`MainMenuRequestedEvent` → `Menu`), Quitter. Échap dans la pause (`UiCancelEvent`, map UI) : retour depuis les options, sinon reprise.
 
 **Machine de run `RunStateMachine`** (active pendant `Game`, pilotée par `RunDirector`, §9.1) :
 
@@ -1118,9 +1122,9 @@ public sealed class EventBus : IEventBus {
 
 | Scope | Durée de vie | Contenu |
 |---|---|---|
-| `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
-| `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `SceneEntryPoint(Menu)` |
-| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `PrefabPool`, `ProjectileLauncher`, `SpellExecutor`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
+| `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, `UserOptions`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
+| `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `OptionsPanel` (UIDocument « OptionsPanel », au-dessus du menu), `SceneEntryPoint(Menu)` |
+| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `PrefabPool`, `ProjectileLauncher`, `SpellExecutor`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PauseMenu` (UIDocument « PauseMenu ») et `PauseInput`, `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
 
 VContainer crée le root **une fois**, avant le premier scope de scène, et le garde entre les chargements (`DontDestroyOnLoad`) ; un scope de scène sans `parentReference` en devient automatiquement l'enfant. Les services du root **ne doivent jamais être ré-enregistrés** dans un scope de scène (sinon deux `EventBus` coexistent et les événements se perdent).
 
@@ -1173,9 +1177,10 @@ Assets/
 │   └── UIManagement/        IPanelManager, PanelManager, OpenClosePanel
 ├── Features/                Game.Features — le jeu
 │   ├── Flow/                GameFlowController, GameFlowSettings (SO), SceneEntryPoint,
-│   │                        InputMapSwitcher, TimeScaleService, CursorConfinement
+│   │                        InputMapSwitcher, TimeScaleService, CursorConfinement, PauseInput
+│   ├── Options/             UserOptions (choix du joueur, JSON)
 │   ├── StateMachines/       GameState, GameFlowStateMachine
-│   ├── Events/              GameStateChangedEvent, PlayRequested/QuitRequested, StatChangedEvent
+│   ├── Events/              GameStateChangedEvent, requêtes de flux (Play/Pause/Resume/MainMenu/Quit, Options), StatChangedEvent
 │   ├── CameraControl/       CameraController, CameraSettings (SO), Billboard
 │   ├── Characters/          Character, CharacterDefinition / EnemyDefinition (SO), CharacterVisual, Faction,
 │   │                        PlayerSpawner, EnemySpawner, RespawnOnDeath
@@ -1189,7 +1194,7 @@ Assets/
 │   ├── Controls/            PlayerCommandInput, ClickMarker, RangeIndicator
 │   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO), TimedModifiers…
 │   └── UI/                  PlayerHud, ElementBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
-│                            Panels/MainMenuPanel, DebugTools/CharacterDebugPanel
+│                            Panels/ (MainMenuPanel, PauseMenu, OptionsPanel, OptionsView), DebugTools/CharacterDebugPanel
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
 ├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, TestSceneSetup, BuildScript
 ├── Data/                    Settings/ (GameFlowSettings, CameraSettings, ControlsSettings, SpellSettings, VContainerSettings),
@@ -1265,7 +1270,7 @@ Points restants (connus) :
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
 - *Tools > Build Linux (Test Scene)* / *(Game)* : builds standalone.
 - *Tools > Regenerate Input Actions Code* : régénère `GameActionMaps.cs` (§4.7).
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, Flash borné à sa portée puis en cooldown).
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, Flash à distance fixe puis en cooldown, Flash dans un mur, Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (sauvegarde / rechargement JSON) et le point visé à portée fixe en EditMode.
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 
