@@ -24,8 +24,22 @@ MonoBehaviour:
   - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
     Definition: {fileID: 11400000, guid: 237e0af517b7483daaa55405833d8852, type: 2}
     Weight: 1
+  - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
+    Definition: {fileID: 11400000, guid: bd493ee97e12bab8cb647cea8811d9ec, type: 2}
+    Weight: 2
+  - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
+    Definition: {fileID: 11400000, guid: a57bdc82cd7ab846b8e8a722511e5665, type: 2}
+    Weight: 2
+  - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
+    Definition: {fileID: 11400000, guid: ecb4b9ecff4be8c76bd4acf1fe8081cb, type: 2}
+    Weight: 1
+  - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
+    Definition: {fileID: 11400000, guid: 45aafc9e031d1d6a7872d859076d468d, type: 2}
+    Weight: 1
   spawnInterval: 0.9
   postQuotaSpawnInterval: 1.62
   maxAlive: 22
+  boss: {fileID: 0}
+  bossPrefab: {fileID: 0}
   healthMultiplier: 1.6
   damageMultiplier: 1.35
