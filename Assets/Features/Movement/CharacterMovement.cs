@@ -16,6 +16,9 @@ namespace Features.Movement {
     ///
     /// Speed is the owner's MoveSpeed stat (<see cref="Init"/>): same code for everyone,
     /// different speed. Does not move before Init.
+    ///
+    /// <see cref="Immobilized"/> (stun, root, §5.7) holds the body in place without forgetting the
+    /// order: the walk resumes when it ends. A dash in progress is stopped.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(NavMeshAgent))]
@@ -41,6 +44,8 @@ namespace Features.Movement {
         private float MoveSpeed => _moveSpeed?.Value ?? 0f;
 
         public bool IsMoving => _hasDestination;
+        /// <summary>Stunned or rooted: no move, orders are kept for later.</summary>
+        public bool Immobilized { get; set; }
         public Vector3 Destination => _destination;
         /// <summary>Normalized horizontal direction of the current move, zero when idle.</summary>
         public Vector3 MoveDirection => _hasDestination ? _moveDirection : Vector3.zero;
@@ -137,6 +142,12 @@ namespace Features.Movement {
         private void FixedUpdate() {
             if (_agent.isOnNavMesh) _agent.nextPosition = _rb.position;
             if (!_hasDestination) return;
+
+            if (Immobilized) {
+                if (_dashUntil > 0f) Stop();
+                else SetHorizontalVelocity(Vector3.zero);
+                return;
+            }
 
             if (_dashUntil > 0f) {
                 if (Time.time >= _dashUntil) {

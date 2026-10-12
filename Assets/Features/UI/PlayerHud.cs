@@ -21,7 +21,7 @@ namespace Features.UI {
 
         private IEventBus _eventBus;
         private readonly DisposableBag _subscriptions = new();
-        private VisualElement _hpFill, _manaFill, _manaCost, _xpFill;
+        private VisualElement _hpFill, _shieldFill, _manaFill, _manaCost, _xpFill;
         private Label _hpText, _manaText, _level, _spell, _feedback, _gold;
         private int _goldValue;
         private ElementBarView _elements;
@@ -32,7 +32,7 @@ namespace Features.UI {
         private Spells.SpellDefinition _signature;
 
         // Last known values: events can arrive before the UI is built
-        private float _hp, _hpMax, _mana, _manaMax;
+        private float _hp, _hpMax, _shield, _mana, _manaMax;
         private XpChangedEvent _xp;
         private ElementSelectionChangedEvent _selection;
         private PlayerElementsEvent? _elementDefs;
@@ -42,7 +42,7 @@ namespace Features.UI {
         [Inject]
         public void Construct(IEventBus eventBus) {
             _eventBus = eventBus;
-            _subscriptions.Add(eventBus.Subscribe<PlayerHealthChangedEvent>(e => { _hp = e.Current; _hpMax = e.Max; Refresh(); }));
+            _subscriptions.Add(eventBus.Subscribe<PlayerHealthChangedEvent>(e => { _hp = e.Current; _hpMax = e.Max; _shield = e.Shield; Refresh(); }));
             _subscriptions.Add(eventBus.Subscribe<PlayerManaChangedEvent>(e => { _mana = e.Current; _manaMax = e.Max; Refresh(); }));
             _subscriptions.Add(eventBus.Subscribe<XpChangedEvent>(e => { _xp = e; Refresh(); }));
             _subscriptions.Add(eventBus.Subscribe<PlayerElementsEvent>(e => {
@@ -105,6 +105,12 @@ namespace Features.UI {
             bars.style.width = 360;
 
             var hpBar = Bar(20, out _hpFill, hpColor);
+            // Shield: white, right after the HP (LoL style)
+            _shieldFill = new VisualElement { pickingMode = PickingMode.Ignore };
+            _shieldFill.style.position = Position.Absolute;
+            _shieldFill.style.top = _shieldFill.style.bottom = 0;
+            _shieldFill.style.backgroundColor = new Color(0.92f, 0.92f, 0.95f, 0.9f);
+            hpBar.Add(_shieldFill);
             _hpText = BarText(hpBar, 12);
 
             var manaBar = Bar(14, out _manaFill, manaColor);
@@ -209,8 +215,13 @@ namespace Features.UI {
 
         private void Refresh() {
             if (_hpFill == null) return;
-            _hpFill.style.width = Percent(_hp, _hpMax);
-            _hpText.text = $"{Mathf.CeilToInt(_hp)} / {Mathf.CeilToInt(_hpMax)}";
+            float total = Mathf.Max(_hpMax, _hp + _shield);
+            _hpFill.style.width = Percent(_hp, total);
+            _shieldFill.style.left = Percent(_hp, total);
+            _shieldFill.style.width = Percent(_shield, total);
+            _shieldFill.style.display = _shield > 0f ? DisplayStyle.Flex : DisplayStyle.None;
+            string shield = _shield > 0f ? $"  (+{Mathf.CeilToInt(_shield)})" : "";
+            _hpText.text = $"{Mathf.CeilToInt(_hp)} / {Mathf.CeilToInt(_hpMax)}{shield}";
 
             _manaFill.style.width = Percent(_mana, _manaMax);
             _manaText.text = $"{Mathf.FloorToInt(_mana)} / {Mathf.CeilToInt(_manaMax)}";

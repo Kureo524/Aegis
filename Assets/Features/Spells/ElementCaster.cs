@@ -110,6 +110,7 @@ namespace Features.Spells {
             if (CooldownRemaining > 0f) return Feedback($"Sorts en recharge ({CooldownRemaining:0.0} s)");
             if (!owner.Mana.CanSpend(CurrentManaCost)) return Feedback("Mana insuffisant");
             if (caster.IsCasting) return Feedback("Incantation en cours");
+            if (!owner.Status.CanCast) return Feedback(owner.Status.IsStunned ? "Étourdi" : "Réduit au silence");
 
             if (spell.NeedsAim) targeting.Aim(spell, AimMode.Spell, Confirm);
             else Confirm(new CastContext { Origin = owner.transform.position, Direction = owner.transform.forward, TargetPoint = owner.transform.position });
@@ -123,6 +124,10 @@ namespace Features.Spells {
             float cost = CurrentManaCost;
             if (caster.IsCasting) {
                 Feedback("Incantation en cours");
+                return;
+            }
+            if (!owner.Status.CanCast) {   // stunned while aiming: nothing spent
+                Feedback(owner.Status.IsStunned ? "Étourdi" : "Réduit au silence");
                 return;
             }
             if (!owner.Mana.TrySpend(cost)) {

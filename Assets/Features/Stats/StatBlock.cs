@@ -29,11 +29,16 @@ namespace Features.Stats {
 
         public IReadOnlyList<StatEntry> Entries => entries;
 
-        public float Get(StatType type) {
+        public float Get(StatType type) => TryGet(type, out float value) ? value : 0f;
+
+        public bool TryGet(StatType type, out float value) {
             foreach (StatEntry e in entries) {
-                if (e.Type == type) return e.Value;
+                if (e.Type != type) continue;
+                value = e.Value;
+                return true;
             }
-            return 0f;
+            value = 0f;
+            return false;
         }
 
 #if UNITY_EDITOR

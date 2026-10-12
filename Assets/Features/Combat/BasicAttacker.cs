@@ -133,6 +133,15 @@ namespace Features.Combat {
                 return;
             }
 
+            // Stunned (§5.7): a windup is lost, the order is kept for afterwards
+            if (!owner.Status.CanAttack) {
+                if (_state == State.Windup) {
+                    AbortWindup();
+                    _state = State.Chasing;
+                }
+                return;
+            }
+
             if (_state == State.Idle) {
                 if (_attackMoving) UpdateAttackMoveWalk();
                 return;

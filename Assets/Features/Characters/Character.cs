@@ -42,6 +42,8 @@ namespace Features.Characters {
         public ManaPool Mana { get; private set; }
         /// <summary>Temporary stat modifiers (buffs, debuffs), ticked every frame.</summary>
         public TimedModifiers Buffs { get; } = new();
+        /// <summary>Crowd control, slows and damage over time (§5.7).</summary>
+        public StatusEffects Status { get; private set; }
         /// <summary>Per-character events for passives, items and augments (§8.1).</summary>
         public CharacterEvents Events { get; } = new();
         /// <summary>Rules granted by passives (SpellCrit…, §5.6).</summary>
@@ -69,6 +71,8 @@ namespace Features.Characters {
 
         private void Awake() {
             _rigidbody = GetComponent<Rigidbody>();
+            Status = new StatusEffects(Stats, Buffs, info => TakeDamage(info));
+            Status.Changed += OnStatusChanged;
             Passives = new PassiveController(this);
             Passives.LootDropped += OnPassiveLoot;
         }
@@ -91,6 +95,7 @@ namespace Features.Characters {
             Passives.Clear();
             Capabilities.Clear();
             Buffs.Clear();
+            Status.Clear();
             ApplyBody(definition);
 
             // Order matters (§12): stats first, everything else reads them.
@@ -113,6 +118,9 @@ namespace Features.Characters {
         private void Update() {
             if (!IsAlive) return;
             Buffs.Tick(Time.deltaTime);
+            Status.Tick(Time.deltaTime);
+            if (!IsAlive) return;   // killed by a damage over time
+            Health.Tick(Time.deltaTime);
             Passives.Tick();
             Health.Heal(Stats.Value(StatType.HealthRegen) * Time.deltaTime);
             Mana.Restore(Stats.Value(StatType.ManaRegen) * Time.deltaTime);
@@ -149,6 +157,31 @@ namespace Features.Characters {
             return taken;
         }
 
+        /// <summary>Applies a status (§5.7). <paramref name="source"/> identifies the effect (same source = refresh).</summary>
+        public void ApplyStatus(in StatusApplication status, Character applier, object source) {
+            if (IsAlive) Status.Apply(status, applier, source);
+        }
+
+        /// <summary>Heals, scaled by the producer's HealShieldPower (§6). Returns the HP actually healed.</summary>
+        public float ReceiveHeal(float amount, Character producer) {
+            if (!IsAlive) return 0f;
+            return Health.Heal(amount * HealShieldMultiplier(producer));
+        }
+
+        /// <summary>Shield for <paramref name="duration"/> s, scaled by the producer's HealShieldPower (§6).</summary>
+        public void ReceiveShield(float amount, float duration, Character producer) {
+            if (IsAlive) Health.AddShield(amount * HealShieldMultiplier(producer), duration);
+        }
+
+        private static float HealShieldMultiplier(Character producer) =>
+            producer != null ? producer.Stats.Value(StatType.HealShieldPower) : 1f;
+
+        // Movement follows the CC; the look shows it
+        private void OnStatusChanged() {
+            if (movement != null) movement.Immobilized = !Status.CanMove;
+            if (visual != null) visual.SetStatus(Status);
+        }
+
         /// <summary>Back to life at full HP (respawn, revive effects).</summary>
         public void Revive() {
             if (Health == null || IsAlive) return;
@@ -167,6 +200,7 @@ namespace Features.Characters {
         private void OnDied() {
             if (attacker != null) attacker.Cancel();
             if (movement != null) movement.Stop();
+            Status.Clear();
             SetBodyActive(false);
 
             if (Definition is EnemyDefinition enemy)
@@ -210,7 +244,7 @@ namespace Features.Characters {
             level.LevelChanged += _ => _eventBus.Publish(new LevelUpEvent(level.Level, level.SkillPoints, level.OverchargePoints));
 
             Health health = Health;
-            health.Changed += (current, max) => _eventBus.Publish(new PlayerHealthChangedEvent(current, max));
+            health.Changed += (current, max) => _eventBus.Publish(new PlayerHealthChangedEvent(current, max, health.Shield));
             ManaPool mana = Mana;
             mana.Changed += (current, max) => _eventBus.Publish(new PlayerManaChangedEvent(current, max));
 
@@ -221,7 +255,7 @@ namespace Features.Characters {
 
             // Initial snapshot for whoever displays it
             foreach (Stat stat in Stats.Stats.Values) _eventBus.Publish(new StatChangedEvent(stat.Type, stat.Value));
-            _eventBus.Publish(new PlayerHealthChangedEvent(health.Current, health.Max));
+            _eventBus.Publish(new PlayerHealthChangedEvent(health.Current, health.Max, health.Shield));
             _eventBus.Publish(new PlayerManaChangedEvent(mana.Current, mana.Max));
             PublishXp();
         }
