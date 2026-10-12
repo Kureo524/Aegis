@@ -189,12 +189,16 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator PlayerDeath_CostsALife() {
+        public IEnumerator PlayerDeath_IsAnInstantGameOver() {
             yield return LoadRun();
-            var run = Game.Resolve<RunDirector>();
-            int lives = run.Lives;
+            var machine = Root.Resolve<GameFlowStateMachine>();
+            Bus.Publish(new SkipWaveRequestedEvent());
+            yield return null;
             Player.TakeDamage(new Features.Combat.DamageInfo(1e7f, Features.Combat.DamageType.True, false, false, null));
-            Assert.AreEqual(lives - 1, run.Lives);
+            yield return WaitFor(() => machine.CurrentState == GameState.GameOver);
+            Assert.AreEqual(Game.Resolve<RunDirector>().Lives, Game.Resolve<StageDefinition>().Lives, "no life involved: the run is over");
+            yield return null;
+            Assert.IsTrue(Object.FindFirstObjectByType<RunEndPanel>().IsOpen);
         }
 
         [UnityTest]
