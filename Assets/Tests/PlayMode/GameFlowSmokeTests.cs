@@ -29,12 +29,12 @@ namespace Game.Tests.PlayMode {
             yield return null;
         }
 
-        // The test scene's horde would walk into every test: its continuous spawn is stopped.
+        // The stage's waves would walk into every test: the run is halted (no wave, no spawn).
         internal static IEnumerator LoadGameScene() {
             yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
             yield return null;
             Object.FindFirstObjectByType<Containers.GameLifetimeScope>().Container
-                  .Resolve<Features.Enemies.HordeSpawner>().SetSpawning(false);
+                  .Resolve<Features.Run.RunDirector>().Halt();
         }
 
         private static IEnumerator WaitFor(System.Func<bool> condition, float timeout = 10f) {
@@ -329,7 +329,9 @@ namespace Game.Tests.PlayMode {
 
             yield return new WaitForSeconds(1f);
             Assert.Less(dummy.Health.Current, dummy.Health.Max, "Fireball hit the dummy");
-            Assert.AreEqual(manaBefore - cost, player.Mana.Current, 2.5f, "mana paid (plus ~1 s of regen at 1.5/s)");
+            float regen = player.Stats.Value(Features.Stats.StatType.ManaRegen);
+            Assert.GreaterOrEqual(player.Mana.Current, manaBefore - cost - 0.01f, "mana paid");
+            Assert.LessOrEqual(player.Mana.Current, manaBefore - cost + regen * 1.3f, "mana paid (plus ~1 s of regen)");
             Assert.AreEqual(0, caster.Selection.Total, "selection cleared after the cast");
             Assert.Greater(caster.CooldownRemaining, 0f, "shared elemental cooldown");
 
@@ -532,6 +534,26 @@ namespace Game.Tests.PlayMode {
             Assert.IsTrue(panel.IsOpen);
             Root.Resolve<IEventBus>().Publish(new Systems.Inputs.Events.UiCancelEvent());
             Assert.IsFalse(panel.IsOpen);
+        }
+
+        [UnityTest]
+        public IEnumerator CancelledWindup_DoesNotSpendTheAttack() {
+            yield return LoadGameScene();
+            var player = FindPlayer();
+            var attacker = player.GetComponent<Features.Combat.BasicAttacker>();
+            var dummy = FindDummy(player);
+            player.GetComponent<Features.Movement.CharacterMovement>()
+                  .Teleport(dummy.transform.position + new Vector3(-3f, 0f, 0f));   // in range
+            yield return null;
+
+            attacker.Attack(dummy);
+            yield return null;
+            Assert.IsTrue(attacker.IsWindingUp, "in range: the windup starts at once");
+            attacker.Cancel();                                                   // a move order during the windup
+            yield return null;
+            attacker.Attack(dummy);
+            yield return null;
+            Assert.IsTrue(attacker.IsWindingUp, "the cancelled attack was not put on cooldown");
         }
 
         [UnityTest]

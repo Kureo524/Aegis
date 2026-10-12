@@ -7,6 +7,7 @@ using Features.CameraControl;
 using Features.Characters;
 using Features.Combat;
 using Features.Enemies;
+using Features.Run;
 using Features.Progression;
 using Features.Spells;
 using Features.Stats;
@@ -92,11 +93,12 @@ namespace EditorTools {
             Character dummyPrefab = CharacterPrefabSetup.CreateDummyPrefab();
             Character enemyPrefab = CharacterPrefabSetup.CreateEnemyPrefab();
             HordeSettings hordeSettings = EnemySetup.Run(enemyPrefab);
+            StageDefinition stage = RunSetup.Run(enemyPrefab);
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
             SetBuildScenes();
             MigrateMenuScene();
-            MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings);
+            MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings, stage);
 
             AssetDatabase.SaveAssets();
             Debug.Log("[ProjectSetup] Done.");
@@ -124,7 +126,7 @@ namespace EditorTools {
             var stats = CreateAsset<StatBlock>(TestHeroDir + "/StatBlock_TestHero.asset");
             SetList(stats, "entries", new (StatType, float)[] {
                 (StatType.MaxHealth, 600f), (StatType.HealthRegen, 1.5f),
-                (StatType.MaxMana, 400f), (StatType.ManaRegen, 1.5f),
+                (StatType.MaxMana, 400f), (StatType.ManaRegen, 8f),
                 (StatType.PhysicalAttack, 55f), (StatType.MagicAttack, 0f),
                 (StatType.AttackSpeed, 0.65f), (StatType.AttackRange, 5.5f),
                 (StatType.CritDamage, 1.75f),
@@ -141,7 +143,7 @@ namespace EditorTools {
             growthSo.ApplyModifiedPropertiesWithoutUndo();
             SetList(growth, "entries", new (StatType, float, ModifierType)[] {
                 (StatType.MaxHealth, 100f, ModifierType.Flat), (StatType.HealthRegen, 0.1f, ModifierType.Flat),
-                (StatType.MaxMana, 30f, ModifierType.Flat), (StatType.ManaRegen, 0.08f, ModifierType.Flat),
+                (StatType.MaxMana, 30f, ModifierType.Flat), (StatType.ManaRegen, 0.4f, ModifierType.Flat),
                 (StatType.PhysicalAttack, 3f, ModifierType.Flat), (StatType.AttackSpeed, 0.02f, ModifierType.PercentAdd),
                 (StatType.Armor, 4f, ModifierType.Flat), (StatType.MagicResist, 1.3f, ModifierType.Flat),
             }, (e, v) => {
@@ -151,6 +153,9 @@ namespace EditorTools {
             });
 
             var attack = CreateAsset<BasicAttackDefinition>(TestHeroDir + "/BasicAttack_TestHero.asset");
+            var attackSo = new SerializedObject(attack);
+            attackSo.FindProperty("windupPercent").floatValue = 0.18f;   // LoL marksman-like
+            attackSo.ApplyModifiedPropertiesWithoutUndo();
 
             var hero = CreateAsset<CharacterDefinition>(TestHeroPath);
             var heroSo = new SerializedObject(hero);
@@ -520,7 +525,7 @@ namespace EditorTools {
             if (dirty) EditorSceneManager.SaveScene(scene);
         }
 
-        private static void MigrateTestScene(Character playerPrefab, Character dummyPrefab, HordeSettings hordeSettings) {
+        private static void MigrateTestScene(Character playerPrefab, Character dummyPrefab, HordeSettings hordeSettings, StageDefinition stage) {
             var scene = EditorSceneManager.OpenScene(TestScenePath, OpenSceneMode.Single);
             var scope = Object.FindFirstObjectByType<GameLifetimeScope>();
             if (scope == null) {
@@ -536,6 +541,7 @@ namespace EditorTools {
                                                   AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath));
             TestSceneSetup.WireCombat(scope, dummyPrefab, AssetDatabase.LoadAssetAtPath<CharacterDefinition>(DummyPath));
             if (scope.hordeSettings == null) scope.hordeSettings = hordeSettings;
+            TestSceneSetup.WireRun(scope, stage);
             EditorUtility.SetDirty(scope);
             EditorSceneManager.SaveScene(scene);
         }

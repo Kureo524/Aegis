@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abd347f478c8b4a30bec73f7dd46bab2, type: 3}
   m_Name: BasicAttack_TestHero
   m_EditorClassIdentifier: Game.Features::Features.Combat.BasicAttackDefinition
-  windupPercent: 0.25
+  windupPercent: 0.18
   projectilePrefab: {fileID: 1090469804728839682, guid: 11cfec3c263bc2036a21d9955ee9a863, type: 3}
   projectileSpeed: 20
   damageRatio: 1

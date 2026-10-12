@@ -24,7 +24,7 @@ MonoBehaviour:
     GainPerLevel: 30
     Type: 0
   - Stat: 3
-    GainPerLevel: 0.08
+    GainPerLevel: 0.4
     Type: 0
   - Stat: 4
     GainPerLevel: 3

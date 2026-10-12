@@ -43,6 +43,7 @@ namespace Features.Combat {
         private Character _target;
         private bool _targetIsAcquired;   // picked by the attack-move scan, not ordered explicitly
         private float _windupEnd;
+        private float _windupStartedAt;
         private float _nextAttackTime;
         private float _nextRepath;
 
@@ -104,8 +105,16 @@ namespace Features.Combat {
             ClearTarget();
         }
 
+        // A windup cut short does not count as an attack (LoL): its timer is given back
+        private void AbortWindup() {
+            if (_state != State.Windup) return;
+            _nextAttackTime = _windupStartedAt;
+            if (visual != null) visual.StopAttack();
+        }
+
         private void SetTarget(Character target, bool acquired) {
             if (target == _target && _state != State.Idle) return;
+            AbortWindup();
             _target = target;
             _targetIsAcquired = acquired;
             _state = State.Chasing;
@@ -113,6 +122,7 @@ namespace Features.Combat {
         }
 
         private void ClearTarget() {
+            AbortWindup();
             _target = null;
             _state = State.Idle;
         }
@@ -200,12 +210,16 @@ namespace Features.Combat {
 
         private void StartWindup() {
             float interval = 1f / Mathf.Max(owner.Stats.Value(StatType.AttackSpeed), 0.01f);
-            _windupEnd = Time.time + interval * owner.Definition.BasicAttack.WindupPercent;
+            float windup = interval * owner.Definition.BasicAttack.WindupPercent;
+            _windupStartedAt = Time.time;
+            _windupEnd = Time.time + windup;
             _nextAttackTime = Time.time + interval;
             _state = State.Windup;
+            if (visual != null) visual.PlayWindup(windup);
         }
 
         private void Impact() {
+            if (visual != null) visual.PlayImpact();
             BasicAttackDefinition def = owner.Definition.BasicAttack;
             StatController stats = owner.Stats;
 

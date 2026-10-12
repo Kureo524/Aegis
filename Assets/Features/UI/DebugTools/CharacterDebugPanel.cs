@@ -8,7 +8,7 @@ using VContainer;
 namespace Features.UI.DebugTools {
     /// <summary>
     /// Test scene panel (IMGUI): shows the player's level, XP, points and main stats, and grants XP;
-    /// horde controls (start / stop the spawn, burst of enemies for stress tests).
+    /// horde controls (start / stop the spawn, burst of enemies for stress tests), skip the wave.
     /// Only talks to the bus: reads XpChanged / LevelUp / StatChanged / HordeStatus, publishes
     /// XpGranted / HordeDebug.
     /// </summary>
@@ -58,6 +58,7 @@ namespace Features.UI.DebugTools {
             if (GUILayout.Button(_horde.Spawning ? "Stop spawn" : "Start spawn")) _eventBus.Publish(new HordeDebugEvent(toggle: true, burst: 0));
             if (GUILayout.Button($"+{hordeBurst}")) _eventBus.Publish(new HordeDebugEvent(toggle: false, burst: hordeBurst));
             GUILayout.EndHorizontal();
+            if (GUILayout.Button("Skip wave")) _eventBus.Publish(new SkipWaveRequestedEvent());
 
             foreach (StatType type in shownStats) {
                 _stats.TryGetValue(type, out float value);

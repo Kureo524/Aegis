@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Features.Characters;
 using Features.Events;
+using Features.Stats;
 using Systems.EventBusses;
 using Systems.Pooling;
 using UnityEngine;
@@ -15,7 +16,9 @@ namespace Features.Enemies {
     /// SpawnInterval, picked by weight in the spawn table, on a ring beyond the screen edge, on a
     /// walkable cell the flow field can reach, up to MaxAlive. Enemies come from the PrefabPool and
     /// go back to it DespawnDelay after their death. The player's death clears the horde.
-    /// Phase 7 waves will drive it (quota, timer, scaling). Game scope service.
+    /// The RunDirector drives it wave by wave (<see cref="Configure"/>: table, rate, cap, WaveScaling);
+    /// without a wave it uses the HordeSettings values. Each horde kill publishes WaveEnemyKilledEvent.
+    /// Game scope service.
     /// </summary>
     public sealed class HordeSpawner : IStartable, ITickable, IDisposable {
         private const int PlacementAttempts = 10;
@@ -31,6 +34,10 @@ namespace Features.Enemies {
         private float _nextSpawn;
         private int _pendingBurst;
         private float _totalWeight;
+        private HordeSpawnEntry[] _table;
+        private float _interval;
+        private int _maxAlive;
+        private float _healthMultiplier = 1f, _damageMultiplier = 1f;
 
         public bool Spawning { get; private set; }
         public int Alive => _alive.Count;
@@ -46,9 +53,7 @@ namespace Features.Enemies {
         }
 
         public void Start() {
-            foreach (HordeSpawnEntry entry in _settings.SpawnTable) {
-                if (entry.Prefab != null && entry.Definition != null) _totalWeight += entry.Weight;
-            }
+            Configure(_settings.SpawnTable, _settings.SpawnInterval, _settings.MaxAlive, 1f, 1f);
             _subscriptions.Add(_eventBus.Subscribe<PlayerDiedEvent>(_ => Clear()));
             _subscriptions.Add(_eventBus.Subscribe<HordeDebugEvent>(e => {
                 if (e.Toggle) SetSpawning(!Spawning);
@@ -57,9 +62,25 @@ namespace Features.Enemies {
             SetSpawning(_settings.SpawnOnStart);
         }
 
+        /// <summary>What and how fast to spawn (a wave, or the HordeSettings defaults).</summary>
+        public void Configure(HordeSpawnEntry[] table, float interval, int maxAlive, float healthMultiplier, float damageMultiplier) {
+            _table = table ?? System.Array.Empty<HordeSpawnEntry>();
+            _interval = Mathf.Max(0.05f, interval);
+            _maxAlive = maxAlive;
+            _healthMultiplier = healthMultiplier;
+            _damageMultiplier = damageMultiplier;
+            _totalWeight = 0f;
+            foreach (HordeSpawnEntry entry in _table) {
+                if (entry.Prefab != null && entry.Definition != null) _totalWeight += entry.Weight;
+            }
+        }
+
+        /// <summary>Changes only the rate (the wave's quota reached: slower, gold only).</summary>
+        public void SetInterval(float interval) => _interval = Mathf.Max(0.05f, interval);
+
         public void SetSpawning(bool spawning) {
             Spawning = spawning;
-            _nextSpawn = Time.time + _settings.SpawnInterval;
+            _nextSpawn = Time.time + (_interval > 0f ? _interval : _settings.SpawnInterval);
             PublishStatus();
         }
 
@@ -72,8 +93,8 @@ namespace Features.Enemies {
             for (int i = 0; i < 10 && _pendingBurst > 0; i++, _pendingBurst--) TrySpawn(player.transform.position);
 
             if (!Spawning || Time.time < _nextSpawn) return;
-            _nextSpawn = Time.time + _settings.SpawnInterval;
-            if (_alive.Count < _settings.MaxAlive) TrySpawn(player.transform.position);
+            _nextSpawn = Time.time + _interval;
+            if (_alive.Count < _maxAlive) TrySpawn(player.transform.position);
         }
 
         /// <summary>Spawns one enemy of the table around <paramref name="center"/>. Null if no spot was found.</summary>
@@ -88,6 +109,7 @@ namespace Features.Enemies {
             enemy.GetComponent<Movement.CharacterMovement>().Teleport(position);
             enemy.name = definition.DisplayName;
             enemy.Init(definition);
+            ApplyScaling(enemy);
             enemy.Died += OnEnemyDied;
             _alive.Add(enemy);
             PublishStatus();
@@ -108,7 +130,20 @@ namespace Features.Enemies {
             enemy.Died -= OnEnemyDied;
             _alive.Remove(enemy);
             _dying.Add((enemy, Time.time + _settings.DespawnDelay));
+            _eventBus.Publish(new WaveEnemyKilledEvent());
             PublishStatus();
+        }
+
+        // WaveScaling: one modifier per stat, its source is the spawner; Init resets them on reuse
+        private void ApplyScaling(Character enemy) {
+            AddPercent(enemy, StatType.MaxHealth, _healthMultiplier);
+            AddPercent(enemy, StatType.PhysicalAttack, _damageMultiplier);
+            AddPercent(enemy, StatType.MagicAttack, _damageMultiplier);
+        }
+
+        private void AddPercent(Character enemy, StatType type, float multiplier) {
+            if (Mathf.Approximately(multiplier, 1f)) return;
+            enemy.Stats.Get(type)?.AddModifier(new StatModifier(multiplier - 1f, ModifierType.PercentMult, this));
         }
 
         private void ReleaseTheDead() {
@@ -127,7 +162,7 @@ namespace Features.Enemies {
         private HordeSpawnEntry Pick() {
             float roll = Random.value * _totalWeight;
             HordeSpawnEntry last = default;
-            foreach (HordeSpawnEntry entry in _settings.SpawnTable) {
+            foreach (HordeSpawnEntry entry in _table) {
                 if (entry.Prefab == null || entry.Definition == null || entry.Weight <= 0f) continue;
                 last = entry;
                 roll -= entry.Weight;

@@ -1,17 +1,20 @@
 using System;
 using Features.Events;
+using Features.Run;
 using Features.StateMachines;
 using Systems.EventBusses;
 using Systems.Inputs;
 using VContainer.Unity;
 
 namespace Features.Flow {
-    /// <summary>Enables the action map matching the game state: Gameplay while in Game, UI
-    /// otherwise (design doc §14.3).</summary>
+    /// <summary>Enables the action map matching the game state: Gameplay while in Game (except
+    /// during the end-of-wave screens), UI otherwise (design doc §14.3).</summary>
     public sealed class InputMapSwitcher : IInitializable, IDisposable {
         private readonly IEventBus _eventBus;
         private readonly InputReader _inputReader;
-        private IDisposable _subscription;
+        private readonly DisposableBag _subscriptions = new();
+        private GameState _gameState;
+        private bool _inReward;
 
         public InputMapSwitcher(IEventBus eventBus, InputReader inputReader) {
             _eventBus = eventBus;
@@ -19,14 +22,21 @@ namespace Features.Flow {
         }
 
         public void Initialize() {
-            _subscription = _eventBus.Subscribe<GameStateChangedEvent>(OnStateChanged);
+            _subscriptions.Add(_eventBus.Subscribe<GameStateChangedEvent>(e => {
+                _gameState = e.To;
+                if (e.To is GameState.Menu or GameState.Loading) _inReward = false;
+                Apply();
+            }));
+            _subscriptions.Add(_eventBus.Subscribe<RunStateChangedEvent>(e => {
+                _inReward = e.To == RunState.Reward;
+                Apply();
+            }));
         }
 
-        public void Dispose() => _subscription?.Dispose();
+        public void Dispose() => _subscriptions.Dispose();
 
-        private void OnStateChanged(GameStateChangedEvent evt) {
-            bool inGame = evt.To == GameState.Game;
-            if (inGame) {
+        private void Apply() {
+            if (_gameState == GameState.Game && !_inReward) {
                 _inputReader.DisableInput(EActionTypes.UI);
                 _inputReader.EnableInput(EActionTypes.Game);
             }

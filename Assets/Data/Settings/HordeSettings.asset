@@ -19,7 +19,7 @@ MonoBehaviour:
   thinkInterval: 0.1
   repathInterval: 0.4
   despawnDelay: 0.5
-  spawnOnStart: 1
+  spawnOnStart: 0
   spawnTable:
   - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
     Definition: {fileID: 11400000, guid: 23239040d5a7166a99e4fa9d9e6a5c6a, type: 2}

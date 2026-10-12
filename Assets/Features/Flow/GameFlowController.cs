@@ -36,6 +36,7 @@ namespace Features.Flow {
             _subscriptions.Add(_eventBus.Subscribe<ResumeRequestedEvent>(_ => _machine.TryChange(GameState.Game)));
             _subscriptions.Add(_eventBus.Subscribe<MainMenuRequestedEvent>(_ => _machine.TryChange(GameState.Menu)));
             _subscriptions.Add(_eventBus.Subscribe<QuitRequestedEvent>(_ => Quit()));
+            _subscriptions.Add(_eventBus.Subscribe<RunEndedEvent>(e => _machine.TryChange(e.Won ? GameState.Win : GameState.GameOver)));
         }
 
         public void Dispose() {
