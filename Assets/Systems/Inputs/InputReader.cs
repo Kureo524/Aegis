@@ -109,6 +109,32 @@ namespace Systems.Inputs {
         private void OnZoomPerformed(UnityEngine.InputSystem.InputAction.CallbackContext ctx) =>
             _eventBus.Publish(new ZoomEvent(ctx.ReadValue<Vector2>().y));
 
+        /// <summary>
+        /// [NEW] Keeps the hardware cursor inside the game window.
+        ///
+        /// CursorLockMode.Confined only works in a standalone Windows/Linux build — it is a
+        /// no-op in the Editor (and unreliable under Wayland). So we clamp the cursor ourselves
+        /// with WarpCursorPosition, which does work in the Editor. Confined is still set by the
+        /// caller as a free bonus for real builds.
+        /// </summary>
+        public void ClampCursorToWindow() {
+            if (_disposed || _input == null) return;
+
+            Mouse mouse = Mouse.current;
+            if (mouse == null || !Application.isFocused) return;
+
+            float maxX = Screen.width - 1f;
+            float maxY = Screen.height - 1f;
+            Vector2 position = mouse.position.ReadValue();
+
+            // Only warp when actually outside, so we never fight the OS while the cursor is inside.
+            if (position.x >= 0f && position.x <= maxX && position.y >= 0f && position.y <= maxY) return;
+
+            mouse.WarpCursorPosition(new Vector2(
+                Mathf.Clamp(position.x, 0f, maxX),
+                Mathf.Clamp(position.y, 0f, maxY)));
+        }
+
         public void EnableInput(EActionTypes actionType) {
             if (_disposed || _input == null) return;
             switch (actionType) {

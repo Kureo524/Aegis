@@ -9,6 +9,16 @@ using Systems.UI;
 
 namespace Systems.Editor {
     public static class TestSceneSetup {
+        private const string ScenePath = "Assets/Scenes/Tests/TestScene.unity";
+
+        // NOTE: this scene is saved as a BINARY .unity file even though the project is in
+        // Force Text mode. Cause: the baked NavMesh. NavMeshData is a binary-only serializable
+        // type, and any scene holding one cannot be written as YAML (verified empirically:
+        // a scene with a NavMeshSurface is TEXT until BuildNavMesh() is called, then BINARY).
+        // This is a Unity constraint, not a project misconfiguration. The scene is a generated
+        // artifact rebuilt by this script, so losing textual diffs on it is acceptable.
+        // If textual diffs ever become necessary, bake the NavMesh at runtime instead of in-editor.
+
         [MenuItem("Tools/Create Test Scene")]
         public static void CreateTestScene() {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -73,9 +83,9 @@ namespace Systems.Editor {
             marker.transform.localScale = new Vector3(0.3f, 0.1f, 0.3f);
             marker.GetComponent<Renderer>().material.color = Color.green;
             Object.DestroyImmediate(marker.GetComponent<Collider>());
-            
+
             marker.AddComponent<ClickMarker>();
-            
+
             string prefabPath = "Assets/Prefabs/ClickMarker.prefab";
             System.IO.Directory.CreateDirectory("Assets/Prefabs");
             PrefabUtility.SaveAsPrefabAsset(marker, prefabPath);
@@ -92,11 +102,71 @@ namespace Systems.Editor {
             scope.cameraController = cameraController;
 
             // Save scene
-            string scenePath = "Assets/Scenes/Tests/TestScene.unity";
             System.IO.Directory.CreateDirectory("Assets/Scenes/Tests");
-            EditorSceneManager.SaveScene(scene, scenePath);
+            EditorSceneManager.SaveScene(scene, ScenePath);
 
-            Debug.Log($"Test scene created at {scenePath}");
+            Debug.Log($"[TestSceneSetup] Test scene created at {ScenePath}");
+        }
+
+        /// <summary>
+        /// Opens the saved test scene and asserts every reference the scene must carry.
+        /// Run headless so a broken scene fails loudly instead of silently in Play mode:
+        ///   Unity -batchmode -executeMethod Systems.Editor.TestSceneSetup.ValidateTestScene
+        /// </summary>
+        [MenuItem("Tools/Validate Test Scene")]
+        public static void ValidateTestScene() {
+            var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+
+            var errors = new System.Text.StringBuilder();
+            int checks = 0;
+
+            void Check(bool ok, string label) {
+                checks++;
+                if (!ok) errors.AppendLine($"  FAIL: {label}");
+                Debug.Log($"  {(ok ? "ok  " : "FAIL")} {label}");
+            }
+
+            var scope = Object.FindFirstObjectByType<GameLifetimeScope>();
+            Check(scope != null, "GameLifetimeScope present in scene");
+
+            var input = Object.FindFirstObjectByType<PlayerCommandInput>();
+            Check(input != null, "PlayerCommandInput present in scene");
+
+            var cameraController = Object.FindFirstObjectByType<CameraController>();
+            Check(cameraController != null, "CameraController present in scene");
+
+            var movement = Object.FindFirstObjectByType<CharacterMovement>();
+            Check(movement != null, "CharacterMovement present in scene");
+
+            var agent = Object.FindFirstObjectByType<UnityEngine.AI.NavMeshAgent>();
+            Check(agent != null, "NavMeshAgent present on Player");
+
+            var surface = Object.FindFirstObjectByType<Unity.AI.Navigation.NavMeshSurface>();
+            Check(surface != null, "NavMeshSurface present on Ground");
+
+            if (scope != null) {
+                Check(scope.playerCommandInput != null, "scope.playerCommandInput wired");
+                Check(scope.cameraController != null, "scope.cameraController wired");
+            }
+
+            if (input != null) {
+                Check(input.characterMovement != null, "input.characterMovement wired");
+                Check(input.mainCamera != null, "input.mainCamera wired");
+                Check(input.clickMarkerPrefab != null, "input.clickMarkerPrefab wired");
+            }
+
+            if (cameraController != null) {
+                Check(cameraController.target != null, "cameraController.target wired");
+            }
+
+            if (errors.Length > 0) {
+                Debug.LogError($"[TestSceneSetup] VALIDATION FAILED ({checks} checks):\n{errors}");
+                EditorApplication.Exit(1);
+            }
+            else {
+                Debug.Log($"[TestSceneSetup] VALIDATION PASSED ({checks} checks) in scene '{scene.name}'");
+                EditorApplication.Exit(0);
+            }
         }
     }
 }

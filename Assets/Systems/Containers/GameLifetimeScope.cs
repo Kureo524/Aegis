@@ -24,8 +24,8 @@ namespace Systems.Containers {
         }
     }
 
-    // [NEW] Initializes the InputReader and confines the mouse to the game window
-    public class GameInputInitializer : IStartable, IDisposable {
+    // [NEW] Initializes the InputReader, confines the mouse to the game window
+    public class GameInputInitializer : IStartable, ITickable, IDisposable {
         private readonly InputReader _inputReader;
         private readonly IEventBus _eventBus;
 
@@ -37,8 +37,13 @@ namespace Systems.Containers {
         public void Start() {
             _inputReader.Initialize(_eventBus, EActionTypes.Game);
 
-            // Keep the cursor inside the game window (visible, but clamped to the borders)
+            // Free bonus for real builds: native confinement (no-op in the Editor).
             Cursor.lockState = CursorLockMode.Confined;
+        }
+
+        // Software clamp, driven every frame — this is what actually works in the Editor.
+        public void Tick() {
+            _inputReader.ClampCursorToWindow();
         }
 
         public void Dispose() {
