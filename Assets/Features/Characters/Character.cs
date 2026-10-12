@@ -176,7 +176,6 @@ namespace Features.Characters {
 
         private void BindPlayerToBus() {
             _busSubscriptions.Add(_eventBus.Subscribe<XpGrantedEvent>(e => Level.AddXp(e.Amount)));
-            _busSubscriptions.Add(_eventBus.Subscribe<EnemyKilledEvent>(e => Level.AddXp(e.Xp)));
 
             CharacterLevel level = Level;
             level.XpChanged += PublishXp;

@@ -4,6 +4,7 @@ using Features.Characters;
 using Features.Combat;
 using Features.Economy;
 using Features.Enemies;
+using Features.Run;
 using Features.Spells;
 using Systems.Pooling;
 using Features.Flow;
@@ -27,6 +28,14 @@ namespace Containers {
         public CharacterDebugPanel characterDebugPanel;
         public PlayerHud playerHud;
         public PauseMenu pauseMenu;
+        public RunHudView runHud;
+        public WaveRewardPanel waveRewardPanel;
+        public RunEndPanel runEndPanel;
+
+        [Header("Run")]
+        [Tooltip("The stage played in this scene: waves, bonus waves, lives (design doc §9.1).")]
+        public StageDefinition stage;
+        public RunStateMachine runStateMachine;
         public DamageNumbersView damageNumbers;
 
         [Header("Player")]
@@ -57,6 +66,12 @@ namespace Containers {
             if (playerHud != null) builder.RegisterComponent(playerHud);
             if (damageNumbers != null) builder.RegisterComponent(damageNumbers);
             if (pauseMenu != null) builder.RegisterComponent(pauseMenu);
+            if (runHud != null) builder.RegisterComponent(runHud);
+            if (waveRewardPanel != null) builder.RegisterComponent(waveRewardPanel);
+            if (runEndPanel != null) builder.RegisterComponent(runEndPanel);
+            builder.RegisterInstance(stage);
+            builder.RegisterComponent(runStateMachine);
+            builder.RegisterEntryPoint<RunDirector>().AsSelf();
             builder.RegisterEntryPoint<PauseInput>();
 
             builder.RegisterEntryPoint<PlayerSpawner>()
