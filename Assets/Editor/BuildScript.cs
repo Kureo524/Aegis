@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -15,14 +16,24 @@ namespace EditorTools {
         /// Builds a standalone Linux player containing only the test scene, so the character,
         /// camera and cursor behaviour can be checked in a real build (where cursor
         /// confinement actually works, unlike in the Editor).
-        ///   Unity -batchmode -executeMethod EditorTools.BuildScript.BuildLinuxTest
+        ///   Unity -batchmode -quit -executeMethod EditorTools.BuildScript.BuildLinuxTest
         /// </summary>
         [MenuItem("Tools/Build Linux (Test Scene)")]
-        public static void BuildLinuxTest() {
+        public static void BuildLinuxTest() => Build(new[] { TestScene });
+
+        /// <summary>
+        /// Builds the full game: every scene enabled in the build scene list (Menu, then TestScene).
+        ///   Unity -batchmode -quit -executeMethod EditorTools.BuildScript.BuildLinuxGame
+        /// </summary>
+        [MenuItem("Tools/Build Linux (Game)")]
+        public static void BuildLinuxGame() =>
+            Build(EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray());
+
+        private static void Build(string[] scenes) {
             Directory.CreateDirectory(OutputDir);
 
             var options = new BuildPlayerOptions {
-                scenes = new[] { TestScene },
+                scenes = scenes,
                 locationPathName = Path.Combine(OutputDir, ExecutableName),
                 target = BuildTarget.StandaloneLinux64,
                 options = BuildOptions.None,
@@ -45,7 +56,8 @@ namespace EditorTools {
                 }
             }
 
-            EditorApplication.Exit(summary.result == BuildResult.Succeeded ? 0 : 1);
+            // Exit code for CI / command line only: from the Tools menu this would close the Editor.
+            if (Application.isBatchMode) EditorApplication.Exit(summary.result == BuildResult.Succeeded ? 0 : 1);
         }
     }
 }
