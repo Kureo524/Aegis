@@ -134,7 +134,7 @@ namespace EditorTools {
             return anvil;
         }
 
-        private static void WriteStats(SerializedProperty list, StatBonus[] stats) {
+        internal static void WriteStats(SerializedProperty list, StatBonus[] stats) {
             list.arraySize = stats.Length;
             for (int i = 0; i < stats.Length; i++) {
                 SerializedProperty e = list.GetArrayElementAtIndex(i);

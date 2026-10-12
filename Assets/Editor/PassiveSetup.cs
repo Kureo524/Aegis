@@ -29,7 +29,7 @@ namespace EditorTools {
         private static StatBonus B(StatType s, float v, ModifierType t = ModifierType.Flat) => new(s, t, v);
 
         // A passive is written as a small description of its bricks
-        private sealed class P {
+        internal sealed class P {
             public string Id, Name, Description;
             public StatBonus[] Stats = System.Array.Empty<StatBonus>();
             public Capability[] Capabilities = System.Array.Empty<Capability>();
@@ -140,7 +140,7 @@ namespace EditorTools {
             return (catalog, loot);
         }
 
-        private static PassiveDefinition Passive(P p, string iconId, Sprite icon = null) {
+        internal static PassiveDefinition Passive(P p, string iconId, Sprite icon = null) {
             string path = $"{Dir}/Passive_{p.Id}.asset";
             var passive = AssetDatabase.LoadAssetAtPath<PassiveDefinition>(path);
             if (passive != null) return passive;

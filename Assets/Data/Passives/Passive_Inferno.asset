@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb268d7b3b865bd4fa4aca45803ef906, type: 3}
+  m_Name: Passive_Inferno
+  m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
+  displayName: "Brasier \xE9ternel"
+  description: "Tes sorts br\xFBlent : 20 (+20 % puissance magique) par seconde pendant
+    4 s, cumulable 5 fois."
+  icon: {fileID: 21300000, guid: ef7c933a447dd0ba8ae60b13fa7afb28, type: 3}
+  stats: []
+  capabilities: 
+  triggers:
+  - On: 4
+    EveryN: 1
+    Chance: 1
+    MinSpellStacks: 0
+    HealthBelow: 0
+    Cooldown: 0
+    Effect: 3
+    Stats: []
+    Duration: 0
+    Damage: 0
+    ScalingStat: 0
+    DamageRatio: 0
+    DamageType: 0
+    Loot: 0
+    Status:
+      Kind: 5
+      Duration: 4
+      Power: 20
+      ScalingStat: 5
+      Ratio: 0.2
+      MaxStacks: 5
+    Amount: 0
+    AmountStat: 0
+    AmountRatio: 0
+  stacks:
+    Source: 0
+    Reset: 0
+    Max: 0
+    Duration: 0
+    PerStack: []
+  nearbyEnemies:
+    Radius: 0
+    Max: 0
+    PerEnemy: []

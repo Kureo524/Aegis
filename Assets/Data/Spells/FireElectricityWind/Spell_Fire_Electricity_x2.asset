@@ -41,6 +41,13 @@ MonoBehaviour:
     Type: 1
     Value: 0.4
     Duration: 6
+  statuses: []
+  selfSustain:
+    Heal: 0
+    Shield: 80
+    PowerRatio: 0.3
+    ShieldDuration: 4
   projectileSpeed: 18
   pierce: 0
   blink: 0
+  fixedRange: 0

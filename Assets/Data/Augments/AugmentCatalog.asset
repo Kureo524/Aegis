@@ -25,6 +25,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 883e090b9fa877922a0f3007d2216d26, type: 2}
   - {fileID: 11400000, guid: ddaafc5d3dcd63ed08d272d59906879e, type: 2}
   - {fileID: 11400000, guid: 29dc5e6c98c147370acd5a1d312c0dc2, type: 2}
+  - {fileID: 11400000, guid: 9df18517dfdc02c8cb8d33cb27a7ac71, type: 2}
+  - {fileID: 11400000, guid: 49b6ddb8c961dda5ea948d019ce5f024, type: 2}
+  - {fileID: 11400000, guid: d76928c7d1b75c9f1805d3208338677d, type: 2}
+  - {fileID: 11400000, guid: f2baa8943086e259faaecb5d6b462536, type: 2}
+  - {fileID: 11400000, guid: fc9f6cdce60f394e2890424ade0bbf17, type: 2}
+  - {fileID: 11400000, guid: 3354519c74bafaf52ab2f2e8f43d80e2, type: 2}
+  - {fileID: 11400000, guid: e6c67ed61b5378e9386e8821731ce1cc, type: 2}
   baseSlots: 4
   maxSlots: 6
   choiceCount: 3
