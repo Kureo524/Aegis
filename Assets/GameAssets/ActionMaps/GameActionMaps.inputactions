@@ -670,7 +670,7 @@
                 {
                     "name": "",
                     "id": "55555555-5555-5555-5555-555555555555",
-                    "path": "<Keyboard>/q",
+                    "path": "<Keyboard>/#(q)",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -681,7 +681,7 @@
                 {
                     "name": "",
                     "id": "66666666-6666-6666-6666-666666666666",
-                    "path": "<Keyboard>/a",
+                    "path": "<Keyboard>/#(a)",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -692,7 +692,7 @@
                 {
                     "name": "",
                     "id": "77777777-7777-7777-7777-777777777777",
-                    "path": "<Keyboard>/z",
+                    "path": "<Keyboard>/#(z)",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -703,7 +703,7 @@
                 {
                     "name": "",
                     "id": "88888888-8888-8888-8888-888888888888",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/#(e)",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -714,7 +714,7 @@
                 {
                     "name": "",
                     "id": "99999999-9999-9999-9999-999999999999",
-                    "path": "<Keyboard>/r",
+                    "path": "<Keyboard>/#(r)",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -725,7 +725,7 @@
                 {
                     "name": "",
                     "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-                    "path": "<Keyboard>/f",
+                    "path": "<Keyboard>/#(f)",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -736,7 +736,7 @@
                 {
                     "name": "",
                     "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
-                    "path": "<Keyboard>/t",
+                    "path": "<Keyboard>/#(t)",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -747,7 +747,7 @@
                 {
                     "name": "",
                     "id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
-                    "path": "<Keyboard>/s",
+                    "path": "<Keyboard>/#(s)",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",

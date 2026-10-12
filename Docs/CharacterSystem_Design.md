@@ -190,7 +190,9 @@ Machine à états : `Idle → Chasing → Windup → Cooldown → (re-attaque si
 
 Avec le **New Input System**, `<Keyboard>/q` désigne la touche à la position physique du Q américain (donc le A sur AZERTY). Pour lier aux **lettres affichées sur le clavier du joueur**, utiliser la syntaxe par nom d'affichage : `<Keyboard>/#(a)`, `#(z)`, `#(e)`, `#(r)`, `#(f)`, `#(t)`, `#(q)`, `#(s)` (à vérifier dans l'éditeur de bindings). Prévoir un **menu de rebind** dès le début.
 
-> État actuel : les bindings de `GameActionMaps.inputactions` utilisent encore `<Keyboard>/a`, `/z`, `/e`… (position **QWERTY** physique : sur AZERTY, « Element1 » est la touche **Q**). À basculer en `#(a)` etc. avant la phase 5b (aucun consommateur de ces touches pour l'instant).
+> En place : les touches lettres du gameplay (Q, A, Z, E, R, F, T, S) sont liées par **caractère affiché** (`<Keyboard>/#(a)`…), vérifié par `AzertyBindingTests` (clavier simulé en AZERTY). Le debug `Move` (WASD) reste en position physique.
+>
+> ⚠️ Résoudre un binding `#(x)` interroge le système pour le nom des touches : l'éditeur Linux **segfault en `-batchmode -nographics`** (pas d'affichage, GDK). Lancer les tests et les builds en ligne de commande **sans `-nographics`** (un affichage, même virtuel type `xvfb-run`, est nécessaire en CI).
 
 ### 4.8 Caméra (en place)
 
@@ -1171,7 +1173,6 @@ Les nouveaux modules du §10 (Combat, Spells, Items, Run, AI…) vont dans `Feat
 | Bouton Quit qui pouvait quitter seul au lancement (IMGUI réagit au bouton maintenu) | Clic lu via `ConfirmEvent` (appui), publie `QuitRequestedEvent` |
 
 Points restants (connus) :
-- Bindings AZERTY (§4.7), à faire avant la phase 5b.
 - `Releases/Game.unity` : ancienne scène WASD, scripts manquants, retirée du build. À supprimer ou à reconstruire quand le vrai stage arrivera.
 
 **Outillage**
