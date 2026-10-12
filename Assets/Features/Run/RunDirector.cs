@@ -12,8 +12,8 @@ namespace Features.Run {
     /// PreWave (countdown, nothing spawns) → Combat (timer + kill quota, the horde spawns) →
     /// Reward (timer over AND quota reached: the horde vanishes, the end-of-wave screen opens, game
     /// paused) → PreWave… If the timer ends before the quota: Overtime, one stage life lost at once
-    /// and one more every LifeLossInterval until the quota is reached. Dying costs a life too
-    /// (StageDefinition.DeathCostsALife). 0 life → RunEndedEvent(lost); the last bonus wave
+    /// and one more every LifeLossInterval until the quota is reached. Dying is an instant defeat
+    /// (StageDefinition.PlayerDeath, or a life with LoseLife). 0 life → RunEndedEvent(lost); the last bonus wave
     /// cleared → RunEndedEvent(won). Once the quota is reached, kills give gold only (no XP):
     /// this is where kill XP is granted (XpGrantedEvent).
     /// Game scope entry point.
@@ -59,7 +59,9 @@ namespace Features.Run {
                 if (!QuotaReachedForXp) _eventBus.Publish(new XpGrantedEvent(e.Xp));
             }));
             _subscriptions.Add(_eventBus.Subscribe<PlayerDiedEvent>(_ => {
-                if (_stage.DeathCostsALife && !_halted) LoseLife();
+                if (_halted) return;
+                if (_stage.PlayerDeath == PlayerDeathRule.GameOver) End(won: false);
+                else LoseLife();
             }));
             _subscriptions.Add(_eventBus.Subscribe<RewardClosedEvent>(_ => OnRewardClosed()));
             _subscriptions.Add(_eventBus.Subscribe<SkipWaveRequestedEvent>(_ => SkipWave()));

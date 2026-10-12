@@ -25,6 +25,6 @@ MonoBehaviour:
   rewardSchedule: {fileID: 11400000, guid: b8147802226b238688f2a45c9fc1ea9e, type: 2}
   lives: 3
   lifeLossInterval: 30
-  deathCostsALife: 1
+  playerDeath: 0
   firstWaveCountdown: 5
   preWaveCountdown: 10
