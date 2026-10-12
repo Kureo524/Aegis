@@ -1143,7 +1143,7 @@ Les nouveaux modules du §10 (Combat, Spells, Items, Run, AI…) vont dans `Feat
 > `TestScene.unity` et son NavMesh sont binaires : déclarés `binary`, jamais fusionnés.
 
 **Workflow**
-- Branches : `main` (stable, taguée par jalon, ex. `v0.1-phase1`), `develop` (intégration), `feature/<module>-<sujet>`, `fix/<sujet>`. Fusion par **pull request** vers `develop`.
+- Branches : `main` (stable, taguée par jalon, ex. `v0.1-phase1`), `dev` (intégration), `feature/<module>-<sujet>`, `fix/<sujet>` (minuscules, tirets, pas de `&` ni d'espace). Fusion par **pull request** vers `dev`.
 - **Commits atomiques** au format *Conventional Commits* : `feat(stats): ajoute les StatModifier`, `fix(nav): corrige le clic hors NavMesh`, `data(spells): ajoute Spell_Fire_x1`, `docs: met à jour le design doc`, `refactor`, `test`, `chore`.
 - **Toujours committer un asset avec son `.meta`**. Déplacer et renommer les assets **dans Unity** uniquement.
 - **Limiter les conflits de scènes** : scènes petites, logique dans les **prefabs** et les ScriptableObjects, scènes additives ; une seule personne édite une scène à la fois.
