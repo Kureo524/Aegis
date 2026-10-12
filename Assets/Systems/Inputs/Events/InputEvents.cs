@@ -51,9 +51,17 @@ namespace Systems.Inputs.Events {
         }
     }
     
-    public readonly struct CastSpellEvent : IEvent { }
+    /// <summary>R pressed, or released (Released: casts in the "quick cast with indicator" mode).</summary>
+    public readonly struct CastSpellEvent : IEvent {
+        public readonly bool Released;
+        public CastSpellEvent(bool released) => Released = released;
+    }
     
-    public readonly struct SignatureEvent : IEvent { }
+    /// <summary>F pressed, or released (see <see cref="CastSpellEvent"/>).</summary>
+    public readonly struct SignatureEvent : IEvent {
+        public readonly bool Released;
+        public SignatureEvent(bool released) => Released = released;
+    }
     
     public readonly struct ResetElementsEvent : IEvent { }
     

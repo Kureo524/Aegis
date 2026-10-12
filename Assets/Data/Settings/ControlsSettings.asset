@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: ControlsSettings
   m_EditorClassIdentifier: Game.Systems::Systems.Inputs.ControlsSettings
   keyboardLayout: 1
+  castMode: 1

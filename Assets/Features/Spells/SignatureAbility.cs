@@ -44,7 +44,10 @@ namespace Features.Spells {
             _subscriptions.Dispose();
             _readyAt = 0f;
             if (Spell == null) return;
-            _subscriptions.Add(_eventBus.Subscribe<SignatureEvent>(_ => TryUse()));
+            _subscriptions.Add(_eventBus.Subscribe<SignatureEvent>(e => {
+                if (e.Released) targeting.Release(AimMode.Signature);
+                else TryUse();
+            }));
             _eventBus.Publish(new SignatureAssignedEvent(Spell));
         }
 

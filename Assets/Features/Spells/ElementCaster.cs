@@ -76,7 +76,10 @@ namespace Features.Spells {
                 if (AimingElemental) targeting.Cancel();   // T also cancels an R aim (§7.1)
                 Selection.Clear();
             }));
-            _subscriptions.Add(_eventBus.Subscribe<CastSpellEvent>(_ => TryCast()));
+            _subscriptions.Add(_eventBus.Subscribe<CastSpellEvent>(e => {
+                if (e.Released) targeting.Release(AimMode.Spell);
+                else TryCast();
+            }));
 
             _eventBus.Publish(new PlayerElementsEvent(Slots[0], Slots[1], Slots[2]));
             PublishLevels();
@@ -98,7 +101,7 @@ namespace Features.Spells {
             return Feedback($"Prochain élément au niveau {Levels.NextUnlockLevel}");
         }
 
-        /// <summary>R: checks, then aims (or casts at once: Self spell, quick cast option).</summary>
+        /// <summary>R: checks, then aims (or casts at once: Self spell, quick cast). Releasing R casts in the "with indicator" mode.</summary>
         public bool TryCast() {
             if (Selection == null || !owner.IsAlive) return false;
             if (Selection.IsEmpty) return Feedback("Aucun élément");

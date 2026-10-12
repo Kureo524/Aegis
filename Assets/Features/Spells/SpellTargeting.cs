@@ -5,6 +5,7 @@ using Features.Controls;
 using Features.Events;
 using Features.Options;
 using Systems.EventBusses;
+using Systems.Inputs;
 using Systems.Inputs.Events;
 using UnityEngine;
 using VContainer;
@@ -14,8 +15,9 @@ namespace Features.Spells {
     /// Aiming of the player's spells (design doc §7.4–7.5): shows the range and the spell shape under
     /// the cursor; left click confirms (builds the CastContext), right click / Escape cancel.
     /// Only one aim at a time: starting one publishes AimModeEvent, and any other aim mode (Q
-    /// attack-move…) cancels this one. With the quick cast option (UserOptions), <see cref="Aim"/>
-    /// skips the aiming and casts at once towards the cursor. Player prefab variant.
+    /// attack-move…) cancels this one. <see cref="Aim"/> follows the player's CastMode (UserOptions):
+    /// Normal = aim then left click; QuickWithIndicator = aim while the key is held, cast on release
+    /// (<see cref="Release"/>); Quick = cast at once towards the cursor. Player prefab variant.
     /// </summary>
     public class SpellTargeting : MonoBehaviour {
         [SerializeField] private Character owner;
@@ -36,6 +38,7 @@ namespace Features.Spells {
         private AimMode _mode;
         private Action<CastContext> _onConfirm;
         private Action _onCancel;
+        private bool _castOnRelease;
         private Vector2 _pointer;
 
         public bool IsAiming => _spell != null;
@@ -61,10 +64,30 @@ namespace Features.Spells {
 
         private void OnDestroy() => _subscriptions.Dispose();
 
-        /// <summary>R / F: aims <paramref name="spell"/>, or casts it at once with the quick cast option.</summary>
+        /// <summary>R / F pressed: aims <paramref name="spell"/> or casts it at once, depending on the cast mode.</summary>
         public void Aim(SpellDefinition spell, AimMode mode, Action<CastContext> onConfirm) {
-            if (_options != null && _options.QuickCast) CastAtCursor(spell, onConfirm);
-            else BeginAim(spell, mode, onConfirm);
+            CastMode castMode = _options != null ? _options.CastMode : CastMode.Normal;
+            if (castMode == CastMode.Quick) {
+                CastAtCursor(spell, onConfirm);
+                return;
+            }
+            BeginAim(spell, mode, onConfirm);
+            _castOnRelease = castMode == CastMode.QuickWithIndicator;
+        }
+
+        /// <summary>
+        /// R / F released: casts the aim started by that key in the "quick cast with indicator" mode.
+        /// Nothing if the aim was already cast (left click), cancelled, or is a plain Normal aim.
+        /// </summary>
+        public void Release(AimMode mode) {
+            if (!IsAiming || _mode != mode || !_castOnRelease) return;
+            if (!TryBuildContext(_spell, out CastContext ctx)) {
+                Cancel();   // no valid target under the cursor: the key is up, the aim ends
+                return;
+            }
+            Action<CastContext> onConfirm = _onConfirm;
+            Stop(publish: true);
+            onConfirm?.Invoke(ctx);
         }
 
         /// <summary>Quick cast: the context is built from the cursor right now, no aiming step.</summary>
@@ -83,6 +106,7 @@ namespace Features.Spells {
             _spell = spell;
             _onConfirm = onConfirm;
             _onCancel = onCancel;
+            _castOnRelease = false;
             ShowRange();
         }
 
@@ -104,6 +128,7 @@ namespace Features.Spells {
             _spell = null;
             _onConfirm = null;
             _onCancel = null;
+            _castOnRelease = false;
             indicator.Hide();
             rangeIndicator.Hide();
             if (publish) _eventBus.Publish(new AimModeEvent(AimMode.None));

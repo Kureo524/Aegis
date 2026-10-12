@@ -1,5 +1,6 @@
 using System;
 using Features.Options;
+using Systems.Inputs;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,30 +10,50 @@ namespace Features.UI.Panels {
     /// menu. Edits <see cref="UserOptions"/> directly: every change is saved at once.
     /// </summary>
     public sealed class OptionsView : VisualElement {
+        private static readonly (CastMode mode, string label, string hint)[] CastModes = {
+            (CastMode.Normal, "Normal", "R / F affichent la portée, le clic gauche lance."),
+            (CastMode.QuickWithIndicator, "Rapide avec indicateur",
+             "Maintiens R / F pour voir la portée, relâche pour lancer vers le curseur."),
+            (CastMode.Quick, "Rapide", "R / F lancent tout de suite vers le curseur, sans rien afficher."),
+        };
+
         public event Action Back;
 
-        private readonly Toggle _quickCast;
         private readonly UserOptions _options;
+        private readonly Button[] _castButtons = new Button[CastModes.Length];
+        private readonly Label _castHint;
 
         public OptionsView(UserOptions options) {
             _options = options;
             style.alignItems = Align.Stretch;
 
             Add(MenuStyles.Title("Options"));
-
-            _quickCast = new Toggle("Quick cast") { value = options.QuickCast };
-            MenuStyles.StyleToggle(_quickCast);
-            _quickCast.RegisterValueChangedCallback(e => _options.QuickCast = e.newValue);
-            Add(_quickCast);
-            Add(MenuStyles.Hint("R et F lancent le sort tout de suite vers le curseur, sans visée ni clic gauche."));
+            Add(MenuStyles.Section("Lancement des sorts"));
+            for (int i = 0; i < CastModes.Length; i++) {
+                CastMode mode = CastModes[i].mode;
+                _castButtons[i] = MenuStyles.Button(CastModes[i].label, () => {
+                    _options.CastMode = mode;
+                    Refresh();
+                });
+                Add(_castButtons[i]);
+            }
+            _castHint = MenuStyles.Hint("");
+            Add(_castHint);
 
             Button back = MenuStyles.Button("Retour", () => Back?.Invoke());
             back.style.marginTop = 18;
             Add(back);
+            Refresh();
         }
 
-        /// <summary>Re-reads the saved values (the other menu may have changed them).</summary>
-        public void Refresh() => _quickCast.SetValueWithoutNotify(_options.QuickCast);
+        /// <summary>Shows the saved values (the other menu may have changed them).</summary>
+        public void Refresh() {
+            for (int i = 0; i < CastModes.Length; i++) {
+                bool selected = CastModes[i].mode == _options.CastMode;
+                MenuStyles.Select(_castButtons[i], selected);
+                if (selected) _castHint.text = CastModes[i].hint;
+            }
+        }
     }
 
     /// <summary>Inline styles of the code-built menus (pause, options).</summary>
@@ -88,16 +109,16 @@ namespace Features.UI.Panels {
             return button;
         }
 
-        public static void StyleToggle(Toggle toggle) {
-            toggle.style.fontSize = 17;
-            toggle.style.color = Color.white;
-            toggle.style.marginLeft = toggle.style.marginRight = 0;
-            toggle.labelElement.style.color = Color.white;
-            toggle.labelElement.style.unityFontStyleAndWeight = FontStyle.Bold;
-            toggle.labelElement.style.minWidth = 0;
-            toggle.labelElement.style.flexGrow = 1;
-            VisualElement input = toggle.Q(className: UnityEngine.UIElements.Toggle.inputUssClassName);
-            if (input != null) input.style.justifyContent = Justify.FlexEnd;   // checkbox at the right end of the row
+        public static Label Section(string text) {
+            Label section = UiStyles.Text(text, 16, Color.white);
+            section.style.marginBottom = 4;
+            return section;
+        }
+
+        /// <summary>Highlights the chosen entry of a list of choices.</summary>
+        public static void Select(Button button, bool selected) {
+            button.style.backgroundColor = selected ? new Color(0.45f, 0.36f, 0.12f) : ButtonColor;
+            UiStyles.Border(button, selected ? 2 : 1, selected ? Accent : new Color(1f, 1f, 1f, 0.2f), 6);
         }
     }
 }

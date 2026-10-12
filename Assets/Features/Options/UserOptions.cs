@@ -16,7 +16,7 @@ namespace Features.Options {
     public sealed class UserOptions {
         [Serializable]
         private class Data {
-            public bool quickCast;
+            public CastMode castMode;
         }
 
         private readonly IEventBus _eventBus;
@@ -31,16 +31,16 @@ namespace Features.Options {
         public UserOptions(ControlsSettings defaults, IEventBus eventBus, string path) {
             _eventBus = eventBus;
             _path = path;
-            _data = new Data { quickCast = defaults != null && defaults.QuickCast };
+            _data = new Data { castMode = defaults != null ? defaults.CastMode : CastMode.QuickWithIndicator };
             Load();
         }
 
-        /// <summary>R and F cast at once towards the cursor, without the aiming step (§7.4).</summary>
-        public bool QuickCast {
-            get => _data.quickCast;
+        /// <summary>How R and F cast: aim + click, hold + release, or at once (§7.4).</summary>
+        public CastMode CastMode {
+            get => _data.castMode;
             set {
-                if (_data.quickCast == value) return;
-                _data.quickCast = value;
+                if (_data.castMode == value) return;
+                _data.castMode = value;
                 Save();
                 _eventBus.Publish(new UserOptionsChangedEvent());
             }

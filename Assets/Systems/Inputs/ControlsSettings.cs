@@ -8,10 +8,10 @@ namespace Systems.Inputs {
     [CreateAssetMenu(menuName = "Game/Settings/Controls Settings", fileName = "ControlsSettings")]
     public class ControlsSettings : ScriptableObject {
         [SerializeField] private KeyboardLayout keyboardLayout = KeyboardLayout.Azerty;
-        [Tooltip("Default of the quick cast option: R / F cast at once towards the cursor.")]
-        [SerializeField] private bool quickCast;
+        [Tooltip("Default cast mode of R / F (player option).")]
+        [SerializeField] private CastMode castMode = CastMode.QuickWithIndicator;
 
         public KeyboardLayout KeyboardLayout => keyboardLayout;
-        public bool QuickCast => quickCast;
+        public CastMode CastMode => castMode;
     }
 }
