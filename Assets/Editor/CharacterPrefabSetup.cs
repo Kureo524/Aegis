@@ -4,6 +4,7 @@ using Features.CameraControl;
 using Features.Characters;
 using Features.Combat;
 using Features.Controls;
+using Features.Enemies;
 using Features.Movement;
 using Features.Spells;
 using Features.UI;
@@ -20,13 +21,14 @@ namespace EditorTools {
     ///                      CharacterMovement, Character) + "Visual" child (billboard sprite)
     ///   Player.prefab      variant of Character + PlayerCommandInput
     ///   TrainingDummy.prefab  variant of Character + RespawnOnDeath
-    /// Enemies will be another variant (+ AI). What differs between two characters of the same
+    ///   Enemy.prefab       variant of Character + EnemyAI (discrete collisions: hundreds of them) What differs between two characters of the same
     /// kind (sprite, size, stats) stays in their CharacterDefinition, never in a variant.
     /// </summary>
     public static class CharacterPrefabSetup {
         public const string BasePrefabPath = "Assets/Prefabs/Characters/Character.prefab";
         public const string PlayerPrefabPath = "Assets/Prefabs/Characters/Player.prefab";
         public const string DummyPrefabPath = "Assets/Prefabs/Characters/TrainingDummy.prefab";
+        public const string EnemyPrefabPath = "Assets/Prefabs/Characters/Enemy.prefab";
         public const string PlaceholderSpritePath = "Assets/GraphicAssets/Sprites/Characters/Placeholder_Hero.png";
         public const string WhiteSpritePath = "Assets/GraphicAssets/Sprites/UI/White.png";
         public const string ArcaneBoltPrefabPath = "Assets/Prefabs/Combat/Projectile_ArcaneBolt.prefab";
@@ -102,6 +104,50 @@ namespace EditorTools {
                 Object.DestroyImmediate(instance);
             }
             return AssetDatabase.LoadAssetAtPath<Character>(DummyPrefabPath);
+        }
+
+        public static Character CreateEnemyPrefab() {
+            CreatePlayerPrefab();   // makes sure the base exists and is up to date
+            if (!File.Exists(EnemyPrefabPath)) {
+                var basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BasePrefabPath);
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(basePrefab);
+                instance.name = "Enemy";
+                instance.AddComponent<EnemyAI>();
+                PrefabUtility.SaveAsPrefabAsset(instance, EnemyPrefabPath);
+                Object.DestroyImmediate(instance);
+            }
+            EditPrefab(EnemyPrefabPath, root => {
+                // Continuous detection on hundreds of bodies costs a lot; enemies are slow enough without it
+                root.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.Discrete;
+                if (!root.TryGetComponent(out EnemyAI ai)) ai = root.AddComponent<EnemyAI>();
+                SetRefs(ai, ("owner", root.GetComponent<Character>()), ("movement", root.GetComponent<CharacterMovement>()),
+                        ("attacker", root.GetComponent<BasicAttacker>()), ("caster", root.GetComponent<SpellCaster>()),
+                        ("agent", root.GetComponent<NavMeshAgent>()));
+            });
+            return AssetDatabase.LoadAssetAtPath<Character>(EnemyPrefabPath);
+        }
+
+        /// <summary>Character sprite import settings: pixel art, 64 px per unit, pivot at the feet. Idempotent.</summary>
+        public static void ConfigureCharacterSprite(string path) {
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer == null) return;
+            var settings = new TextureImporterSettings();
+            importer.ReadTextureSettings(settings);
+            if (importer.textureType == TextureImporterType.Sprite && importer.spriteImportMode == SpriteImportMode.Single
+                && Mathf.Approximately(importer.spritePixelsPerUnit, PixelsPerUnit) && importer.filterMode == FilterMode.Point
+                && settings.spriteAlignment == (int)SpriteAlignment.BottomCenter) return;
+
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.spritePixelsPerUnit = PixelsPerUnit;
+            importer.filterMode = FilterMode.Point;
+            importer.mipmapEnabled = false;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.alphaIsTransparency = true;
+            importer.ReadTextureSettings(settings);
+            settings.spriteAlignment = (int)SpriteAlignment.BottomCenter;
+            importer.SetTextureSettings(settings);
+            importer.SaveAndReimport();
         }
 
         // Adds what later phases put on every character (basic attack, HP bar). Idempotent, keeps edits.

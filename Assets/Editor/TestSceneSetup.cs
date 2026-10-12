@@ -12,6 +12,7 @@ using Features.Movement;
 using Features.UI;
 using Features.UI.DebugTools;
 using Features.UI.Panels;
+using Features.Stats;
 using UnityEngine.UIElements;
 using VContainer.Unity;
 
@@ -308,6 +309,19 @@ namespace EditorTools {
                 Check(scope.playerPrefab != null, "scope.playerPrefab wired");
                 Check(scope.playerHud != null, "scope.playerHud wired");
                 Check(scope.damageNumbers != null, "scope.damageNumbers wired");
+                Check(scope.hordeSettings != null, "scope.hordeSettings wired");
+                if (scope.hordeSettings != null) {
+                    var table = scope.hordeSettings.SpawnTable;
+                    Check(table.Length > 0 && System.Array.TrueForAll(table, e => e.Prefab != null && e.Definition != null && e.Weight > 0f),
+                          "horde spawn table: prefab, definition and weight on every entry");
+                    Check(System.Array.TrueForAll(table, e => e.Prefab == null || e.Prefab.GetComponent<Features.Enemies.EnemyAI>() != null),
+                          "horde prefabs carry an EnemyAI");
+                    Check(System.Array.TrueForAll(table, e => e.Definition == null || (e.Definition.BasicAttack != null && e.Definition.Sprite != null)),
+                          "horde enemies have a basic attack and a sprite");
+                    Check(System.Array.TrueForAll(table, e => e.Definition == null || e.Definition.SpecialSpell == null
+                                                              || e.Definition.BaseStats.Get(StatType.MaxMana) > 0f),
+                          "enemies with a special spell have mana (MaxMana)");
+                }
                 Check(scope.pauseMenu != null && scope.pauseMenu.GetComponent<UIDocument>().panelSettings != null,
                       "scope.pauseMenu wired, with panel settings");
                 Check(scope.playerHud != null && scope.playerHud.GetComponent<UIDocument>().panelSettings != null,
