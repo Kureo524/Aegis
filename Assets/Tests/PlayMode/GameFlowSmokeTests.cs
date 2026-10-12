@@ -295,6 +295,87 @@ namespace Game.Tests.PlayMode {
             }
         }
 
+        private static Vector2 ScreenOf(Vector3 world) =>
+            Object.FindFirstObjectByType<CameraController>().GetComponent<Camera>().WorldToScreenPoint(world);
+
+        [UnityTest]
+        public IEnumerator Fireball_HitsTheAimedDummy_PaysMana_StartsTheCooldown_ClearsTheSelection() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var dummy = FindDummy(player);
+            var caster = player.GetComponent<Features.Spells.ElementCaster>();
+            var bus = Root.Resolve<IEventBus>();
+
+            bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0, levelUp: true));   // unlock Fire
+            bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));                  // A
+            Assert.AreEqual("Boule de feu", caster.ResolvedSpell.DisplayName);
+            float manaBefore = player.Mana.Current;
+            float cost = caster.CurrentManaCost;
+
+            bus.Publish(new Systems.Inputs.Events.CastSpellEvent());                     // R: aim
+            var targeting = player.GetComponent<Features.Spells.SpellTargeting>();
+            Assert.IsTrue(targeting.IsAiming);
+            bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(dummy.transform.position)));   // left click on it
+            Assert.IsFalse(targeting.IsAiming);
+
+            yield return new WaitForSeconds(1f);
+            Assert.Less(dummy.Health.Current, dummy.Health.Max, "Fireball hit the dummy");
+            Assert.AreEqual(manaBefore - cost, player.Mana.Current, 2.5f, "mana paid (plus ~1 s of regen at 1.5/s)");
+            Assert.AreEqual(0, caster.Selection.Total, "selection cleared after the cast");
+            Assert.Greater(caster.CooldownRemaining, 0f, "shared elemental cooldown");
+
+            string feedback = null;
+            using (bus.Subscribe<Features.Events.GameplayFeedbackEvent>(e => feedback = e.Message)) {
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));
+                bus.Publish(new Systems.Inputs.Events.CastSpellEvent());
+            }
+            Assert.IsFalse(targeting.IsAiming, "on cooldown: no aim");
+            StringAssert.Contains("recharge", feedback);
+        }
+
+        [UnityTest]
+        public IEnumerator SelfBuff_IsCastAtOnce_AndWearsOff() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var bus = Root.Resolve<IEventBus>();
+            float speed = player.Stats.Value(Features.Stats.StatType.MoveSpeed);
+
+            bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(2, levelUp: true));   // unlock Wind
+            bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(2));
+            bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(2));                  // Wind x2 = Bourrasque (Self)
+            bus.Publish(new Systems.Inputs.Events.CastSpellEvent());
+
+            Assert.IsFalse(player.GetComponent<Features.Spells.SpellTargeting>().IsAiming, "Self spell: no aim");
+            Assert.AreEqual(speed * 1.3f, player.Stats.Value(Features.Stats.StatType.MoveSpeed), 1e-3f, "+30% move speed");
+            yield return new WaitForSeconds(4.3f);
+            Assert.AreEqual(speed, player.Stats.Value(Features.Stats.StatType.MoveSpeed), 1e-3f, "buff expired");
+        }
+
+        [UnityTest]
+        public IEnumerator Flash_TeleportsTowardsTheCursor_ClampedToRange_ThenGoesOnCooldown() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var bus = Root.Resolve<IEventBus>();
+            var signature = player.GetComponent<Features.Spells.SignatureAbility>();
+            Vector3 start = player.transform.position;
+
+            bus.Publish(new Systems.Inputs.Events.SignatureEvent());                     // F: aim
+            bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(start + new Vector3(-10f, 0f, -3f))));
+            yield return null;
+
+            Vector3 moved = player.transform.position - start;
+            moved.y = 0f;
+            Assert.AreEqual(signature.Spell.Range, moved.magnitude, 0.5f, "clamped to Flash range");
+            Assert.Less(moved.x, -3f, "towards the cursor");
+            Assert.Greater(signature.CooldownRemaining, 19f);
+
+            bus.Publish(new Systems.Inputs.Events.SignatureEvent());
+            Assert.IsFalse(player.GetComponent<Features.Spells.SpellTargeting>().IsAiming, "on cooldown");
+        }
+
         [UnityTest]
         public IEnumerator Menu_Play_LoadsGameScene() {
             yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
