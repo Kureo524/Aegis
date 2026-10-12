@@ -29,6 +29,14 @@ namespace Game.Tests.PlayMode {
             yield return null;
         }
 
+        // The test scene's horde would walk into every test: its continuous spawn is stopped.
+        internal static IEnumerator LoadGameScene() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            Object.FindFirstObjectByType<Containers.GameLifetimeScope>().Container
+                  .Resolve<Features.Enemies.HordeSpawner>().SetSpawning(false);
+        }
+
         private static IEnumerator WaitFor(System.Func<bool> condition, float timeout = 10f) {
             float end = Time.realtimeSinceStartup + timeout;
             while (!condition() && Time.realtimeSinceStartup < end) yield return null;
@@ -37,7 +45,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator GameScene_BootsDirectly_IntoGameState() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             var machine = Root.Resolve<GameFlowStateMachine>();
 
             yield return WaitFor(() => machine.HasState && machine.CurrentState == GameState.Game);
@@ -52,7 +60,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator Camera_KeepsAFixedAngle_WhileFollowing() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var camera = Object.FindFirstObjectByType<CameraController>();
             var movement = FindPlayer().GetComponent<Features.Movement.CharacterMovement>();
@@ -76,7 +84,7 @@ namespace Game.Tests.PlayMode {
             };
             Vector3 destination = destinations[caseIndex];
 
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return new WaitForFixedUpdate();
             var movement = FindPlayer().GetComponent<Features.Movement.CharacterMovement>();
             Assert.IsNotNull(movement);
@@ -92,7 +100,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator Player_IsInitializedFromItsDefinition_AndLevelsUpFromBusXp() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             Assert.IsNotNull(player.Definition, "Player not initialized");
@@ -113,7 +121,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator Player_IsSpawnedFromPrefab_SpriteFacesCamera_AndFlips() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var camera = Object.FindFirstObjectByType<CameraController>();
@@ -149,7 +157,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator Player_AttacksADummy_DamageIsDealtAndShown() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var dummy = FindDummy(player);
@@ -169,7 +177,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator KillingADummy_GivesXp_ThenItRespawns() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var dummy = FindDummy(player);
@@ -187,7 +195,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator RangedAttack_FiresPooledProjectiles() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var dummy = FindDummy(player);
@@ -207,7 +215,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator AttackMove_AttacksEnemiesInRange_ThenWalksToThePoint() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var attacker = player.GetComponent<Features.Combat.BasicAttacker>();
@@ -230,7 +238,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator HoldingAttackMove_ShowsTheAttackRange_ReleasingHidesIt() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var indicator = player.GetComponentInChildren<Features.Controls.RangeIndicator>(true);
@@ -252,7 +260,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator Elements_UnlockWithSkillPoints_StackAndResolveToASpell() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var caster = player.GetComponent<Features.Spells.ElementCaster>();
@@ -300,7 +308,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator Fireball_HitsTheAimedDummy_PaysMana_StartsTheCooldown_ClearsTheSelection() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var dummy = FindDummy(player);
@@ -336,7 +344,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator SelfBuff_IsCastAtOnce_AndWearsOff() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var bus = Root.Resolve<IEventBus>();
@@ -355,7 +363,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator Flash_AlwaysBlinksItsFullRange_TowardsTheCursor_ThenGoesOnCooldown() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var bus = Root.Resolve<IEventBus>();
@@ -378,7 +386,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator Flash_IntoAWall_LandsOnTheLastWalkableSpot() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var bus = Root.Resolve<IEventBus>();
@@ -399,7 +407,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator QuickCast_CastsAtOnceTowardsTheCursor() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var options = Root.Resolve<Features.Options.UserOptions>();
             Systems.Inputs.CastMode previous = options.CastMode;
@@ -430,7 +438,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator QuickCastWithIndicator_AimsWhileHeld_CastsOnRelease() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var options = Root.Resolve<Features.Options.UserOptions>();
             Systems.Inputs.CastMode previous = options.CastMode;
@@ -478,7 +486,7 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator Escape_CancelsTheAimFirst_ThenPauses_AndThePauseMenuLeadsBackOrToTheMenu() {
-            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return LoadGameScene();
             yield return null;
             var machine = Root.Resolve<GameFlowStateMachine>();
             var bus = Root.Resolve<IEventBus>();
