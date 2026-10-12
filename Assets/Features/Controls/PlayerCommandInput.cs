@@ -1,7 +1,7 @@
-using System;
 using Features.Characters;
 using Features.Combat;
 using Features.Movement;
+using Features.Stats;
 using Systems.EventBusses;
 using Systems.Inputs.Events;
 using UnityEngine;
@@ -14,6 +14,9 @@ namespace Features.Controls {
     /// Turns the player's pointer commands into orders for the character (design doc §4).
     /// Right click on an enemy: attack it (chase, then auto-attack). Right click on the ground:
     /// move there, which cancels the attack (a windup in progress is lost), LoL style.
+    /// Q then left click: attack-move (§4.6) to the clicked point, attacking first the enemy closest
+    /// to the click (if any within attackMoveSelectRadius); while aiming, the attack range is shown.
+    /// Right click or Escape cancels the aim without giving any order.
     /// Lives on the Player prefab variant.
     /// </summary>
     public class PlayerCommandInput : MonoBehaviour {
@@ -22,12 +25,16 @@ namespace Features.Controls {
         [SerializeField] public BasicAttacker attacker;
         [Tooltip("Thin sprites are hard to click: an enemy this close to the clicked ground point counts.")]
         [SerializeField] public float pickRadius = 0.8f;
+        [Tooltip("Attack-move: an enemy this close to the clicked point becomes the first target.")]
+        [SerializeField] public float attackMoveSelectRadius = 2f;
+        [SerializeField] public RangeIndicator rangeIndicator;
         [SerializeField] public GameObject clickMarkerPrefab;   // must carry a ClickMarker
 
         private IEventBus _eventBus;
         private IObjectResolver _resolver;
         private Camera _camera;
-        private IDisposable _pointerCommandSubscription;
+        private readonly DisposableBag _subscriptions = new();
+        private bool _aimingAttackMove;
         private ClickMarker _currentMarker;
         private Plane _groundPlane;
         private readonly RaycastHit[] _rayHits = new RaycastHit[16];
@@ -45,18 +52,52 @@ namespace Features.Controls {
         }
 
         private void Start() {
-            _pointerCommandSubscription = _eventBus.Subscribe<PointerCommandEvent>(OnPointerCommand);
+            _subscriptions.Add(_eventBus.Subscribe<PointerCommandEvent>(OnPointerCommand));
+            _subscriptions.Add(_eventBus.Subscribe<AttackMoveEvent>(_ => StartAimingAttackMove()));
+            _subscriptions.Add(_eventBus.Subscribe<ConfirmEvent>(OnConfirm));
+            _subscriptions.Add(_eventBus.Subscribe<CancelEvent>(_ => StopAiming()));
         }
 
-        private void OnDestroy() => _pointerCommandSubscription?.Dispose();
+        private void OnDestroy() => _subscriptions.Dispose();
+
+        private void StartAimingAttackMove() {
+            if (!character.IsAlive) return;
+            _aimingAttackMove = true;
+            if (rangeIndicator != null) rangeIndicator.Show(character.Stats.Value(StatType.AttackRange));
+        }
+
+        private void StopAiming() {
+            _aimingAttackMove = false;
+            if (rangeIndicator != null) rangeIndicator.Hide();
+        }
+
+        private void OnConfirm(ConfirmEvent evt) {
+            if (!_aimingAttackMove) return;
+            StopAiming();
+            if (!TryGetGroundPoint(evt.ScreenPosition, out Ray _, out Vector3 point)) return;
+
+            Character preferred = ClosestEnemy(point, attackMoveSelectRadius);
+            if (attacker.AttackMove(point, preferred)) ShowMarker(point, new Color(1f, 0.55f, 0.1f));
+        }
+
+        private bool TryGetGroundPoint(Vector2 screenPosition, out Ray ray, out Vector3 point) {
+            ray = _camera.ScreenPointToRay(screenPosition);
+            point = default;
+            if (!_groundPlane.Raycast(ray, out float distance)) return false;
+            point = ray.GetPoint(distance);
+            return true;
+        }
 
         private void OnPointerCommand(PointerCommandEvent evt) {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
 
-            Ray ray = _camera.ScreenPointToRay(evt.ScreenPosition);
-            if (!_groundPlane.Raycast(ray, out float distance)) return;
+            // Right click while aiming only cancels the aim (§4.6)
+            if (_aimingAttackMove) {
+                StopAiming();
+                return;
+            }
 
-            Vector3 worldPoint = ray.GetPoint(distance);
+            if (!TryGetGroundPoint(evt.ScreenPosition, out Ray ray, out Vector3 worldPoint)) return;
 
             Character enemy = PickEnemy(ray, worldPoint);
             if (enemy != null && attacker.Attack(enemy)) {
@@ -81,9 +122,13 @@ namespace Features.Controls {
                 best = c;
                 bestDistance = _rayHits[i].distance;
             }
-            if (best != null) return best;
+            return best != null ? best : ClosestEnemy(groundPoint, pickRadius);
+        }
 
-            count = Physics.OverlapSphereNonAlloc(groundPoint, pickRadius, _overlapHits);
+        private Character ClosestEnemy(Vector3 groundPoint, float radius) {
+            Character best = null;
+            float bestDistance = float.MaxValue;
+            int count = Physics.OverlapSphereNonAlloc(groundPoint, radius, _overlapHits);
             for (int i = 0; i < count; i++) {
                 Character c = _overlapHits[i].GetComponentInParent<Character>();
                 if (!IsTargetable(c)) continue;

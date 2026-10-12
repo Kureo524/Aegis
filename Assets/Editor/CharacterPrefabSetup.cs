@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.IO;
+using Features.CameraControl;
 using Features.Characters;
 using Features.Combat;
 using Features.Controls;
@@ -27,6 +28,9 @@ namespace EditorTools {
         public const string DummyPrefabPath = "Assets/Prefabs/Characters/TrainingDummy.prefab";
         public const string PlaceholderSpritePath = "Assets/GraphicAssets/Sprites/Characters/Placeholder_Hero.png";
         public const string WhiteSpritePath = "Assets/GraphicAssets/Sprites/UI/White.png";
+        public const string ArcaneBoltPrefabPath = "Assets/Prefabs/Combat/Projectile_ArcaneBolt.prefab";
+        private const string ArcaneBoltSpritePath = "Assets/GraphicAssets/Sprites/VFX/Arcane_Bolt.png";
+        private const string UnlitMaterialPath = "Assets/GraphicAssets/Materials/Unlit_Sprite.mat";
         private const string ClickMarkerPath = "Assets/Prefabs/ClickMarker.prefab";
 
         private const int SpriteWidth = 64;
@@ -54,6 +58,10 @@ namespace EditorTools {
                 var input = root.GetComponent<PlayerCommandInput>();
                 input.character = root.GetComponent<Character>();
                 input.attacker = root.GetComponent<BasicAttacker>();
+
+                RangeIndicator indicator = root.GetComponentInChildren<RangeIndicator>(true);
+                if (indicator == null) indicator = CreateRangeIndicator(root.transform);
+                input.rangeIndicator = indicator;
             });
             return AssetDatabase.LoadAssetAtPath<Character>(PlayerPrefabPath);
         }
@@ -96,6 +104,68 @@ namespace EditorTools {
                 characterSo.FindProperty("healthBar").objectReferenceValue = bar;
                 characterSo.ApplyModifiedPropertiesWithoutUndo();
             });
+        }
+
+        private static RangeIndicator CreateRangeIndicator(Transform parent) {
+            var go = new GameObject("RangeIndicator");
+            go.transform.SetParent(parent, false);
+            var line = go.AddComponent<LineRenderer>();
+            line.sharedMaterial = UnlitMaterial();
+            line.widthMultiplier = 0.06f;
+            line.startColor = line.endColor = new Color(0.45f, 0.85f, 1f, 0.8f);
+            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            line.receiveShadows = false;
+            line.sortingOrder = 50;
+            var indicator = go.AddComponent<RangeIndicator>();
+            go.SetActive(false);
+            return indicator;
+        }
+
+        /// <summary>Homing arcane bolt of the test hero's basic attack: glowing orb facing the camera + short trail.</summary>
+        public static Projectile CreateArcaneBoltPrefab() {
+            if (!File.Exists(ArcaneBoltPrefabPath)) {
+                Directory.CreateDirectory(Path.GetDirectoryName(ArcaneBoltPrefabPath)!);
+                var root = new GameObject("Projectile_ArcaneBolt");
+
+                var visual = new GameObject("Visual");
+                visual.transform.SetParent(root.transform, false);
+                var sprite = visual.AddComponent<SpriteRenderer>();
+                sprite.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(ArcaneBoltSpritePath);
+                sprite.sortingOrder = 60;
+                visual.AddComponent<Billboard>();
+
+                var trail = root.AddComponent<TrailRenderer>();
+                trail.sharedMaterial = UnlitMaterial();
+                trail.time = 0.12f;
+                trail.minVertexDistance = 0.05f;
+                trail.widthCurve = AnimationCurve.Linear(0f, 0.22f, 1f, 0f);
+                trail.colorGradient = new Gradient {
+                    colorKeys = new[] { new GradientColorKey(new Color(0.55f, 0.9f, 1f), 0f), new GradientColorKey(new Color(0.2f, 0.5f, 1f), 1f) },
+                    alphaKeys = new[] { new GradientAlphaKey(0.9f, 0f), new GradientAlphaKey(0f, 1f) },
+                };
+                trail.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                trail.receiveShadows = false;
+                trail.sortingOrder = 59;
+
+                var projectile = root.AddComponent<Projectile>();
+                var so = new SerializedObject(projectile);
+                so.FindProperty("trail").objectReferenceValue = trail;
+                so.ApplyModifiedPropertiesWithoutUndo();
+
+                PrefabUtility.SaveAsPrefabAsset(root, ArcaneBoltPrefabPath);
+                Object.DestroyImmediate(root);
+            }
+            return AssetDatabase.LoadAssetAtPath<Projectile>(ArcaneBoltPrefabPath);
+        }
+
+        // Unlit, vertex-colored, alpha-blended: for lines, trails and small VFX.
+        private static Material UnlitMaterial() {
+            var material = AssetDatabase.LoadAssetAtPath<Material>(UnlitMaterialPath);
+            if (material != null) return material;
+            Directory.CreateDirectory(Path.GetDirectoryName(UnlitMaterialPath)!);
+            material = new Material(Shader.Find("Sprites/Default"));
+            AssetDatabase.CreateAsset(material, UnlitMaterialPath);
+            return material;
         }
 
         private static HealthBarView CreateHealthBar(Transform parent) {

@@ -68,6 +68,7 @@ namespace EditorTools {
             CreateTestHero();
             Character playerPrefab = CharacterPrefabSetup.CreatePlayerPrefab();
             AssignMissingHeroSprite();
+            AssignMissingHeroProjectile();
             CreateTrainingDummy();
             Character dummyPrefab = CharacterPrefabSetup.CreateDummyPrefab();
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve);
@@ -161,6 +162,16 @@ namespace EditorTools {
             so.FindProperty("baseStats").objectReferenceValue = stats;
             so.FindProperty("xpReward").intValue = 150;
             so.FindProperty("goldReward").intValue = 25;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Ranged hero: its basic attack fires the arcane bolt. Only fills an empty slot.
+        private static void AssignMissingHeroProjectile() {
+            var attack = AssetDatabase.LoadAssetAtPath<BasicAttackDefinition>(TestHeroDir + "/BasicAttack_TestHero.asset");
+            if (attack == null || attack.ProjectilePrefab != null) return;
+            var so = new SerializedObject(attack);
+            so.FindProperty("projectilePrefab").objectReferenceValue = CharacterPrefabSetup.CreateArcaneBoltPrefab();
+            so.FindProperty("projectileSpeed").floatValue = 20f;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
