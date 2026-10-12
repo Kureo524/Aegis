@@ -97,7 +97,10 @@ namespace Features.UI {
             slot.Icon = new VisualElement { pickingMode = PickingMode.Ignore };
             UiStyles.Fill(slot.Icon);
             slot.Icon.style.left = slot.Icon.style.right = slot.Icon.style.top = slot.Icon.style.bottom = 6;
-            slot.Icon.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+            slot.Icon.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+            slot.Icon.style.backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center);
+            slot.Icon.style.backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center);
+            slot.Icon.style.backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat);
             slot.Frame.Add(slot.Icon);
 
             var key = UiStyles.Text(Keys[index], 12, Color.white);
