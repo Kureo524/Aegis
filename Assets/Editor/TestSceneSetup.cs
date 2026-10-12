@@ -4,12 +4,14 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using Containers;
+using System.Collections.Generic;
 using Features.CameraControl;
 using Features.Characters;
 using Features.Controls;
 using Features.Movement;
 using Features.UI;
 using Features.UI.DebugTools;
+using UnityEngine.UIElements;
 using VContainer.Unity;
 
 namespace EditorTools {
@@ -75,6 +77,8 @@ namespace EditorTools {
             scope.playerSpawn = spawn;
             WirePlayer(scope, CharacterPrefabSetup.CreatePlayerPrefab(),
                        AssetDatabase.LoadAssetAtPath<CharacterDefinition>(ProjectSetup.TestHeroPath));
+            WireCombat(scope, CharacterPrefabSetup.CreateDummyPrefab(),
+                       AssetDatabase.LoadAssetAtPath<CharacterDefinition>(ProjectSetup.DummyPath));
 
             // Save scene
             System.IO.Directory.CreateDirectory("Assets/Scenes/Tests");
@@ -127,6 +131,44 @@ namespace EditorTools {
 
             var surface = Object.FindFirstObjectByType<Unity.AI.Navigation.NavMeshSurface>();
             if (surface != null) BakeNavMesh(surface);
+        }
+
+        private const string DummiesRoot = "=== Dummies ===";
+        private const string PanelSettingsPath = "Assets/UI Toolkit/PanelSettings.asset";
+
+        // Two dummies in range of the spawn, one that has to be chased
+        private static readonly Vector3[] DummyPositions = {
+            new(3f, 0f, 3f), new(-4f, 0f, 2f), new(0f, 0f, -7f),
+        };
+
+        /// <summary>
+        /// Training dummies (spawn points + scope spawn list) and the game HUD (player bars, damage
+        /// numbers) in the test scene. Idempotent.
+        /// </summary>
+        public static void WireCombat(GameLifetimeScope scope, Character dummyPrefab, CharacterDefinition dummyDefinition) {
+            var existing = GameObject.Find(DummiesRoot);
+            if (existing != null) Object.DestroyImmediate(existing);
+            var root = new GameObject(DummiesRoot);
+
+            scope.enemySpawns = new List<CharacterSpawn>();
+            for (int i = 0; i < DummyPositions.Length; i++) {
+                var point = new GameObject($"DummySpawn_{i + 1}").transform;
+                point.SetParent(root.transform);
+                point.position = DummyPositions[i];
+                scope.enemySpawns.Add(new CharacterSpawn { Prefab = dummyPrefab, Definition = dummyDefinition, Point = point });
+            }
+
+            var hud = Object.FindFirstObjectByType<PlayerHud>();
+            if (hud == null) {
+                var hudGo = new GameObject("GameHud");
+                var document = hudGo.AddComponent<UIDocument>();
+                document.panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
+                hud = hudGo.AddComponent<PlayerHud>();
+                hudGo.AddComponent<DamageNumbersView>();
+            }
+            scope.playerHud = hud;
+            scope.damageNumbers = hud.GetComponent<DamageNumbersView>();
+            EditorUtility.SetDirty(scope);
         }
 
         private const string ObstaclesRoot = "=== Obstacles ===";
@@ -246,6 +288,15 @@ namespace EditorTools {
                 Check(scope.characterDebugPanel != null, "scope.characterDebugPanel wired");
                 Check(scope.playerSpawn != null, "scope.playerSpawn wired");
                 Check(scope.playerPrefab != null, "scope.playerPrefab wired");
+                Check(scope.playerHud != null, "scope.playerHud wired");
+                Check(scope.damageNumbers != null, "scope.damageNumbers wired");
+                Check(scope.playerHud != null && scope.playerHud.GetComponent<UIDocument>().panelSettings != null,
+                      "game HUD has panel settings");
+                Check(scope.enemySpawns.Count == DummyPositions.Length, "training dummies listed in scope.enemySpawns");
+                foreach (CharacterSpawn spawn in scope.enemySpawns) {
+                    Check(spawn.Prefab != null && spawn.Definition is EnemyDefinition && spawn.Point != null,
+                          $"dummy spawn {(spawn.Point != null ? spawn.Point.name : "?")} complete");
+                }
                 Check(scope.playerDefinition != null, "scope.playerDefinition wired");
                 if (scope.playerDefinition != null) {
                     Check(scope.playerDefinition.Faction == Faction.Player, "player definition is in the Player faction");
@@ -255,7 +306,7 @@ namespace EditorTools {
                 if (scope.playerPrefab != null) {
                     Character prefab = scope.playerPrefab;
                     var characterSo = new SerializedObject(prefab);
-                    foreach (string field in new[] { "movement", "visual", "body", "agent" })
+                    foreach (string field in new[] { "movement", "visual", "body", "agent", "attacker", "healthBar" })
                         Check(characterSo.FindProperty(field).objectReferenceValue != null, $"Player prefab: character.{field} wired");
 
                     var input = prefab.GetComponent<PlayerCommandInput>();
@@ -263,6 +314,7 @@ namespace EditorTools {
                     if (input != null) {
                         Check(input.characterMovement != null, "Player prefab: input.characterMovement wired");
                         Check(input.clickMarkerPrefab != null, "Player prefab: input.clickMarkerPrefab wired");
+                        Check(input.character != null && input.attacker != null, "Player prefab: input.character / attacker wired");
                     }
 
                     var rb = prefab.GetComponent<Rigidbody>();

@@ -55,7 +55,7 @@ namespace Game.Tests.PlayMode {
             yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
             yield return null;
             var camera = Object.FindFirstObjectByType<CameraController>();
-            var movement = Object.FindFirstObjectByType<Features.Movement.CharacterMovement>();
+            var movement = FindPlayer().GetComponent<Features.Movement.CharacterMovement>();
             Quaternion initial = camera.transform.rotation;
 
             movement.SetDestination(new Vector3(-8f, 0f, -8f));
@@ -78,7 +78,7 @@ namespace Game.Tests.PlayMode {
 
             yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
             yield return new WaitForFixedUpdate();
-            var movement = Object.FindFirstObjectByType<Features.Movement.CharacterMovement>();
+            var movement = FindPlayer().GetComponent<Features.Movement.CharacterMovement>();
             Assert.IsNotNull(movement);
 
             movement.SetDestination(destination);
@@ -94,7 +94,7 @@ namespace Game.Tests.PlayMode {
         public IEnumerator Player_IsInitializedFromItsDefinition_AndLevelsUpFromBusXp() {
             yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
             yield return null;
-            var player = Object.FindFirstObjectByType<Features.Characters.Character>();
+            var player = FindPlayer();
             Assert.IsNotNull(player.Definition, "Player not initialized");
             Assert.IsTrue(player.IsPlayer);
             Assert.Greater(player.Stats.Value(Features.Stats.StatType.MoveSpeed), 0f, "MoveSpeed comes from the stats");
@@ -115,7 +115,7 @@ namespace Game.Tests.PlayMode {
         public IEnumerator Player_IsSpawnedFromPrefab_SpriteFacesCamera_AndFlips() {
             yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
             yield return null;
-            var player = Object.FindFirstObjectByType<Features.Characters.Character>();
+            var player = FindPlayer();
             var camera = Object.FindFirstObjectByType<CameraController>();
             Assert.IsNotNull(player, "Player not spawned");
             Assert.AreEqual(player.transform, camera.target, "Camera received the player through PlayerSpawnedEvent");
@@ -132,6 +132,57 @@ namespace Game.Tests.PlayMode {
             movement.SetDestination(player.transform.position + camera.transform.right * 6f);   // right on screen
             yield return new WaitForSeconds(0.3f);   // time, not frames: batchmode runs uncapped
             Assert.IsFalse(visual.FacesLeft, "Faces right when moving right");
+        }
+
+        // Training dummies are Characters too: always look the player up explicitly.
+        private static Features.Characters.Character FindPlayer() {
+            foreach (var c in Object.FindObjectsByType<Features.Characters.Character>(FindObjectsSortMode.None))
+                if (c.IsPlayer) return c;
+            return null;
+        }
+
+        private static Features.Characters.Character FindDummy(Features.Characters.Character player) {
+            foreach (var c in Object.FindObjectsByType<Features.Characters.Character>(FindObjectsSortMode.None))
+                if (c != player && c.IsAlive) return c;
+            return null;
+        }
+
+        [UnityTest]
+        public IEnumerator Player_AttacksADummy_DamageIsDealtAndShown() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var dummy = FindDummy(player);
+            Assert.IsNotNull(dummy, "Training dummies spawned");
+
+            int hits = 0;
+            var bus = Root.Resolve<IEventBus>();
+            using (bus.Subscribe<Features.Events.DamageDealtEvent>(e => { if (!e.TargetIsPlayer) hits++; })) {
+                var attacker = player.GetComponent<Features.Combat.BasicAttacker>();
+                Assert.IsTrue(attacker.Attack(dummy));
+                yield return new WaitForSeconds(4f);
+            }
+
+            Assert.Less(dummy.Health.Current, dummy.Health.Max, "Dummy took damage");
+            Assert.Greater(hits, 1, "Several attacks landed (and were published for the damage numbers)");
+        }
+
+        [UnityTest]
+        public IEnumerator KillingADummy_GivesXp_ThenItRespawns() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var dummy = FindDummy(player);
+            int xpBefore = player.Level.Xp;
+
+            dummy.TakeDamage(new Features.Combat.DamageInfo(100000f, Features.Combat.DamageType.True, false, false, player));
+            Assert.IsFalse(dummy.IsAlive);
+            var dummyDef = (Features.Characters.EnemyDefinition)dummy.Definition;
+            Assert.AreEqual(xpBefore + dummyDef.XpReward, player.Level.Xp, "XP granted on kill");
+
+            yield return new WaitForSeconds(2.5f);
+            Assert.IsTrue(dummy.IsAlive, "Dummy respawned");
+            Assert.AreEqual(dummy.Health.Max, dummy.Health.Current, 1e-3f);
         }
 
         [UnityTest]
