@@ -106,9 +106,11 @@ namespace Systems.Inputs {
         private void OnConfirm(InputAction.CallbackContext ctx)        => _eventBus.Publish(new ConfirmEvent(_pointerPosition));
         private void OnCancel(InputAction.CallbackContext ctx)         => _eventBus.Publish(new CancelEvent());
         private void OnAttackMove(InputAction.CallbackContext ctx)     => _eventBus.Publish(new AttackMoveEvent(ctx.performed));
-        private void OnElement1(InputAction.CallbackContext ctx)       => _eventBus.Publish(new ElementKeyEvent(0));
-        private void OnElement2(InputAction.CallbackContext ctx)       => _eventBus.Publish(new ElementKeyEvent(1));
-        private void OnElement3(InputAction.CallbackContext ctx)       => _eventBus.Publish(new ElementKeyEvent(2));
+        private void OnElement1(InputAction.CallbackContext ctx)       => PublishElementKey(0);
+        private void OnElement2(InputAction.CallbackContext ctx)       => PublishElementKey(1);
+        private void OnElement3(InputAction.CallbackContext ctx)       => PublishElementKey(2);
+        private void PublishElementKey(int slot) =>
+            _eventBus.Publish(new ElementKeyEvent(slot, levelUp: _input.Gameplay.LevelUpModifier.IsPressed()));
         private void OnCastSpell(InputAction.CallbackContext ctx)      => _eventBus.Publish(new CastSpellEvent());
         private void OnSignature(InputAction.CallbackContext ctx)      => _eventBus.Publish(new SignatureEvent());
         private void OnResetElements(InputAction.CallbackContext ctx)  => _eventBus.Publish(new ResetElementsEvent());

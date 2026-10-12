@@ -1585,7 +1585,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game.Features::Features.UI.PlayerHud
   hpColor: {r: 0.3, g: 0.8, b: 0.35, a: 1}
+  manaColor: {r: 0.25, g: 0.5, b: 0.95, a: 1}
   xpColor: {r: 0.55, g: 0.4, b: 0.95, a: 1}
+  feedbackDuration: 1.5
 --- !u!114 &846932365
 MonoBehaviour:
   m_ObjectHideFlags: 0

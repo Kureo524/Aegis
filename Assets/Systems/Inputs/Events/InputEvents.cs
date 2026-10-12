@@ -37,11 +37,14 @@ namespace Systems.Inputs.Events {
         public AttackMoveEvent(bool pressed) => Pressed = pressed;
     }
     
+    /// <summary>A / Z / E. With Ctrl held (LevelUp), spends a skill point on the element instead.</summary>
     public readonly struct ElementKeyEvent : IEvent {
         public readonly int Slot; // 0, 1, 2
-        
-        public ElementKeyEvent(int slot) {
+        public readonly bool LevelUp;
+
+        public ElementKeyEvent(int slot, bool levelUp = false) {
             Slot = slot;
+            LevelUp = levelUp;
         }
     }
     

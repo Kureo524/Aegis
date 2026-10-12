@@ -19,3 +19,9 @@ MonoBehaviour:
   baseStats: {fileID: 11400000, guid: 678c37d837112de6d9c82309cb4b4bb1, type: 2}
   growthPerLevel: {fileID: 11400000, guid: f56a6bbecec94666a9f39d0ac4101af0, type: 2}
   basicAttack: {fileID: 11400000, guid: 65fc0cafb31edf45cbf2771e1b8b28fc, type: 2}
+  elements:
+  - {fileID: 11400000, guid: 285e684a3b80006cd82825202311105a, type: 2}
+  - {fileID: 11400000, guid: 98103e74f2cbae5ca997b11d08750fe1, type: 2}
+  - {fileID: 11400000, guid: d5eff05456af63b8e8b1123fe0fbe3f9, type: 2}
+  elementUnlockLevels: 010000000300000005000000
+  spellBook: {fileID: 11400000, guid: 160ee35b4f843680c9479b45e1e6931f, type: 2}

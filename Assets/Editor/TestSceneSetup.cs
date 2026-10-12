@@ -309,6 +309,12 @@ namespace EditorTools {
                     var attack = scope.playerDefinition.BasicAttack;
                     Check(attack != null && attack.ProjectilePrefab != null && attack.ProjectileSpeed > 0f,
                           "player basic attack fires a projectile");
+                    Check(scope.playerDefinition.HasElements, "player has 3 elements and a spell book");
+                    if (scope.playerDefinition.HasElements) {
+                        var resolver = new Features.Spells.SpellResolver(scope.playerDefinition.SpellBook, scope.playerDefinition.Elements);
+                        Check(resolver.Problems.Count == 0 && resolver.MissingKeys(3, 3).Count == 0 && resolver.Count == 19,
+                              "player spell book covers the 19 recipes, no duplicate");
+                    }
                 }
                 if (scope.playerPrefab != null) {
                     Character prefab = scope.playerPrefab;
@@ -323,6 +329,9 @@ namespace EditorTools {
                         Check(input.clickMarkerPrefab != null, "Player prefab: input.clickMarkerPrefab wired");
                         Check(input.character != null && input.attacker != null, "Player prefab: input.character / attacker wired");
                         Check(input.rangeIndicator != null, "Player prefab: input.rangeIndicator wired");
+                        var caster = prefab.GetComponent<Features.Spells.ElementCaster>();
+                        Check(caster != null && new SerializedObject(caster).FindProperty("owner").objectReferenceValue != null,
+                              "Player prefab: ElementCaster wired");
                     }
 
                     var rb = prefab.GetComponent<Rigidbody>();
@@ -350,6 +359,7 @@ namespace EditorTools {
                 Check(rootSo.FindProperty("cameraSettings").objectReferenceValue != null, "root.cameraSettings wired");
                 Check(rootSo.FindProperty("experienceCurve").objectReferenceValue != null, "root.experienceCurve wired");
                 Check(rootSo.FindProperty("controlsSettings").objectReferenceValue != null, "root.controlsSettings wired");
+                Check(rootSo.FindProperty("spellSettings").objectReferenceValue != null, "root.spellSettings wired");
             }
 
             if (errors.Length > 0) {

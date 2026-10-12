@@ -44,6 +44,17 @@ namespace Features.Events {
         }
     }
 
+    /// <summary>Player mana changed (HUD).</summary>
+    public readonly struct PlayerManaChangedEvent : IEvent {
+        public readonly float Current;
+        public readonly float Max;
+
+        public PlayerManaChangedEvent(float current, float max) {
+            Current = current;
+            Max = max;
+        }
+    }
+
     /// <summary>The player died. Nothing reacts yet (GameOver comes with the run loop, phase 7).</summary>
     public readonly struct PlayerDiedEvent : IEvent { }
 }

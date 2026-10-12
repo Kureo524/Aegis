@@ -323,6 +323,16 @@ namespace GameAssets.ActionMaps
                     ""interactions"": """",
                     ""initialStateCheck"": true,
                     ""priority"": 0
+                },
+                {
+                    ""name"": ""LevelUpModifier"",
+                    ""type"": ""Button"",
+                    ""id"": ""909c6b7d-ec57-409c-af89-cced20a5a936"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true,
+                    ""priority"": 0
                 }
             ],
             ""bindings"": [
@@ -873,6 +883,28 @@ namespace GameAssets.ActionMaps
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Zoom"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ef86f5ab-b737-4071-860f-50f4ca3f617a"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""LevelUpModifier"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9ee776fb-4551-4d2d-b714-80b9095a40c4"",
+                    ""path"": ""<Keyboard>/rightCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""LevelUpModifier"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1493,6 +1525,7 @@ namespace GameAssets.ActionMaps
             m_Gameplay_Stop = m_Gameplay.FindAction("Stop", throwIfNotFound: true);
             m_Gameplay_CameraLock = m_Gameplay.FindAction("CameraLock", throwIfNotFound: true);
             m_Gameplay_Zoom = m_Gameplay.FindAction("Zoom", throwIfNotFound: true);
+            m_Gameplay_LevelUpModifier = m_Gameplay.FindAction("LevelUpModifier", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1609,6 +1642,7 @@ namespace GameAssets.ActionMaps
         private readonly InputAction m_Gameplay_Stop;
         private readonly InputAction m_Gameplay_CameraLock;
         private readonly InputAction m_Gameplay_Zoom;
+        private readonly InputAction m_Gameplay_LevelUpModifier;
         /// <summary>
         /// Provides access to input actions defined in input action map "Gameplay".
         /// </summary>
@@ -1713,6 +1747,10 @@ namespace GameAssets.ActionMaps
             /// </summary>
             public InputAction @Zoom => m_Wrapper.m_Gameplay_Zoom;
             /// <summary>
+            /// Provides access to the underlying input action "Gameplay/LevelUpModifier".
+            /// </summary>
+            public InputAction @LevelUpModifier => m_Wrapper.m_Gameplay_LevelUpModifier;
+            /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
             public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
@@ -1807,6 +1845,9 @@ namespace GameAssets.ActionMaps
                 @Zoom.started += instance.OnZoom;
                 @Zoom.performed += instance.OnZoom;
                 @Zoom.canceled += instance.OnZoom;
+                @LevelUpModifier.started += instance.OnLevelUpModifier;
+                @LevelUpModifier.performed += instance.OnLevelUpModifier;
+                @LevelUpModifier.canceled += instance.OnLevelUpModifier;
             }
 
             /// <summary>
@@ -1887,6 +1928,9 @@ namespace GameAssets.ActionMaps
                 @Zoom.started -= instance.OnZoom;
                 @Zoom.performed -= instance.OnZoom;
                 @Zoom.canceled -= instance.OnZoom;
+                @LevelUpModifier.started -= instance.OnLevelUpModifier;
+                @LevelUpModifier.performed -= instance.OnLevelUpModifier;
+                @LevelUpModifier.canceled -= instance.OnLevelUpModifier;
             }
 
             /// <summary>
@@ -2348,6 +2392,13 @@ namespace GameAssets.ActionMaps
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnZoom(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "LevelUpModifier" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnLevelUpModifier(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

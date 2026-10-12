@@ -38,6 +38,7 @@ namespace Features.Characters {
         public StatController Stats { get; } = new();
         public CharacterLevel Level { get; private set; }
         public Health Health { get; private set; }
+        public ManaPool Mana { get; private set; }
         public bool IsAlive => Health != null && !Health.IsDead;
         public bool IsPlayer => Definition != null && Definition.Faction == Faction.Player;
         public Faction Faction => Definition != null ? Definition.Faction : Faction.Neutral;
@@ -48,6 +49,8 @@ namespace Features.Characters {
         public event Action<Character, float> Damaged;   // (self, damage taken)
         public event Action<Character> Died;
         public event Action<Character> Revived;
+        /// <summary>After every Init: same-prefab components configure themselves from the definition.</summary>
+        public event Action<Character> Initialized;
 
         [Inject]
         public void Construct(IEventBus eventBus, ExperienceCurve experienceCurve) {
@@ -66,6 +69,7 @@ namespace Features.Characters {
                 Health.Died -= OnDied;
                 Health.Detach();
             }
+            Mana?.Detach();
 
             Definition = definition;
             ApplyBody(definition);
@@ -75,21 +79,26 @@ namespace Features.Characters {
             Level = new CharacterLevel(Stats, definition.GrowthPerLevel, _experienceCurve);
             Health = new Health(Stats.Get(StatType.MaxHealth));
             Health.Died += OnDied;
+            Mana = new ManaPool(Stats.Get(StatType.MaxMana));
             if (movement != null) movement.Init(Stats.Get(StatType.MoveSpeed));
             if (healthBar != null) healthBar.Bind(this);
             SetBodyActive(true);
 
             if (IsPlayer) BindPlayerToBus();
+            Initialized?.Invoke(this);
         }
 
         // TODO(phase 6): regeneration of hundreds of enemies → one central tick.
         private void Update() {
-            if (IsAlive) Health.Heal(Stats.Value(StatType.HealthRegen) * Time.deltaTime);
+            if (!IsAlive) return;
+            Health.Heal(Stats.Value(StatType.HealthRegen) * Time.deltaTime);
+            Mana.Restore(Stats.Value(StatType.ManaRegen) * Time.deltaTime);
         }
 
         private void OnDestroy() {
             _busSubscriptions.Dispose();
             Health?.Detach();
+            Mana?.Detach();
         }
 
         public bool IsHostileTo(Character other) =>
@@ -171,6 +180,8 @@ namespace Features.Characters {
 
             Health health = Health;
             health.Changed += (current, max) => _eventBus.Publish(new PlayerHealthChangedEvent(current, max));
+            ManaPool mana = Mana;
+            mana.Changed += (current, max) => _eventBus.Publish(new PlayerManaChangedEvent(current, max));
 
             foreach (Stat stat in Stats.Stats.Values) {
                 StatType type = stat.Type;
@@ -180,6 +191,7 @@ namespace Features.Characters {
             // Initial snapshot for whoever displays it
             foreach (Stat stat in Stats.Stats.Values) _eventBus.Publish(new StatChangedEvent(stat.Type, stat.Value));
             _eventBus.Publish(new PlayerHealthChangedEvent(health.Current, health.Max));
+            _eventBus.Publish(new PlayerManaChangedEvent(mana.Current, mana.Max));
             PublishXp();
         }
 
