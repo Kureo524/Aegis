@@ -50,6 +50,21 @@ namespace Game.Tests.PlayMode {
             Assert.IsFalse(camera.IsLocked, "CameraLockEvent toggles the lock");
         }
 
+        [UnityTest]
+        public IEnumerator Camera_KeepsAFixedAngle_WhileFollowing() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var camera = Object.FindFirstObjectByType<CameraController>();
+            var movement = Object.FindFirstObjectByType<Features.Movement.CharacterMovement>();
+            Quaternion initial = camera.transform.rotation;
+
+            movement.SetDestination(new Vector3(-8f, 0f, -8f));
+            for (int i = 0; i < 60; i++) {
+                yield return null;
+                Assert.Less(Quaternion.Angle(initial, camera.transform.rotation), 0.01f, "Camera tilted");
+            }
+        }
+
         // Destinations hidden behind the test course obstacles (see TestSceneSetup.Obstacles):
         // reaching them proves the path goes around instead of into the walls.
         [UnityTest]

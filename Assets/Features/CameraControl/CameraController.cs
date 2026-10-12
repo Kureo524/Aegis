@@ -7,7 +7,8 @@ using VContainer;
 namespace Features.CameraControl {
     /// <summary>
     /// LoL-style camera. Locked: follows <see cref="target"/>. Unlocked: free, scrolled by moving
-    /// the cursor to the screen edges. Space / middle mouse toggles the lock (CameraLockEvent),
+    /// the cursor to the screen edges. The angle never changes: the rotation is derived once from
+    /// the offset (no LookAt, which tilted the camera while it lagged behind the character). Space / middle mouse toggles the lock (CameraLockEvent),
     /// the wheel zooms (ZoomEvent). Tuning comes from <see cref="CameraSettings"/>.
     /// </summary>
     [RequireComponent(typeof(Camera))]
@@ -40,6 +41,7 @@ namespace Features.CameraControl {
             _currentOffset = _settings.Offset;
             _currentZoom = _settings.Offset.magnitude;
             _isLocked = _settings.StartLocked;
+            transform.rotation = Quaternion.LookRotation(-_settings.Offset);
 
             _subscriptions.Add(_eventBus.Subscribe<CameraLockEvent>(_ => ToggleLock()));
             _subscriptions.Add(_eventBus.Subscribe<ZoomEvent>(OnZoom));
@@ -59,7 +61,6 @@ namespace Features.CameraControl {
             if (_isLocked) {
                 Vector3 targetPosition = target.position + _currentOffset;
                 transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * _settings.FollowSpeed);
-                transform.LookAt(target.position);
             }
             else {
                 transform.position += _scrollVelocity * Time.deltaTime;
