@@ -748,6 +748,15 @@ Une **run** est une partie sur un **stage**, **équivalent d'un niveau de BTD6**
 - Le temps de complétion d'un stage **n'a aucune importance** (pas de score de vitesse).
 - `WaveDefinition` : `KillQuota`, `TimeLimit`, tables de spawn, `PostQuotaSpawnRate`, `WaveScaling`, boss éventuel.
 
+> **En place (phase 7a)** :
+> - **Données** : `StageDefinition` (vagues, vagues bonus, `WaveRewardSchedule`, `Lives` = 3, `LifeLossInterval` = 30 s, `DeathCostsALife`, `FirstWaveCountdown` = 5 s, `PreWaveCountdown` = 10 s), `WaveDefinition` (`KillQuota`, `TimeLimit`, `SpawnTable`, `SpawnInterval`, `PostQuotaSpawnInterval`, `MaxAlive`, `WaveScaling` = multiplicateurs de PV et de dégâts appliqués en `PercentMult`). Stage de test `Stage_Test` (`Assets/Data/Run/TestStage`) : **5 vagues + 2 vagues bonus**, quotas 12 → 36, 40 à 60 s, gobelins d'abord puis archers et brutes, PV ×1 → ×2,1 (valeurs provisoires).
+> - **`RunDirector`** (scope Game) pilote la `RunStateMachine` (objet de la scène, règles écrites par *Project Setup*) : `PreWave` (compte à rebours, rien ne spawn) → `Combat` (`HordeSpawner.Configure` avec la vague, spawn continu) → `Reward` si timer écoulé **et** quota atteint, sinon `Overtime` (−1 vie tout de suite, puis toutes les 30 s ; quota atteint → `Reward`). Fin de vague : la horde disparaît, `WaveRewardEvent` annonce la récompense du `WaveRewardSchedule`, le jeu est en pause (`TimeScaleService`, map UI). « Continuer » (`RewardClosedEvent`) → compte à rebours de la vague suivante. Dernière vague bonus terminée → `RunEndedEvent(won)` → `GameState.Win` ; 0 vie → `GameState.GameOver`.
+> - **Quota et XP** : seuls les ennemis du `HordeSpawner` comptent (`WaveEnemyKilledEvent`, pas les mannequins). L'XP de kill passe désormais par le `RunDirector` (`EnemyKilledEvent` → `XpGrantedEvent`), coupée une fois le quota atteint ; le gold reste.
+> - **Mort du joueur** : coûte une vie de stage (`DeathCostsALife`, choix provisoire à valider, §13), la horde disparaît et le joueur réapparaît au spawn après 3 s ; la vague continue.
+> - **UI** : `RunHudView` en haut (vague / bonus, timer ou compte à rebours, kills / quota, vies, bannières « Vague N », « Vie perdue »), `WaveRewardPanel` (récompense annoncée + Continuer ; le contenu arrive en 7b et en phase 8), `RunEndPanel` (Victoire / Défaite, vagues terminées, niveau, or ; Rejouer = la vague 1 de nouveau, Menu principal, Quitter).
+> - **Debug** : bouton « Skip wave » du panneau de test (`SkipWaveRequestedEvent`).
+> - *Reste (7b) : boutiques, élixirs, enclumes, items, `Inventory`. Plus tard : augments (phase 8), boss, `RunSnapshot`.*
+
 ### 9.2 XP, niveaux, points de compétence et gold
 
 - **XP et gold sont crédités directement au kill** (`EnemyDefinition.XpReward`, `GoldReward`). Une fois le quota de la vague atteint, l'XP n'est plus donnée (gold seul).
@@ -951,7 +960,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 
 | Phase | Contenu | Résultat jouable |
 |---|---|---|
-| **0** ✅ | **Fondations** (§14) : dépôt Git, arborescence et asmdef, `IEventBus`, `GameState` (+ `Win`), `RootLifetimeScope`, SO de réglages, tests EditMode + PlayMode. *Reste : `RunStateMachine` (avec la phase 7).* | Projet propre qui compile, états de jeu et événements en place |
+| **0** ✅ | **Fondations** (§14) : dépôt Git, arborescence et asmdef, `IEventBus`, `GameState` (+ `Win`), `RootLifetimeScope`, SO de réglages, tests EditMode + PlayMode. `RunStateMachine` ajoutée avec la phase 7a. | Projet propre qui compile, états de jeu et événements en place |
 | **1** ✅ | `CharacterMovement` (clic droit, **NavMesh**), marqueur, caméra verrouillée / libre (§4.8), `TestScene`, prefab 2.5D (`Character` + variant `Player`, sprite billboard, §3) | Un perso qui se déplace au clic en évitant les obstacles |
 | **2** ✅ | `Stat` / `StatModifier` / `StatController` + toutes les stats + tests unitaires | Stats modifiables |
 | **3** ✅ | `CharacterDefinition`, `Character.Init`, `BasicAttackDefinition`, `CharacterLevel` (XP, points de compétence, croissance), vitesse lue depuis `MoveSpeed`. Sprite et taille du corps depuis la définition. | Un perso configurable par données |
@@ -960,7 +969,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **5b** ✅ | `ManaPool`, `ElementSelection` (A/Z/E, T reset), `SpellBook` + `SpellResolver`, coût en mana + UI, déblocage d'éléments par points (niv. 1/3/5, Ctrl + A/Z/E) | Éléments activables, coût affiché |
 | **5c** ✅ | R + visée + indicateurs, sorts Magic/Physical/Buff, niveaux d'éléments, cooldown par lancement, compétence propre F (Flash) | Sorts lancés à la souris |
 | **6** ✅ | `EnemyDefinition`, `EnemyAI` (flow field + NavMesh pour élites), mana TFT + sort spécial, spawner, XP/gold au kill | Un combat complet avec des hordes |
-| **7** | `RunDirector` (timer + quota, fin de vague = timer ET quota, vies), `Wallet`, `Inventory` (6 slots), `WaveRewardSchedule`, boutiques, enclumes, élixirs, items | Boucle de run + économie |
+| **7** 🟡 | `RunDirector` (timer + quota, fin de vague = timer ET quota, vies), `Wallet`, `WaveRewardSchedule`, victoire / défaite ✅ (7a). *Reste (7b) : `Inventory` (6 slots), boutiques, enclumes, élixirs, items.* | Boucle de run + économie |
 | **8** | `CharacterEvents`, passifs (`StackCounter`), capacités, augments (4 slots, rerolls), loot | Builds variés |
 | **9** | Boss à patterns et items, contenu : sorts, éléments, passifs, items, augments, ennemis | Prototype riche |
 | **10** | Méta-progression (arbres par élément et par personnage, monnaie persistante, surcharge), `RunSnapshot` (quitter/reprendre), polish, UI, audio | Prototype solide |
@@ -987,6 +996,8 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 ## 13. Questions ouvertes (à valider avant de coder)
 
 **Résolu** : plan XZ ; reset (T) ; une recette = un sort (19 par perso) ; cooldown par lancement {2, 3.5, 5.5} s ; compétence propre F (Flash 20 s) remplaçable par un sort d'invocateur ; points de compétence aux niveaux 1 à 15 pour monter le niveau des éléments (une fois par sort) ; niveaux 16 à 18 : stats seules, sauf surcharge débloquée en méta ; déblocage des éléments aux niveaux 1 / 3 / 5 ; 3 stacks max par sort ; sorts Magic / Physical / Buff ; passifs à persistance et sources de stacks variables ; XP et gold directs au kill ; fin de vague = timer ET quota ; 3 vies de stage, game over = rejouer le stage depuis la vague 1 ; ordre des fins de vague (augment, enclume prismatique gratuite à 3 choix avec 1 reroll par choix, puis boucle boutique légère / augment / boutique complète) ; vagues bonus : boutique complète après chaque vague et augment toutes les deux vagues ; un élixir max, enclumes à items comptées dans la limite d'un item ; enclumes à stats : une rareté tirée, 3 choix de même rareté ; augments toutes les 3 vagues, reroll doré ~5 % ; méta par arbres d'éléments et de personnages ; quitter/reprendre au début de la vague ; centaines d'ennemis avec creep block ; mana TFT ; boss à patterns avec 3 items ; **pas de crit sur les sorts sauf passif/augment** ; solo, un seul perso de test.
+
+**À valider** : la **mort du joueur** coûte-t-elle une vie de stage ? (en place : oui, `StageDefinition.DeathCostsALife`, la horde disparaît et le joueur réapparaît au spawn 3 s plus tard.)
 
 Il ne reste **aucune question bloquante** pour la phase 1. Les valeurs d'équilibrage (prix, durées, poids de rareté, nombre de vagues, niveaux méta) sont des données à régler plus tard dans les ScriptableObjects.
 
@@ -1033,6 +1044,7 @@ Instance unique sur le **prefab `RootLifetimeScope`** (règles éditées là, ou
 - `PlayRequestedEvent` → `Loading` → chargement **Single** de `GameFlowSettings.GameScene` (aujourd'hui `TestScene`).
 - Chaque scène déclare l'état qu'elle représente via un **`SceneEntryPoint`** enregistré par son scope (`MenuLifetimeScope` → `Menu`, `GameLifetimeScope` → `Game`). Ainsi **n'importe quelle scène peut être lancée directement** depuis l'éditeur et passe quand même par la state machine.
 - Retour à `Menu` (depuis `Pause`, `Win`, `GameOver`) → chargement Single de `GameFlowSettings.MenuScene`.
+- `RunEndedEvent` (`RunDirector`) → `Win` ou `GameOver` ; « Rejouer » publie `PlayRequestedEvent` (→ `Loading` → la scène de jeu est rechargée).
 - `QuitRequestedEvent` (bouton Quitter du menu, bouton Quit de debug, menu pause) → `Application.Quit` (arrêt du Play mode dans l'éditeur).
 - **Pause** : Échap en jeu (`CancelEvent`) annule d'abord la visée en cours ; sans visée, `PauseInput` (scope Game) publie `PauseRequestedEvent` → `Pause` (`TimeScaleService` met le temps à 0, `InputMapSwitcher` passe sur la map UI). `PauseMenu` (UIDocument au-dessus du HUD) : Reprendre (`ResumeRequestedEvent` → `Game`), Options, Menu principal (`MainMenuRequestedEvent` → `Menu`), Quitter. Échap dans la pause (`UiCancelEvent`, map UI) : retour depuis les options, sinon reprise.
 
@@ -1059,8 +1071,8 @@ Le type d'écran de `Reward` (augment, enclume gratuite, boutique légère, bout
 
 **Règles d'usage**
 - Les panneaux et la pause réagissent aux **changements d'état** (`GameStateChangedEvent`) : `MainMenuPanel` s'ouvre en `Menu` ; `GameHUD` pilote les autres panneaux via un dictionnaire état → panneau (data-driven).
-- `Time.timeScale` est géré **à un seul endroit** (`TimeScaleService`, abonné aux changements d'état : `Pause` → 0, sinon 1), jamais depuis l'UI.
-- L'action map active suit l'état (`InputMapSwitcher`) : `Gameplay` en `Game`, `UI` sinon.
+- `Time.timeScale` est géré **à un seul endroit** (`TimeScaleService`, abonné aux changements d'état : `Pause`, `Win`, `GameOver` et `RunState.Reward` → 0, sinon 1), jamais depuis l'UI.
+- L'action map active suit l'état (`InputMapSwitcher`) : `Gameplay` en `Game` (hors écrans de fin de vague), `UI` sinon.
 - Une transition refusée par les règles doit être **loguée** (voir §14.8).
 
 ### 14.3 EventBus
@@ -1140,7 +1152,7 @@ public sealed class EventBus : IEventBus {
 |---|---|---|
 | `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, `UserOptions`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
 | `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `OptionsPanel` (UIDocument « OptionsPanel », au-dessus du menu), `SceneEntryPoint(Menu)` |
-| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `PrefabPool`, `ProjectileLauncher`, `SpellExecutor`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PauseMenu` (UIDocument « PauseMenu ») et `PauseInput`, `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn ; respawn provisoire), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `HordeSettings`, `FlowFieldService`, `EnemyDirector`, `HordeSpawner`, `Wallet`, `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
+| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `PrefabPool`, `ProjectileLauncher`, `SpellExecutor`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PauseMenu` (UIDocument « PauseMenu ») et `PauseInput`, `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn ; respawn provisoire), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `HordeSettings`, `FlowFieldService`, `EnemyDirector`, `HordeSpawner`, `Wallet`, `StageDefinition`, `RunStateMachine`, `RunDirector`, `RunHudView` (sur « GameHud »), `WaveRewardPanel` et `RunEndPanel` (UIDocuments), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
 
 VContainer crée le root **une fois**, avant le premier scope de scène, et le garde entre les chargements (`DontDestroyOnLoad`) ; un scope de scène sans `parentReference` en devient automatiquement l'enfant. Les services du root **ne doivent jamais être ré-enregistrés** dans un scope de scène (sinon deux `EventBus` coexistent et les événements se perdent).
 
@@ -1209,18 +1221,19 @@ Assets/
 │   ├── Movement/            CharacterMovement
 │   ├── Enemies/             EnemyAI, EnemyDirector, FlowField, FlowFieldService, HordeSpawner, HordeSettings (SO)
 │   ├── Economy/             Wallet
+│   ├── Run/                 RunDirector, RunStateMachine, StageDefinition, WaveDefinition, WaveRewardSchedule (SO)
 │   ├── Controls/            PlayerCommandInput, ClickMarker, RangeIndicator
 │   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO), TimedModifiers…
 │   └── UI/                  PlayerHud, ElementBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
-│                            Panels/ (MainMenuPanel, PauseMenu, OptionsPanel, OptionsView), DebugTools/CharacterDebugPanel
+│                            Panels/ (MainMenuPanel, PauseMenu, OptionsPanel, OptionsView, WaveRewardPanel, RunEndPanel), RunHudView, DebugTools/CharacterDebugPanel
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
-├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, EnemySetup, TestSceneSetup, BuildScript
+├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, EnemySetup, RunSetup, TestSceneSetup, BuildScript
 ├── Data/                    Settings/ (GameFlowSettings, CameraSettings, ControlsSettings, SpellSettings, HordeSettings, VContainerSettings),
 │                            Elements/ (Elem_Fire…), Spells/FireElectricityWind/ (19 Spell_…, SpellBook_…), Spells/Signature/Spell_Flash,
 │                            Progression/ExperienceCurve, Characters/TestHero/ (Char_TestHero…),
 │                            Characters/TrainingDummy/ (Enemy_TrainingDummy : 1000 PV, 30 armure/RM, 150 XP),
 │                            Characters/Enemies/ (Enemy_Goblin, Enemy_SkeletonArcher, Enemy_Brute + StatBlock / BasicAttack),
-│                            Spells/Enemies/Spell_BruteSlam
+│                            Spells/Enemies/Spell_BruteSlam, Run/ (WaveRewardSchedule, TestStage/Stage_Test + Wave_01…05, BonusWave_01…02)
 ├── GameAssets/ActionMaps/   Game.Input — GameActionMaps (.inputactions + C# généré)
 ├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy, Enemy),
 │                            Combat/ (Projectile_ArcaneBolt, Projectile_Skillshot, Vfx_SpellShape)
@@ -1290,7 +1303,7 @@ Points restants (connus) :
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
 - *Tools > Build Linux (Test Scene)* / *(Game)* : builds standalone.
 - *Tools > Regenerate Input Actions Code* : régénère `GameActionMaps.cs` (§4.7).
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, quick cast avec indicateur (maintien → visée, relâchement → lancer, Échap pendant le maintien, mode Normal), Flash à distance fixe puis en cooldown, Flash dans un mur, gobelin qui poursuit et frappe, contournement d'un mur par le flow field, archer qui garde sa portée, brute qui lance son sort à mana plein, kill → XP + gold → retour au pool → réutilisation, mort du joueur → horde vidée → respawn, spawn continu borné à `MaxAlive`, Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (mode de lancement par défaut, sauvegarde / rechargement JSON), le flow field (ligne droite, contournement, coins, cellule enfermée) et le `Wallet` et le point visé à portée fixe en EditMode.
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, quick cast avec indicateur (maintien → visée, relâchement → lancer, Échap pendant le maintien, mode Normal), Flash à distance fixe puis en cooldown, Flash dans un mur, gobelin qui poursuit et frappe, contournement d'un mur par le flow field, archer qui garde sa portée, brute qui lance son sort à mana plein, kill → XP + gold → retour au pool → réutilisation, mort du joueur → horde vidée → respawn, spawn continu borné à `MaxAlive`, vague : compte à rebours → combat → quota (XP coupée, gold gardé) → timer → récompense en pause → vague suivante, overtime → vies perdues → défaite → Rejouer, mort = une vie, toutes les vagues + bonus → victoire, Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (mode de lancement par défaut, sauvegarde / rechargement JSON), le flow field (ligne droite, contournement, coins, cellule enfermée) le `Wallet` et le `WaveRewardSchedule` et le point visé à portée fixe en EditMode.
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 
