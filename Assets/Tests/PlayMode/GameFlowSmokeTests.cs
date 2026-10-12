@@ -29,12 +29,12 @@ namespace Game.Tests.PlayMode {
             yield return null;
         }
 
-        // The test scene's horde would walk into every test: its continuous spawn is stopped.
+        // The stage's waves would walk into every test: the run is halted (no wave, no spawn).
         internal static IEnumerator LoadGameScene() {
             yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
             yield return null;
             Object.FindFirstObjectByType<Containers.GameLifetimeScope>().Container
-                  .Resolve<Features.Enemies.HordeSpawner>().SetSpawning(false);
+                  .Resolve<Features.Run.RunDirector>().Halt();
         }
 
         private static IEnumerator WaitFor(System.Func<bool> condition, float timeout = 10f) {
