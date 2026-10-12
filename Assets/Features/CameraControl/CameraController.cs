@@ -1,4 +1,4 @@
-using System;
+using Features.Events;
 using Systems.EventBusses;
 using Systems.Inputs.Events;
 using UnityEngine;
@@ -10,6 +10,7 @@ namespace Features.CameraControl {
     /// the cursor to the screen edges. The angle never changes: the rotation is derived once from
     /// the offset (no LookAt, which tilted the camera while it lagged behind the character). Space / middle mouse toggles the lock (CameraLockEvent),
     /// the wheel zooms (ZoomEvent). Tuning comes from <see cref="CameraSettings"/>.
+    /// The target is the player, received through PlayerSpawnedEvent.
     /// </summary>
     [RequireComponent(typeof(Camera))]
     public class CameraController : MonoBehaviour {
@@ -27,17 +28,14 @@ namespace Features.CameraControl {
 
         public bool IsLocked => _isLocked;
 
+        // Everything is set up at injection time: the player is spawned (PlayerSpawnedEvent) by an
+        // entry point that can run before this component's Start.
         [Inject]
         public void Construct(IEventBus eventBus, CameraSettings settings) {
             _eventBus = eventBus;
             _settings = settings;
-        }
-
-        private void Awake() {
             _cam = GetComponent<Camera>();
-        }
 
-        private void Start() {
             _currentOffset = _settings.Offset;
             _currentZoom = _settings.Offset.magnitude;
             _isLocked = _settings.StartLocked;
@@ -46,6 +44,7 @@ namespace Features.CameraControl {
             _subscriptions.Add(_eventBus.Subscribe<CameraLockEvent>(_ => ToggleLock()));
             _subscriptions.Add(_eventBus.Subscribe<ZoomEvent>(OnZoom));
             _subscriptions.Add(_eventBus.Subscribe<PointerPositionEvent>(OnPointerPosition));
+            _subscriptions.Add(_eventBus.Subscribe<PlayerSpawnedEvent>(e => SetTarget(e.Player)));
         }
 
         private void OnDestroy() => _subscriptions.Dispose();
@@ -67,7 +66,11 @@ namespace Features.CameraControl {
             }
         }
 
-        public void SetTarget(Transform newTarget) => target = newTarget;
+        // Snaps on the new target instead of sliding across the map to it.
+        public void SetTarget(Transform newTarget) {
+            target = newTarget;
+            if (target != null) transform.position = target.position + _currentOffset;
+        }
 
         public void ToggleLock() => _isLocked = !_isLocked;
 

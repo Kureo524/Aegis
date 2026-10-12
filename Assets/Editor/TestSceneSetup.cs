@@ -42,64 +42,24 @@ namespace EditorTools {
             CreateObstacles();
             BakeNavMesh(navSurface);
 
-            // Player
-            var player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            player.name = "Player";
-            player.transform.position = new Vector3(0, 1, 0);
-            player.GetComponent<Renderer>().material.color = Color.blue;
-
-            var rb = player.AddComponent<Rigidbody>();
-            rb.useGravity = true;
-            rb.interpolation = RigidbodyInterpolation.Interpolate;
-            rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-
-            var agent = player.AddComponent<UnityEngine.AI.NavMeshAgent>();
-            agent.speed = 5f;
-            agent.acceleration = 1000f;
-            agent.angularSpeed = 360f;
-            agent.autoBraking = false;
-
-            var movement = player.AddComponent<CharacterMovement>();
-
-            var input = player.AddComponent<PlayerCommandInput>();
-            input.characterMovement = movement;
+            // Player spawn point: the player itself is spawned from its prefab at runtime (PlayerSpawner)
+            var spawn = new GameObject(PlayerSpawnName).transform;
 
             // Camera
             var cameraObj = new GameObject("Main Camera");
             cameraObj.tag = "MainCamera";
             var camera = cameraObj.AddComponent<Camera>();
             camera.transform.position = new Vector3(0, 10, -8);
-            camera.transform.rotation = Quaternion.Euler(45, 0, 0);
+            camera.transform.rotation = Quaternion.LookRotation(-new Vector3(0, 10, -8));
             cameraObj.AddComponent<AudioListener>();
 
             var cameraController = cameraObj.AddComponent<CameraController>();
-            cameraController.target = player.transform;
-
-            input.mainCamera = camera;
 
             // Light
             var lightObj = new GameObject("Directional Light");
             var light = lightObj.AddComponent<Light>();
             light.type = LightType.Directional;
             lightObj.transform.rotation = Quaternion.Euler(50, -30, 0);
-
-            // Click Marker Prefab
-            var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            marker.name = "ClickMarker";
-            marker.transform.localScale = new Vector3(0.3f, 0.1f, 0.3f);
-            marker.GetComponent<Renderer>().material.color = Color.green;
-            Object.DestroyImmediate(marker.GetComponent<Collider>());
-
-            marker.AddComponent<ClickMarker>();
-
-            string prefabPath = "Assets/Prefabs/ClickMarker.prefab";
-            System.IO.Directory.CreateDirectory("Assets/Prefabs");
-            PrefabUtility.SaveAsPrefabAsset(marker, prefabPath);
-            Object.DestroyImmediate(marker);
-
-            // Assign marker prefab to input
-            var markerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-            input.clickMarkerPrefab = markerPrefab;
 
             // Quit affordance: a windowed build with a confined cursor cannot be closed
             // otherwise (the WM close button is unreachable).
@@ -109,10 +69,12 @@ namespace EditorTools {
             // Scene LifetimeScope (DI): child of the RootLifetimeScope, injects the scene components
             var scopeObj = new GameObject("GameLifetimeScope");
             var scope = scopeObj.AddComponent<GameLifetimeScope>();
-            scope.playerCommandInput = input;
+            scope.mainCamera = camera;
             scope.cameraController = cameraController;
             scope.quitOverlay = quit;
-            WirePlayer(scope, movement, AssetDatabase.LoadAssetAtPath<CharacterDefinition>(ProjectSetup.TestHeroPath));
+            scope.playerSpawn = spawn;
+            WirePlayer(scope, CharacterPrefabSetup.CreatePlayerPrefab(),
+                       AssetDatabase.LoadAssetAtPath<CharacterDefinition>(ProjectSetup.TestHeroPath));
 
             // Save scene
             System.IO.Directory.CreateDirectory("Assets/Scenes/Tests");
@@ -121,25 +83,50 @@ namespace EditorTools {
             Debug.Log($"[TestSceneSetup] Test scene created at {ScenePath}");
         }
 
+        private const string PlayerSpawnName = "PlayerSpawn";
+
         /// <summary>
-        /// Makes the scene's player a data-driven <see cref="Character"/> (design doc §8) and adds
-        /// the character debug panel. Idempotent.
+        /// Points the scope at the player prefab, its definition and the spawn point, and adds the
+        /// character debug panel. Idempotent.
         /// </summary>
-        public static void WirePlayer(GameLifetimeScope scope, CharacterMovement movement, CharacterDefinition definition) {
-            GameObject player = movement.gameObject;
-            if (!player.TryGetComponent(out Character character)) character = player.AddComponent<Character>();
-
-            var so = new SerializedObject(character);
-            so.FindProperty("movement").objectReferenceValue = movement;
-            so.ApplyModifiedPropertiesWithoutUndo();
-
+        public static void WirePlayer(GameLifetimeScope scope, Character playerPrefab, CharacterDefinition definition) {
             var panel = Object.FindFirstObjectByType<CharacterDebugPanel>();
             if (panel == null) panel = new GameObject("CharacterDebugPanel").AddComponent<CharacterDebugPanel>();
 
-            scope.player = character;
+            scope.playerPrefab = playerPrefab;
             scope.playerDefinition = definition;
             scope.characterDebugPanel = panel;
             EditorUtility.SetDirty(scope);
+        }
+
+        /// <summary>
+        /// Migrates a test scene whose player was a capsule placed in the scene: removes it, adds a
+        /// spawn point at its position and wires the scope to spawn the Player prefab instead.
+        /// Rebakes the NavMesh (the old capsule was part of the bake). Idempotent.
+        /// </summary>
+        public static void MigrateToSpawnedPlayer(GameLifetimeScope scope, Character playerPrefab, CharacterDefinition definition) {
+            Vector3 spawnPosition = Vector3.zero;
+            foreach (var movement in Object.FindObjectsByType<CharacterMovement>(FindObjectsSortMode.None)) {
+                spawnPosition = new Vector3(movement.transform.position.x, 0f, movement.transform.position.z);
+                Object.DestroyImmediate(movement.gameObject);
+            }
+
+            var spawnGo = GameObject.Find(PlayerSpawnName);
+            if (spawnGo == null) {
+                spawnGo = new GameObject(PlayerSpawnName);
+                spawnGo.transform.position = spawnPosition;
+            }
+
+            var cameraController = Object.FindFirstObjectByType<CameraController>();
+            if (cameraController != null) cameraController.target = null;   // set at spawn time
+
+            scope.mainCamera = cameraController != null ? cameraController.GetComponent<Camera>() : null;
+            scope.cameraController = cameraController;
+            scope.playerSpawn = spawnGo.transform;
+            WirePlayer(scope, playerPrefab, definition);
+
+            var surface = Object.FindFirstObjectByType<Unity.AI.Navigation.NavMeshSurface>();
+            if (surface != null) BakeNavMesh(surface);
         }
 
         private const string ObstaclesRoot = "=== Obstacles ===";
@@ -217,7 +204,7 @@ namespace EditorTools {
         /// <summary>
         /// Opens the saved test scene and asserts every reference the scene must carry.
         /// Run headless so a broken scene fails loudly instead of silently in Play mode:
-        ///   Unity -batchmode -executeMethod Systems.Editor.TestSceneSetup.ValidateTestScene
+        ///   Unity -batchmode -executeMethod EditorTools.TestSceneSetup.ValidateTestScene
         /// </summary>
         [MenuItem("Tools/Validate Test Scene")]
         public static void ValidateTestScene() {
@@ -235,17 +222,11 @@ namespace EditorTools {
             var scope = Object.FindFirstObjectByType<GameLifetimeScope>();
             Check(scope != null, "GameLifetimeScope present in scene");
 
-            var input = Object.FindFirstObjectByType<PlayerCommandInput>();
-            Check(input != null, "PlayerCommandInput present in scene");
-
             var cameraController = Object.FindFirstObjectByType<CameraController>();
             Check(cameraController != null, "CameraController present in scene");
 
-            var movement = Object.FindFirstObjectByType<CharacterMovement>();
-            Check(movement != null, "CharacterMovement present in scene");
-
-            var agent = Object.FindFirstObjectByType<UnityEngine.AI.NavMeshAgent>();
-            Check(agent != null, "NavMeshAgent present on Player");
+            Check(Object.FindFirstObjectByType<CharacterMovement>() == null,
+                  "no character placed in the scene (the player is spawned from its prefab)");
 
             var surface = Object.FindFirstObjectByType<Unity.AI.Navigation.NavMeshSurface>();
             Check(surface != null, "NavMeshSurface present on Ground");
@@ -259,19 +240,41 @@ namespace EditorTools {
                   "NavMesh baked and stored as an asset");
 
             if (scope != null) {
-                Check(scope.playerCommandInput != null, "scope.playerCommandInput wired");
+                Check(scope.mainCamera != null, "scope.mainCamera wired");
                 Check(scope.cameraController != null, "scope.cameraController wired");
                 Check(scope.quitOverlay != null, "scope.quitOverlay wired");
                 Check(scope.characterDebugPanel != null, "scope.characterDebugPanel wired");
-                Check(scope.player != null, "scope.player (Character) wired");
+                Check(scope.playerSpawn != null, "scope.playerSpawn wired");
+                Check(scope.playerPrefab != null, "scope.playerPrefab wired");
                 Check(scope.playerDefinition != null, "scope.playerDefinition wired");
                 if (scope.playerDefinition != null) {
                     Check(scope.playerDefinition.Faction == Faction.Player, "player definition is in the Player faction");
                     Check(scope.playerDefinition.BaseStats != null, "player definition has base stats");
+                    Check(scope.playerDefinition.Sprite != null, "player definition has a sprite");
                 }
-                if (scope.player != null) {
-                    var characterSo = new SerializedObject(scope.player);
-                    Check(characterSo.FindProperty("movement").objectReferenceValue != null, "player.movement wired");
+                if (scope.playerPrefab != null) {
+                    Character prefab = scope.playerPrefab;
+                    var characterSo = new SerializedObject(prefab);
+                    foreach (string field in new[] { "movement", "visual", "body", "agent" })
+                        Check(characterSo.FindProperty(field).objectReferenceValue != null, $"Player prefab: character.{field} wired");
+
+                    var input = prefab.GetComponent<PlayerCommandInput>();
+                    Check(input != null, "Player prefab has a PlayerCommandInput");
+                    if (input != null) {
+                        Check(input.characterMovement != null, "Player prefab: input.characterMovement wired");
+                        Check(input.clickMarkerPrefab != null, "Player prefab: input.clickMarkerPrefab wired");
+                    }
+
+                    var rb = prefab.GetComponent<Rigidbody>();
+                    Check(rb != null && rb.interpolation == RigidbodyInterpolation.Interpolate, "Player prefab: Rigidbody interpolated");
+
+                    var visual = prefab.GetComponentInChildren<CharacterVisual>();
+                    Check(visual != null && visual.transform != prefab.transform, "Player prefab: CharacterVisual on a child");
+
+                    Check(PrefabUtility.GetPrefabAssetType(prefab.gameObject) == PrefabAssetType.Variant
+                          && PrefabUtility.GetCorrespondingObjectFromSource(prefab.gameObject) ==
+                             AssetDatabase.LoadAssetAtPath<GameObject>(CharacterPrefabSetup.BasePrefabPath),
+                          "Player prefab is a variant of Character.prefab");
                 }
             }
 
@@ -288,23 +291,14 @@ namespace EditorTools {
                 Check(rootSo.FindProperty("experienceCurve").objectReferenceValue != null, "root.experienceCurve wired");
             }
 
-            if (input != null) {
-                Check(input.characterMovement != null, "input.characterMovement wired");
-                Check(input.mainCamera != null, "input.mainCamera wired");
-                Check(input.clickMarkerPrefab != null, "input.clickMarkerPrefab wired");
-            }
-
-            if (cameraController != null) {
-                Check(cameraController.target != null, "cameraController.target wired");
-            }
-
             if (errors.Length > 0) {
                 Debug.LogError($"[TestSceneSetup] VALIDATION FAILED ({checks} checks):\n{errors}");
-                EditorApplication.Exit(1);
+                if (Application.isBatchMode) EditorApplication.Exit(1);
             }
             else {
                 Debug.Log($"[TestSceneSetup] VALIDATION PASSED ({checks} checks) in scene '{scene.name}'");
-                EditorApplication.Exit(0);
+                // Exit code for the command line only: from the Tools menu this would close the Editor.
+                if (Application.isBatchMode) EditorApplication.Exit(0);
             }
         }
     }

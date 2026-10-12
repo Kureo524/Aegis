@@ -36,6 +36,8 @@ namespace Features.Movement {
 
         public bool IsMoving => _hasDestination;
         public Vector3 Destination => _destination;
+        /// <summary>Normalized horizontal direction of the current move, zero when idle.</summary>
+        public Vector3 MoveDirection => _hasDestination ? _moveDirection : Vector3.zero;
 
         private void Awake() {
             _rb = GetComponent<Rigidbody>();

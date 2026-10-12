@@ -6,7 +6,6 @@ using Containers;
 using Features.CameraControl;
 using Features.Characters;
 using Features.Combat;
-using Features.Movement;
 using Features.Progression;
 using Features.Stats;
 using Features.Flow;
@@ -28,8 +27,9 @@ namespace EditorTools {
     /// - build scene list: Menu, then TestScene
     /// - ExperienceCurve and the test hero data (Char_TestHero + its stats, growth, basic attack).
     ///   Created once with placeholder values: later runs never overwrite designer edits.
+    /// - character prefabs (Character + Player variant) and a placeholder sprite, see CharacterPrefabSetup
     /// - scene migrations (Menu: drop its old local state machine; TestScene: wire QuitOverlay,
-    ///   player Character, debug panel)
+    ///   spawn the player from its prefab, debug panel)
     /// </summary>
     public static class ProjectSetup {
         private const string SettingsDir = "Assets/Data/Settings";
@@ -63,11 +63,13 @@ namespace EditorTools {
             var cameraSettings = LoadOrCreate<CameraSettings>(CameraSettingsPath);
             var experienceCurve = CreateExperienceCurve();
             CreateTestHero();
+            Character playerPrefab = CharacterPrefabSetup.CreatePlayerPrefab();
+            AssignMissingHeroSprite();
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve);
             RegisterVContainerSettings(rootPrefab);
             SetBuildScenes();
             MigrateMenuScene();
-            MigrateTestScene();
+            MigrateTestScene(playerPrefab);
 
             AssetDatabase.SaveAssets();
             Debug.Log("[ProjectSetup] Done.");
@@ -131,6 +133,15 @@ namespace EditorTools {
             heroSo.FindProperty("growthPerLevel").objectReferenceValue = growth;
             heroSo.FindProperty("basicAttack").objectReferenceValue = attack;
             heroSo.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Only fills an empty sprite slot: never replaces art chosen by hand.
+        private static void AssignMissingHeroSprite() {
+            var hero = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath);
+            if (hero == null || hero.Sprite != null) return;
+            var so = new SerializedObject(hero);
+            so.FindProperty("sprite").objectReferenceValue = CharacterPrefabSetup.CreatePlaceholderSprite();
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static T CreateAsset<T>(string path) where T : ScriptableObject {
@@ -226,7 +237,7 @@ namespace EditorTools {
             if (dirty) EditorSceneManager.SaveScene(scene);
         }
 
-        private static void MigrateTestScene() {
+        private static void MigrateTestScene(Character playerPrefab) {
             var scene = EditorSceneManager.OpenScene(TestScenePath, OpenSceneMode.Single);
             var scope = Object.FindFirstObjectByType<GameLifetimeScope>();
             if (scope == null) {
@@ -238,10 +249,8 @@ namespace EditorTools {
             if (quit == null) quit = new GameObject("QuitOverlay").AddComponent<QuitOverlay>();
             scope.quitOverlay = quit;
 
-            var movement = Object.FindFirstObjectByType<CharacterMovement>();
-            if (movement != null) {
-                TestSceneSetup.WirePlayer(scope, movement, AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath));
-            }
+            TestSceneSetup.MigrateToSpawnedPlayer(scope, playerPrefab,
+                                                  AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath));
             EditorUtility.SetDirty(scope);
             EditorSceneManager.SaveScene(scene);
         }
