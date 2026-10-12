@@ -108,7 +108,7 @@ Le prefab de base porte aussi `BasicAttacker` et une **barre de PV** (`HealthBar
 |---|---|
 | **Clic droit sur le sol** | `MoveCommand(point)` |
 | **Clic droit sur un ennemi** | `AttackTargetCommand(ennemi)` : le perso se rapproche jusqu'à sa portée puis attaque en boucle |
-| **Q**, puis **clic gauche** | *Attack-move* (§4.6) : affiche la portée d'attaque ; marche vers le point en attaquant ce qui croise sa route |
+| **Maintenir Q** + **clic gauche** | *Attack-move* (§4.6) : affiche la portée d'attaque tant que Q est maintenu ; le clic lance la marche vers le point en attaquant ce qui croise sa route |
 | **A / Z / E** | Active / désactive l'élément 1 / 2 / 3 (§7) |
 | **R** | Lance le sort correspondant aux éléments actifs (visée puis clic gauche, §7.4) |
 | **F** | Compétence propre du personnage (visée puis clic gauche, §7.8) |
@@ -171,10 +171,10 @@ Machine à états : `Idle → Chasing → Windup → Cooldown → (re-attaque si
 ### 4.6 Q + clic gauche : attack-move (comportement LoL)
 
 **Saisie**
-1. Appui sur **Q** → état `Targeting` : cercle d'indicateur de **portée d'attaque** (`AttackRange`) autour du perso.
+1. **Maintenir Q** → état `Targeting` : cercle d'indicateur de **portée d'attaque** (`AttackRange`) autour du perso, **tant que Q est enfoncé** (relâcher Q annule la visée).
 2. **Clic gauche** → `AttackMoveCommand(point, preferredTarget)` :
    - `preferredTarget` = l'ennemi le **plus proche du point cliqué** dans un rayon `AttackMoveSelectRadius`, ou `null` s'il n'y en a pas.
-3. **Clic droit / Échap** : annule la visée sans rien ordonner.
+3. **Relâcher Q / clic droit / Échap** : annule la visée sans rien ordonner. Tant que Q reste enfoncé, chaque clic gauche donne un nouvel ordre.
 
 **Exécution (boucle de l'attack-move)**
 
@@ -210,11 +210,17 @@ Machine à états : `Idle → Chasing → Windup → Cooldown → (re-attaque si
 
 ### 4.7 Mapping clavier AZERTY
 
-Avec le **New Input System**, `<Keyboard>/q` désigne la touche à la position physique du Q américain (donc le A sur AZERTY). Pour lier aux **lettres affichées sur le clavier du joueur**, utiliser la syntaxe par nom d'affichage : `<Keyboard>/#(a)`, `#(z)`, `#(e)`, `#(r)`, `#(f)`, `#(t)`, `#(q)`, `#(s)` (à vérifier dans l'éditeur de bindings). Prévoir un **menu de rebind** dès le début.
+Avec le **New Input System**, `<Keyboard>/q` désigne la touche à la **position physique** du Q américain (donc le A sur AZERTY).
 
-> En place : les touches lettres du gameplay (Q, A, Z, E, R, F, T, S) sont liées par **caractère affiché** (`<Keyboard>/#(a)`…), vérifié par `AzertyBindingTests` (clavier simulé en AZERTY). Le debug `Move` (WASD) reste en position physique.
->
-> ⚠️ Résoudre un binding `#(x)` interroge le système pour le nom des touches : l'éditeur Linux **segfault en `-batchmode -nographics`** (pas d'affichage, GDK). Lancer les tests et les builds en ligne de commande **sans `-nographics`** (un affichage, même virtuel type `xvfb-run`, est nécessaire en CI).
+**Choix retenu** : les bindings des lettres sont écrits pour la **lettre voulue à sa position QWERTY** (`<Keyboard>/q` = attack-move…), puis **remappés au démarrage** selon la disposition du joueur : réglage `KeyboardLayout` (`Qwerty` / `Azerty`, **AZERTY par défaut**) dans le SO `ControlsSettings` (`Assets/Data/Settings`), appliqué par `InputReader` via des *binding overrides* (A ↔ Q, Z ↔ W, M → `;`). Vérifié par `KeyboardLayoutTests` à travers le vrai `InputReader`.
+
+**Rejeté** : les bindings par nom affiché (`<Keyboard>/#(a)`). Le player Linux ne remonte pas la disposition de l'OS (il retombe sur les noms QWERTY : en jeu, « Q » se retrouvait sur la touche A), et l'éditeur Linux segfault en `-batchmode -nographics` en les résolvant.
+
+À venir : le choix du joueur (`UserOptions`, JSON) par-dessus `ControlsSettings`, puis un **menu de rebind** complet.
+
+> **Wrapper C#** : `GameActionMaps.cs` est **généré** par l'Input System depuis le `.inputactions`. Après toute modification des actions : *Tools > Regenerate Input Actions Code*, et committer les deux fichiers ensemble. (L'ancien fichier était un stub écrit à la main que Unity refusait d'écraser ; le `.meta` de l'importer avait aussi des noms de champs invalides, ce qui désactivait la génération.)
+
+---
 
 ### 4.8 Caméra (en place)
 
@@ -1088,7 +1094,7 @@ public sealed class EventBus : IEventBus {
 |---|---|---|
 | `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
 | `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `SceneEntryPoint(Menu)` |
-| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **En place** : la `Camera` principale, `ProjectileLauncher`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
+| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` en plus (§4.7). **Game, en place** : la `Camera` principale, `ProjectileLauncher`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
 
 VContainer crée le root **une fois**, avant le premier scope de scène, et le garde entre les chargements (`DontDestroyOnLoad`) ; un scope de scène sans `parentReference` en devient automatiquement l'enfant. Les services du root **ne doivent jamais être ré-enregistrés** dans un scope de scène (sinon deux `EventBus` coexistent et les événements se perdent).
 
@@ -1226,8 +1232,9 @@ Points restants (connus) :
 - *Tools > Project Setup* (`EditorTools.ProjectSetup.Run`) : crée / répare le prefab root, ses règles de transition, les SO de réglages, `VContainerSettings`, la liste de scènes du build. Idempotent.
 - *Tools > Create Test Scene* / *Validate Test Scene* : régénère / vérifie `TestScene`.
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
-- *Tools > Build Linux (Test Scene)* : build standalone de test.
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, bindings AZERTY, `CharacterLevel`, formules de dégâts, `Health`), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move).
+- *Tools > Build Linux (Test Scene)* / *(Game)* : builds standalone.
+- *Tools > Regenerate Input Actions Code* : régénère `GameActionMaps.cs` (§4.7).
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move).
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 
@@ -1239,7 +1246,7 @@ Map **Gameplay** (les actions `Move`, `Look`, `Jump`… du template ne sont plus
 | `PointerCommand` | Button | clic droit (déplacement ou attaque) |
 | `Confirm` | Button | clic gauche (valide une visée) |
 | `Cancel` | Button | Échap (annule la visée, sinon ouvre la pause) |
-| `AttackMove` | Button | Q |
+| `AttackMove` | Button | Q (maintenu ; `AttackMoveEvent.Pressed` vrai à l'appui, faux au relâchement) |
 | `Element1`, `Element2`, `Element3` | Button | A, Z, E |
 | `CastSpell` | Button | R |
 | `Signature` | Button | F |
@@ -1248,4 +1255,4 @@ Map **Gameplay** (les actions `Move`, `Look`, `Jump`… du template ne sont plus
 | `CameraLock` | Button | Espace, clic molette |
 | `Zoom` | Value (Vector2) | molette |
 
-Les bindings suivent les **lettres du clavier du joueur** (AZERTY) via la syntaxe par nom d'affichage, par exemple `<Keyboard>/#(a)` (à vérifier dans l'éditeur). Prévoir le **rebind** (`UserOptions`).
+Les lettres sont remappées selon `ControlsSettings.KeyboardLayout` (§4.7). Prévoir le **rebind** (`UserOptions`).
