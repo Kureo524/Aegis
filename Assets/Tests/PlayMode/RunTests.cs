@@ -100,15 +100,17 @@ namespace Game.Tests.PlayMode {
             Assert.AreEqual(1f, Time.timeScale);
         }
 
-        // Closes every end-of-wave screen in turn (augment placeholder, anvil, shop)
-        private static void FinishRewards() {
-            var run = Game.Resolve<RunDirector>();
-            var shop = Game.Resolve<ShopService>();
+        // Closes every end-of-wave screen in turn (augment, anvil, shop)
+        private static void FinishRewards() => FinishRewardsFor(Game);
+
+        internal static void FinishRewardsFor(IObjectResolver game) {
+            var run = game.Resolve<RunDirector>();
+            var shop = game.Resolve<ShopService>();
             for (int guard = 0; guard < 10 && run.State == RunState.Reward; guard++) {
                 if (shop.AnvilOpen) shop.Choose(0);
                 else if (shop.IsOpen) shop.Close();
                 else {
-                    var augments = Game.Resolve<Features.Augments.AugmentController>();
+                    var augments = game.Resolve<Features.Augments.AugmentController>();
                     if (augments.Phase == AugmentDraftPhase.SlotsFull) augments.ChooseFullSlotsOption(FullSlotsOption.SlotOrGold, 0);
                     else augments.Pick(0);
                 }

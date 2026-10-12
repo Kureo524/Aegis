@@ -30,6 +30,25 @@ namespace Features.Spells {
             }
         }
 
+        /// <summary>Rectangle outline from <paramref name="origin"/> along <paramref name="direction"/> (charges, skillshots).</summary>
+        public void PlayLine(Vector3 origin, Vector3 direction, float length, float halfWidth, Color color, float duration,
+                             Action<Component> release) {
+            Begin(color, duration, release);
+            LineRenderer line = Line;
+            line.loop = true;
+            direction.y = 0f;
+            direction.Normalize();
+            Vector3 side = new Vector3(direction.z, 0f, -direction.x) * halfWidth;
+            Vector3 end = origin + direction * length;
+            line.positionCount = 4;
+            line.SetPosition(0, Flat(origin - side));
+            line.SetPosition(1, Flat(end - side));
+            line.SetPosition(2, Flat(end + side));
+            line.SetPosition(3, Flat(origin + side));
+        }
+
+        private Vector3 Flat(Vector3 p) => new(p.x, groundOffset, p.z);
+
         public void PlayCone(Vector3 origin, Vector3 direction, float range, float angle, Color color, float duration,
                              Action<Component> release) {
             Begin(color, duration, release);

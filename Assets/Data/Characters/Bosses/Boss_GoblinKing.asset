@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f978ccf1df618837a8c7d12ccbb77e10, type: 3}
+  m_Name: Boss_GoblinKing
+  m_EditorClassIdentifier: Game.Features::Features.Enemies.BossDefinition
+  displayName: Grokk
+  faction: 1
+  sprite: {fileID: 21300000, guid: 7efb84ea5596c8f4e95ee86d54e84189, type: 3}
+  bodySize: {x: 1.8, y: 2.9}
+  baseStats: {fileID: 11400000, guid: ff4d8277b2712607b9252ea07ea18155, type: 2}
+  growthPerLevel: {fileID: 0}
+  basicAttack: {fileID: 11400000, guid: 465b557e9ed6cfee1a6686ac1c42099b, type: 2}
+  elements:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  elementUnlockLevels: 010000000300000005000000
+  spellBook: {fileID: 0}
+  signatureAbility: {fileID: 0}
+  passive: {fileID: 0}
+  xpReward: 600
+  goldReward: 150
+  navigation: 1
+  specialSpell: {fileID: 0}
+  startMana: 0
+  manaPerSecond: 5
+  manaPerAttack: 10
+  manaPerHitTaken: 2
+  title: Roi des gobelins
+  pattern: {fileID: 11400000, guid: 50369d3ca288fea649f80662f3187f63, type: 2}
+  items:
+  - {fileID: 11400000, guid: 5d566104818939f1c80f17edb5334afb, type: 2}
+  - {fileID: 11400000, guid: 434f82b2aac8a24c0930dcc30f437441, type: 2}

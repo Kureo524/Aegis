@@ -90,6 +90,12 @@ namespace Features.Spells {
             }
         }
 
+        /// <summary>Shows a charge path (boss) for <paramref name="duration"/>.</summary>
+        public void TelegraphLine(Vector3 origin, Vector3 direction, float length, float halfWidth, float duration) {
+            SpellVfx vfx = _pool.Get(_settings.ShapeVfx);
+            vfx.PlayLine(origin, direction, length, halfWidth, new Color(1f, 0.25f, 0.2f, 0.9f), duration, _pool.Release);
+        }
+
         public void Execute(Character caster, SpellDefinition spell, CastContext ctx, int levelsAboveOne) {
             if (caster == null || !caster.IsAlive) return;
             Vector3 origin = caster.transform.position;
