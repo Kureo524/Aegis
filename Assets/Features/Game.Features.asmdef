@@ -1,0 +1,19 @@
+{
+    "name": "Game.Features",
+    "rootNamespace": "Features",
+    "references": [
+        "Game.Systems",
+        "AYellowpaper.SerializedCollections",
+        "VContainer",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
