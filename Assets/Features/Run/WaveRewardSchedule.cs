@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Features.Run {
-    /// <summary>What opens at the end of a wave (design doc §9.3). Augments come with phase 8.</summary>
-    public enum RewardKind { Augment, FreePrismaticAnvil, LightShop, FullShop }
+    /// <summary>
+    /// What opens at the end of a wave (design doc §9.3). FreeStatAnvil comes from loot picked up
+    /// during the wave (§9.5). Only append at the end.
+    /// </summary>
+    public enum RewardKind { Augment, FreePrismaticAnvil, LightShop, FullShop, FreeStatAnvil }
 
     /// <summary>
     /// Order of the end-of-wave events (design doc §9.3): a prelude, then a loop for the regular

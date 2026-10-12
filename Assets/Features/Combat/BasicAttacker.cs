@@ -240,7 +240,10 @@ namespace Features.Combat {
             }
         }
 
-        private void OnHit(Character target, float taken) => Hit?.Invoke(target, taken);
+        private void OnHit(Character target, float taken) {
+            owner.Events.RaiseBasicAttackHit(target, taken);
+            Hit?.Invoke(target, taken);
+        }
 
         private float DistanceTo(Character other) {
             Vector3 delta = other.transform.position - owner.transform.position;

@@ -2,6 +2,7 @@ using System;
 using Features.Combat;
 using Features.Events;
 using Features.Movement;
+using Features.Passives;
 using Features.Progression;
 using Features.Stats;
 using Features.UI;
@@ -41,6 +42,12 @@ namespace Features.Characters {
         public ManaPool Mana { get; private set; }
         /// <summary>Temporary stat modifiers (buffs, debuffs), ticked every frame.</summary>
         public TimedModifiers Buffs { get; } = new();
+        /// <summary>Per-character events for passives, items and augments (§8.1).</summary>
+        public CharacterEvents Events { get; } = new();
+        /// <summary>Rules granted by passives (SpellCrit…, §5.6).</summary>
+        public CapabilityController Capabilities { get; } = new();
+        /// <summary>The character's passives: its own (definition), items', augments' (§8.1).</summary>
+        public PassiveController Passives { get; private set; }
         public bool IsAlive => Health != null && !Health.IsDead;
         public bool IsPlayer => Definition != null && Definition.Faction == Faction.Player;
         public Faction Faction => Definition != null ? Definition.Faction : Faction.Neutral;
@@ -62,6 +69,13 @@ namespace Features.Characters {
 
         private void Awake() {
             _rigidbody = GetComponent<Rigidbody>();
+            Passives = new PassiveController(this);
+            Passives.LootDropped += OnPassiveLoot;
+        }
+
+        // Only the player's passives drop loot (augments, items, §9.5)
+        private void OnPassiveLoot(LootKind kind, Vector3 position) {
+            if (IsPlayer) _eventBus.Publish(new LootDropRequestedEvent(kind, position));
         }
 
         public void Init(CharacterDefinition definition) {
@@ -74,6 +88,8 @@ namespace Features.Characters {
             Mana?.Detach();
 
             Definition = definition;
+            Passives.Clear();
+            Capabilities.Clear();
             Buffs.Clear();
             ApplyBody(definition);
 
@@ -87,6 +103,8 @@ namespace Features.Characters {
             if (healthBar != null) healthBar.Bind(this);
             SetBodyActive(true);
 
+            Level.LevelChanged += Events.RaiseLevelUp;
+            Passives.Add(definition.Passive, definition);   // the character's own passive (§8.1)
             if (IsPlayer) BindPlayerToBus();
             Initialized?.Invoke(this);
         }
@@ -95,6 +113,7 @@ namespace Features.Characters {
         private void Update() {
             if (!IsAlive) return;
             Buffs.Tick(Time.deltaTime);
+            Passives.Tick();
             Health.Heal(Stats.Value(StatType.HealthRegen) * Time.deltaTime);
             Mana.Restore(Stats.Value(StatType.ManaRegen) * Time.deltaTime);
         }
@@ -121,7 +140,12 @@ namespace Features.Characters {
 
             _eventBus.Publish(new DamageDealtEvent(HeadPosition, taken, info.Type, info.IsCrit, IsPlayer));
             Damaged?.Invoke(this, taken);
-            if (info.Source != null) info.Source.OnDamageDealt(taken, info.IsBasicAttack);
+            Events.RaiseDamageTaken(taken);
+            if (info.Source != null) {
+                info.Source.OnDamageDealt(taken, info.IsBasicAttack);
+                info.Source.Events.RaiseDamageDealt(this, taken, info);
+                if (!IsAlive) info.Source.Events.RaiseKill(this);
+            }
             return taken;
         }
 
@@ -175,6 +199,10 @@ namespace Features.Characters {
         }
 
         private void BindPlayerToBus() {
+            _busSubscriptions.Add(_eventBus.Subscribe<RunStateChangedEvent>(e => {
+                if (e.To == Features.Run.RunState.Reward) Passives.OnWaveEnded();
+            }));
+
             _busSubscriptions.Add(_eventBus.Subscribe<XpGrantedEvent>(e => Level.AddXp(e.Amount)));
 
             CharacterLevel level = Level;
