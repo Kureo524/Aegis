@@ -88,13 +88,76 @@ namespace Game.Tests.PlayMode {
             Assert.IsTrue(reward.HasValue);
             Assert.AreEqual(RewardKind.Augment, reward.Value.Rewards[0], "wave 1 → augment (schedule prelude)");
             yield return null;
-            var panel = Object.FindFirstObjectByType<WaveRewardPanel>();
-            Assert.IsTrue(panel.IsOpen);
+            var augments = Game.Resolve<Features.Augments.AugmentController>();
+            Assert.AreEqual(AugmentDraftPhase.Choose, augments.Phase, "wave 1 → augment draft");
+            Assert.AreEqual(3, augments.Choices.Count);
+            Assert.IsTrue(Object.FindFirstObjectByType<AugmentPanel>().IsOpen);
 
-            panel.Close();
+            augments.Pick(0);
+            Assert.AreEqual(1, augments.Owned.Count, "augment taken");
             Assert.AreEqual(RunState.PreWave, run.State);
             Assert.AreEqual(2, run.WaveNumber);
             Assert.AreEqual(1f, Time.timeScale);
+        }
+
+        // Closes every end-of-wave screen in turn (augment, anvil, shop)
+        private static void FinishRewards() => FinishRewardsFor(Game);
+
+        internal static void FinishRewardsFor(IObjectResolver game) {
+            var run = game.Resolve<RunDirector>();
+            var shop = game.Resolve<ShopService>();
+            for (int guard = 0; guard < 10 && run.State == RunState.Reward; guard++) {
+                if (shop.AnvilOpen) shop.Choose(0);
+                else if (shop.IsOpen) shop.Close();
+                else {
+                    var augments = game.Resolve<Features.Augments.AugmentController>();
+                    if (augments.Phase == AugmentDraftPhase.SlotsFull) augments.ChooseFullSlotsOption(FullSlotsOption.SlotOrGold, 0);
+                    else augments.Pick(0);
+                }
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator FreePrismaticAnvil_AfterWave2_ThenShopsSpendTheGold() {
+            yield return LoadRun();
+            var run = Game.Resolve<RunDirector>();
+            var shop = Game.Resolve<ShopService>();
+            var inventory = Game.Resolve<Inventory>();
+            var wallet = Game.Resolve<Wallet>();
+
+            for (int wave = 0; wave < 2; wave++) {
+                Bus.Publish(new SkipWaveRequestedEvent());
+                yield return null;
+                Bus.Publish(new SkipWaveRequestedEvent());
+                yield return null;
+                if (wave == 0) Game.Resolve<Features.Augments.AugmentController>().Pick(0);   // augment
+            }
+            Assert.IsTrue(shop.AnvilOpen, "wave 2 → free prismatic anvil");
+            yield return null;
+            Assert.IsTrue(Object.FindFirstObjectByType<AnvilPanel>().IsOpen);
+            shop.Choose(0);
+            Assert.AreEqual(1, inventory.Items.Count);
+            Assert.AreEqual(ItemTier.Prismatic, inventory.Items[0].Tier);
+            Assert.AreEqual(RunState.PreWave, run.State, "back to the countdown");
+
+            // Wave 3 → light shop: buy a stat anvil with the gold
+            Bus.Publish(new SkipWaveRequestedEvent());
+            yield return null;
+            Bus.Publish(new SkipWaveRequestedEvent());
+            yield return null;
+            Assert.IsTrue(shop.IsOpen && !shop.IsFull, "wave 3 → light shop");
+            yield return null;
+            Assert.IsTrue(Object.FindFirstObjectByType<ShopPanel>().IsOpen);
+            wallet.Add(100);
+            float hp = Player.Stats.Value(Features.Stats.StatType.MaxHealth);
+            var statAnvil = Game.Resolve<ShopCatalog>().StatAnvils[0];
+            Bus.Publish(new ShopBuyRequestedEvent(statAnvil));
+            Assert.IsTrue(shop.AnvilOpen);
+            shop.Choose(0);
+            Assert.AreEqual(100 - statAnvil.Cost, wallet.Gold);
+            Bus.Publish(new ShopCloseRequestedEvent());
+            Assert.AreEqual(RunState.PreWave, run.State);
+            Assert.IsTrue(Player.Stats.Value(Features.Stats.StatType.MaxHealth) >= hp, "stats kept");
         }
 
         [UnityTest]
@@ -128,12 +191,16 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator PlayerDeath_CostsALife() {
+        public IEnumerator PlayerDeath_IsAnInstantGameOver() {
             yield return LoadRun();
-            var run = Game.Resolve<RunDirector>();
-            int lives = run.Lives;
+            var machine = Root.Resolve<GameFlowStateMachine>();
+            Bus.Publish(new SkipWaveRequestedEvent());
+            yield return null;
             Player.TakeDamage(new Features.Combat.DamageInfo(1e7f, Features.Combat.DamageType.True, false, false, null));
-            Assert.AreEqual(lives - 1, run.Lives);
+            yield return WaitFor(() => machine.CurrentState == GameState.GameOver);
+            Assert.AreEqual(Game.Resolve<RunDirector>().Lives, Game.Resolve<StageDefinition>().Lives, "no life involved: the run is over");
+            yield return null;
+            Assert.IsTrue(Object.FindFirstObjectByType<RunEndPanel>().IsOpen);
         }
 
         [UnityTest]
@@ -142,7 +209,6 @@ namespace Game.Tests.PlayMode {
             var run = Game.Resolve<RunDirector>();
             var machine = Root.Resolve<GameFlowStateMachine>();
             var stage = Game.Resolve<StageDefinition>();
-            var panel = Object.FindFirstObjectByType<WaveRewardPanel>();
 
             for (int wave = 0; wave < stage.TotalWaves; wave++) {
                 Bus.Publish(new SkipWaveRequestedEvent());   // countdown
@@ -150,7 +216,7 @@ namespace Game.Tests.PlayMode {
                 Assert.AreEqual(RunState.Combat, run.State, $"wave {wave + 1} started");
                 Bus.Publish(new SkipWaveRequestedEvent());   // quota + timer
                 yield return null;
-                if (wave < stage.TotalWaves - 1) panel.Close();
+                if (wave < stage.TotalWaves - 1) FinishRewards();
             }
             yield return WaitFor(() => machine.CurrentState == GameState.Win);
             yield return null;

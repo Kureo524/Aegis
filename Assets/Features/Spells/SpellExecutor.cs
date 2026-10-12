@@ -22,7 +22,7 @@ namespace Features.Spells {
     /// - Cone: every enemy in the sector.
     /// - UnitTarget: homing projectile to the chosen enemy.
     /// Damage = Scaling(element levels) + attack stat × PowerRatio; Magic vs MagicResist, Physical vs
-    /// Armor. Spells cannot crit (no SpellCrit capability yet, §5.6). Buffs are applied to the caster
+    /// Armor. Spells only crit with the SpellCrit capability (§5.6). Buffs are applied to the caster
     /// whatever the targeting.
     /// </summary>
     public sealed class SpellExecutor {
@@ -90,6 +90,12 @@ namespace Features.Spells {
             }
         }
 
+        /// <summary>Shows a charge path (boss) for <paramref name="duration"/>.</summary>
+        public void TelegraphLine(Vector3 origin, Vector3 direction, float length, float halfWidth, float duration) {
+            SpellVfx vfx = _pool.Get(_settings.ShapeVfx);
+            vfx.PlayLine(origin, direction, length, halfWidth, new Color(1f, 0.25f, 0.2f, 0.9f), duration, _pool.Release);
+        }
+
         public void Execute(Character caster, SpellDefinition spell, CastContext ctx, int levelsAboveOne) {
             if (caster == null || !caster.IsAlive) return;
             Vector3 origin = caster.transform.position;
@@ -143,7 +149,10 @@ namespace Features.Spells {
             StatController stats = caster.Stats;
             float raw = SpellMath.RawDamage(spell, levelsAboveOne, stats.Value(StatType.MagicAttack), stats.Value(StatType.PhysicalAttack));
             DamageType type = spell.Kind == SpellKind.Physical ? DamageType.Physical : DamageType.Magic;
-            return new DamageInfo(raw, type, isCrit: false, isBasicAttack: false, caster,
+            // Spells only crit with the SpellCrit capability (passive, augment: design doc §5.6)
+            bool crit = caster.Capabilities.Has(Passives.Capability.SpellCrit) && Random.value < stats.Value(StatType.CritChance);
+            if (crit) raw *= Mathf.Max(1f, stats.Value(StatType.CritDamage));
+            return new DamageInfo(raw, type, isCrit: crit, isBasicAttack: false, caster,
                 stats.Value(StatType.ArmorPenFlat), stats.Value(StatType.ArmorPenPercent),
                 stats.Value(StatType.MagicPenFlat), stats.Value(StatType.MagicPenPercent));
         }

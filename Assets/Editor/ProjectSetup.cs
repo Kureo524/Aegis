@@ -6,6 +6,7 @@ using Containers;
 using Features.CameraControl;
 using Features.Characters;
 using Features.Combat;
+using Features.Economy;
 using Features.Enemies;
 using Features.Run;
 using Features.Progression;
@@ -94,11 +95,14 @@ namespace EditorTools {
             Character enemyPrefab = CharacterPrefabSetup.CreateEnemyPrefab();
             HordeSettings hordeSettings = EnemySetup.Run(enemyPrefab);
             StageDefinition stage = RunSetup.Run(enemyPrefab);
+            ShopCatalog shopCatalog = EconomySetup.Run();
+            (Features.Augments.AugmentCatalog augmentCatalog, Features.Loot.LootSettings lootSettings) = PassiveSetup.Run();
+            BossSetup.Run(enemyPrefab);   // after the items: the boss carries some
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
             SetBuildScenes();
             MigrateMenuScene();
-            MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings, stage);
+            MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings, stage, shopCatalog, augmentCatalog, lootSettings);
 
             AssetDatabase.SaveAssets();
             Debug.Log("[ProjectSetup] Done.");
@@ -525,7 +529,9 @@ namespace EditorTools {
             if (dirty) EditorSceneManager.SaveScene(scene);
         }
 
-        private static void MigrateTestScene(Character playerPrefab, Character dummyPrefab, HordeSettings hordeSettings, StageDefinition stage) {
+        private static void MigrateTestScene(Character playerPrefab, Character dummyPrefab, HordeSettings hordeSettings,
+                                             StageDefinition stage, ShopCatalog shopCatalog,
+                                             Features.Augments.AugmentCatalog augmentCatalog, Features.Loot.LootSettings lootSettings) {
             var scene = EditorSceneManager.OpenScene(TestScenePath, OpenSceneMode.Single);
             var scope = Object.FindFirstObjectByType<GameLifetimeScope>();
             if (scope == null) {
@@ -542,6 +548,8 @@ namespace EditorTools {
             TestSceneSetup.WireCombat(scope, dummyPrefab, AssetDatabase.LoadAssetAtPath<CharacterDefinition>(DummyPath));
             if (scope.hordeSettings == null) scope.hordeSettings = hordeSettings;
             TestSceneSetup.WireRun(scope, stage);
+            TestSceneSetup.WireShop(scope, shopCatalog);
+            TestSceneSetup.WireAugments(scope, augmentCatalog, lootSettings);
             EditorUtility.SetDirty(scope);
             EditorSceneManager.SaveScene(scene);
         }

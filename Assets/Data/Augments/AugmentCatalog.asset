@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83377e7a44e9bc91d9a0cf82152ba216, type: 3}
+  m_Name: AugmentCatalog
+  m_EditorClassIdentifier: Game.Features::Features.Augments.AugmentCatalog
+  augments:
+  - {fileID: 11400000, guid: 3e63ab81d6c4b9d65bd651ffc0ccc399, type: 2}
+  - {fileID: 11400000, guid: 24ee7b474721daf258317c33592978b0, type: 2}
+  - {fileID: 11400000, guid: b8ab1303eb1408d609be543a7a44f3a6, type: 2}
+  - {fileID: 11400000, guid: 6138b47c36cb5e0f398ce01ba21e1e97, type: 2}
+  - {fileID: 11400000, guid: b5213b0fc90e1caf9a7f1a422d859e10, type: 2}
+  - {fileID: 11400000, guid: 510c62a6007bc100daae7205258d1924, type: 2}
+  - {fileID: 11400000, guid: 73ae68089205927afbb37e71dacaa3f8, type: 2}
+  - {fileID: 11400000, guid: 69c16783b50174f85b24d62f7d12e953, type: 2}
+  - {fileID: 11400000, guid: befa62a90d5265256b005dcc96a5bb2a, type: 2}
+  - {fileID: 11400000, guid: 883e090b9fa877922a0f3007d2216d26, type: 2}
+  - {fileID: 11400000, guid: ddaafc5d3dcd63ed08d272d59906879e, type: 2}
+  - {fileID: 11400000, guid: 29dc5e6c98c147370acd5a1d312c0dc2, type: 2}
+  baseSlots: 4
+  maxSlots: 6
+  choiceCount: 3
+  rarityWeights:
+  - 55
+  - 33
+  - 12
+  rerolls: 4
+  goldRerollChance: 0.05
+  fullSlotsAnvil: {fileID: 11400000, guid: 98f0f4f4a74b97499bda846780430f31, type: 2}
+  goldPerRarity: 960000002c010000f4010000

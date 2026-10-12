@@ -5,6 +5,8 @@ using Features.Combat;
 using Features.Economy;
 using Features.Enemies;
 using Features.Run;
+using Features.Augments;
+using Features.Loot;
 using Features.Spells;
 using Systems.Pooling;
 using Features.Flow;
@@ -29,13 +31,24 @@ namespace Containers {
         public PlayerHud playerHud;
         public PauseMenu pauseMenu;
         public RunHudView runHud;
-        public WaveRewardPanel waveRewardPanel;
+        public AugmentPanel augmentPanel;
+        public AugmentsView augmentsView;
+        public BossHudView bossHud;
         public RunEndPanel runEndPanel;
+        public ShopPanel shopPanel;
+        public AnvilPanel anvilPanel;
+        public InventoryView inventoryView;
 
         [Header("Run")]
         [Tooltip("The stage played in this scene: waves, bonus waves, lives (design doc §9.1).")]
         public StageDefinition stage;
         public RunStateMachine runStateMachine;
+        [Tooltip("Elixirs, anvils, items and stat choices of the shops (design doc §9.3).")]
+        public ShopCatalog shopCatalog;
+        [Tooltip("Augments and draft rules (design doc §9.4).")]
+        public AugmentCatalog augmentCatalog;
+        [Tooltip("Ground loot dropped by the player's passives (design doc §9.5).")]
+        public LootSettings lootSettings;
         public DamageNumbersView damageNumbers;
 
         [Header("Player")]
@@ -67,11 +80,25 @@ namespace Containers {
             if (damageNumbers != null) builder.RegisterComponent(damageNumbers);
             if (pauseMenu != null) builder.RegisterComponent(pauseMenu);
             if (runHud != null) builder.RegisterComponent(runHud);
-            if (waveRewardPanel != null) builder.RegisterComponent(waveRewardPanel);
+            if (augmentPanel != null) builder.RegisterComponent(augmentPanel);
+            if (augmentsView != null) builder.RegisterComponent(augmentsView);
+            if (bossHud != null) builder.RegisterComponent(bossHud);
             if (runEndPanel != null) builder.RegisterComponent(runEndPanel);
             builder.RegisterInstance(stage);
             builder.RegisterComponent(runStateMachine);
             builder.RegisterEntryPoint<RunDirector>().AsSelf();
+            builder.RegisterEntryPoint<RewardController>().AsSelf();
+            builder.RegisterInstance(shopCatalog);
+            builder.Register<PlayerUpgrades>(Lifetime.Scoped);
+            builder.RegisterEntryPoint<Inventory>().AsSelf();
+            builder.RegisterEntryPoint<ShopService>().AsSelf();
+            if (shopPanel != null) builder.RegisterComponent(shopPanel);
+            if (anvilPanel != null) builder.RegisterComponent(anvilPanel);
+            if (inventoryView != null) builder.RegisterComponent(inventoryView);
+            builder.RegisterInstance(augmentCatalog);
+            builder.RegisterEntryPoint<AugmentController>().AsSelf();
+            builder.RegisterInstance(lootSettings);
+            builder.RegisterEntryPoint<LootService>().AsSelf();
             builder.RegisterEntryPoint<PauseInput>();
 
             builder.RegisterEntryPoint<PlayerSpawner>()

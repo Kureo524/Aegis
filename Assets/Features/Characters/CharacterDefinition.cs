@@ -39,6 +39,10 @@ namespace Features.Characters {
         [Tooltip("Own ability on F (Flash for the test hero): cooldown only, no mana, no element (§7.8).")]
         [SerializeField] private SpellDefinition signatureAbility;
 
+        [Header("Passive (design doc §8.1)")]
+        [Tooltip("Optional: the character's own passive.")]
+        [SerializeField] private Passives.PassiveDefinition passive;
+
         public string DisplayName => displayName;
         public Faction Faction => faction;
         public Sprite Sprite => sprite;
@@ -50,6 +54,7 @@ namespace Features.Characters {
         public System.Collections.Generic.IReadOnlyList<int> ElementUnlockLevels => elementUnlockLevels;
         public SpellBook SpellBook => spellBook;
         public SpellDefinition SignatureAbility => signatureAbility;
+        public Passives.PassiveDefinition Passive => passive;
         public bool HasElements => spellBook != null && elements.Length == ElementSelection.SlotCount;
 
 #if UNITY_EDITOR

@@ -197,6 +197,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.CharacterVisual
   movement: {fileID: 1033432127841491160}
   flipThreshold: 0.1
+  windupLean: 9
+  lungeLean: 12
+  lungeDistance: 0.15
+  lungeDuration: 0.15
 --- !u!1 &6333415215501701613
 GameObject:
   m_ObjectHideFlags: 0

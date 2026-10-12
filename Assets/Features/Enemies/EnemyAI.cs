@@ -38,6 +38,8 @@ namespace Features.Enemies {
         private float _nextRepath;
 
         public EnemyDefinition Definition => _definition;
+        /// <summary>A boss pattern step has the control: no decision until it gives it back.</summary>
+        public bool Suspended { get; set; }
 
         [Inject]
         public void Construct(EnemyDirector director, FlowFieldService flowField, SpellExecutor executor, HordeSettings settings) {
@@ -74,6 +76,7 @@ namespace Features.Enemies {
             if (_definition.SpecialSpell != null) owner.Mana.Set(_definition.StartMana);
             _lastThink = Time.time;
             _nextRepath = 0f;
+            Suspended = false;
             _director?.Register(this);
         }
 
@@ -81,7 +84,7 @@ namespace Features.Enemies {
         public void Think() {
             float elapsed = Time.time - _lastThink;
             _lastThink = Time.time;
-            if (_definition == null || !owner.IsAlive) return;
+            if (_definition == null || !owner.IsAlive || Suspended) return;
 
             Character player = _director.Player;
             if (player == null || !player.IsAlive) {

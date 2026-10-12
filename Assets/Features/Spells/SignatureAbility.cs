@@ -12,7 +12,9 @@ namespace Features.Spells {
     /// only (CooldownOverride, reduced by AbilityHaste), no mana, no element. Same aiming and casting
     /// as R (quick cast included). Flash for the test hero: blink of fixed length (FixedRange) towards
     /// the cursor, onto the farthest walkable spot of that line; refused only if there is none.
-    /// Player prefab variant. (Picked-up summoner spells replacing it come with phase 8.)
+    /// A picked-up summoner spell (§9.5, SummonerSpellPickedEvent) takes F for one use, ignoring the
+    /// signature's cooldown; then F is the signature again, its own cooldown untouched. No other
+    /// summoner spell can be picked up meanwhile. Player prefab variant.
     /// </summary>
     public class SignatureAbility : MonoBehaviour {
         [SerializeField] private Character owner;
@@ -23,9 +25,13 @@ namespace Features.Spells {
         private SpellExecutor _executor;
         private readonly DisposableBag _subscriptions = new();
         private float _readyAt;
+        private SpellDefinition _consumable;
 
-        public SpellDefinition Spell => owner.Definition != null ? owner.Definition.SignatureAbility : null;
-        public float CooldownRemaining => Mathf.Max(0f, _readyAt - Time.time);
+        public SpellDefinition Default => owner.Definition != null ? owner.Definition.SignatureAbility : null;
+        /// <summary>What F casts now: the picked-up summoner spell, else the signature ability.</summary>
+        public SpellDefinition Spell => _consumable != null ? _consumable : Default;
+        public bool HoldsConsumable => _consumable != null;
+        public float CooldownRemaining => _consumable != null ? 0f : Mathf.Max(0f, _readyAt - Time.time);
 
         [Inject]
         public void Construct(IEventBus eventBus, SpellExecutor executor) {
@@ -43,12 +49,24 @@ namespace Features.Spells {
         private void OnInitialized(Character _) {
             _subscriptions.Dispose();
             _readyAt = 0f;
+            _consumable = null;
+            _subscriptions.Add(_eventBus.Subscribe<SummonerSpellPickedEvent>(e => PickUp(e.Spell)));
             if (Spell == null) return;
             _subscriptions.Add(_eventBus.Subscribe<SignatureEvent>(e => {
                 if (e.Released) targeting.Release(AimMode.Signature);
                 else TryUse();
             }));
             _eventBus.Publish(new SignatureAssignedEvent(Spell));
+        }
+
+        public bool PickUp(SpellDefinition spell) {
+            if (spell == null || _consumable != null) return false;
+            _consumable = spell;
+            _eventBus.Publish(new SignatureAssignedEvent(spell));
+            _eventBus.Publish(new CooldownStartedEvent(CooldownSlot.Signature, 0f));
+            _eventBus.Publish(new SummonerSlotChangedEvent(true));
+            _eventBus.Publish(new GameplayFeedbackEvent($"{spell.DisplayName} sur F (usage unique)"));
+            return true;
         }
 
         public bool TryUse() {
@@ -73,6 +91,13 @@ namespace Features.Spells {
             }
             if (!caster.Cast(spell, ctx, 0)) return;
 
+            if (_consumable != null) {   // used up: F is the signature again, with its own cooldown
+                _consumable = null;
+                _eventBus.Publish(new SignatureAssignedEvent(Default));
+                _eventBus.Publish(new CooldownStartedEvent(CooldownSlot.Signature, CooldownRemaining));
+                _eventBus.Publish(new SummonerSlotChangedEvent(false));
+                return;
+            }
             float cooldown = SpellMath.CooldownWithHaste(spell.CooldownOverride, owner.Stats.Value(StatType.AbilityHaste));
             _readyAt = Time.time + cooldown;
             _eventBus.Publish(new CooldownStartedEvent(CooldownSlot.Signature, cooldown));

@@ -65,6 +65,7 @@ namespace Features.Spells {
             SpellDefinition spell = _spell;
             _spell = null;
             _executor.Execute(owner, spell, _context, _levels);
+            owner.Events.RaiseSpellCast(spell);
             CastCompleted?.Invoke(spell);
         }
     }
