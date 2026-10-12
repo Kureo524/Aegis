@@ -111,8 +111,8 @@ Le prefab de base porte aussi `BasicAttacker` et une **barre de PV** (`HealthBar
 | **Maintenir Q** + **clic gauche** | *Attack-move* (§4.6) : affiche la portée d'attaque tant que Q est maintenu ; le clic lance la marche vers le point en attaquant ce qui croise sa route |
 | **A / Z / E** | Ajoute un stack de l'élément 1 / 2 / 3 (§7) |
 | **Ctrl + A / Z / E** | Dépense un point de compétence sur l'élément (le débloque au premier point, §7.8) ; aussi via le bouton « + » du HUD |
-| **R** | Lance le sort correspondant aux éléments actifs (visée puis clic gauche, ou tout de suite vers le curseur en quick cast, §7.4) |
-| **F** | Compétence propre du personnage (visée puis clic gauche, ou quick cast, §7.8) |
+| **R** | Lance le sort correspondant aux éléments actifs. Par défaut (**rapide avec indicateur**) : maintenir = portée et forme affichées, relâcher = lancer vers le curseur. Selon l'option : visée puis clic gauche (Normal), ou lancer immédiat (Rapide) (§7.4) |
+| **F** | Compétence propre du personnage, même mode de lancement que R (§7.8) |
 | **T** | Reset : vide la sélection d'éléments |
 | **S** | `StopCommand` (annule l'ordre en cours) |
 | **Échap / clic droit** pendant une visée | Annule la visée |
@@ -218,7 +218,7 @@ Avec le **New Input System**, `<Keyboard>/q` désigne la touche à la **position
 
 **Rejeté** : les bindings par nom affiché (`<Keyboard>/#(a)`). Le player Linux ne remonte pas la disposition de l'OS (il retombe sur les noms QWERTY : en jeu, « Q » se retrouvait sur la touche A), et l'éditeur Linux segfault en `-batchmode -nographics` en les résolvant.
 
-**Options du joueur** : `UserOptions` (Features/Options, root) garde les choix du joueur en JSON (`persistentDataPath/options.json`, `options.editor.json` dans l'éditeur pour ne jamais toucher aux choix de la build) par-dessus les valeurs par défaut de `ControlsSettings`. Chaque changement est sauvegardé aussitôt et publié (`UserOptionsChangedEvent`) ; les systèmes lisent la valeur au moment où ils en ont besoin. Option en place : **quick cast** (défaut `ControlsSettings.QuickCast = false`). Écran d'options : `OptionsView` (UI Toolkit construit en code), dans le menu pause en jeu et dans `OptionsPanel` (bouton Paramètres du menu principal).
+**Options du joueur** : `UserOptions` (Features/Options, root) garde les choix du joueur en JSON (`persistentDataPath/options.json`, `options.editor.json` dans l'éditeur pour ne jamais toucher aux choix de la build) par-dessus les valeurs par défaut de `ControlsSettings`. Chaque changement est sauvegardé aussitôt et publié (`UserOptionsChangedEvent`) ; les systèmes lisent la valeur au moment où ils en ont besoin. Option en place : **mode de lancement** de R / F (`CastMode` : `Normal`, `QuickWithIndicator`, `Quick` ; défaut `ControlsSettings.CastMode = QuickWithIndicator`). Écran d'options : `OptionsView` (UI Toolkit construit en code), dans le menu pause en jeu et dans `OptionsPanel` (bouton Paramètres du menu principal).
 
 À venir : la disposition clavier dans les options, puis un **menu de rebind** complet.
 
@@ -516,9 +516,13 @@ La courbe croît plus vite que le nombre de stacks pour que chaque ajout coûte 
 - **Un seul mode de visée à la fois** : Q (attack-move), R (sort élémentaire) et F (compétence propre) sont exclusifs ; appuyer sur l'un remplace l'autre. A/Z/E/T ne sont pas des modes de visée, donc ne coupent pas Q ni F. La **compétence propre (F)** ne consomme ni ne vide la sélection d'éléments.
 - **Après un cast réussi** : la sélection est **vidée automatiquement** (`ClearAfterCast = true`).
 - **Pendant un cast** (windup) : le joueur peut déjà empiler pour le sort suivant, le sort en cours est figé.
-- **Quick cast** (option du joueur, menu Options) : R et F lancent directement vers le curseur sans passer par la visée ni le clic gauche. Un sort ciblé sans ennemi à portée sous le curseur est refusé (« Aucune cible »), sans rien consommer.
+- **Mode de lancement** (option du joueur, menu Options, `CastMode`) :
+  - **Rapide avec indicateur** (défaut) : tant que R / F est **maintenu**, la portée et la forme du sort suivent le curseur ; au **relâchement**, le sort part vers le curseur. Clic gauche pendant le maintien : lance aussi. Échap / clic droit pendant le maintien : annule, le relâchement ne lance alors rien.
+  - **Normal** : R / F affichent la visée, le clic gauche lance (le relâchement ne fait rien).
+  - **Rapide** : R / F lancent tout de suite vers le curseur, sans rien afficher.
+  - Un sort ciblé sans ennemi à portée sous le curseur est refusé (« Aucune cible »), sans rien consommer ; au relâchement, la visée se termine.
 
-> **En place (phase 5c)** : `ElementCaster.TryCast` (R) vérifie sélection, sort, cooldown, mana et incantation, puis vise via `SpellTargeting` (ou lance aussitôt un sort `Self`). Clic gauche : le sort résolu **à cet instant** est lancé (il suit les éléments ajoutés pendant la visée), le mana est débité (refus + sélection conservée s'il manque), le cooldown démarre, la sélection est vidée. Clic droit / Échap : visée annulée, sélection conservée ; T : visée annulée et sélection vidée. Exclusivité Q / R / F par `AimModeEvent`. Pendant une incantation (`SpellCaster`, sauf `CanMoveWhileCasting`), les ordres de déplacement / attaque sont ignorés ; on peut empiler des éléments pour le sort suivant. Quick cast : `SpellTargeting.Aim` lit `UserOptions.QuickCast` et, s'il est actif, construit le contexte depuis le curseur et lance aussitôt (`CastAtCursor`). *Reste : quick cast avec indicateur (visée tant que la touche est tenue), buffer d'input, stun / silence.*
+> **En place (phase 5c)** : `ElementCaster.TryCast` (R) vérifie sélection, sort, cooldown, mana et incantation, puis vise via `SpellTargeting` (ou lance aussitôt un sort `Self`). Clic gauche : le sort résolu **à cet instant** est lancé (il suit les éléments ajoutés pendant la visée), le mana est débité (refus + sélection conservée s'il manque), le cooldown démarre, la sélection est vidée. Clic droit / Échap : visée annulée, sélection conservée ; T : visée annulée et sélection vidée. Exclusivité Q / R / F par `AimModeEvent`. Pendant une incantation (`SpellCaster`, sauf `CanMoveWhileCasting`), les ordres de déplacement / attaque sont ignorés ; on peut empiler des éléments pour le sort suivant. Modes de lancement : `SpellTargeting.Aim` lit `UserOptions.CastMode` : `Quick` → `CastAtCursor` ; sinon visée, marquée « lancer au relâchement » en `QuickWithIndicator`. `InputReader` publie aussi le relâchement de R / F (`CastSpellEvent.Released`, `SignatureEvent.Released`) → `SpellTargeting.Release`. *Reste : buffer d'input, stun / silence.*
 
 ### 7.5 Résolution du sort et visée
 
@@ -1270,7 +1274,7 @@ Points restants (connus) :
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
 - *Tools > Build Linux (Test Scene)* / *(Game)* : builds standalone.
 - *Tools > Regenerate Input Actions Code* : régénère `GameActionMaps.cs` (§4.7).
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, Flash à distance fixe puis en cooldown, Flash dans un mur, Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (sauvegarde / rechargement JSON) et le point visé à portée fixe en EditMode.
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, quick cast avec indicateur (maintien → visée, relâchement → lancer, Échap pendant le maintien, mode Normal), Flash à distance fixe puis en cooldown, Flash dans un mur, Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (mode de lancement par défaut, sauvegarde / rechargement JSON) et le point visé à portée fixe en EditMode.
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 
@@ -1284,8 +1288,8 @@ Map **Gameplay** (les actions `Move`, `Look`, `Jump`… du template ne sont plus
 | `Cancel` | Button | Échap (annule la visée, sinon ouvre la pause) |
 | `AttackMove` | Button | Q (maintenu ; `AttackMoveEvent.Pressed` vrai à l'appui, faux au relâchement) |
 | `Element1`, `Element2`, `Element3` | Button | A, Z, E |
-| `CastSpell` | Button | R |
-| `Signature` | Button | F |
+| `CastSpell` | Button | R (appui et relâchement) |
+| `Signature` | Button | F (appui et relâchement) |
 | `ResetElements` | Button | T |
 | `Stop` | Button | S |
 | `LevelUpModifier` | Button | Ctrl gauche / droit (maintenu avec A/Z/E : dépense un point) |
