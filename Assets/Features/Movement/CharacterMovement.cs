@@ -84,6 +84,14 @@ namespace Features.Movement {
             _corners = hasPath ? _path.corners : System.Array.Empty<Vector3>();   // no path: straight line fallback
         }
 
+        /// <summary>Instant move (blink): no path, keeps physics and agent in sync.</summary>
+        public void Teleport(Vector3 position) {
+            Stop();
+            _rb.position = position;
+            transform.position = position;
+            if (_agent.isOnNavMesh) _agent.Warp(position);
+        }
+
         public void Stop() {
             _hasDestination = false;
             _moveDirection = Vector3.zero;

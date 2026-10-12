@@ -14,9 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
   displayName: Lance de plasma
   icon: {fileID: 0}
-  kind: 0
+  color: {r: 1, g: 0.45, b: 0.15, a: 1}
   recipe:
   - Element: {fileID: 11400000, guid: 285e684a3b80006cd82825202311105a, type: 2}
     Count: 2
   - Element: {fileID: 11400000, guid: 98103e74f2cbae5ca997b11d08750fe1, type: 2}
     Count: 1
+  targeting: 1
+  range: 14
+  radius: 0.8
+  coneAngle: 60
+  castTime: 0.35
+  canMoveWhileCasting: 0
+  cooldownOverride: 0
+  kind: 0
+  powerRatio: 0.9
+  scaling:
+    Base: 170
+    PerElementLevel: 28
+  buffs: []
+  projectileSpeed: 30
+  pierce: 1
+  blink: 0

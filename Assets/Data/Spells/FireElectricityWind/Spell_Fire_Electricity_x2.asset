@@ -14,9 +14,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
   displayName: Surcharge
   icon: {fileID: 0}
-  kind: 2
+  color: {r: 1, g: 0.88, b: 0.25, a: 1}
   recipe:
   - Element: {fileID: 11400000, guid: 285e684a3b80006cd82825202311105a, type: 2}
     Count: 1
   - Element: {fileID: 11400000, guid: 98103e74f2cbae5ca997b11d08750fe1, type: 2}
     Count: 2
+  targeting: 0
+  range: 0
+  radius: 1.5
+  coneAngle: 60
+  castTime: 0
+  canMoveWhileCasting: 1
+  cooldownOverride: 0
+  kind: 2
+  powerRatio: 0
+  scaling:
+    Base: 0
+    PerElementLevel: 0
+  buffs:
+  - Stat: 5
+    Type: 1
+    Value: 0.3
+    Duration: 6
+  - Stat: 6
+    Type: 1
+    Value: 0.4
+    Duration: 6
+  projectileSpeed: 18
+  pierce: 0
+  blink: 0

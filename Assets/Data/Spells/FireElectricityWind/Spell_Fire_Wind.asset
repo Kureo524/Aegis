@@ -14,9 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
   displayName: Tornade de feu
   icon: {fileID: 0}
-  kind: 0
+  color: {r: 1, g: 0.45, b: 0.15, a: 1}
   recipe:
   - Element: {fileID: 11400000, guid: 285e684a3b80006cd82825202311105a, type: 2}
     Count: 1
   - Element: {fileID: 11400000, guid: d5eff05456af63b8e8b1123fe0fbe3f9, type: 2}
     Count: 1
+  targeting: 3
+  range: 6
+  radius: 0
+  coneAngle: 50
+  castTime: 0.2
+  canMoveWhileCasting: 0
+  cooldownOverride: 0
+  kind: 0
+  powerRatio: 0.7
+  scaling:
+    Base: 100
+    PerElementLevel: 18
+  buffs: []
+  projectileSpeed: 18
+  pierce: 0
+  blink: 0

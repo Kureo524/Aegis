@@ -310,6 +310,8 @@ namespace EditorTools {
                     Check(attack != null && attack.ProjectilePrefab != null && attack.ProjectileSpeed > 0f,
                           "player basic attack fires a projectile");
                     Check(scope.playerDefinition.HasElements, "player has 3 elements and a spell book");
+                    var signature = scope.playerDefinition.SignatureAbility;
+                    Check(signature != null && signature.CooldownOverride > 0f && signature.Icon != null, "player has a signature ability (F) with a cooldown");
                     if (scope.playerDefinition.HasElements) {
                         var resolver = new Features.Spells.SpellResolver(scope.playerDefinition.SpellBook, scope.playerDefinition.Elements);
                         Check(resolver.Problems.Count == 0 && resolver.MissingKeys(3, 3).Count == 0 && resolver.Count == 19,
@@ -332,6 +334,20 @@ namespace EditorTools {
                         var caster = prefab.GetComponent<Features.Spells.ElementCaster>();
                         Check(caster != null && new SerializedObject(caster).FindProperty("owner").objectReferenceValue != null,
                               "Player prefab: ElementCaster wired");
+                        foreach (var (component, fields) in new (Component, string[])[] {
+                                     (caster, new[] { "targeting", "caster" }),
+                                     (prefab.GetComponent<Features.Spells.SpellTargeting>(), new[] { "owner", "indicator", "rangeIndicator" }),
+                                     (prefab.GetComponent<Features.Spells.SignatureAbility>(), new[] { "owner", "targeting", "caster" }),
+                                     (prefab.GetComponent<Features.Spells.SpellCaster>(), new[] { "owner", "movement", "attacker", "visual" }),
+                                 }) {
+                            bool ok = component != null;
+                            if (ok) {
+                                var so = new SerializedObject(component);
+                                foreach (string f in fields) ok &= so.FindProperty(f).objectReferenceValue != null;
+                            }
+                            Check(ok, $"Player prefab: {(component != null ? component.GetType().Name : "component")} wired");
+                        }
+                        Check(input.spellCaster != null, "Player prefab: input.spellCaster wired");
                     }
 
                     var rb = prefab.GetComponent<Rigidbody>();
@@ -360,6 +376,9 @@ namespace EditorTools {
                 Check(rootSo.FindProperty("experienceCurve").objectReferenceValue != null, "root.experienceCurve wired");
                 Check(rootSo.FindProperty("controlsSettings").objectReferenceValue != null, "root.controlsSettings wired");
                 Check(rootSo.FindProperty("spellSettings").objectReferenceValue != null, "root.spellSettings wired");
+                var spellSettings = rootSo.FindProperty("spellSettings").objectReferenceValue as Features.Spells.SpellSettings;
+                Check(spellSettings != null && spellSettings.HomingProjectile != null && spellSettings.SkillshotProjectile != null
+                      && spellSettings.ShapeVfx != null, "spell settings: effect prefabs assigned");
             }
 
             if (errors.Length > 0) {

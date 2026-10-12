@@ -39,6 +39,8 @@ namespace Features.Characters {
         public CharacterLevel Level { get; private set; }
         public Health Health { get; private set; }
         public ManaPool Mana { get; private set; }
+        /// <summary>Temporary stat modifiers (buffs, debuffs), ticked every frame.</summary>
+        public TimedModifiers Buffs { get; } = new();
         public bool IsAlive => Health != null && !Health.IsDead;
         public bool IsPlayer => Definition != null && Definition.Faction == Faction.Player;
         public Faction Faction => Definition != null ? Definition.Faction : Faction.Neutral;
@@ -72,6 +74,7 @@ namespace Features.Characters {
             Mana?.Detach();
 
             Definition = definition;
+            Buffs.Clear();
             ApplyBody(definition);
 
             // Order matters (§12): stats first, everything else reads them.
@@ -91,6 +94,7 @@ namespace Features.Characters {
         // TODO(phase 6): regeneration of hundreds of enemies → one central tick.
         private void Update() {
             if (!IsAlive) return;
+            Buffs.Tick(Time.deltaTime);
             Health.Heal(Stats.Value(StatType.HealthRegen) * Time.deltaTime);
             Mana.Restore(Stats.Value(StatType.ManaRegen) * Time.deltaTime);
         }

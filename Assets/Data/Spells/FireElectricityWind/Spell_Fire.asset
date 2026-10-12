@@ -14,7 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
   displayName: Boule de feu
   icon: {fileID: 0}
-  kind: 0
+  color: {r: 1, g: 0.45, b: 0.15, a: 1}
   recipe:
   - Element: {fileID: 11400000, guid: 285e684a3b80006cd82825202311105a, type: 2}
     Count: 1
+  targeting: 1
+  range: 9
+  radius: 0.6
+  coneAngle: 60
+  castTime: 0.15
+  canMoveWhileCasting: 0
+  cooldownOverride: 0
+  kind: 0
+  powerRatio: 0.6
+  scaling:
+    Base: 60
+    PerElementLevel: 15
+  buffs: []
+  projectileSpeed: 18
+  pierce: 0
+  blink: 0

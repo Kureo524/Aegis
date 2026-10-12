@@ -36,6 +36,8 @@ namespace Features.Characters {
         [Tooltip("Character level needed to unlock the 1st / 2nd / 3rd element.")]
         [SerializeField] private int[] elementUnlockLevels = { 1, 3, 5 };
         [SerializeField] private SpellBook spellBook;
+        [Tooltip("Own ability on F (Flash for the test hero): cooldown only, no mana, no element (§7.8).")]
+        [SerializeField] private SpellDefinition signatureAbility;
 
         public string DisplayName => displayName;
         public Faction Faction => faction;
@@ -47,6 +49,7 @@ namespace Features.Characters {
         public System.Collections.Generic.IReadOnlyList<ElementDefinition> Elements => elements;
         public System.Collections.Generic.IReadOnlyList<int> ElementUnlockLevels => elementUnlockLevels;
         public SpellBook SpellBook => spellBook;
+        public SpellDefinition SignatureAbility => signatureAbility;
         public bool HasElements => spellBook != null && elements.Length == ElementSelection.SlotCount;
 
 #if UNITY_EDITOR
@@ -57,6 +60,8 @@ namespace Features.Characters {
             if (basicAttack == null && faction == Faction.Player)
                 Debug.LogWarning($"[CharacterDefinition] {name}: the player needs a basic attack.", this);
             if (spellBook != null) ValidateSpellBook();
+            if (signatureAbility != null && signatureAbility.CooldownOverride <= 0f)
+                Debug.LogWarning($"[CharacterDefinition] {name}: the signature ability needs a CooldownOverride.", this);
         }
 
         // Every recipe of the 3 elements must have exactly one spell (§7.2).

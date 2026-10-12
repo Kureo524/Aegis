@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Features.CameraControl;
 using Features.Characters;
 using Features.Combat;
+using Features.Spells;
+using Systems.Pooling;
 using Features.Flow;
 using Features.StateMachines;
 using Features.UI;
@@ -35,7 +37,9 @@ namespace Containers {
 
         protected override void Configure(IContainerBuilder builder) {
             builder.RegisterComponent(mainCamera);
+            builder.Register<PrefabPool>(Lifetime.Scoped);
             builder.Register<ProjectileLauncher>(Lifetime.Scoped);
+            builder.Register<SpellExecutor>(Lifetime.Scoped);
             builder.RegisterComponent(cameraController);
             if (quitOverlay != null) builder.RegisterComponent(quitOverlay);
             if (characterDebugPanel != null) builder.RegisterComponent(characterDebugPanel);
