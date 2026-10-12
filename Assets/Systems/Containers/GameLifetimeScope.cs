@@ -24,8 +24,8 @@ namespace Systems.Containers {
         }
     }
 
-    // [NEW] Initializes the InputReader, confines the mouse to the game window
-    public class GameInputInitializer : IStartable, ITickable, IDisposable {
+    // [NEW] Initializes the InputReader. Cursor confinement is build-only (see Start).
+    public class GameInputInitializer : IStartable, IDisposable {
         private readonly InputReader _inputReader;
         private readonly IEventBus _eventBus;
 
@@ -37,18 +37,21 @@ namespace Systems.Containers {
         public void Start() {
             _inputReader.Initialize(_eventBus, EActionTypes.Game);
 
-            // Free bonus for real builds: native confinement (no-op in the Editor).
+            // Cursor confinement is standalone-build-only and must NEVER run in the Editor.
+            // Cursor.lockState is process-global: on Wayland/Hyprland a Confined lock leaks
+            // out of the Game view and desyncs the pointer for the whole Editor, so clicks
+            // land away from the visible cursor. Observed on this machine — do not remove
+            // the guard.
+#if !UNITY_EDITOR
             Cursor.lockState = CursorLockMode.Confined;
-        }
-
-        // Software clamp, driven every frame — this is what actually works in the Editor.
-        public void Tick() {
-            _inputReader.ClampCursorToWindow();
+#endif
         }
 
         public void Dispose() {
+#if !UNITY_EDITOR
             // Release the cursor when the scope is torn down
             Cursor.lockState = CursorLockMode.None;
+#endif
         }
     }
 }
