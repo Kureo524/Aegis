@@ -32,9 +32,7 @@
 *.spriteatlasv2 text eol=lf merge=unityyamlmerge
 *.meta          text eol=lf merge=unityyamlmerge
 
-# Unity writes these two as BINARY (baked NavMesh, see TestSceneSetup):
-# never line-ending-convert or text-merge them.
-Assets/Scenes/Tests/TestScene.unity              binary
+# NavMeshData is a binary-only asset: never line-ending-convert or text-merge it.
 Assets/Scenes/Tests/TestScene/NavMesh-Ground.asset binary
 
 # --- Binary assets ------------------------------------------------------------

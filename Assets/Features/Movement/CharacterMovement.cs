@@ -34,6 +34,9 @@ namespace Features.Movement {
 
         private void Awake() {
             _rb = GetComponent<Rigidbody>();
+            // The body moves at the physics rate while the camera follows it every rendered frame:
+            // without interpolation the character visibly stutters (design doc §3).
+            _rb.interpolation = RigidbodyInterpolation.Interpolate;
             _agent = GetComponent<NavMeshAgent>();
             _path = new NavMeshPath();
 
@@ -86,12 +89,15 @@ namespace Features.Movement {
             toWaypoint.y = 0f;
             _moveDirection = toWaypoint.normalized;
             SetHorizontalVelocity(_moveDirection * moveSpeed);
+            FaceMoveDirection();
         }
 
-        private void Update() {
+        // Rotated through the Rigidbody, in FixedUpdate: writing transform.rotation directly
+        // would bypass (and break) the interpolation.
+        private void FaceMoveDirection() {
             if (_moveDirection.sqrMagnitude < 0.001f) return;
             Quaternion targetRotation = Quaternion.LookRotation(_moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+            _rb.MoveRotation(Quaternion.Slerp(_rb.rotation, targetRotation, Time.fixedDeltaTime * rotationSpeed));
         }
 
         // Skips the corners already reached. False once the destination itself is reached.

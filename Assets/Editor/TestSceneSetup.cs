@@ -19,13 +19,9 @@ namespace EditorTools {
     public static class TestSceneSetup {
         private const string ScenePath = ProjectSetup.TestScenePath;
 
-        // NOTE: this scene is saved as a BINARY .unity file even though the project is in
-        // Force Text mode. Cause: the baked NavMesh. NavMeshData is a binary-only serializable
-        // type, and any scene holding one cannot be written as YAML (verified empirically:
-        // a scene with a NavMeshSurface is TEXT until BuildNavMesh() is called, then BINARY).
-        // This is a Unity constraint, not a project misconfiguration. The scene is a generated
-        // artifact rebuilt by this script, so losing textual diffs on it is acceptable.
-        // If textual diffs ever become necessary, bake the NavMesh at runtime instead of in-editor.
+        // NOTE: the baked NavMeshData is binary-only. Left inside the scene, it forces Unity to save
+        // the whole scene in binary (no diffs, no merges): BakeNavMesh stores it as its own asset
+        // next to the scene instead, so TestScene.unity stays YAML.
 
         [MenuItem("Tools/Create Test Scene")]
         public static void CreateTestScene() {
@@ -37,10 +33,12 @@ namespace EditorTools {
             ground.transform.localScale = new Vector3(10, 1, 10);
             ground.GetComponent<Renderer>().material.color = new Color(0.2f, 0.3f, 0.2f);
 
-            // NavMeshSurface
+            // NavMeshSurface (baked once the obstacles exist, see below)
             var navSurface = ground.AddComponent<Unity.AI.Navigation.NavMeshSurface>();
             navSurface.collectObjects = Unity.AI.Navigation.CollectObjects.All;
-            navSurface.BuildNavMesh();
+
+            CreateObstacles();
+            BakeNavMesh(navSurface);
 
             // Player
             var player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -50,6 +48,7 @@ namespace EditorTools {
 
             var rb = player.AddComponent<Rigidbody>();
             rb.useGravity = true;
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
             rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
             var agent = player.AddComponent<UnityEngine.AI.NavMeshAgent>();
@@ -120,6 +119,78 @@ namespace EditorTools {
             Debug.Log($"[TestSceneSetup] Test scene created at {ScenePath}");
         }
 
+        private const string ObstaclesRoot = "=== Obstacles ===";
+        private const string NavMeshAssetPath = "Assets/Scenes/Tests/TestScene/NavMesh-Ground.asset";
+
+        // Pathfinding test course around the spawn (player at the origin, ground is 100 x 100):
+        // (name, position, size). Height 2 so the character cannot step onto them.
+        private static readonly (string name, Vector3 position, Vector3 size)[] Obstacles = {
+            ("Wall_Front",     new Vector3(  0f, 1f,   6f), new Vector3(10f,  2f, 1f)),   // straight wall: go around
+            ("L_Long",         new Vector3(  9f, 1f,  -4f), new Vector3( 1f,  2f, 9f)),   // L corner
+            ("L_Short",        new Vector3( 12f, 1f,  -8f), new Vector3( 7f,  2f, 1f)),
+            ("U_Back",         new Vector3(-15f, 1f,   0f), new Vector3( 1f,  2f, 9f)),   // U trap, open towards the spawn
+            ("U_Top",          new Vector3(-11.5f, 1f, 4f), new Vector3( 6f,  2f, 1f)),
+            ("U_Bottom",       new Vector3(-11.5f, 1f,-4f), new Vector3( 6f,  2f, 1f)),
+            ("Pillar_1",       new Vector3( -3f, 1f,  12f), new Vector3(1.5f, 2f, 1.5f)), // pillar field
+            ("Pillar_2",       new Vector3(  0f, 1f,  14f), new Vector3(1.5f, 2f, 1.5f)),
+            ("Pillar_3",       new Vector3(  3f, 1f,  12f), new Vector3(1.5f, 2f, 1.5f)),
+            ("Pillar_4",       new Vector3( -1.5f, 1f, 17f), new Vector3(1.5f, 2f, 1.5f)),
+            ("Pillar_5",       new Vector3(  1.5f, 1f, 17f), new Vector3(1.5f, 2f, 1.5f)),
+            ("Corridor_Left",  new Vector3( 18f, 1f,  10f), new Vector3( 1f,  2f, 12f)),  // narrow corridor
+            ("Corridor_Right", new Vector3( 21f, 1f,  10f), new Vector3( 1f,  2f, 12f)),
+        };
+
+        /// <summary>
+        /// Adds (or rebuilds) the pathfinding test course in the existing test scene and rebakes
+        /// the NavMesh, without touching anything else in the scene.
+        ///   Unity -batchmode -quit -executeMethod EditorTools.TestSceneSetup.AddTestObstacles
+        /// </summary>
+        [MenuItem("Tools/Add Test Obstacles")]
+        public static void AddTestObstacles() {
+            var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+            CreateObstacles();
+
+            var surface = Object.FindFirstObjectByType<Unity.AI.Navigation.NavMeshSurface>();
+            if (surface == null) {
+                Debug.LogError("[TestSceneSetup] No NavMeshSurface in the test scene.");
+                return;
+            }
+            BakeNavMesh(surface);
+
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[TestSceneSetup] {Obstacles.Length} obstacles added, NavMesh rebaked.");
+        }
+
+        private static void CreateObstacles() {
+            var existing = GameObject.Find(ObstaclesRoot);
+            if (existing != null) Object.DestroyImmediate(existing);
+
+            var root = new GameObject(ObstaclesRoot);
+            foreach (var (name, position, size) in Obstacles) {
+                var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.name = name;
+                cube.transform.SetParent(root.transform);
+                cube.transform.position = position;
+                cube.transform.localScale = size;
+                cube.isStatic = true;
+
+                // Carved out of the NavMesh (top faces included) instead of becoming walkable islands
+                var modifier = cube.AddComponent<Unity.AI.Navigation.NavMeshModifier>();
+                modifier.overrideArea = true;
+                modifier.area = UnityEngine.AI.NavMesh.GetAreaFromName("Not Walkable");
+            }
+        }
+
+        // Bakes and stores the NavMeshData as an asset next to the scene: data left inside the
+        // scene would force Unity to save the scene in binary.
+        private static void BakeNavMesh(Unity.AI.Navigation.NavMeshSurface surface) {
+            surface.BuildNavMesh();
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(NavMeshAssetPath)!);
+            AssetDatabase.DeleteAsset(NavMeshAssetPath);
+            AssetDatabase.CreateAsset(surface.navMeshData, NavMeshAssetPath);
+            EditorUtility.SetDirty(surface);
+        }
+
         /// <summary>
         /// Opens the saved test scene and asserts every reference the scene must carry.
         /// Run headless so a broken scene fails loudly instead of silently in Play mode:
@@ -158,6 +229,11 @@ namespace EditorTools {
 
             var quit = Object.FindFirstObjectByType<QuitOverlay>();
             Check(quit != null, "QuitOverlay present in scene");
+
+            var obstacles = GameObject.Find(ObstaclesRoot);
+            Check(obstacles != null && obstacles.transform.childCount == Obstacles.Length, "pathfinding obstacles present");
+            Check(surface != null && surface.navMeshData != null && AssetDatabase.Contains(surface.navMeshData),
+                  "NavMesh baked and stored as an asset");
 
             if (scope != null) {
                 Check(scope.playerCommandInput != null, "scope.playerCommandInput wired");

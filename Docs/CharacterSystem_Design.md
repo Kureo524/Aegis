@@ -1140,7 +1140,7 @@ Les nouveaux modules du §10 (Combat, Spells, Items, Run, AI…) vont dans `Feat
 > git config merge.unityyamlmerge.driver "<Editor>/Data/Tools/UnityYAMLMerge merge -p %O %B %A %A"
 > git config merge.unityyamlmerge.recursive binary
 > ```
-> `TestScene.unity` et son NavMesh sont binaires : déclarés `binary`, jamais fusionnés.
+> Le NavMesh baké (`NavMesh-Ground.asset`) est binaire : déclaré `binary`, jamais fusionné. Il doit rester un **asset séparé** : embarqué dans la scène, il force Unity à l'enregistrer en binaire.
 
 **Workflow**
 - Branches : `main` (stable, taguée par jalon, ex. `v0.1-phase1`), `dev` (intégration), `feature/<module>-<sujet>`, `fix/<sujet>` (minuscules, tirets, pas de `&` ni d'espace). Fusion par **pull request** vers `dev`.
@@ -1167,18 +1167,19 @@ Les nouveaux modules du §10 (Combat, Spells, Items, Run, AI…) vont dans `Feat
 | Réglages caméra en champs sérialisés | SO `CameraSettings` injecté |
 | `Camera.main` / `GetComponent` en fallback, `Instantiate` direct du marqueur | Références câblées, `IObjectResolver.Instantiate` |
 | `CharacterMovement` écrasait la vitesse verticale (gravité) et ne synchronisait pas l'agent | `y` conservé, `agent.nextPosition = rb.position` |
+| Perso saccadé : Rigidbody non interpolé, rotation écrite sur le `transform` dans `Update` | `RigidbodyInterpolation.Interpolate` imposé, rotation via `rb.MoveRotation` en `FixedUpdate` |
 | Bouton Quit qui pouvait quitter seul au lancement (IMGUI réagit au bouton maintenu) | Clic lu via `ConfirmEvent` (appui), publie `QuitRequestedEvent` |
 
 Points restants (connus) :
 - Bindings AZERTY (§4.7), à faire avant la phase 5b.
 - `Releases/Game.unity` : ancienne scène WASD, scripts manquants, retirée du build. À supprimer ou à reconstruire quand le vrai stage arrivera.
-- `TestScene.unity` est sérialisée en **binaire** (voir la note dans `TestSceneSetup`) : pas de diff lisible sur cette scène.
 
 **Outillage**
 - *Tools > Project Setup* (`EditorTools.ProjectSetup.Run`) : crée / répare le prefab root, ses règles de transition, les SO de réglages, `VContainerSettings`, la liste de scènes du build. Idempotent.
 - *Tools > Create Test Scene* / *Validate Test Scene* : régénère / vérifie `TestScene`.
+- *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
 - *Tools > Build Linux (Test Scene)* : build standalone de test.
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine), `Game.Tests.PlayMode` (lancement direct de `TestScene`, et Menu → Play → `TestScene`).
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles).
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 

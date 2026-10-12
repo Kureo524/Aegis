@@ -50,6 +50,31 @@ namespace Game.Tests.PlayMode {
             Assert.IsFalse(camera.IsLocked, "CameraLockEvent toggles the lock");
         }
 
+        // Destinations hidden behind the test course obstacles (see TestSceneSetup.Obstacles):
+        // reaching them proves the path goes around instead of into the walls.
+        [UnityTest]
+        public IEnumerator Character_PathsAroundObstacles([Values(0, 1, 2)] int caseIndex) {
+            Vector3[] destinations = {
+                new(0f, 0f, 9f),     // behind Wall_Front
+                new(-18f, 0f, 0f),   // behind the U trap
+                new(19.5f, 0f, 14f), // inside the narrow corridor
+            };
+            Vector3 destination = destinations[caseIndex];
+
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return new WaitForFixedUpdate();
+            var movement = Object.FindFirstObjectByType<Features.Movement.CharacterMovement>();
+            Assert.IsNotNull(movement);
+
+            movement.SetDestination(destination);
+            Transform body = movement.transform;
+            yield return WaitFor(() => !movement.IsMoving, timeout: 20f);
+
+            Vector3 delta = body.position - destination;
+            delta.y = 0f;
+            Assert.Less(delta.magnitude, 0.5f, $"Stopped at {body.position}, expected {destination}");
+        }
+
         [UnityTest]
         public IEnumerator Menu_Play_LoadsGameScene() {
             yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
