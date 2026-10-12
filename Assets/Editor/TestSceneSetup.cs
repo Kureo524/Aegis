@@ -181,6 +181,45 @@ namespace EditorTools {
             EditorUtility.SetDirty(scope);
         }
 
+        /// <summary>
+        /// Run of the test scene (design doc §9.1): stage, RunStateMachine object with its rules,
+        /// run HUD (on the GameHud document), end-of-wave and victory / defeat screens. Idempotent.
+        /// </summary>
+        public static void WireRun(GameLifetimeScope scope, Features.Run.StageDefinition stage) {
+            if (scope.stage == null) scope.stage = stage;
+
+            var machine = Object.FindFirstObjectByType<Features.Run.RunStateMachine>();
+            if (machine == null) machine = new GameObject("RunStateMachine").AddComponent<Features.Run.RunStateMachine>();
+            var machineSo = new SerializedObject(machine);
+            SerializedProperty rules = machineSo.FindProperty("rules");
+            rules.ClearArray();
+            for (int i = 0; i < RunSetup.Rules.Length; i++) {
+                rules.InsertArrayElementAtIndex(i);
+                SerializedProperty rule = rules.GetArrayElementAtIndex(i);
+                rule.FindPropertyRelative("from").enumValueIndex = (int)RunSetup.Rules[i].from;
+                SerializedProperty to = rule.FindPropertyRelative("to");
+                to.ClearArray();
+                for (int j = 0; j < RunSetup.Rules[i].to.Length; j++) {
+                    to.InsertArrayElementAtIndex(j);
+                    to.GetArrayElementAtIndex(j).enumValueIndex = (int)RunSetup.Rules[i].to[j];
+                }
+            }
+            machineSo.ApplyModifiedPropertiesWithoutUndo();
+            scope.runStateMachine = machine;
+
+            if (scope.playerHud != null && !scope.playerHud.TryGetComponent(out RunHudView runHud))
+                runHud = scope.playerHud.gameObject.AddComponent<RunHudView>();
+            scope.runHud = scope.playerHud != null ? scope.playerHud.GetComponent<RunHudView>() : null;
+
+            var reward = Object.FindFirstObjectByType<WaveRewardPanel>();
+            if (reward == null) reward = CreateOverlayDocument<WaveRewardPanel>("WaveRewardPanel");
+            scope.waveRewardPanel = reward;
+            var end = Object.FindFirstObjectByType<RunEndPanel>();
+            if (end == null) end = CreateOverlayDocument<RunEndPanel>("RunEndPanel");
+            scope.runEndPanel = end;
+            EditorUtility.SetDirty(scope);
+        }
+
         /// <summary>Menu drawn above the HUD / main menu: its own UIDocument with a higher sorting order.</summary>
         public static T CreateOverlayDocument<T>(string name) where T : Component {
             var go = new GameObject(name);
@@ -310,6 +349,16 @@ namespace EditorTools {
                 Check(scope.playerHud != null, "scope.playerHud wired");
                 Check(scope.damageNumbers != null, "scope.damageNumbers wired");
                 Check(scope.hordeSettings != null, "scope.hordeSettings wired");
+                Check(scope.runStateMachine != null, "scope.runStateMachine wired");
+                Check(scope.runHud != null && scope.waveRewardPanel != null && scope.runEndPanel != null, "run HUD and run screens wired");
+                Check(scope.stage != null && scope.stage.Waves.Length > 0 && scope.stage.RewardSchedule != null,
+                      "scope.stage: waves and reward schedule");
+                if (scope.stage != null) {
+                    bool wavesOk = true;
+                    foreach (var wave in scope.stage.Waves) wavesOk &= wave != null && wave.SpawnTable.Length > 0;
+                    foreach (var wave in scope.stage.BonusWaves) wavesOk &= wave != null && wave.SpawnTable.Length > 0;
+                    Check(wavesOk, "every wave has a spawn table");
+                }
                 if (scope.hordeSettings != null) {
                     var table = scope.hordeSettings.SpawnTable;
                     Check(table.Length > 0 && System.Array.TrueForAll(table, e => e.Prefab != null && e.Definition != null && e.Weight > 0f),

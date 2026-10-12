@@ -141,6 +141,7 @@ namespace EditorTools {
             }
             so.FindProperty("spawnInterval").floatValue = 2f;
             so.FindProperty("maxAlive").intValue = 18;
+            so.FindProperty("spawnOnStart").boolValue = false;   // the stage's waves drive the spawn
             so.ApplyModifiedPropertiesWithoutUndo();
             return settings;
         }

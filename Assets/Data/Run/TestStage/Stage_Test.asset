@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48ff19132256703f2a9bc8ec29fd1638, type: 3}
+  m_Name: Stage_Test
+  m_EditorClassIdentifier: Game.Features::Features.Run.StageDefinition
+  displayName: Plaine d'essai
+  waves:
+  - {fileID: 11400000, guid: f200042afefefdded8e5223ebd938a63, type: 2}
+  - {fileID: 11400000, guid: b0782ef9beb9308da808c83f696d6d2e, type: 2}
+  - {fileID: 11400000, guid: 373da30efb592e16ba6c88a3c48c64da, type: 2}
+  - {fileID: 11400000, guid: 8169b8e5504ac74fcb2cb29a44d19f08, type: 2}
+  - {fileID: 11400000, guid: ab98185debceae7f9a1bbcc7a49d690a, type: 2}
+  bonusWaves:
+  - {fileID: 11400000, guid: 3c2f9e8778d684945b3e9c8da625de4b, type: 2}
+  - {fileID: 11400000, guid: 70d474616125a4d928c800674f12f0c9, type: 2}
+  rewardSchedule: {fileID: 11400000, guid: b8147802226b238688f2a45c9fc1ea9e, type: 2}
+  lives: 3
+  lifeLossInterval: 30
+  deathCostsALife: 1
+  firstWaveCountdown: 5
+  preWaveCountdown: 10
