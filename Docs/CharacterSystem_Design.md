@@ -80,6 +80,21 @@ Déplacement sur le plan **XZ** (vue de dessus), caméra inclinée, sprites en b
 - **Tri d'affichage** : trier par profondeur (Z) via *Transparency Sort Axis* (Graphics Settings) ou `sortingOrder` dérivé de la position Z.
 - **Layers physiques** : `Player`, `Enemy`, `PlayerProjectile`, `EnemyProjectile`, `Pickup`. Matrice de collision configurée dès le début.
 
+### Prefabs (en place)
+
+**Un prefab générique, des variants pour qui le pilote, des données pour le reste** :
+
+| Prefab (`Assets/Prefabs/Characters/`) | Contenu |
+|---|---|
+| `Character` (base) | Racine physique, **pivot aux pieds** : `Rigidbody` (interpolé, rotation X/Z gelée), `BoxCollider`, `NavMeshAgent`, `CharacterMovement`, `Character`. Enfant **`Visual`** : `SpriteRenderer` + `CharacterVisual` |
+| `Player` (variant de `Character`) | + `PlayerCommandInput` |
+| `Enemy` (variant, phase 6) | + IA |
+
+- Ce qui distingue deux persos d'un même type (**sprite**, **taille du corps** `BodySize`, stats…) vient de la `CharacterDefinition`, appliquée par `Character.Init` : jamais un variant par personnage.
+- **`CharacterVisual`** : billboard (copie la rotation de la caméra, donc le sprite est vu à plat, sans déformation de perspective) et `flipX` selon le déplacement horizontal **à l'écran**. Les sprites sont dessinés **tournés vers la droite**, pivot en bas au centre. *Pour les centaines d'ennemis : un `LateUpdate` par entité est à remplacer par une mise à jour centrale (phase 6).*
+- Le joueur n'est **pas posé dans la scène** : `PlayerSpawner` (entry point du `GameLifetimeScope`) l'instancie via `IObjectResolver.Instantiate` au `PlayerSpawn`, appelle `Init` et publie `PlayerSpawnedEvent`, que la caméra écoute pour le suivre.
+- Sprite provisoire : `Assets/GraphicAssets/Sprites/Characters/Placeholder_Hero.png` (64 × 128, 64 px/unité, généré par *Project Setup*).
+
 ---
 
 ## 4. Ordres, déplacement et attaque de base (façon LoL)
@@ -625,10 +640,10 @@ public class CharacterDefinition : ScriptableObject {
 `Character.Init(CharacterDefinition def)` configure le prefab générique :
 sprite, collider, stats, croissance, attaque de base, éléments, grimoire, compétence propre, comportement. **Un prefab, N personnages.**
 
-> **En place (phase 3)** : `CharacterDefinition` porte `DisplayName`, `Faction`, `BaseStats` (`StatBlock`), `GrowthPerLevel` (`StatGrowth`) et `BasicAttack` (`BasicAttackDefinition`). Les autres champs arrivent avec leur phase (éléments 5b, sorts 5c, passif 8, IA 6, sprite / collider avec le prefab 2.5D).
-> - `Character.Init` : `StatController.Init(BaseStats)` → `CharacterLevel` (applique la croissance) → `CharacterMovement.Init(stat MoveSpeed)`. Ré-appelable (pooling, nouvelle run).
+> **En place (phase 3)** : `CharacterDefinition` porte `DisplayName`, `Faction`, `BaseStats` (`StatBlock`), `GrowthPerLevel` (`StatGrowth`) et `BasicAttack` (`BasicAttackDefinition`). Ainsi que `Sprite` et `BodySize` (corps physique et agent). Les autres champs arrivent avec leur phase (éléments 5b, sorts 5c, passif 8, IA 6).
+> - `Character.Init` : sprite et corps → `StatController.Init(BaseStats)` → `CharacterLevel` (applique la croissance) → `CharacterMovement.Init(stat MoveSpeed)`. Ré-appelable (pooling, nouvelle run).
 > - Seul le **personnage joueur** parle au bus global : il écoute `XpGrantedEvent` et publie `XpChangedEvent`, `LevelUpEvent` et `StatChangedEvent` (snapshot complet à l'`Init`). Les ennemis n'y publient rien.
-> - Joueur de `TestScene` : `Char_TestHero` (`Assets/Data/Characters/TestHero/`), initialisé par `PlayerBootstrap` (entry point du `GameLifetimeScope`). Valeurs de stats **provisoires**.
+> - Joueur de `TestScene` : prefab `Player` + `Char_TestHero` (`Assets/Data/Characters/TestHero/`), spawné par `PlayerSpawner` (§3). Valeurs de stats **provisoires**.
 > - `CharacterDebugPanel` (TestScene, IMGUI) : niveau, XP, points, stats principales, boutons « +100 XP » et « Level up » ; ne passe que par le bus.
 
 ### 8.1 Passif
@@ -882,9 +897,9 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | Phase | Contenu | Résultat jouable |
 |---|---|---|
 | **0** ✅ | **Fondations** (§14) : dépôt Git, arborescence et asmdef, `IEventBus`, `GameState` (+ `Win`), `RootLifetimeScope`, SO de réglages, tests EditMode + PlayMode. *Reste : `RunStateMachine` (avec la phase 7).* | Projet propre qui compile, états de jeu et événements en place |
-| **1** ✅ | `CharacterMovement` (clic droit, **NavMesh**), marqueur, caméra verrouillée / libre (§4.8), `TestScene`. *Reste : prefab 2.5D (sprite billboard), vitesse lue depuis la stat `MoveSpeed`.* | Un perso qui se déplace au clic en évitant les obstacles |
+| **1** ✅ | `CharacterMovement` (clic droit, **NavMesh**), marqueur, caméra verrouillée / libre (§4.8), `TestScene`, prefab 2.5D (`Character` + variant `Player`, sprite billboard, §3) | Un perso qui se déplace au clic en évitant les obstacles |
 | **2** ✅ | `Stat` / `StatModifier` / `StatController` + toutes les stats + tests unitaires | Stats modifiables |
-| **3** ✅ | `CharacterDefinition`, `Character.Init`, `BasicAttackDefinition`, `CharacterLevel` (XP, points de compétence, croissance), vitesse lue depuis `MoveSpeed`. *Reste : sprite / collider depuis la définition (avec le prefab 2.5D).* | Un perso configurable par données |
+| **3** ✅ | `CharacterDefinition`, `Character.Init`, `BasicAttackDefinition`, `CharacterLevel` (XP, points de compétence, croissance), vitesse lue depuis `MoveSpeed`. Sprite et taille du corps depuis la définition. | Un perso configurable par données |
 | **4** | `Health`, `DamageInfo`, `DamageReceiver`, formules, régénérations, CC et ténacité | Dégâts corrects |
 | **5** | `CommandController`, clic droit sur ennemi, `BasicAttacker`, Q + clic gauche (attack-move) | Attaque de base façon LoL |
 | **5b** | `ManaPool`, `ElementSelection` (A/Z/E, T reset), `SpellBook` + `SpellResolver`, coût en mana + UI, déblocage d'éléments par points (niv. 1/3/5) | Éléments activables, coût affiché |
@@ -1047,6 +1062,7 @@ public sealed class EventBus : IEventBus {
 | `WaveStartedEvent`, `WaveEndedEvent`, `LifeLostEvent` | `RunDirector` | HUD, audio, `WaveSpawner` |
 | `StageClearedEvent`, `StageFailedEvent` | `RunDirector` | `GameFlowController`, méta-progression |
 | `EnemyKilledEvent` (xp, gold, position) | `Health` / `EnemyDeath` | `CharacterLevel`, `Wallet`, loot, HUD |
+| `PlayerSpawnedEvent` (transform du joueur) | `PlayerSpawner` | `CameraController` |
 | `XpGrantedEvent` | `CharacterDebugPanel` (plus tard : kills) | `Character` joueur |
 | `XpChangedEvent`, `LevelUpEvent`, `StatChangedEvent` | `Character` joueur | HUD, `CharacterDebugPanel` |
 | `ElementLevelChangedEvent` | `ElementCaster` | HUD, `SpellBook` |
@@ -1061,7 +1077,7 @@ public sealed class EventBus : IEventBus {
 |---|---|---|
 | `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
 | `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `SceneEntryPoint(Menu)` |
-| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **En place** : `PlayerCommandInput`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, le joueur (`Character` + `CharacterDefinition`, initialisé par `PlayerBootstrap`), `SceneEntryPoint(Game)`. **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
+| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **En place** : la `Camera` principale, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
 
 VContainer crée le root **une fois**, avant le premier scope de scène, et le garde entre les chargements (`DontDestroyOnLoad`) ; un scope de scène sans `parentReference` en devient automatiquement l'enfant. Les services du root **ne doivent jamais être ré-enregistrés** dans un scope de scène (sinon deux `EventBus` coexistent et les événements se perdent).
 
@@ -1117,7 +1133,7 @@ Assets/
 │   ├── StateMachines/       GameState, GameFlowStateMachine
 │   ├── Events/              GameStateChangedEvent, PlayRequested/QuitRequested, StatChangedEvent
 │   ├── CameraControl/       CameraController, CameraSettings (SO)
-│   ├── Characters/          Character, CharacterDefinition (SO), Faction, PlayerBootstrap
+│   ├── Characters/          Character, CharacterDefinition (SO), CharacterVisual, Faction, PlayerSpawner
 │   ├── Progression/         CharacterLevel, StatGrowth (SO), ExperienceCurve (SO)
 │   ├── Combat/              BasicAttackDefinition (SO), DamageType
 │   ├── Movement/            CharacterMovement
@@ -1125,14 +1141,15 @@ Assets/
 │   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO)…
 │   └── UI/                  GameHUD, QuitOverlay, Panels/MainMenuPanel, DebugTools/CharacterDebugPanel
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
-├── Editor/                  Game.Editor — ProjectSetup, TestSceneSetup, BuildScript
+├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, TestSceneSetup, BuildScript
 ├── Data/                    Settings/ (GameFlowSettings, CameraSettings, VContainerSettings),
 │                            Progression/ExperienceCurve, Characters/TestHero/ (Char_TestHero…)
 ├── GameAssets/ActionMaps/   Game.Input — GameActionMaps (.inputactions + C# généré)
-├── Prefabs/                 RootLifetimeScope, ClickMarker
+├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player)
+├── GraphicAssets/Sprites/   Characters/Placeholder_Hero
 ├── Scenes/                  Releases/Menu, Tests/TestScene (+ Releases/Game : ancienne scène WASD, hors build)
 ├── Tests/                   EditMode/, PlayMode/
-└── UI Toolkit/   GraphicAssets/   Settings/
+└── UI Toolkit/   Settings/
 Docs/                        CharacterSystem_Design.md
 ```
 
@@ -1194,7 +1211,7 @@ Points restants (connus) :
 - *Tools > Create Test Scene* / *Validate Test Scene* : régénère / vérifie `TestScene`.
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
 - *Tools > Build Linux (Test Scene)* : build standalone de test.
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, bindings AZERTY, `CharacterLevel`), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus).
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, bindings AZERTY, `CharacterLevel`), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite).
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 
