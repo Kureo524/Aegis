@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a79fbfcc21b119caaeda70a927a5337, type: 3}
+  m_Name: SpellSettings
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellSettings
+  maxTotalStacks: 3
+  maxStacksPerElement: 3
+  costCurve:
+  - 1
+  - 1.5
+  - 2.25
+  maxElementLevel: 5
+  cooldownByStacks:
+  - 2
+  - 3.5
+  - 5.5
+  clearSelectionAfterCast: 1
+  blinkTolerance: 0.5
+  homingProjectile: {fileID: 1090469804728839682, guid: 11cfec3c263bc2036a21d9955ee9a863, type: 3}
+  skillshotProjectile: {fileID: 3344706275699075422, guid: b9a1d3fc9bf16b9e785fe463fa74ddc7, type: 3}
+  shapeVfx: {fileID: 4418750059760424966, guid: e9e6152ecc2e9e1e6aeb4da15c03a328, type: 3}

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4053d26ab657801ee987df81da50c0b3, type: 3}
+  m_Name: Elem_Electricity
+  m_EditorClassIdentifier: Game.Features::Features.Spells.ElementDefinition
+  displayName: "\xC9lectricit\xE9"
+  icon: {fileID: 21300000, guid: 11e4281d49374db0b7a24e87f38dcdf4, type: 3}
+  color: {r: 1, g: 0.88, b: 0.25, a: 1}
+  manaCost: 12

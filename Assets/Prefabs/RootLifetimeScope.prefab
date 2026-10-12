@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1137050413795510884
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5200834558858249301}
+  - component: {fileID: 6002295589862436142}
+  - component: {fileID: 3941373531709769783}
+  m_Layer: 0
+  m_Name: RootLifetimeScope
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5200834558858249301
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1137050413795510884}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6002295589862436142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1137050413795510884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bdfd17864fd635c89af6470eee7572b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Features::Features.StateMachines.GameFlowStateMachine
+  rules:
+  - from: 0
+    to: 01000000
+  - from: 1
+    to: 0200000000000000
+  - from: 2
+    to: 030000000400000005000000
+  - from: 3
+    to: 0200000000000000
+  - from: 4
+    to: 0100000000000000
+  - from: 5
+    to: 0100000000000000
+--- !u!114 &3941373531709769783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1137050413795510884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b85d527f381f03ef88743cf654c32ca0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Containers::Containers.RootLifetimeScope
+  parentReference:
+    TypeName: 
+  autoRun: 1
+  autoInjectGameObjects: []
+  stateMachine: {fileID: 6002295589862436142}
+  gameFlowSettings: {fileID: 11400000, guid: 37406ca206fc202eb9e565f11e0d97c7, type: 2}
+  cameraSettings: {fileID: 11400000, guid: e8583fb67373cb210b7c51f1d39214e9, type: 2}
+  experienceCurve: {fileID: 11400000, guid: 0448e4c82aa8e2eb0ad2164b74bb46bc, type: 2}
+  controlsSettings: {fileID: 11400000, guid: 5888a8dd4e4ab8bd8b04221b887807b3, type: 2}
+  spellSettings: {fileID: 11400000, guid: ef4c3e679943fbe9985d85c5e3814123, type: 2}

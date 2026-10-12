@@ -1,2 +1,67 @@
-# Auto detect text files and perform LF normalization
+# Default: let Git detect text vs binary, normalize text to LF in the repo.
 * text=auto
+
+# --- Code & config: always LF ------------------------------------------------
+*.cs            text eol=lf diff=csharp
+*.asmdef        text eol=lf
+*.asmref        text eol=lf
+*.json          text eol=lf
+*.inputactions  text eol=lf
+*.uxml          text eol=lf
+*.uss           text eol=lf
+*.tss           text eol=lf
+*.shader        text eol=lf
+*.hlsl          text eol=lf
+*.md            text eol=lf
+*.txt           text eol=lf
+
+# --- Unity YAML (Force Text): LF + Smart Merge --------------------------------
+# Merge driver "unityyamlmerge" is configured per clone in .git/config (see Docs §14.7).
+*.unity         text eol=lf merge=unityyamlmerge
+*.prefab        text eol=lf merge=unityyamlmerge
+*.asset         text eol=lf merge=unityyamlmerge
+*.mat           text eol=lf merge=unityyamlmerge
+*.anim          text eol=lf merge=unityyamlmerge
+*.controller    text eol=lf merge=unityyamlmerge
+*.overrideController text eol=lf merge=unityyamlmerge
+*.physicMaterial text eol=lf merge=unityyamlmerge
+*.playable      text eol=lf merge=unityyamlmerge
+*.mask          text eol=lf merge=unityyamlmerge
+*.lighting      text eol=lf merge=unityyamlmerge
+*.spriteatlas   text eol=lf merge=unityyamlmerge
+*.spriteatlasv2 text eol=lf merge=unityyamlmerge
+*.meta          text eol=lf merge=unityyamlmerge
+
+# NavMeshData is a binary-only asset: never line-ending-convert or text-merge it.
+Assets/Scenes/Tests/TestScene/NavMesh-Ground.asset binary
+
+# --- Binary assets ------------------------------------------------------------
+# TODO: move to Git LFS once git-lfs is installed (replace "binary" with
+#       "filter=lfs diff=lfs merge=lfs -text", then `git add --renormalize .`).
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.psd   binary
+*.tga   binary
+*.tif   binary
+*.tiff  binary
+*.exr   binary
+*.hdr   binary
+*.gif   binary
+*.wav   binary
+*.mp3   binary
+*.ogg   binary
+*.aif   binary
+*.aiff  binary
+*.fbx   binary
+*.obj   binary
+*.blend binary
+*.mp4   binary
+*.mov   binary
+*.webm  binary
+*.ttf   binary
+*.otf   binary
+*.dll   binary
+*.so    binary
+*.a     binary
+*.bytes binary
