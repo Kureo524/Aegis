@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Features.CameraControl;
 using Features.Characters;
 using Features.Combat;
+using Features.Economy;
+using Features.Enemies;
 using Features.Spells;
 using Systems.Pooling;
 using Features.Flow;
@@ -34,6 +36,8 @@ namespace Containers {
         public Transform playerSpawn;
 
         [Header("Enemies")]
+        [Tooltip("Flow field, AI rate and continuous spawn of the horde (design doc §9.6).")]
+        public HordeSettings hordeSettings;
         [Tooltip("Fixed characters spawned at scene start (training dummies).")]
         public List<CharacterSpawn> enemySpawns = new();
 
@@ -42,6 +46,11 @@ namespace Containers {
             builder.Register<PrefabPool>(Lifetime.Scoped);
             builder.Register<ProjectileLauncher>(Lifetime.Scoped);
             builder.Register<SpellExecutor>(Lifetime.Scoped);
+            builder.RegisterInstance(hordeSettings);
+            builder.RegisterEntryPoint<FlowFieldService>().AsSelf();
+            builder.RegisterEntryPoint<EnemyDirector>().AsSelf();
+            builder.RegisterEntryPoint<HordeSpawner>().AsSelf();
+            builder.RegisterEntryPoint<Wallet>().AsSelf();
             builder.RegisterComponent(cameraController);
             if (quitOverlay != null) builder.RegisterComponent(quitOverlay);
             if (characterDebugPanel != null) builder.RegisterComponent(characterDebugPanel);

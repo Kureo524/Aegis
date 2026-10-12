@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Flow.GameFlowSettings
   menuScene: Menu
   gameScene: TestScene
+  playerRespawnDelay: 3

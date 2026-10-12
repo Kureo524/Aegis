@@ -58,3 +58,35 @@ namespace Features.Events {
     /// <summary>The player died. Nothing reacts yet (GameOver comes with the run loop, phase 7).</summary>
     public readonly struct PlayerDiedEvent : IEvent { }
 }
+
+namespace Features.Events {
+    /// <summary>The run's gold changed (Wallet → HUD).</summary>
+    public readonly struct GoldChangedEvent : Systems.EventBusses.IEvent {
+        public readonly int Gold;
+        public readonly int Delta;
+        public GoldChangedEvent(int gold, int delta) {
+            Gold = gold;
+            Delta = delta;
+        }
+    }
+
+    /// <summary>Debug: start / stop the continuous horde spawn, or add a burst of enemies.</summary>
+    public readonly struct HordeDebugEvent : Systems.EventBusses.IEvent {
+        public readonly bool Toggle;
+        public readonly int Burst;
+        public HordeDebugEvent(bool toggle, int burst) {
+            Toggle = toggle;
+            Burst = burst;
+        }
+    }
+
+    /// <summary>Horde state, for the debug panel.</summary>
+    public readonly struct HordeStatusEvent : Systems.EventBusses.IEvent {
+        public readonly bool Spawning;
+        public readonly int Alive;
+        public HordeStatusEvent(bool spawning, int alive) {
+            Spawning = spawning;
+            Alive = alive;
+        }
+    }
+}

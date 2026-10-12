@@ -66,6 +66,30 @@ namespace Features.Spells {
             return false;
         }
 
+        /// <summary>
+        /// Shows where a spell is about to land, for <paramref name="duration"/> (enemy casts, so the
+        /// player can dodge, §9.6).
+        /// </summary>
+        public void Telegraph(SpellDefinition spell, CastContext ctx, float duration) {
+            if (duration <= 0f) return;
+            Color color = new(1f, 0.25f, 0.2f, 0.9f);
+            SpellVfx vfx = _pool.Get(_settings.ShapeVfx);
+            switch (spell.Targeting) {
+                case TargetingType.GroundPoint:
+                    vfx.PlayRing(ctx.TargetPoint, Mathf.Max(spell.Radius, 0.5f), color, duration, _pool.Release);
+                    break;
+                case TargetingType.Cone:
+                    vfx.PlayCone(ctx.Origin, ctx.Direction, spell.Range, spell.ConeAngle, color, duration, _pool.Release);
+                    break;
+                case TargetingType.Self:
+                    vfx.PlayRing(ctx.Origin, Mathf.Max(spell.Radius, 1f), color, duration, _pool.Release);
+                    break;
+                default:
+                    _pool.Release(vfx);
+                    break;
+            }
+        }
+
         public void Execute(Character caster, SpellDefinition spell, CastContext ctx, int levelsAboveOne) {
             if (caster == null || !caster.IsAlive) return;
             Vector3 origin = caster.transform.position;

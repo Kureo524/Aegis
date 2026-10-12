@@ -11,6 +11,9 @@ namespace Features.Movement {
     /// by hand; the NavMeshAgent never moves the body (updatePosition = false) and is only kept in
     /// sync with it, so it stays usable for queries and avoidance later.
     ///
+    /// <see cref="Steer"/> is the other way to move, for the hordes (§9.6): walk in a direction given
+    /// from outside (the flow field), no path at all.
+    ///
     /// Speed is the owner's MoveSpeed stat (<see cref="Init"/>): same code for everyone,
     /// different speed. Does not move before Init.
     /// </summary>
@@ -28,6 +31,7 @@ namespace Features.Movement {
         private Vector3[] _corners = System.Array.Empty<Vector3>();   // cached: NavMeshPath.corners allocates
         private Vector3 _destination;
         private bool _hasDestination;
+        private bool _steering;
         private int _currentCorner;
         private Vector3 _moveDirection;
         private Stat _moveSpeed;
@@ -56,7 +60,7 @@ namespace Features.Movement {
         }
 
         private void Start() {
-            if (NavMesh.SamplePosition(_rb.position, out NavMeshHit hit, SampleRadius, NavMesh.AllAreas)) {
+            if (_agent.enabled && NavMesh.SamplePosition(_rb.position, out NavMeshHit hit, SampleRadius, NavMesh.AllAreas)) {
                 _agent.Warp(hit.position);
             }
         }
@@ -78,10 +82,24 @@ namespace Features.Movement {
 
             _destination = point;
             _hasDestination = true;
+            _steering = false;
             _currentCorner = 0;
 
             bool hasPath = _agent.isOnNavMesh && NavMesh.CalculatePath(_rb.position, point, NavMesh.AllAreas, _path);
             _corners = hasPath ? _path.corners : System.Array.Empty<Vector3>();   // no path: straight line fallback
+        }
+
+        /// <summary>Walks in <paramref name="direction"/> (horizontal, normalized) until the next order.</summary>
+        public void Steer(Vector3 direction) {
+            direction.y = 0f;
+            if (direction.sqrMagnitude < 1e-6f) {
+                Stop();
+                return;
+            }
+            _steering = true;
+            _hasDestination = true;
+            _moveDirection = direction.normalized;
+            _corners = System.Array.Empty<Vector3>();
         }
 
         /// <summary>Instant move (blink): no path, keeps physics and agent in sync.</summary>
@@ -94,6 +112,7 @@ namespace Features.Movement {
 
         public void Stop() {
             _hasDestination = false;
+            _steering = false;
             _moveDirection = Vector3.zero;
             _corners = System.Array.Empty<Vector3>();
             SetHorizontalVelocity(Vector3.zero);
@@ -102,6 +121,12 @@ namespace Features.Movement {
         private void FixedUpdate() {
             if (_agent.isOnNavMesh) _agent.nextPosition = _rb.position;
             if (!_hasDestination) return;
+
+            if (_steering) {
+                SetHorizontalVelocity(_moveDirection * MoveSpeed);
+                FaceMoveDirection();
+                return;
+            }
 
             if (!TryGetNextWaypoint(out Vector3 waypoint)) {
                 Stop();
