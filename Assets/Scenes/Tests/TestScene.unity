@@ -1804,6 +1804,7 @@ GameObject:
   - component: {fileID: 846932367}
   - component: {fileID: 846932368}
   - component: {fileID: 846932369}
+  - component: {fileID: 846932370}
   m_Layer: 0
   m_Name: GameHud
   m_TagString: Untagged
@@ -1924,6 +1925,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 730b62410f2b032f589f883cf15c09c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Features::Features.UI.AugmentsView
+--- !u!114 &846932370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846932362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cd1596ad9e015964ae3e68ef2ddd30a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Features::Features.UI.BossHudView
+  barColor: {r: 0.85, g: 0.2, b: 0.25, a: 1}
 --- !u!1 &849504313
 GameObject:
   m_ObjectHideFlags: 0
@@ -2396,6 +2410,7 @@ MonoBehaviour:
   runHud: {fileID: 846932367}
   augmentPanel: {fileID: 2061533363}
   augmentsView: {fileID: 846932369}
+  bossHud: {fileID: 846932370}
   runEndPanel: {fileID: 645235}
   shopPanel: {fileID: 1674489230}
   anvilPanel: {fileID: 173942654}

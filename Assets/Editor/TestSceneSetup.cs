@@ -233,6 +233,10 @@ namespace EditorTools {
         public static void WireAugments(GameLifetimeScope scope, Features.Augments.AugmentCatalog catalog, Features.Loot.LootSettings loot) {
             if (scope.augmentCatalog == null) scope.augmentCatalog = catalog;
             if (scope.lootSettings == null) scope.lootSettings = loot;
+            if (scope.playerHud != null) {
+                if (!scope.playerHud.TryGetComponent(out BossHudView boss)) boss = scope.playerHud.gameObject.AddComponent<BossHudView>();
+                scope.bossHud = boss;
+            }
             var panel = Object.FindFirstObjectByType<AugmentPanel>();
             if (panel == null) panel = CreateOverlayDocument<AugmentPanel>("AugmentPanel");
             scope.augmentPanel = panel;
@@ -390,6 +394,16 @@ namespace EditorTools {
                 Check(scope.augmentCatalog != null && scope.augmentCatalog.Augments.Count >= 3 && scope.augmentCatalog.FullSlotsAnvil != null,
                       "scope.augmentCatalog: augments and full-slots anvil");
                 Check(scope.augmentPanel != null && scope.augmentsView != null, "augment screen and augment slots wired");
+                Check(scope.bossHud != null, "boss bar wired");
+                if (scope.stage != null) {
+                    bool bossesOk = true;
+                    foreach (var wave in scope.stage.Waves) {
+                        if (wave == null || wave.Boss == null) continue;
+                        bossesOk &= wave.BossPrefab != null && wave.BossPrefab.GetComponent<Features.Enemies.PatternRunner>() != null
+                                    && wave.Boss.Pattern != null && wave.Boss.Pattern.Phases.Length > 0 && wave.Boss.Items.Length <= 3;
+                    }
+                    Check(bossesOk, "boss waves: prefab with a PatternRunner, a pattern, 3 items max");
+                }
                 Check(scope.lootSettings != null && scope.lootSettings.StatAnvilSprite != null && scope.lootSettings.SummonerSpells.Length > 0,
                       "scope.lootSettings: sprites and summoner spells");
                 if (scope.augmentCatalog != null) {

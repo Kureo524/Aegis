@@ -1,0 +1,204 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064fc6a7e2a306944a6e0b0659b40ba5, type: 3}
+  m_Name: Pattern_GoblinKing
+  m_EditorClassIdentifier: Game.Features::Features.Enemies.PatternDefinition
+  phases:
+  - HealthThreshold: 1
+    Order: 0
+    Steps:
+    - Kind: 0
+      Duration: 3
+      Weight: 1
+      Spell: {fileID: 0}
+      AtSelf: 0
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+    - Kind: 1
+      Duration: 0.6
+      Weight: 1
+      Spell: {fileID: 11400000, guid: 4fb93d23e58f6ecdf8d2aa17719d4e7f, type: 2}
+      AtSelf: 0
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+    - Kind: 0
+      Duration: 3
+      Weight: 1
+      Spell: {fileID: 0}
+      AtSelf: 0
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+    - Kind: 2
+      Duration: 0.8
+      Weight: 1
+      Spell: {fileID: 0}
+      AtSelf: 0
+      ChargeDistance: 11
+      ChargeSpeed: 15
+      ChargeDamage: 80
+      Telegraph: 0.8
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+  - HealthThreshold: 0.6
+    Order: 0
+    Steps:
+    - Kind: 3
+      Duration: 0.8
+      Weight: 1
+      Spell: {fileID: 0}
+      AtSelf: 0
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 11400000, guid: 23239040d5a7166a99e4fa9d9e6a5c6a, type: 2}
+      SummonPrefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
+      Count: 4
+    - Kind: 0
+      Duration: 2
+      Weight: 1
+      Spell: {fileID: 0}
+      AtSelf: 0
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+    - Kind: 1
+      Duration: 0.6
+      Weight: 1
+      Spell: {fileID: 11400000, guid: 24bf09aba1a7fa69490b68c3caf8e088, type: 2}
+      AtSelf: 1
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+    - Kind: 2
+      Duration: 0.8
+      Weight: 1
+      Spell: {fileID: 0}
+      AtSelf: 0
+      ChargeDistance: 11
+      ChargeSpeed: 15
+      ChargeDamage: 100
+      Telegraph: 0.8
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+    - Kind: 0
+      Duration: 1.5
+      Weight: 1
+      Spell: {fileID: 0}
+      AtSelf: 0
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+    - Kind: 1
+      Duration: 0.6
+      Weight: 1
+      Spell: {fileID: 11400000, guid: 4fb93d23e58f6ecdf8d2aa17719d4e7f, type: 2}
+      AtSelf: 0
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+  - HealthThreshold: 0.3
+    Order: 1
+    Steps:
+    - Kind: 1
+      Duration: 0.6
+      Weight: 1
+      Spell: {fileID: 11400000, guid: 4fb93d23e58f6ecdf8d2aa17719d4e7f, type: 2}
+      AtSelf: 0
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+    - Kind: 2
+      Duration: 0.8
+      Weight: 1
+      Spell: {fileID: 0}
+      AtSelf: 0
+      ChargeDistance: 11
+      ChargeSpeed: 15
+      ChargeDamage: 120
+      Telegraph: 0.8
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+    - Kind: 1
+      Duration: 0.6
+      Weight: 1
+      Spell: {fileID: 11400000, guid: 24bf09aba1a7fa69490b68c3caf8e088, type: 2}
+      AtSelf: 1
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0
+    - Kind: 3
+      Duration: 0.8
+      Weight: 1
+      Spell: {fileID: 0}
+      AtSelf: 0
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 11400000, guid: 23239040d5a7166a99e4fa9d9e6a5c6a, type: 2}
+      SummonPrefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
+      Count: 5
+    - Kind: 0
+      Duration: 1.2
+      Weight: 1
+      Spell: {fileID: 0}
+      AtSelf: 0
+      ChargeDistance: 0
+      ChargeSpeed: 0
+      ChargeDamage: 0
+      Telegraph: 0
+      Summon: {fileID: 0}
+      SummonPrefab: {fileID: 0}
+      Count: 0

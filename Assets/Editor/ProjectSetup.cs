@@ -97,6 +97,7 @@ namespace EditorTools {
             StageDefinition stage = RunSetup.Run(enemyPrefab);
             ShopCatalog shopCatalog = EconomySetup.Run();
             (Features.Augments.AugmentCatalog augmentCatalog, Features.Loot.LootSettings lootSettings) = PassiveSetup.Run();
+            BossSetup.Run(enemyPrefab);   // after the items: the boss carries some
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
             SetBuildScenes();
