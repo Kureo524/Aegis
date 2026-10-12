@@ -14,9 +14,10 @@ namespace Features.Controls {
     /// Turns the player's pointer commands into orders for the character (design doc §4).
     /// Right click on an enemy: attack it (chase, then auto-attack). Right click on the ground:
     /// move there, which cancels the attack (a windup in progress is lost), LoL style.
-    /// Q then left click: attack-move (§4.6) to the clicked point, attacking first the enemy closest
-    /// to the click (if any within attackMoveSelectRadius); while aiming, the attack range is shown.
-    /// Right click or Escape cancels the aim without giving any order.
+    /// Hold Q and left click: attack-move (§4.6) to the clicked point, attacking first the enemy
+    /// closest to the click (if any within attackMoveSelectRadius). Aiming lasts while Q is held
+    /// (the attack range is shown, each click gives an order); releasing Q, right click or Escape
+    /// end it without giving any order.
     /// Lives on the Player prefab variant.
     /// </summary>
     public class PlayerCommandInput : MonoBehaviour {
@@ -53,7 +54,10 @@ namespace Features.Controls {
 
         private void Start() {
             _subscriptions.Add(_eventBus.Subscribe<PointerCommandEvent>(OnPointerCommand));
-            _subscriptions.Add(_eventBus.Subscribe<AttackMoveEvent>(_ => StartAimingAttackMove()));
+            _subscriptions.Add(_eventBus.Subscribe<AttackMoveEvent>(e => {
+                if (e.Pressed) StartAimingAttackMove();
+                else StopAiming();
+            }));
             _subscriptions.Add(_eventBus.Subscribe<ConfirmEvent>(OnConfirm));
             _subscriptions.Add(_eventBus.Subscribe<CancelEvent>(_ => StopAiming()));
         }
@@ -73,7 +77,6 @@ namespace Features.Controls {
 
         private void OnConfirm(ConfirmEvent evt) {
             if (!_aimingAttackMove) return;
-            StopAiming();
             if (!TryGetGroundPoint(evt.ScreenPosition, out Ray _, out Vector3 point)) return;
 
             Character preferred = ClosestEnemy(point, attackMoveSelectRadius);
