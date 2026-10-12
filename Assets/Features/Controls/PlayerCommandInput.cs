@@ -10,23 +10,24 @@ using VContainer.Unity;
 namespace Features.Controls {
     /// <summary>
     /// Turns the player's pointer commands into orders for the character (design doc §4).
-    /// Right click on the ground: move there, LoL style.
+    /// Right click on the ground: move there, LoL style. Lives on the Player prefab variant.
     /// </summary>
     public class PlayerCommandInput : MonoBehaviour {
         [SerializeField] public CharacterMovement characterMovement;
-        [SerializeField] public Camera mainCamera;
         [SerializeField] public GameObject clickMarkerPrefab;   // must carry a ClickMarker
 
         private IEventBus _eventBus;
         private IObjectResolver _resolver;
+        private Camera _camera;
         private IDisposable _pointerCommandSubscription;
         private ClickMarker _currentMarker;
         private Plane _groundPlane;
 
         [Inject]
-        public void Construct(IEventBus eventBus, IObjectResolver resolver) {
+        public void Construct(IEventBus eventBus, IObjectResolver resolver, Camera mainCamera) {
             _eventBus = eventBus;
             _resolver = resolver;
+            _camera = mainCamera;
         }
 
         private void Awake() {
@@ -42,7 +43,7 @@ namespace Features.Controls {
         private void OnPointerCommand(PointerCommandEvent evt) {
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
 
-            Ray ray = mainCamera.ScreenPointToRay(evt.ScreenPosition);
+            Ray ray = _camera.ScreenPointToRay(evt.ScreenPosition);
             if (!_groundPlane.Raycast(ray, out float distance)) return;
 
             Vector3 worldPoint = ray.GetPoint(distance);

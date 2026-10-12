@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45f014c6ae418d65281ee01e40135079, type: 3}
+  m_Name: Char_TestHero
+  m_EditorClassIdentifier: Game.Features::Features.Characters.CharacterDefinition
+  displayName: Test Hero
+  faction: 0
+  sprite: {fileID: 21300000, guid: 486aa9c1d749412595e7a2c07c70dc85, type: 3}
+  bodySize: {x: 0.8, y: 1.8}
+  baseStats: {fileID: 11400000, guid: 678c37d837112de6d9c82309cb4b4bb1, type: 2}
+  growthPerLevel: {fileID: 11400000, guid: f56a6bbecec94666a9f39d0ac4101af0, type: 2}
+  basicAttack: {fileID: 11400000, guid: 65fc0cafb31edf45cbf2771e1b8b28fc, type: 2}

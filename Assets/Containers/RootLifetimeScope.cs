@@ -1,5 +1,6 @@
 using Features.CameraControl;
 using Features.Flow;
+using Features.Progression;
 using Features.StateMachines;
 using Systems.EventBusses;
 using Systems.Inputs;
@@ -19,6 +20,7 @@ namespace Containers {
         [SerializeField] private GameFlowStateMachine stateMachine;
         [SerializeField] private GameFlowSettings gameFlowSettings;
         [SerializeField] private CameraSettings cameraSettings;
+        [SerializeField] private ExperienceCurve experienceCurve;
 
         protected override void Configure(IContainerBuilder builder) {
             // Infrastructure
@@ -29,6 +31,7 @@ namespace Containers {
             // Settings (ScriptableObjects)
             builder.RegisterInstance(gameFlowSettings);
             builder.RegisterInstance(cameraSettings);
+            builder.RegisterInstance(experienceCurve);
 
             // Game flow
             builder.RegisterComponent(stateMachine);
