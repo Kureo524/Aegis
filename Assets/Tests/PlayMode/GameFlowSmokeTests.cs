@@ -398,6 +398,87 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
+        public IEnumerator QuickCast_CastsAtOnceTowardsTheCursor() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var options = Root.Resolve<Features.Options.UserOptions>();
+            bool previous = options.QuickCast;
+            options.QuickCast = true;
+            try {
+                var player = FindPlayer();
+                var dummy = FindDummy(player);
+                var caster = player.GetComponent<Features.Spells.ElementCaster>();
+                var bus = Root.Resolve<IEventBus>();
+
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0, levelUp: true));
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));
+                float manaBefore = player.Mana.Current;
+                float cost = caster.CurrentManaCost;
+                bus.Publish(new Systems.Inputs.Events.PointerPositionEvent(ScreenOf(dummy.transform.position)));
+                bus.Publish(new Systems.Inputs.Events.CastSpellEvent());                 // R: no aim, cast now
+
+                Assert.IsFalse(player.GetComponent<Features.Spells.SpellTargeting>().IsAiming, "quick cast: no aiming");
+                Assert.AreEqual(manaBefore - cost, player.Mana.Current, 0.5f, "mana paid at once");
+                Assert.Greater(caster.CooldownRemaining, 0f);
+                yield return new WaitForSeconds(1f);
+                Assert.Less(dummy.Health.Current, dummy.Health.Max, "Fireball hit the dummy under the cursor");
+            }
+            finally {
+                options.QuickCast = previous;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Escape_CancelsTheAimFirst_ThenPauses_AndThePauseMenuLeadsBackOrToTheMenu() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var machine = Root.Resolve<GameFlowStateMachine>();
+            var bus = Root.Resolve<IEventBus>();
+            var player = FindPlayer();
+            var pauseMenu = Object.FindFirstObjectByType<Features.UI.Panels.PauseMenu>();
+            Assert.IsNotNull(pauseMenu);
+
+            bus.Publish(new Systems.Inputs.Events.SignatureEvent());                     // F: aim
+            bus.Publish(new Systems.Inputs.Events.CancelEvent());
+            Assert.IsFalse(player.GetComponent<Features.Spells.SpellTargeting>().IsAiming, "aim cancelled");
+            Assert.AreEqual(GameState.Game, machine.CurrentState, "Escape with an aim does not pause");
+
+            yield return null;
+            bus.Publish(new Systems.Inputs.Events.CancelEvent());
+            Assert.AreEqual(GameState.Pause, machine.CurrentState);
+            Assert.AreEqual(0f, Time.timeScale);
+            Assert.IsTrue(pauseMenu.IsOpen);
+
+            pauseMenu.ShowOptions(true);
+            bus.Publish(new Systems.Inputs.Events.UiCancelEvent());                      // back from the options
+            Assert.IsFalse(pauseMenu.OptionsOpen);
+            Assert.AreEqual(GameState.Pause, machine.CurrentState);
+            bus.Publish(new Systems.Inputs.Events.UiCancelEvent());                      // resume
+            Assert.AreEqual(GameState.Game, machine.CurrentState);
+            Assert.AreEqual(1f, Time.timeScale);
+            Assert.IsFalse(pauseMenu.IsOpen);
+
+            bus.Publish(new PauseRequestedEvent());
+            bus.Publish(new MainMenuRequestedEvent());
+            yield return WaitFor(() => machine.CurrentState == GameState.Menu && SceneManager.GetActiveScene().name == MenuScene);
+            Assert.AreEqual(1f, Time.timeScale);
+        }
+
+        [UnityTest]
+        public IEnumerator MainMenu_SettingsButton_OpensTheOptions_EscapeClosesThem() {
+            yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
+            var machine = Root.Resolve<GameFlowStateMachine>();
+            yield return WaitFor(() => machine.HasState && machine.CurrentState == GameState.Menu);
+            var panel = Object.FindFirstObjectByType<Features.UI.Panels.OptionsPanel>();
+            Assert.IsNotNull(panel, "OptionsPanel in the Menu scene");
+
+            Root.Resolve<IEventBus>().Publish(new OptionsRequestedEvent());
+            Assert.IsTrue(panel.IsOpen);
+            Root.Resolve<IEventBus>().Publish(new Systems.Inputs.Events.UiCancelEvent());
+            Assert.IsFalse(panel.IsOpen);
+        }
+
+        [UnityTest]
         public IEnumerator Menu_Play_LoadsGameScene() {
             yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
             var machine = Root.Resolve<GameFlowStateMachine>();
