@@ -22,8 +22,9 @@ namespace Features.Spells {
     /// - Cone: every enemy in the sector.
     /// - UnitTarget: homing projectile to the chosen enemy.
     /// Damage = Scaling(element levels) + attack stat × PowerRatio; Magic vs MagicResist, Physical vs
-    /// Armor. Spells only crit with the SpellCrit capability (§5.6). Buffs are applied to the caster
-    /// whatever the targeting.
+    /// Armor. Spells only crit with the SpellCrit capability (§5.6). Buffs and the self heal /
+    /// shield are applied to the caster whatever the targeting; statuses (§5.7) to every enemy hit,
+    /// which also raises the caster's SpellHit event (passives).
     /// </summary>
     public sealed class SpellExecutor {
         private const float VfxDuration = 0.45f;
@@ -100,6 +101,7 @@ namespace Features.Spells {
             if (caster == null || !caster.IsAlive) return;
             Vector3 origin = caster.transform.position;
             DamageInfo damage = BuildDamage(caster, spell, levelsAboveOne);
+            System.Action<Character, float> onHit = (target, taken) => OnSpellHit(caster, spell, target, taken);
 
             switch (spell.Targeting) {
                 case TargetingType.Self:
@@ -110,7 +112,7 @@ namespace Features.Spells {
                     Vector3 muzzle = origin + Vector3.up * (caster.Definition.BodySize.y * 0.6f);
                     SkillshotProjectile projectile = _pool.Get(_settings.SkillshotProjectile);
                     projectile.Launch(muzzle, ctx.Direction, spell.Range, spell.ProjectileSpeed, spell.Radius, spell.Pierce,
-                                      caster, damage, spell.Color, null, _pool.Release);
+                                      caster, damage, spell.Color, onHit, _pool.Release);
                     break;
                 }
 
@@ -123,12 +125,12 @@ namespace Features.Spells {
                         }
                         break;
                     }
-                    if (spell.DealsDamage) HitAll(caster, damage, InCircle(caster, ctx.TargetPoint, spell.Radius));
+                    if (spell.DealsDamage) HitAll(damage, InCircle(caster, ctx.TargetPoint, spell.Radius), onHit);
                     Ring(ctx.TargetPoint, spell.Radius, spell.Color);
                     break;
 
                 case TargetingType.Cone:
-                    if (spell.DealsDamage) HitAll(caster, damage, InCone(caster, origin, ctx.Direction, spell.Range, spell.ConeAngle));
+                    if (spell.DealsDamage) HitAll(damage, InCone(caster, origin, ctx.Direction, spell.Range, spell.ConeAngle), onHit);
                     SpellVfx cone = _pool.Get(_settings.ShapeVfx);
                     cone.PlayCone(origin, ctx.Direction, spell.Range, spell.ConeAngle, spell.Color, VfxDuration, _pool.Release);
                     break;
@@ -136,12 +138,13 @@ namespace Features.Spells {
                 case TargetingType.UnitTarget:
                     if (ctx.TargetUnit != null && ctx.TargetUnit.IsAlive) {
                         Vector3 muzzle = origin + Vector3.up * (caster.Definition.BodySize.y * 0.6f);
-                        _projectiles.Launch(_settings.HomingProjectile, muzzle, ctx.TargetUnit, damage, spell.ProjectileSpeed, null, spell.Color);
+                        _projectiles.Launch(_settings.HomingProjectile, muzzle, ctx.TargetUnit, damage, spell.ProjectileSpeed, onHit, spell.Color);
                     }
                     break;
             }
 
             ApplyBuffs(caster, spell);
+            ApplySelfSustain(caster, spell);
             _eventBus.Publish(new SpellCastEvent(spell, caster.IsPlayer));
         }
 
@@ -163,8 +166,24 @@ namespace Features.Spells {
             }
         }
 
-        private static void HitAll(Character caster, DamageInfo damage, List<Character> targets) {
-            foreach (Character target in targets) target.TakeDamage(damage);
+        private static void HitAll(DamageInfo damage, List<Character> targets, System.Action<Character, float> onHit) {
+            // onHit can kill and pool things: iterate over a snapshot
+            Character[] snapshot = targets.ToArray();
+            foreach (Character target in snapshot) onHit(target, target.TakeDamage(damage));
+        }
+
+        private static void OnSpellHit(Character caster, SpellDefinition spell, Character target, float taken) {
+            if (target == null || (taken <= 0f && !target.IsAlive)) return;   // already dead
+            foreach (StatusApplication status in spell.Statuses) target.ApplyStatus(status, caster, spell);
+            if (caster != null) caster.Events.RaiseSpellHit(target, taken);
+        }
+
+        private static void ApplySelfSustain(Character caster, SpellDefinition spell) {
+            SelfSustain s = spell.SelfSustain;
+            if (s.IsEmpty) return;
+            float bonus = s.PowerRatio * caster.Stats.Value(StatType.MagicAttack);
+            if (s.Heal > 0f || (s.PowerRatio > 0f && s.Shield <= 0f)) caster.ReceiveHeal(s.Heal + bonus, caster);
+            if (s.Shield > 0f) caster.ReceiveShield(s.Shield + bonus, s.ShieldDuration, caster);
         }
 
         private List<Character> InCircle(Character caster, Vector3 center, float radius) {

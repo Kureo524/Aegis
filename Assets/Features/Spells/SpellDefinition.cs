@@ -1,4 +1,5 @@
 using System;
+using Features.Combat;
 using Features.Stats;
 using UnityEngine;
 
@@ -43,6 +44,18 @@ namespace Features.Spells {
         [Min(0f)] public float Duration;
     }
 
+    /// <summary>Heal and / or shield the caster gets when the spell goes off (§6).</summary>
+    [Serializable]
+    public struct SelfSustain {
+        public float Heal;
+        public float Shield;
+        [Tooltip("+ MagicAttack × this, on both.")]
+        public float PowerRatio;
+        [Min(0f)] public float ShieldDuration;
+
+        public bool IsEmpty => Heal <= 0f && Shield <= 0f && PowerRatio <= 0f;
+    }
+
     /// <summary>
     /// One spell (design doc §7.2, §7.5–7.7). Elemental spells are identified by their recipe; a
     /// signature ability (F) has no recipe. Everything is data: the effect is chosen by
@@ -78,6 +91,9 @@ namespace Features.Spells {
         [SerializeField] private float powerRatio = 0.5f;
         [SerializeField] private SpellScaling scaling = new() { Base = 50f, PerElementLevel = 10f };
         [SerializeField] private BuffEffect[] buffs = Array.Empty<BuffEffect>();
+        [Tooltip("Applied to every enemy hit (§5.7).")]
+        [SerializeField] private StatusApplication[] statuses = Array.Empty<StatusApplication>();
+        [SerializeField] private SelfSustain selfSustain;
         [Tooltip("Skillshot / UnitTarget projectile speed.")]
         [SerializeField, Min(0.1f)] private float projectileSpeed = 18f;
         [Tooltip("Skillshot: goes through enemies instead of stopping on the first one.")]
@@ -102,6 +118,8 @@ namespace Features.Spells {
         public float PowerRatio => powerRatio;
         public SpellScaling Scaling => scaling;
         public BuffEffect[] Buffs => buffs;
+        public StatusApplication[] Statuses => statuses;
+        public SelfSustain SelfSustain => selfSustain;
         public float ProjectileSpeed => projectileSpeed;
         public bool Pierce => pierce;
         public bool Blink => blink;
