@@ -73,5 +73,38 @@ namespace Game.Tests.EditMode {
             Assert.IsFalse(_health.IsDead);
             Assert.AreEqual(100f, _health.Current, 1e-4f);
         }
+    
+        [Test]
+        public void Shield_AbsorbsBeforeHp_AndCountsAsTaken() {
+            _health.AddShield(30f, 5f);
+            float taken = _health.TakeDamage(50f);
+            Assert.AreEqual(50f, taken, 1e-4f);
+            Assert.AreEqual(0f, _health.Shield, 1e-4f);
+            Assert.AreEqual(80f, _health.Current, 1e-4f);
+        }
+
+        [Test]
+        public void Shield_ExpiringFirst_IsUsedFirst_AndExpires() {
+            _health.AddShield(20f, 10f);
+            _health.AddShield(20f, 1f);
+            _health.TakeDamage(10f);
+            Assert.AreEqual(30f, _health.Shield, 1e-4f);
+            _health.Tick(1.1f);   // the short one (10 left) expires
+            Assert.AreEqual(20f, _health.Shield, 1e-4f, "the long one is still whole");
+            Assert.AreEqual(100f, _health.Current, 1e-4f);
+        }
+
+        [Test]
+        public void Shield_RaisesChanged_AndIsLostOnDeath() {
+            int changes = 0;
+            _health.Changed += (_, __) => changes++;
+            _health.AddShield(10f, 5f);
+            Assert.AreEqual(1, changes);
+            _health.TakeDamage(500f);
+            Assert.IsTrue(_health.IsDead);
+            Assert.AreEqual(0f, _health.Shield, 1e-4f);
+            _health.AddShield(10f, 5f);
+            Assert.AreEqual(0f, _health.Shield, 1e-4f, "no shield on the dead");
+        }
     }
 }

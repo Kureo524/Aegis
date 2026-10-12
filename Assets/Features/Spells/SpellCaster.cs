@@ -9,7 +9,8 @@ namespace Features.Spells {
     /// <summary>
     /// Casts a spell on behalf of its character (design doc §7.7): optional cast time (windup) during
     /// which the character stops (unless CanMoveWhileCasting) and the spell is frozen, then
-    /// SpellExecutor applies the effect. One cast at a time; dying cancels it.
+    /// SpellExecutor applies the effect. One cast at a time; dying, a stun or a silence (§5.7)
+    /// cancels it, and nothing can be cast while they last.
     /// On the base Character prefab: the player's element and signature casters and, in phase 6,
     /// enemy AI all go through it.
     /// </summary>
@@ -35,7 +36,7 @@ namespace Features.Spells {
         public void Construct(SpellExecutor executor) => _executor = executor;
 
         public bool Cast(SpellDefinition spell, CastContext context, int levelsAboveOne) {
-            if (spell == null || IsCasting || !owner.IsAlive) return false;
+            if (spell == null || IsCasting || !owner.IsAlive || !owner.Status.CanCast) return false;
 
             _spell = spell;
             _context = context;
@@ -54,7 +55,7 @@ namespace Features.Spells {
 
         private void Update() {
             if (_spell == null) return;
-            if (!owner.IsAlive) {
+            if (!owner.IsAlive || !owner.Status.CanCast) {
                 _spell = null;   // interrupted
                 return;
             }

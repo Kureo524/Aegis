@@ -47,6 +47,7 @@ namespace Features.Economy {
         private static readonly HashSet<StatType> Shares = new() {
             StatType.CritChance, StatType.ArmorPenPercent, StatType.MagicPenPercent, StatType.Tenacity,
             StatType.SlowResist, StatType.Omnivamp, StatType.Lifesteal, StatType.ManaCostReduction,
+            StatType.HealShieldPower,
         };
 
         public static string Name(StatType stat) => Names.TryGetValue(stat, out string n) ? n : stat.ToString();

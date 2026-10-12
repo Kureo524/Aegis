@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb268d7b3b865bd4fa4aca45803ef906, type: 3}
+  m_Name: Passive_StaticShock
+  m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
+  displayName: Choc statique
+  description: "Un coup de sort sur six \xE9tourdit la cible 0,75 s."
+  icon: {fileID: 21300000, guid: b45c0ad83ed631239b6c844ed22ab221, type: 3}
+  stats: []
+  capabilities: 
+  triggers:
+  - On: 4
+    EveryN: 6
+    Chance: 1
+    MinSpellStacks: 0
+    HealthBelow: 0
+    Cooldown: 0
+    Effect: 3
+    Stats: []
+    Duration: 0
+    Damage: 0
+    ScalingStat: 0
+    DamageRatio: 0
+    DamageType: 0
+    Loot: 0
+    Status:
+      Kind: 0
+      Duration: 0.75
+      Power: 0
+      ScalingStat: 0
+      Ratio: 0
+      MaxStacks: 0
+    Amount: 0
+    AmountStat: 0
+    AmountRatio: 0
+  stacks:
+    Source: 0
+    Reset: 0
+    Max: 0
+    Duration: 0
+    PerStack: []
+  nearbyEnemies:
+    Radius: 0
+    Max: 0
+    PerEnemy: []

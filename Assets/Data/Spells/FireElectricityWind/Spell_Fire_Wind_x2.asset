@@ -33,6 +33,25 @@ MonoBehaviour:
     Base: 150
     PerElementLevel: 25
   buffs: []
+  statuses:
+  - Kind: 5
+    Duration: 3
+    Power: 20
+    ScalingStat: 5
+    Ratio: 0.08
+    MaxStacks: 3
+  - Kind: 3
+    Duration: 2
+    Power: 0.3
+    ScalingStat: 0
+    Ratio: 0
+    MaxStacks: 0
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
   projectileSpeed: 18
   pierce: 0
   blink: 0
+  fixedRange: 0

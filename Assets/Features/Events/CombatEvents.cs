@@ -33,14 +33,16 @@ namespace Features.Events {
         }
     }
 
-    /// <summary>Player HP changed (HUD).</summary>
+    /// <summary>Player HP or shield changed (HUD).</summary>
     public readonly struct PlayerHealthChangedEvent : IEvent {
         public readonly float Current;
         public readonly float Max;
+        public readonly float Shield;
 
-        public PlayerHealthChangedEvent(float current, float max) {
+        public PlayerHealthChangedEvent(float current, float max, float shield = 0f) {
             Current = current;
             Max = max;
+            Shield = shield;
         }
     }
 

@@ -16,6 +16,8 @@ namespace Features.Characters {
         public event Action<float> DamageTaken;
         /// <summary>This character killed someone (victim).</summary>
         public event Action<Character> Kill;
+        /// <summary>A spell of this character hit someone (target, damage taken).</summary>
+        public event Action<Character, float> SpellHit;
         /// <summary>This character cast a spell (after its cast time).</summary>
         public event Action<SpellDefinition> SpellCast;
         /// <summary>This character's level went up (new level).</summary>
@@ -25,6 +27,7 @@ namespace Features.Characters {
         public void RaiseDamageDealt(Character target, float damage, in DamageInfo info) => DamageDealt?.Invoke(target, damage, info);
         public void RaiseDamageTaken(float damage) => DamageTaken?.Invoke(damage);
         public void RaiseKill(Character victim) => Kill?.Invoke(victim);
+        public void RaiseSpellHit(Character target, float damage) => SpellHit?.Invoke(target, damage);
         public void RaiseSpellCast(SpellDefinition spell) => SpellCast?.Invoke(spell);
         public void RaiseLevelUp(int level) => LevelUp?.Invoke(level);
     }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Features.Passives {
     /// <summary>What a passive reacts to (CharacterEvents, design doc §8.1).</summary>
-    public enum PassiveEvent { BasicAttackHit, SpellCast, Kill, DamageTaken }
+    public enum PassiveEvent { BasicAttackHit, SpellCast, Kill, DamageTaken, SpellHit }
 
     /// <summary>What a trigger does.</summary>
     public enum PassiveEffectKind {
@@ -16,6 +16,12 @@ namespace Features.Passives {
         BonusDamage,
         /// <summary>Drops a loot on the ground where it happened (design doc §9.5).</summary>
         DropLoot,
+        /// <summary>A status on the target of the hit (BasicAttackHit, SpellHit, §5.7).</summary>
+        ApplyStatus,
+        /// <summary>Heals the owner: Amount + AmountRatio × AmountStat.</summary>
+        Heal,
+        /// <summary>Shields the owner for Duration seconds: Amount + AmountRatio × AmountStat.</summary>
+        Shield,
     }
 
     /// <summary>Loot that a passive can drop (design doc §9.5).</summary>
@@ -36,9 +42,14 @@ namespace Features.Passives {
         [Range(0f, 1f)] public float Chance;
         [Tooltip("SpellCast: only spells of at least this many elements (0 = any).")]
         [Min(0)] public int MinSpellStacks;
+        [Tooltip("Only while the owner's HP share is at most this (0 = always).")]
+        [Range(0f, 1f)] public float HealthBelow;
+        [Tooltip("Seconds before the trigger can go off again (0 = none).")]
+        [Min(0f)] public float Cooldown;
         public PassiveEffectKind Effect;
         [Header("TimedStats")]
         public StatBonus[] Stats;
+        [Tooltip("TimedStats, Shield: seconds.")]
         [Min(0f)] public float Duration;
         [Header("BonusDamage")]
         public float Damage;
@@ -47,6 +58,12 @@ namespace Features.Passives {
         public DamageType DamageType;
         [Header("DropLoot")]
         public LootKind Loot;
+        [Header("ApplyStatus")]
+        public StatusApplication Status;
+        [Header("Heal / Shield")]
+        public float Amount;
+        public StatType AmountStat;
+        public float AmountRatio;
     }
 
     /// <summary>Where stacks come from (design doc §8.1).</summary>

@@ -98,6 +98,7 @@ namespace EditorTools {
             ShopCatalog shopCatalog = EconomySetup.Run();
             (Features.Augments.AugmentCatalog augmentCatalog, Features.Loot.LootSettings lootSettings) = PassiveSetup.Run();
             BossSetup.Run(enemyPrefab);   // after the items: the boss carries some
+            ContentSetup.Run();           // phase 9b: statuses on spells, more items and augments
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
             SetBuildScenes();

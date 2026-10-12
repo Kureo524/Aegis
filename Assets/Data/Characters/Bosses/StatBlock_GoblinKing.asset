@@ -29,3 +29,5 @@ MonoBehaviour:
     Value: 3
   - Type: 9
     Value: 1.5
+  - Type: 16
+    Value: 0.5

@@ -74,6 +74,7 @@ namespace Features.Spells {
             if (spell == null || !owner.IsAlive) return false;
             if (CooldownRemaining > 0f) return Feedback($"{spell.DisplayName} en recharge");
             if (caster.IsCasting) return Feedback("Incantation en cours");
+            if (!owner.Status.CanCast) return Feedback(owner.Status.IsStunned ? "Étourdi" : "Réduit au silence");
 
             if (spell.NeedsAim) targeting.Aim(spell, AimMode.Signature, Confirm);
             else Confirm(new CastContext { Origin = owner.transform.position, Direction = owner.transform.forward, TargetPoint = owner.transform.position });

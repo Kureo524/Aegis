@@ -12,18 +12,21 @@ namespace Features.Stats {
         public IReadOnlyDictionary<StatType, Stat> Stats => _stats;
 
         /// <summary>
-        /// Creates every stat from the block (missing ones default to 0) and applies the
-        /// intrinsic clamp rules. Safe to call again to reset a character.
+        /// Creates every stat from the block and applies the intrinsic clamp rules. Missing stats
+        /// default to 0, except the multipliers (HealShieldPower) which default to 1. Safe to call
+        /// again to reset a character.
         /// </summary>
         public void Init(StatBlock block) {
             _stats.Clear();
 
             foreach (StatType type in System.Enum.GetValues(typeof(StatType))) {
-                float baseValue = block != null ? block.Get(type) : 0f;
+                float baseValue = block != null && block.TryGet(type, out float v) ? v : DefaultValue(type);
                 (float min, float max) = StatClamp.GetBounds(type);
                 _stats[type] = new Stat(type, baseValue, min, max);
             }
         }
+
+        private static float DefaultValue(StatType type) => type == StatType.HealShieldPower ? 1f : 0f;
 
         public Stat Get(StatType type) {
             return _stats.TryGetValue(type, out Stat stat) ? stat : null;

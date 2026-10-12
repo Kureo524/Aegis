@@ -21,6 +21,7 @@ namespace Features.Passives {
         private readonly List<(Stat stat, StatModifier modifier)> _stackModifiers = new();
         private readonly List<(Stat stat, StatModifier modifier)> _nearbyModifiers = new();
         private readonly int[] _counters;
+        private readonly float[] _readyAt;
         private readonly Collider[] _hits = new Collider[64];
         private readonly HashSet<Character> _seen = new();
         private float _lastStackTime;
@@ -41,6 +42,7 @@ namespace Features.Passives {
             _owner = owner;
             Source = source ?? this;
             _counters = new int[definition.Triggers.Length];
+            _readyAt = new float[definition.Triggers.Length];
         }
 
         public void Attach() {
@@ -51,6 +53,7 @@ namespace Features.Passives {
             events.SpellCast += OnSpellCast;
             events.Kill += OnKill;
             events.DamageTaken += OnDamageTaken;
+            events.SpellHit += OnSpellHit;
         }
 
         public void Detach() {
@@ -63,6 +66,7 @@ namespace Features.Passives {
             events.SpellCast -= OnSpellCast;
             events.Kill -= OnKill;
             events.DamageTaken -= OnDamageTaken;
+            events.SpellHit -= OnSpellHit;
         }
 
         public void Tick() {
@@ -98,15 +102,20 @@ namespace Features.Passives {
 
         private void OnDamageTaken(float damage) => Fire(PassiveEvent.DamageTaken, null, 0);
 
+        private void OnSpellHit(Character target, float damage) => Fire(PassiveEvent.SpellHit, target, 0);
+
         private void Fire(PassiveEvent happened, Character target, int spellStacks) {
             PassiveTrigger[] triggers = Definition.Triggers;
             for (int i = 0; i < triggers.Length; i++) {
                 PassiveTrigger t = triggers[i];
                 if (t.On != happened) continue;
                 if (happened == PassiveEvent.SpellCast && spellStacks < t.MinSpellStacks) continue;
+                if (t.HealthBelow > 0f && (_owner.Health == null || _owner.Health.Ratio > t.HealthBelow)) continue;
+                if (Time.time < _readyAt[i]) continue;
                 if (++_counters[i] < Mathf.Max(1, t.EveryN)) continue;
                 _counters[i] = 0;
                 if (UnityEngine.Random.value > t.Chance) continue;
+                if (t.Cooldown > 0f) _readyAt[i] = Time.time + t.Cooldown;
                 Apply(t, target);
             }
         }
@@ -131,8 +140,19 @@ namespace Features.Passives {
                 case PassiveEffectKind.DropLoot:
                     LootDropped?.Invoke(t.Loot, target != null ? target.transform.position : _owner.transform.position);
                     break;
+                case PassiveEffectKind.ApplyStatus:
+                    if (target != null && target.IsAlive && _owner.IsHostileTo(target)) target.ApplyStatus(t.Status, _owner, this);
+                    break;
+                case PassiveEffectKind.Heal:
+                    _owner.ReceiveHeal(Amount(t), _owner);
+                    break;
+                case PassiveEffectKind.Shield:
+                    _owner.ReceiveShield(Amount(t), t.Duration, _owner);
+                    break;
             }
         }
+
+        private float Amount(in PassiveTrigger t) => t.Amount + t.AmountRatio * _owner.Stats.Value(t.AmountStat);
 
         private void AddStack() {
             StackSettings s = Definition.Stacks;

@@ -180,6 +180,7 @@ namespace Game.Tests.PlayMode {
             Assert.AreEqual(0f, Time.timeScale, "frozen on the defeat screen");
             yield return null;
             Assert.IsTrue(Object.FindFirstObjectByType<RunEndPanel>().IsOpen);
+            Assert.AreEqual("Défaite", Object.FindFirstObjectByType<RunEndPanel>().Title);
 
             Bus.Publish(new PlayRequestedEvent());   // "Rejouer"
             yield return WaitFor(() => machine.CurrentState == GameState.Game);
@@ -201,6 +202,7 @@ namespace Game.Tests.PlayMode {
             Assert.AreEqual(Game.Resolve<RunDirector>().Lives, Game.Resolve<StageDefinition>().Lives, "no life involved: the run is over");
             yield return null;
             Assert.IsTrue(Object.FindFirstObjectByType<RunEndPanel>().IsOpen);
+            Assert.AreEqual("Défaite", Object.FindFirstObjectByType<RunEndPanel>().Title);
         }
 
         [UnityTest]
@@ -220,7 +222,9 @@ namespace Game.Tests.PlayMode {
             }
             yield return WaitFor(() => machine.CurrentState == GameState.Win);
             yield return null;
-            Assert.IsTrue(Object.FindFirstObjectByType<RunEndPanel>().IsOpen);
+            var panel = Object.FindFirstObjectByType<RunEndPanel>();
+            Assert.IsTrue(panel.IsOpen);
+            Assert.AreEqual("Victoire !", panel.Title, "the victory screen, not the defeat one");
         }
     }
 }
