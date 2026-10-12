@@ -94,6 +94,8 @@ namespace Features.Spells {
         [Tooltip("Applied to every enemy hit (§5.7).")]
         [SerializeField] private StatusApplication[] statuses = Array.Empty<StatusApplication>();
         [SerializeField] private SelfSustain selfSustain;
+        [Tooltip("Self: buffs and SelfSustain also go to every ally within Radius (enemy support, §9.6).")]
+        [SerializeField] private bool affectsAllies;
         [Tooltip("Skillshot / UnitTarget projectile speed.")]
         [SerializeField, Min(0.1f)] private float projectileSpeed = 18f;
         [Tooltip("Skillshot: goes through enemies instead of stopping on the first one.")]
@@ -120,6 +122,7 @@ namespace Features.Spells {
         public BuffEffect[] Buffs => buffs;
         public StatusApplication[] Statuses => statuses;
         public SelfSustain SelfSustain => selfSustain;
+        public bool AffectsAllies => affectsAllies;
         public float ProjectileSpeed => projectileSpeed;
         public bool Pierce => pierce;
         public bool Blink => blink;
