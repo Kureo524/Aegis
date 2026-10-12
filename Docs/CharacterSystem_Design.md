@@ -313,7 +313,7 @@ Final = (Base + ΣFlat) × (1 + ΣPercentAdd) × Π(1 + PercentMult)
 ### 5.4 Modificateurs temporaires
 `TimedModifier` / `StatusEffect` : applique un modificateur pendant X secondes, gère stack/refresh, retire proprement (via `Source`). Base des buffs, debuffs, ralentissements, upgrades de level-up et objets.
 
-> **En place** : `TimedModifiers` (`Character.Buffs`, tick chaque frame) : réappliquer depuis la même source sur la même stat **rafraîchit** (valeur + durée) au lieu de cumuler ; des sources différentes se cumulent. *Reste : CC (stun, root, silence…) et ténacité (§5.7).*
+> **En place** : `TimedModifiers` (`Character.Buffs`, tick chaque frame) : réappliquer depuis la même source sur la même stat **rafraîchit** (valeur + durée) au lieu de cumuler ; des sources différentes se cumulent. CC et ténacité : §5.7.
 
 ### 5.5 Croissance par niveau
 
@@ -345,6 +345,13 @@ Types : `Stun`, `Root`, `Silence`, `Slow`, `Knockup`. `StatusEffect` calcule la 
 duréeEffective = duréeBase × (1 − Tenacity)        // Tenacity clampée (ex. max 0.9)
 ```
 S'applique aux CC **et aux ralentissements** (un Slow = `StatModifier` PercentAdd négatif sur `MoveSpeed`, retiré à l'expiration). `SlowResist` (optionnel) réduit en plus l'intensité du ralentissement.
+
+> **En place (phase 9b)** :
+> - **`StatusApplication`** (struct sérialisable, dans les données des sorts, passifs, items et augments) : `Kind` (`Stun`, `Root`, `Silence`, `Slow`, `Bleed`, `Burn`), `Duration`, `Power` (part de vitesse retirée pour un Slow, dégâts par seconde et par stack pour un DoT), `ScalingStat` + `Ratio` (DoT : + ratio × stat de celui qui l'applique), `MaxStacks`.
+> - **`StatusEffects`** (C# pur, `Character.Status`, tické avec le perso, testé en EditMode) : Stun / Root / Silence durent `durée × (1 − Tenacity)`, un nouveau CC ne fait que **prolonger** le CC en cours ; **Slow** = modificateur **PercentMult** `−Power × (1 − SlowResist)` sur `MoveSpeed` via `TimedModifiers` (multiplicatif comme LoL, même source = rafraîchi), durée réduite par la ténacité ; **Bleed** (physique) / **Burn** (magique) : un DoT par (type, source), chaque application ajoute un stack (jusqu'à `MaxStacks`) et rafraîchit la durée, dégâts figés à l'application et infligés toutes les 0,5 s via `Character.TakeDamage` (crédités à l'applicateur : omnivamp, kills) ; la ténacité ne réduit pas les DoT. Tout est retiré à la mort et à l'`Init`.
+> - **Effets** : Stun → pas de déplacement, d'attaque ni de sort, windup et incantation interrompus ; Root → pas de déplacement (attaques, sorts et Flash permis) ; Silence → pas de sort (F compris). `CharacterMovement.Immobilized` garde l'ordre en cours pour après (une ruée est arrêtée), `BasicAttacker` garde sa cible, `SpellCaster.Cast` refuse, `ElementCaster` / `SignatureAbility` affichent « Étourdi » / « Réduit au silence » sans dépenser mana ni cooldown. `PatternRunner` ne lance pas d'étape pendant un stun du boss.
+> - **Lisibilité** : icône du statut le plus fort à gauche de la barre de PV (`Sprites/Status`) et teinte du sprite (stun jaune et tremblant, root vert, silence violet, slow bleu, brûlure orange, saignement rouge).
+> - Ténacité des ennemis : Brute 30 %, Grokk 50 %. *Reste : Knockup.*
 
 ---
 
@@ -388,7 +395,7 @@ public struct DamageInfo {
 
 > `HealShieldPower` s'applique à **tous les soins et boucliers produits** par le perso, y compris sur lui-même (omnivamp, lifesteal, sorts de soin).
 
-> **En place** : `DamageInfo` (struct), `DamageCalculator` (formules pures, testées), `Health` (PV liés à `MaxHealth` : un gain de max ajoute autant de PV courants, une baisse les borne ; régénération `HealthRegen`/s ; mort ; résurrection), `Character.TakeDamage` (résistances → PV → sustain de l'attaquant). Chiffres de dégâts (`DamageNumbersView`) : jaunes, plus gros et suivis de « ! » en crit, rouges quand le joueur est touché. *Reste : bouclier, flash blanc, hit-stop, SFX ; mort du joueur (`PlayerDiedEvent` publié, rien n'y réagit avant la boucle de run).*
+> **En place** : `DamageInfo` (struct), `DamageCalculator` (formules pures, testées), `Health` (PV liés à `MaxHealth` : un gain de max ajoute autant de PV courants, une baisse les borne ; régénération `HealthRegen`/s ; mort ; résurrection), `Character.TakeDamage` (résistances → PV → sustain de l'attaquant). Chiffres de dégâts (`DamageNumbersView`) : jaunes, plus gros et suivis de « ! » en crit, rouges quand le joueur est touché. **Boucliers (phase 9b)** : `Health.AddShield(montant, durée)` ; les boucliers absorbent avant les PV (celui qui expire le premier d'abord), disparaissent à expiration, à la mort et à la résurrection ; les dégâts absorbés comptent comme subis (omnivamp, chiffres). Affichés en blanc après les PV (barre du HUD avec « (+N) », barres au-dessus des têtes), `PlayerHealthChangedEvent.Shield`. **Soins / boucliers produits** : `Character.ReceiveHeal` / `ReceiveShield` × `HealShieldPower` du producteur (1 par défaut quand le `StatBlock` ne la définit pas). *Reste : flash blanc, hit-stop, SFX.*
 
 ### Cooldowns & Ability Haste
 ```
@@ -524,7 +531,7 @@ La courbe croît plus vite que le nombre de stacks pour que chaque ajout coûte 
   - **Rapide** : R / F lancent tout de suite vers le curseur, sans rien afficher.
   - Un sort ciblé sans ennemi à portée sous le curseur est refusé (« Aucune cible »), sans rien consommer ; au relâchement, la visée se termine.
 
-> **En place (phase 5c)** : `ElementCaster.TryCast` (R) vérifie sélection, sort, cooldown, mana et incantation, puis vise via `SpellTargeting` (ou lance aussitôt un sort `Self`). Clic gauche : le sort résolu **à cet instant** est lancé (il suit les éléments ajoutés pendant la visée), le mana est débité (refus + sélection conservée s'il manque), le cooldown démarre, la sélection est vidée. Clic droit / Échap : visée annulée, sélection conservée ; T : visée annulée et sélection vidée. Exclusivité Q / R / F par `AimModeEvent`. Pendant une incantation (`SpellCaster`, sauf `CanMoveWhileCasting`), les ordres de déplacement / attaque sont ignorés ; on peut empiler des éléments pour le sort suivant. Modes de lancement : `SpellTargeting.Aim` lit `UserOptions.CastMode` : `Quick` → `CastAtCursor` ; sinon visée, marquée « lancer au relâchement » en `QuickWithIndicator`. `InputReader` publie aussi le relâchement de R / F (`CastSpellEvent.Released`, `SignatureEvent.Released`) → `SpellTargeting.Release`. *Reste : buffer d'input, stun / silence.*
+> **En place (phase 5c)** : `ElementCaster.TryCast` (R) vérifie sélection, sort, cooldown, mana et incantation, puis vise via `SpellTargeting` (ou lance aussitôt un sort `Self`). Clic gauche : le sort résolu **à cet instant** est lancé (il suit les éléments ajoutés pendant la visée), le mana est débité (refus + sélection conservée s'il manque), le cooldown démarre, la sélection est vidée. Clic droit / Échap : visée annulée, sélection conservée ; T : visée annulée et sélection vidée. Exclusivité Q / R / F par `AimModeEvent`. Pendant une incantation (`SpellCaster`, sauf `CanMoveWhileCasting`), les ordres de déplacement / attaque sont ignorés ; on peut empiler des éléments pour le sort suivant. Modes de lancement : `SpellTargeting.Aim` lit `UserOptions.CastMode` : `Quick` → `CastAtCursor` ; sinon visée, marquée « lancer au relâchement » en `QuickWithIndicator`. `InputReader` publie aussi le relâchement de R / F (`CastSpellEvent.Released`, `SignatureEvent.Released`) → `SpellTargeting.Release`. *Reste : buffer d'input.* Stun / silence : §5.7.
 
 ### 7.5 Résolution du sort et visée
 
@@ -588,7 +595,7 @@ public struct CastContext {
 - **Évolution avec le niveau des éléments** : la valeur d'un sort (dégâts, soin, valeur du buff, durée) vaut `Base + PerElementLevel × Σ (niveau − 1)` calculé sur les **éléments distincts** de sa recette, en plus du scaling sur les stats. **Un même élément compte une seule fois** par sort : Feu ×3 ne profite du niveau de Feu qu'une fois. Le niveau d'un élément vient des points de compétence (§7.8).
 - Un sort **mixte** (dégâts + buff) est possible : `SpellDefinition` peut porter une liste d'effets, mais le `Kind` principal décide du scaling.
 
-> **En place** : dégâts = `Scaling.Evaluate(Σ niveaux − 1 des éléments distincts)` + `MagicAttack` (ou `PhysicalAttack`) × `PowerRatio`, contre `MagicResist` (ou `Armor`) avec la pénétration du lanceur ; omnivamp oui, lifesteal non ; pas de crit (capacité `SpellCrit` à venir). Buffs : `BuffEffect` → `Character.Buffs` (Source = le sort, donc relancer rafraîchit). *Reste : soins et boucliers, buffs sur les alliés, valeurs de buff qui évoluent avec le niveau des éléments.* Les 19 sorts du perso de test ont des valeurs **provisoires** (Assets/Data/Spells) ; le héros a 40 de `MagicAttack` de base.
+> **En place** : dégâts = `Scaling.Evaluate(Σ niveaux − 1 des éléments distincts)` + `MagicAttack` (ou `PhysicalAttack`) × `PowerRatio`, contre `MagicResist` (ou `Armor`) avec la pénétration du lanceur ; omnivamp oui, lifesteal non ; pas de crit (capacité `SpellCrit` à venir). Buffs : `BuffEffect` → `Character.Buffs` (Source = le sort, donc relancer rafraîchit). **Phase 9b** : `Statuses` (liste de `StatusApplication`, §5.7) appliqués à chaque ennemi touché, qui lève aussi `CharacterEvents.SpellHit` ; `SelfSustain` (soin et / ou bouclier du lanceur + `PowerRatio` × `MagicAttack`, × `HealShieldPower`). Sorts de test : le **Feu brûle**, l'**Électricité étourdit**, le **Vent ralentit** (ex. Foudre 0,8 s de stun, Cyclone −45 % 2 s, Météore brûlure + stun) ; Bourrasque soigne, Surcharge et Ouragan statique donnent un bouclier. *Reste : buffs sur les alliés, valeurs de buff qui évoluent avec le niveau des éléments.* Les 19 sorts du perso de test ont des valeurs **provisoires** (Assets/Data/Spells) ; le héros a 40 de `MagicAttack` de base.
 
 ### 7.7 Cooldown, cast et ordres
 
@@ -598,7 +605,7 @@ public struct CastContext {
 - **Les éléments restent modifiables pendant un cast** (préparation du sort suivant), mais le sort en cours est déjà résolu et figé.
 - Un **stun/silence** bloque R (pas A/Z/E).
 
-> **En place** : cooldown commun dans `ElementCaster` (`SpellSettings.CooldownByStacks` ou `CooldownOverride`, × 100 / (100 + `AbilityHaste`)) ; cooldown propre de F dans `SignatureAbility` ; `CooldownStartedEvent` → HUD (temps restant sur la ligne du sort, compte à rebours sur le slot F). *Reste : stun / silence (CC).*
+> **En place** : cooldown commun dans `ElementCaster` (`SpellSettings.CooldownByStacks` ou `CooldownOverride`, × 100 / (100 + `AbilityHaste`)) ; cooldown propre de F dans `SignatureAbility` ; `CooldownStartedEvent` → HUD (temps restant sur la ligne du sort, compte à rebours sur le slot F). Stun / silence : §5.7.
 
 ### 7.8 Identité d'un personnage, points de compétence et éléments
 
@@ -723,7 +730,8 @@ public enum ResetPolicy { Never /* toute la run */, EndOfWave, EndOfStage, After
 > - **`PassiveDefinition`** (SO, aucune ligne de code par passif) = briques combinables : `Stats` (statique), `Capabilities`, `Triggers` (`On` = BasicAttackHit / SpellCast / Kill / DamageTaken, `EveryN`, `Chance`, `MinSpellStacks` ; effets `TimedStats`, `BonusDamage` = base + ratio × stat, `DropLoot`), `Stacks` (`StackSource` PerBasicAttack / PerSpellCast / PerKill, `ResetPolicy` Never / EndOfWave / AfterDuration, `Max`, `PerStack`), `NearbyEnemies` (bonus continu par ennemi dans un rayon, recalculé toutes les 0,25 s).
 > - **`Passive`** (runtime : chaque `StatModifier` a pour Source l'instance, retiré proprement) et **`PassiveController`** (`Character.Passives` : passif du perso ajouté par `Init`, puis items et augments ; tick par le perso ; `EndOfWave` au `Reward`).
 > - **Test Hero** : « Surcharge arcanique », une attaque de base sur trois inflige 20 (+35 % PM) dégâts magiques. **Items** : « Salve » (Arc rapide, 1 attaque sur 4) et « Inspiration » (Couronne du mage, +20 PM 3 s après un sort à 2 éléments).
-> - *Reste : valeurs qui évoluent avec le niveau (`Base + PerLevel`), statuts (saignement), soins et boucliers.*
+> - **Phase 9b** : événement `SpellHit` (chaque cible touchée par un sort) ; effets `ApplyStatus` (sur la cible d'une attaque ou d'un sort), `Heal` et `Shield` (sur le porteur : `Amount` + `AmountRatio` × `AmountStat`, ex. % des PV max) ; conditions `HealthBelow` (PV du porteur sous un seuil) et `Cooldown` (recharge interne) sur chaque trigger.
+> - *Reste : valeurs qui évoluent avec le niveau (`Base + PerLevel`).*
 
 ---
 
@@ -855,7 +863,8 @@ public class ElixirDefinition : ScriptableObject {   // consommable acheté en b
 > - **`ShopService`** (requêtes par le bus, réponses en instantanés `ShopStateEvent` / `AnvilOfferEvent` avec, pour chaque offre, la raison du refus) : limites par boutique (1 élixir ; 1 item, enclumes à items comprises ; enclumes à stats libres), inventaire plein, items uniques, enclume à stats (rareté tirée, 3 choix de cette rareté), enclume à items (3 items non possédés du rang, 1 reroll par choix), enclume prismatique gratuite après la vague 2.
 > - **`Inventory`** (6 slots) et **`PlayerUpgrades`** : chaque bonus est un `StatModifier` dont la `Source` est ce qui l'a donné (copie d'item, choix d'enclume, élixir) ; l'élixir disparaît au `Reward` qui suit sa première vague.
 > - **UI** : `ShopPanel` (or, limites, inventaire, cartes grisées avec la raison), `AnvilPanel` (au-dessus de la boutique ; Choisir, Relancer, Passer si l'inventaire est plein), `InventoryView` (6 slots + élixir actif en bas à droite du HUD).
-> - *Reste : vente d'items, passifs d'items (phase 8), prix et poids après le clear du stage (méta), équilibrage.*
+> - **Phase 9b** (`ContentSetup`) : **+12 légendaires et +2 prismatiques** (26 items en tout), la plupart avec un passif : Lame hémorragique (saignement), Sceptre glacial (sorts qui ralentissent), Marteau-tonnerre (1 attaque sur 5 étourdit), Talisman du brasier (sorts qui brûlent), Bouclier du gardien (bouclier sous 35 % PV, 30 s), Bottes de vif-argent (ténacité), Calice de vie (soin au kill, puissance des soins), Grimoire runique, Lance du chasseur, Cœur de troll, Sablier runique, Crocs du vent (vitesse au kill) ; prismatiques Couronne du roi gobelin (stun + bouclier) et Orbe de l'éclipse (brûlure).
+> - *Reste : vente d'items, prix et poids après le clear du stage (méta), équilibrage.*
 
 ### 9.4 Augments (façon Arena)
 
@@ -877,6 +886,7 @@ public class ElixirDefinition : ScriptableObject {   // consommable acheté en b
 > **En place (phase 8)** :
 > - `AugmentDefinition` = une rareté + un `PassiveDefinition` (nom, description, icône, effets). `AugmentCatalog` : 12 augments de test (4 Argent, 5 Or, 3 Prismatique : stats, `SpellCrit`, stacks par kill / par attaque, bonus par ennemi proche, sort à 3 éléments → buff, loot), slots 4 → 6, poids de rareté 55 / 33 / 12, **4 relances pour toute la run** (une par slot de base, chacune remplace un choix), relance dorée 5 %, gold par rareté si 6 slots.
 > - `AugmentController` : draft à l'étape `Augment` (rareté tirée, 3 augments non possédés), relances, relance dorée (la première relance donne rareté + 1), slots pleins (enclume à stats de la rareté via `ShopService.OpenAnvil(forcedRarity)`, remplacement selon la règle ci-dessous, +1 slot puis gold). `AugmentPanel` remplace l'écran d'attente de la 7a ; `AugmentsView` affiche les slots au-dessus des items.
+> - **Phase 9b** : +7 augments (19 en tout) : Volonté de fer (ténacité), Main guérisseuse (puissance des soins), Saignée (attaques qui saignent), Choc statique (1 coup de sort sur 6 étourdit), Barrière arcanique (bouclier après un sort à 2 éléments), Phénix (soin de 30 % PV max sous 30 %, 90 s), Brasier éternel (sorts qui brûlent).
 
 Le cas **Argent** permet de **rétrograder** volontairement : un augment de rareté basse peut être très pertinent selon le build (par exemple pour un personnage avec beaucoup de PV), et le joueur doit pouvoir y accéder même quand ses slots sont remplis par des raretés supérieures.
 
@@ -920,7 +930,8 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 > - **Spawn** (`HordeSpawner`) : un ennemi toutes les `SpawnInterval` (2 s), tiré au poids dans `SpawnTable` (gobelin 6, archer 3, brute 1), sur un anneau de 16 à 22 autour du joueur (hors écran), sur le NavMesh et atteignable par le flow field, jusqu'à `MaxAlive` (18). Pooling (`PrefabPool`), retour au pool `DespawnDelay` après la mort. La mort du joueur vide la horde ; le joueur réapparaît au spawn après `GameFlowSettings.PlayerRespawnDelay` (3 s) — **provisoire** jusqu'aux vies de stage et au game over (phase 7).
 > - **Debug** : le panneau de la scène de test affiche le nombre d'ennemis, arrête / relance le spawn et ajoute 50 ennemis d'un coup (`HordeDebugEvent`).
 > - Perf mesurée : 200 ennemis ≈ 1,6 ms par frame dans l'éditeur (IA, physique, rendu).
-> - *Reste : `WaveScaling` et vagues (phase 7), CC / ténacité, IA à fréquence réduite pour les ennemis lointains, boss (`PatternRunner`).*
+> - **Phase 9b** : Fracas de la Brute ralentit (−40 %), le coup de massue de Grokk étourdit 0,75 s, son onde royale ralentit.
+> - *Reste : `WaveScaling` et vagues (phase 7), IA à fréquence réduite pour les ennemis lointains, boss (`PatternRunner`).*
 
 ### 9.7 Méta-progression (rogue-lite)
 
@@ -993,14 +1004,14 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **1** ✅ | `CharacterMovement` (clic droit, **NavMesh**), marqueur, caméra verrouillée / libre (§4.8), `TestScene`, prefab 2.5D (`Character` + variant `Player`, sprite billboard, §3) | Un perso qui se déplace au clic en évitant les obstacles |
 | **2** ✅ | `Stat` / `StatModifier` / `StatController` + toutes les stats + tests unitaires | Stats modifiables |
 | **3** ✅ | `CharacterDefinition`, `Character.Init`, `BasicAttackDefinition`, `CharacterLevel` (XP, points de compétence, croissance), vitesse lue depuis `MoveSpeed`. Sprite et taille du corps depuis la définition. | Un perso configurable par données |
-| **4** 🟡 | `Health`, `DamageInfo`, formules, régénération des PV, barres de PV, chiffres de dégâts ✅. *Reste : bouclier, CC et ténacité.* | Dégâts corrects |
+| **4** ✅ | `Health`, `DamageInfo`, formules, régénération des PV, barres de PV, chiffres de dégâts ; boucliers, CC et ténacité (avec la 9b) | Dégâts corrects |
 | **5** 🟡 | Clic droit sur ennemi, `BasicAttacker`, projectiles poolés, Q + clic gauche (attack-move) ✅, dummies d'entraînement (XP au kill). *Reste : `CommandController`.* | Attaque de base façon LoL |
 | **5b** ✅ | `ManaPool`, `ElementSelection` (A/Z/E, T reset), `SpellBook` + `SpellResolver`, coût en mana + UI, déblocage d'éléments par points (niv. 1/3/5, Ctrl + A/Z/E) | Éléments activables, coût affiché |
 | **5c** ✅ | R + visée + indicateurs, sorts Magic/Physical/Buff, niveaux d'éléments, cooldown par lancement, compétence propre F (Flash) | Sorts lancés à la souris |
 | **6** ✅ | `EnemyDefinition`, `EnemyAI` (flow field + NavMesh pour élites), mana TFT + sort spécial, spawner, XP/gold au kill | Un combat complet avec des hordes |
 | **7** ✅ | `RunDirector` (timer + quota, fin de vague = timer ET quota, vies), `Wallet`, `WaveRewardSchedule`, victoire / défaite (7a) ; `Inventory` (6 slots), boutiques, enclumes, élixirs, items (7b) | Boucle de run + économie |
 | **8** ✅ | `CharacterEvents`, passifs (briques génériques : stats, triggers, stacks, ennemis proches), capacités (`SpellCrit`), augments (4 → 6 slots, relances, relance dorée, slots pleins), passifs d'items, loot (enclume à stats, sorts d'invocateur) | Builds variés |
-| **9** 🟡 | Boss à patterns et items ✅ (9a). *Reste (9b) : contenu (sorts, éléments, passifs, items, augments, ennemis), statuts (saignement, ralentissement, étourdissement, ténacité), soins et boucliers.* | Prototype riche |
+| **9** 🟡 | Boss à patterns et items ✅ (9a). Statuts (stun, root, silence, ralentissement, saignement, brûlure, ténacité), soins et boucliers, statuts sur les sorts, +14 items, +7 augments ✅ (9b). *Reste (9c) : nouveaux ennemis, éléments et sorts, équilibrage.* | Prototype riche |
 | **10** | Méta-progression (arbres par élément et par personnage, monnaie persistante, surcharge), `RunSnapshot` (quitter/reprendre), polish, UI, audio | Prototype solide |
 
 ---
