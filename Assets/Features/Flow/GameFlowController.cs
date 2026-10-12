@@ -1,71 +1,76 @@
 using System;
 using Features.Events;
 using Features.StateMachines;
-using Features.UI.Panels;
 using Systems.EventBusses;
-using Systems.Inputs;
-using Systems.UIManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VContainer;
 using VContainer.Unity;
 
 namespace Features.Flow {
-    public class GameFlowController : IStartable, IDisposable {
+    /// <summary>
+    /// Owns the global flow: turns requests (bus events) into state transitions, publishes
+    /// <see cref="GameStateChangedEvent"/>, and loads scenes. Root scope entry point.
+    ///
+    /// Scene loads are Single-mode: the RootLifetimeScope survives them (DontDestroyOnLoad), so
+    /// every scene scope — and all of its run state — is rebuilt from scratch on each load.
+    /// The loaded scene's <see cref="SceneEntryPoint"/> then requests its own state (e.g. Game).
+    /// </summary>
+    public sealed class GameFlowController : IInitializable, IDisposable {
         private readonly GameFlowStateMachine _machine;
-        private readonly MainMenuPanel _menu;
-        private readonly InputReader _inputReader;
+        private readonly GameFlowSettings _settings;
         private readonly IEventBus _eventBus;
         private IDisposable _playSubscription;
-        private const string GameScene = "Game";
+        private IDisposable _quitSubscription;
 
-        [Inject]
-        public GameFlowController(GameFlowStateMachine machine, MainMenuPanel menu, InputReader inputReader, IEventBus eventBus) {
+        public GameFlowController(GameFlowStateMachine machine, GameFlowSettings settings, IEventBus eventBus) {
             _machine = machine;
-            _menu = menu;
-            _inputReader = inputReader;
+            _settings = settings;
             _eventBus = eventBus;
         }
 
-        public void Start() {
+        // IInitializable runs as soon as the root container is built, i.e. before any scene
+        // entry point can request a state, so no transition is ever missed.
+        public void Initialize() {
             _machine.Changed += OnStateChanged;
             _playSubscription = _eventBus.Subscribe<PlayRequestedEvent>(_ => OnPlayRequested());
-            
-            _inputReader.Initialize(_eventBus, EActionTypes.UI);
-
-            _ = PanelManager.TryOpenOrClosePanelAsync(_menu, toOpen: true);
-            _machine.TryChange(new GameFlowStateMachine.State(GameState.Menu));
+            _quitSubscription = _eventBus.Subscribe<QuitRequestedEvent>(_ => Quit());
         }
 
         public void Dispose() {
             _machine.Changed -= OnStateChanged;
             _playSubscription?.Dispose();
+            _quitSubscription?.Dispose();
         }
 
-        private void OnStateChanged(GameFlowStateMachine.State from, GameFlowStateMachine.State to) {
-            _eventBus.Publish(new GameStateChangedEvent(from?.Id ?? default, to.Id));
-            HandleSceneTransition(from?.Id ?? default, to.Id);
-        }
+        private void OnPlayRequested() => _machine.TryChange(GameState.Loading);
 
-        private void OnPlayRequested() =>
-            _machine.TryChange(new GameFlowStateMachine.State(GameState.Game));
+        private void OnStateChanged(GameState? from, GameState to) {
+            _eventBus.Publish(new GameStateChangedEvent(from, to));
 
-        private async void HandleSceneTransition(GameState from, GameState to) {
-            try {
-                if (from == GameState.Menu && to == GameState.Game) {
-                    _inputReader.DisableInput(EActionTypes.UI);
-                    await SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Additive);
-                    await PanelManager.TryOpenOrClosePanelAsync(_menu, toOpen: false);
-                    _inputReader.EnableInput(EActionTypes.Game);
-                }
-                else if (from == GameState.Game && to == GameState.Menu) {
-                    _inputReader.DisableInput(EActionTypes.Game);
-                    await PanelManager.TryOpenOrClosePanelAsync(_menu, toOpen: true);
-                    await SceneManager.UnloadSceneAsync(GameScene);
-                    _inputReader.EnableInput(EActionTypes.UI);
-                }
+            // First state of the session: the scene is already the right one.
+            if (from == null) return;
+
+            switch (to) {
+                case GameState.Loading: LoadScene(_settings.GameScene); break;
+                case GameState.Menu:    LoadScene(_settings.MenuScene); break;
             }
-            catch (Exception e) { Debug.LogException(e); }
+        }
+
+        private async void LoadScene(string sceneName) {
+            try {
+                await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+            }
+            catch (Exception e) {
+                Debug.LogException(e);
+            }
+        }
+
+        private static void Quit() {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
         }
     }
 }

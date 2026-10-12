@@ -4,13 +4,12 @@ using Systems.EventBusses;
 namespace Systems.Inputs.Events {
     // Input events published by InputReader, consumed by PlayerCommandInput / CameraController
     
+    // Screen-space only: projecting onto the ground is the consumer's job (it owns the camera).
     public readonly struct PointerCommandEvent : IEvent {
         public readonly Vector2 ScreenPosition;
-        public readonly Vector3 WorldPosition;
         
-        public PointerCommandEvent(Vector2 screenPosition, Vector3 worldPosition) {
+        public PointerCommandEvent(Vector2 screenPosition) {
             ScreenPosition = screenPosition;
-            WorldPosition = worldPosition;
         }
     }
     

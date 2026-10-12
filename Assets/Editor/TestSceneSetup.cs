@@ -1,15 +1,23 @@
 #if UNITY_EDITOR
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using Systems.Characters;
-using Systems.Containers;
-using Systems.Inputs;
-using Systems.UI;
+using Containers;
+using Features.CameraControl;
+using Features.Controls;
+using Features.Movement;
+using Features.UI;
+using VContainer.Unity;
 
-namespace Systems.Editor {
+namespace EditorTools {
+    /// <summary>
+    /// Regenerates the test scene from scratch (overwrites it) and validates its wiring.
+    /// Shared services (event bus, input, game flow, settings) come from the RootLifetimeScope
+    /// prefab created by <see cref="ProjectSetup"/>: run that first.
+    /// </summary>
     public static class TestSceneSetup {
-        private const string ScenePath = "Assets/Scenes/Tests/TestScene.unity";
+        private const string ScenePath = ProjectSetup.TestScenePath;
 
         // NOTE: this scene is saved as a BINARY .unity file even though the project is in
         // Force Text mode. Cause: the baked NavMesh. NavMeshData is a binary-only serializable
@@ -55,7 +63,6 @@ namespace Systems.Editor {
 
             var input = player.AddComponent<PlayerCommandInput>();
             input.characterMovement = movement;
-            input.groundLayer = LayerMask.GetMask("Default");
 
             // Camera
             var cameraObj = new GameObject("Main Camera");
@@ -67,7 +74,6 @@ namespace Systems.Editor {
 
             var cameraController = cameraObj.AddComponent<CameraController>();
             cameraController.target = player.transform;
-            cameraController.offset = new Vector3(0, 10, -8);
 
             input.mainCamera = camera;
 
@@ -95,11 +101,17 @@ namespace Systems.Editor {
             var markerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
             input.clickMarkerPrefab = markerPrefab;
 
-            // LifetimeScope (DI) - provides IEventBus and injects scene components
+            // Quit affordance: a windowed build with a confined cursor cannot be closed
+            // otherwise (the WM close button is unreachable).
+            var quitObj = new GameObject("QuitOverlay");
+            var quit = quitObj.AddComponent<QuitOverlay>();
+
+            // Scene LifetimeScope (DI): child of the RootLifetimeScope, injects the scene components
             var scopeObj = new GameObject("GameLifetimeScope");
             var scope = scopeObj.AddComponent<GameLifetimeScope>();
             scope.playerCommandInput = input;
             scope.cameraController = cameraController;
+            scope.quitOverlay = quit;
 
             // Save scene
             System.IO.Directory.CreateDirectory("Assets/Scenes/Tests");
@@ -144,9 +156,25 @@ namespace Systems.Editor {
             var surface = Object.FindFirstObjectByType<Unity.AI.Navigation.NavMeshSurface>();
             Check(surface != null, "NavMeshSurface present on Ground");
 
+            var quit = Object.FindFirstObjectByType<QuitOverlay>();
+            Check(quit != null, "QuitOverlay present in scene");
+
             if (scope != null) {
                 Check(scope.playerCommandInput != null, "scope.playerCommandInput wired");
                 Check(scope.cameraController != null, "scope.cameraController wired");
+                Check(scope.quitOverlay != null, "scope.quitOverlay wired");
+            }
+
+            // Root scope: the scene relies on it for every shared service
+            var vcSettings = PlayerSettings.GetPreloadedAssets().OfType<VContainerSettings>().FirstOrDefault();
+            Check(vcSettings != null, "VContainerSettings registered in preloaded assets");
+            var root = vcSettings != null ? vcSettings.RootLifetimeScope as RootLifetimeScope : null;
+            Check(root != null, "VContainerSettings.RootLifetimeScope is the RootLifetimeScope prefab");
+            if (root != null) {
+                var rootSo = new SerializedObject(root);
+                Check(rootSo.FindProperty("stateMachine").objectReferenceValue != null, "root.stateMachine wired");
+                Check(rootSo.FindProperty("gameFlowSettings").objectReferenceValue != null, "root.gameFlowSettings wired");
+                Check(rootSo.FindProperty("cameraSettings").objectReferenceValue != null, "root.cameraSettings wired");
             }
 
             if (input != null) {

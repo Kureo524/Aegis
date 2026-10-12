@@ -3,35 +3,45 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Systems.UIManagement {
-    public static class PanelManager {
-        private static readonly List<OpenClosePanel> OpenPanels = new();
-        private static readonly List<(OpenClosePanel panel, bool inFront, bool toOpen, TaskCompletionSource<bool> done)> BusyPool = new();
-        
-        private static bool _isBusy;
+    public interface IPanelManager {
+        /// <summary>
+        /// Queues an open (<paramref name="toOpen"/> = true) or close request. Requests run one at a
+        /// time, in order. Resolves to false if the request is redundant or the panel threw.
+        /// </summary>
+        Task<bool> TryOpenOrClosePanelAsync(OpenClosePanel panel, bool toOpen, bool inFront = false);
+    }
 
-        public static Task<bool> TryOpenOrClosePanelAsync(OpenClosePanel panel, bool inFront = false, bool toOpen = false) {
-            if (!IsPoolable(panel, toOpen)) return Task.FromResult(false);
+    /// <summary>Serializes panel animations so two panels never transition at the same time.
+    /// Registered as a singleton in the RootLifetimeScope (no static state).</summary>
+    public sealed class PanelManager : IPanelManager {
+        private readonly List<OpenClosePanel> _openPanels = new();
+        private readonly List<(OpenClosePanel panel, bool inFront, bool toOpen, TaskCompletionSource<bool> done)> _queue = new();
+
+        private bool _isBusy;
+
+        public Task<bool> TryOpenOrClosePanelAsync(OpenClosePanel panel, bool toOpen, bool inFront = false) {
+            if (panel == null || !IsPoolable(panel, toOpen)) return Task.FromResult(false);
 
             var done = new TaskCompletionSource<bool>();
-            BusyPool.Add((panel, inFront, toOpen, done));
+            _queue.Add((panel, inFront, toOpen, done));
 
             if (!_isBusy) _ = HandlePanelRoutine();
 
             return done.Task;
         }
 
-        private static async Awaitable HandlePanelRoutine() {
+        private async Awaitable HandlePanelRoutine() {
             _isBusy = true;
             try {
-                while (BusyPool.Count > 0) {
-                    var data = BusyPool[0];
+                while (_queue.Count > 0) {
+                    var data = _queue[0];
                     bool success = false;
 
                     try {
                         await (data.toOpen ? data.panel.OpenPanel() : data.panel.ClosePanel());
 
-                        if (data.toOpen) AddPanel(data.panel, data.inFront);
-                        else RemovePanel(data.panel);
+                        if (data.toOpen) _openPanels.Insert(data.inFront ? 0 : _openPanels.Count, data.panel);
+                        else _openPanels.Remove(data.panel);
 
                         success = true;
                     }
@@ -39,7 +49,7 @@ namespace Systems.UIManagement {
                         Debug.LogException(e);
                     }
                     finally {
-                        BusyPool.RemoveAt(0);
+                        _queue.RemoveAt(0);
                         data.done.TrySetResult(success);
                     }
                 }
@@ -49,17 +59,12 @@ namespace Systems.UIManagement {
             }
         }
 
-        private static void AddPanel(OpenClosePanel panel, bool inFront) =>
-            OpenPanels.Insert(inFront ? 0 : OpenPanels.Count, panel);
-
-        private static void RemovePanel(OpenClosePanel panel) => OpenPanels.Remove(panel);
-
-        private static bool IsPoolable(OpenClosePanel panelToCheck, bool doOpen) {
-            for (int i = BusyPool.Count - 1; i >= 0; i--) {
-                if (!BusyPool[i].panel.Equals(panelToCheck)) continue;
-                return doOpen != BusyPool[i].toOpen;
+        // The last queued request for a panel wins; otherwise compare with the current open state.
+        private bool IsPoolable(OpenClosePanel panel, bool toOpen) {
+            for (int i = _queue.Count - 1; i >= 0; i--) {
+                if (_queue[i].panel == panel) return toOpen != _queue[i].toOpen;
             }
-            return OpenPanels.Contains(panelToCheck) != doOpen;
+            return _openPanels.Contains(panel) != toOpen;
         }
     }
 }

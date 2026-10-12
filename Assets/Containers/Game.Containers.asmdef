@@ -1,6 +1,6 @@
 {
     "name": "Game.Containers",
-    "rootNamespace": "Systems.Containers",
+    "rootNamespace": "Containers",
     "references": [
         "Game.Systems",
         "Game.Features",
