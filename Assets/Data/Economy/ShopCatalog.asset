@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51aeb8f6eb9d27bd283da40cae4edc63, type: 3}
+  m_Name: ShopCatalog
+  m_EditorClassIdentifier: Game.Features::Features.Economy.ShopCatalog
+  elixirs:
+  - {fileID: 11400000, guid: 4b64a3a46ecbe6fceb093fe581eb8729, type: 2}
+  - {fileID: 11400000, guid: bf54e3180e9ec95a0ae9bbe069aae01c, type: 2}
+  - {fileID: 11400000, guid: 95297c333adf2864db65afe81c305d11, type: 2}
+  statAnvils:
+  - {fileID: 11400000, guid: 98f0f4f4a74b97499bda846780430f31, type: 2}
+  itemAnvils:
+  - {fileID: 11400000, guid: cbaa1506d326b40b7a352c85ea377b73, type: 2}
+  - {fileID: 11400000, guid: 4f5a4a743300450be9a28571f0732d4d, type: 2}
+  items:
+  - {fileID: 11400000, guid: 434f82b2aac8a24c0930dcc30f437441, type: 2}
+  - {fileID: 11400000, guid: c029dce061b26c54480d63dfeaa206f4, type: 2}
+  - {fileID: 11400000, guid: c942a4aa89127fb979d91e68c07f632e, type: 2}
+  - {fileID: 11400000, guid: 67c937902826d1c408754b7b285e6bbd, type: 2}
+  - {fileID: 11400000, guid: cfe47ff898426120e8b2963b24b4c445, type: 2}
+  - {fileID: 11400000, guid: 016bd1ac71166b89282e6fc2a7fb267f, type: 2}
+  - {fileID: 11400000, guid: 5d566104818939f1c80f17edb5334afb, type: 2}
+  - {fileID: 11400000, guid: 446ddb30a7693a9b88a46b30c74f51bc, type: 2}
+  - {fileID: 11400000, guid: 81c1e692cda14f6079857000b759856d, type: 2}
+  - {fileID: 11400000, guid: d76af6b472cfa046b99c6d72400f48ae, type: 2}
+  - {fileID: 11400000, guid: 31f05ddbdf55fc575b5a161a278f4e03, type: 2}
+  - {fileID: 11400000, guid: db3e29d648c18984ea54d106ea3cdf2c, type: 2}
+  statChoices:
+  - {fileID: 11400000, guid: 1817eee3d1f6e17669d2b0b43372d046, type: 2}
+  - {fileID: 11400000, guid: ce36d38675e6eab918e5515d5cbc310d, type: 2}
+  - {fileID: 11400000, guid: cee1b9a88889ad1d0987f14951df125d, type: 2}
+  - {fileID: 11400000, guid: 322ee16038a2605e086daece1163ece2, type: 2}
+  - {fileID: 11400000, guid: 03d71c1dba6b7fac1b5077680c8019d4, type: 2}
+  - {fileID: 11400000, guid: 1113adb96095a345db3c93d904491443, type: 2}
+  - {fileID: 11400000, guid: 6623b15f65ded36f0a5cbcdf9653e8cb, type: 2}
+  - {fileID: 11400000, guid: 1e05adc0b354b8e7ca8c106908902762, type: 2}
+  - {fileID: 11400000, guid: a3566ec786696bd71938477681551541, type: 2}
+  - {fileID: 11400000, guid: c50b0e9056f0b95a2a54f90e35b65c80, type: 2}
+  - {fileID: 11400000, guid: 9946009377dad1ce0b8c6c0b4ad36851, type: 2}
+  - {fileID: 11400000, guid: a05f452084f1da739ae43ef16dc620c4, type: 2}
+  - {fileID: 11400000, guid: be9e6e9a3bee0b81aa966b6ad01ce20a, type: 2}
+  - {fileID: 11400000, guid: 20c27022faa9f28ed80c2d351f08266f, type: 2}
+  - {fileID: 11400000, guid: 6cbab246a0a0ed891bebe25c14a91a2f, type: 2}
+  - {fileID: 11400000, guid: 19dbc8b0ac9e4914ebe68c80a010d053, type: 2}
+  - {fileID: 11400000, guid: f5f744f2996d09e0d9ea004935f7f5b4, type: 2}
+  - {fileID: 11400000, guid: 28fd671fc919292db82d4a21af307a28, type: 2}
+  - {fileID: 11400000, guid: f35ca300857ecdf698d3db219e00084b, type: 2}
+  - {fileID: 11400000, guid: 34901d2b7f7a95a489f0202db92527b2, type: 2}
+  freeAnvil: {fileID: 11400000, guid: 4f5a4a743300450be9a28571f0732d4d, type: 2}

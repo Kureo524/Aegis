@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
+  m_Name: Item_VoidHeart
+  m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
+  displayName: "C\u0153ur du n\xE9ant"
+  icon: {fileID: 21300000, guid: 4ee3799227f9dcd498a3856b70c1c856, type: 3}
+  cost: 0
+  tier: 1
+  stats:
+  - Stat: 5
+    Type: 0
+    Value: 70
+  - Stat: 3
+    Type: 0
+    Value: 6
+  - Stat: 23
+    Type: 0
+    Value: 0.2
+  unique: 1

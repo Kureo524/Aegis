@@ -221,12 +221,28 @@ namespace EditorTools {
         }
 
         /// <summary>Menu drawn above the HUD / main menu: its own UIDocument with a higher sorting order.</summary>
-        public static T CreateOverlayDocument<T>(string name) where T : Component {
+        public static T CreateOverlayDocument<T>(string name, int sortingOrder = 100) where T : Component {
             var go = new GameObject(name);
             var document = go.AddComponent<UIDocument>();
             document.panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
-            document.sortingOrder = 100;
+            document.sortingOrder = sortingOrder;
             return go.AddComponent<T>();
+        }
+
+        /// <summary>Shops of the test scene (design doc §9.3): catalog, shop and anvil screens, inventory on the HUD. Idempotent.</summary>
+        public static void WireShop(GameLifetimeScope scope, Features.Economy.ShopCatalog catalog) {
+            if (scope.shopCatalog == null) scope.shopCatalog = catalog;
+            var shop = Object.FindFirstObjectByType<ShopPanel>();
+            if (shop == null) shop = CreateOverlayDocument<ShopPanel>("ShopPanel");
+            scope.shopPanel = shop;
+            var anvil = Object.FindFirstObjectByType<AnvilPanel>();
+            if (anvil == null) anvil = CreateOverlayDocument<AnvilPanel>("AnvilPanel", 110);   // above the shop
+            scope.anvilPanel = anvil;
+            if (scope.playerHud != null) {
+                if (!scope.playerHud.TryGetComponent(out InventoryView inventory)) inventory = scope.playerHud.gameObject.AddComponent<InventoryView>();
+                scope.inventoryView = inventory;
+            }
+            EditorUtility.SetDirty(scope);
         }
 
         private const string ObstaclesRoot = "=== Obstacles ===";
@@ -350,6 +366,12 @@ namespace EditorTools {
                 Check(scope.damageNumbers != null, "scope.damageNumbers wired");
                 Check(scope.hordeSettings != null, "scope.hordeSettings wired");
                 Check(scope.runStateMachine != null, "scope.runStateMachine wired");
+                Check(scope.shopCatalog != null && scope.shopCatalog.Items.Count > 0 && scope.shopCatalog.FreeAnvil != null,
+                      "scope.shopCatalog: items and free anvil");
+                Check(scope.shopPanel != null && scope.anvilPanel != null && scope.inventoryView != null, "shop, anvil and inventory UI wired");
+                Check(scope.anvilPanel == null || scope.shopPanel == null
+                      || scope.anvilPanel.GetComponent<UIDocument>().sortingOrder > scope.shopPanel.GetComponent<UIDocument>().sortingOrder,
+                      "anvil screen drawn above the shop");
                 Check(scope.runHud != null && scope.waveRewardPanel != null && scope.runEndPanel != null, "run HUD and run screens wired");
                 Check(scope.stage != null && scope.stage.Waves.Length > 0 && scope.stage.RewardSchedule != null,
                       "scope.stage: waves and reward schedule");

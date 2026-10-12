@@ -31,11 +31,16 @@ namespace Containers {
         public RunHudView runHud;
         public WaveRewardPanel waveRewardPanel;
         public RunEndPanel runEndPanel;
+        public ShopPanel shopPanel;
+        public AnvilPanel anvilPanel;
+        public InventoryView inventoryView;
 
         [Header("Run")]
         [Tooltip("The stage played in this scene: waves, bonus waves, lives (design doc §9.1).")]
         public StageDefinition stage;
         public RunStateMachine runStateMachine;
+        [Tooltip("Elixirs, anvils, items and stat choices of the shops (design doc §9.3).")]
+        public ShopCatalog shopCatalog;
         public DamageNumbersView damageNumbers;
 
         [Header("Player")]
@@ -72,6 +77,14 @@ namespace Containers {
             builder.RegisterInstance(stage);
             builder.RegisterComponent(runStateMachine);
             builder.RegisterEntryPoint<RunDirector>().AsSelf();
+            builder.RegisterEntryPoint<RewardController>().AsSelf();
+            builder.RegisterInstance(shopCatalog);
+            builder.Register<PlayerUpgrades>(Lifetime.Scoped);
+            builder.RegisterEntryPoint<Inventory>().AsSelf();
+            builder.RegisterEntryPoint<ShopService>().AsSelf();
+            if (shopPanel != null) builder.RegisterComponent(shopPanel);
+            if (anvilPanel != null) builder.RegisterComponent(anvilPanel);
+            if (inventoryView != null) builder.RegisterComponent(inventoryView);
             builder.RegisterEntryPoint<PauseInput>();
 
             builder.RegisterEntryPoint<PlayerSpawner>()
