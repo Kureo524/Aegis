@@ -32,3 +32,4 @@ MonoBehaviour:
   projectileSpeed: 18
   pierce: 0
   blink: 1
+  fixedRange: 1

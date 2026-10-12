@@ -145,10 +145,12 @@ namespace Features.Spells {
             Ray ray = _camera.ScreenPointToRay(_pointer);
             Vector3 point = _ground.Raycast(ray, out float distance) ? ray.GetPoint(distance) : origin;
 
+            Vector3 direction = SpellMath.FlatDirection(origin, point, owner.transform.forward);
+
             var ctx = new CastContext {
                 Origin = origin,
-                Direction = SpellMath.FlatDirection(origin, point, owner.transform.forward),
-                TargetPoint = SpellMath.ClampToRange(origin, point, _spell.Range),
+                Direction = direction,
+                TargetPoint = SpellMath.AimPoint(origin, point, direction, _spell.Range, _spell.FixedRange),
             };
 
             if (_spell.Targeting == TargetingType.UnitTarget) {

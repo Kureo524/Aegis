@@ -12,6 +12,18 @@ namespace Game.Tests.EditMode {
         }
 
         [Test]
+        public void AimPoint_IsClampedToRange_OrAlwaysAtFullRangeWithFixedRange() {
+            Vector3 origin = new(1f, 0f, 1f);
+            Vector3 close = new(2f, 0f, 1f);   // 1 unit to the right
+            Vector3 far = new(11f, 0f, 1f);
+            Vector3 right = Vector3.right;
+
+            Assert.AreEqual(close, SpellMath.AimPoint(origin, close, right, 4.5f, fixedRange: false), "close: the cursor point");
+            Assert.AreEqual(new Vector3(5.5f, 0f, 1f), SpellMath.AimPoint(origin, far, right, 4.5f, fixedRange: false), "far: clamped");
+            Assert.AreEqual(new Vector3(5.5f, 0f, 1f), SpellMath.AimPoint(origin, close, right, 4.5f, fixedRange: true), "fixed: full range");
+        }
+
+        [Test]
         public void ElementLevels_CountOncePerDistinctElement() {
             ElementDefinition fire = SpellTestData.Element("Fire", 10f);
             ElementDefinition elec = SpellTestData.Element("Elec", 10f);

@@ -82,8 +82,10 @@ namespace Features.Spells {
         [SerializeField, Min(0.1f)] private float projectileSpeed = 18f;
         [Tooltip("Skillshot: goes through enemies instead of stopping on the first one.")]
         [SerializeField] private bool pierce;
-        [Tooltip("GroundPoint: teleports the caster to the point (Flash). Refused if the point is not walkable.")]
+        [Tooltip("GroundPoint: teleports the caster to the point (Flash). Lands on the farthest walkable spot of the line.")]
         [SerializeField] private bool blink;
+        [Tooltip("GroundPoint: the point is always at full Range in the cursor direction, however close the cursor is (Flash).")]
+        [SerializeField] private bool fixedRange;
 
         public string DisplayName => displayName;
         public Sprite Icon => icon;
@@ -103,6 +105,7 @@ namespace Features.Spells {
         public float ProjectileSpeed => projectileSpeed;
         public bool Pierce => pierce;
         public bool Blink => blink;
+        public bool FixedRange => fixedRange;
 
         public bool DealsDamage => kind != SpellKind.Buff;
         public bool NeedsAim => targeting != TargetingType.Self;

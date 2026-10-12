@@ -30,6 +30,14 @@ namespace Features.Spells {
             return new Vector3(origin.x + delta.x, origin.y, origin.z + delta.z);
         }
 
+        /// <summary>
+        /// Ground point of a cast: the cursor point clamped to <paramref name="range"/>, or with
+        /// <paramref name="fixedRange"/> always at full range along <paramref name="direction"/>.
+        /// </summary>
+        public static Vector3 AimPoint(Vector3 origin, Vector3 point, Vector3 direction, float range, bool fixedRange) =>
+            fixedRange ? new Vector3(origin.x + direction.x * range, origin.y, origin.z + direction.z * range)
+                       : ClampToRange(origin, point, range);
+
         public static Vector3 FlatDirection(Vector3 from, Vector3 to, Vector3 fallback) {
             Vector3 d = to - from;
             d.y = 0f;

@@ -354,7 +354,7 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator Flash_TeleportsTowardsTheCursor_ClampedToRange_ThenGoesOnCooldown() {
+        public IEnumerator Flash_AlwaysBlinksItsFullRange_TowardsTheCursor_ThenGoesOnCooldown() {
             yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
             yield return null;
             var player = FindPlayer();
@@ -363,17 +363,38 @@ namespace Game.Tests.PlayMode {
             Vector3 start = player.transform.position;
 
             bus.Publish(new Systems.Inputs.Events.SignatureEvent());                     // F: aim
-            bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(start + new Vector3(-10f, 0f, -3f))));
+            bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(start + new Vector3(-1.5f, 0f, 0f))));   // cursor close by
             yield return null;
 
             Vector3 moved = player.transform.position - start;
             moved.y = 0f;
-            Assert.AreEqual(signature.Spell.Range, moved.magnitude, 0.5f, "clamped to Flash range");
-            Assert.Less(moved.x, -3f, "towards the cursor");
+            Assert.AreEqual(signature.Spell.Range, moved.magnitude, 0.3f, "full Flash range, however close the cursor");
+            Assert.Less(moved.x, -4f, "towards the cursor");
             Assert.Greater(signature.CooldownRemaining, 19f);
 
             bus.Publish(new Systems.Inputs.Events.SignatureEvent());
             Assert.IsFalse(player.GetComponent<Features.Spells.SpellTargeting>().IsAiming, "on cooldown");
+        }
+
+        [UnityTest]
+        public IEnumerator Flash_IntoAWall_LandsOnTheLastWalkableSpot() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var bus = Root.Resolve<IEventBus>();
+            // Wall_Front spans z 5.5..6.5: from z = 1.5 a full Flash (4.5) would end inside it.
+            player.GetComponent<Features.Movement.CharacterMovement>().Teleport(new Vector3(0f, 0f, 1.5f));
+            yield return null;
+            Vector3 start = player.transform.position;
+
+            bus.Publish(new Systems.Inputs.Events.SignatureEvent());
+            bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(start + new Vector3(0f, 0f, 2f))));
+            yield return null;
+
+            float z = player.transform.position.z;
+            Assert.Less(z, 5.5f, "not inside the wall");
+            Assert.Greater(z, 4f, "went as far as it could");
+            Assert.Greater(player.GetComponent<Features.Spells.SignatureAbility>().CooldownRemaining, 19f);
         }
 
         [UnityTest]

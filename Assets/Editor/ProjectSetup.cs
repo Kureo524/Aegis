@@ -347,7 +347,7 @@ namespace EditorTools {
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        // Flash (design doc §7.8): blink to the cursor, clamped to range, refused if not walkable. Created once.
+        // Flash (design doc §7.8): fixed-length blink towards the cursor. Created once.
         private static SpellDefinition CreateFlash() {
             var flash = AssetDatabase.LoadAssetAtPath<SpellDefinition>(FlashPath);
             if (flash != null) return flash;
@@ -364,6 +364,7 @@ namespace EditorTools {
             so.FindProperty("cooldownOverride").floatValue = 20f;
             so.FindProperty("kind").enumValueIndex = (int)SpellKind.Buff;
             so.FindProperty("blink").boolValue = true;
+            so.FindProperty("fixedRange").boolValue = true;
             so.ApplyModifiedPropertiesWithoutUndo();
             return flash;
         }

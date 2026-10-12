@@ -10,7 +10,8 @@ namespace Features.Spells {
     /// <summary>
     /// The character's own ability on F (design doc §7.8): a spell outside the spell book, cooldown
     /// only (CooldownOverride, reduced by AbilityHaste), no mana, no element. Same aiming and casting
-    /// as R. Flash for the test hero: blink to the cursor, refused if the spot is not walkable.
+    /// as R. Flash for the test hero: blink of fixed length (FixedRange) towards
+    /// the cursor, onto the farthest walkable spot of that line; refused only if there is none.
     /// Player prefab variant. (Picked-up summoner spells replacing it come with phase 8.)
     /// </summary>
     public class SignatureAbility : MonoBehaviour {
@@ -60,9 +61,12 @@ namespace Features.Spells {
 
         private void Confirm(CastContext ctx) {
             SpellDefinition spell = Spell;
-            if (spell.Blink && !_executor.TryGetBlinkPoint(ctx.TargetPoint, out _)) {
-                Feedback("Destination inaccessible");
-                return;
+            if (spell.Blink) {
+                if (!_executor.TryGetBlinkPoint(ctx.Origin, ctx.TargetPoint, out Vector3 landing)) {
+                    Feedback("Destination inaccessible");
+                    return;
+                }
+                ctx.TargetPoint = landing;
             }
             if (!caster.Cast(spell, ctx, 0)) return;
 

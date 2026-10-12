@@ -17,7 +17,8 @@ namespace Features.Spells {
     ///
     /// - Self: buffs on the caster.
     /// - Skillshot: straight projectile (first enemy hit, or all with Pierce).
-    /// - GroundPoint: every enemy in Radius around the point; Blink teleports the caster there.
+    /// - GroundPoint: every enemy in Radius around the point; Blink teleports the caster there
+    ///   (or to the farthest walkable spot before it).
     /// - Cone: every enemy in the sector.
     /// - UnitTarget: homing projectile to the chosen enemy.
     /// Damage = Scaling(element levels) + attack stat × PowerRatio; Magic vs MagicResist, Physical vs
@@ -41,13 +42,27 @@ namespace Features.Spells {
             _eventBus = eventBus;
         }
 
-        /// <summary>Walkable spot for a blink at <paramref name="point"/> (walls in between do not matter).</summary>
-        public bool TryGetBlinkPoint(Vector3 point, out Vector3 walkable) {
-            if (NavMesh.SamplePosition(point, out NavMeshHit hit, _settings.BlinkTolerance, NavMesh.AllAreas)) {
+        /// <summary>
+        /// Landing spot of a blink from <paramref name="origin"/> towards <paramref name="point"/>:
+        /// the point itself if walkable (walls in between do not matter), otherwise the farthest
+        /// walkable spot back along the line. False if that is barely away from the origin.
+        /// </summary>
+        public bool TryGetBlinkPoint(Vector3 origin, Vector3 point, out Vector3 walkable) {
+            float step = Mathf.Max(0.1f, _settings.BlinkTolerance);
+            Vector3 back = origin - point;
+            back.y = 0f;
+            float length = back.magnitude;
+            Vector3 dir = length > 0f ? back / length : Vector3.zero;
+
+            for (float d = 0f; d < length; d += step) {
+                if (!NavMesh.SamplePosition(point + dir * d, out NavMeshHit hit, _settings.BlinkTolerance, NavMesh.AllAreas)) continue;
+                Vector3 flat = hit.position - origin;
+                flat.y = 0f;
+                if (flat.magnitude < step) break;   // only the caster's own spot left
                 walkable = hit.position;
                 return true;
             }
-            walkable = point;
+            walkable = origin;
             return false;
         }
 
@@ -71,7 +86,7 @@ namespace Features.Spells {
 
                 case TargetingType.GroundPoint:
                     if (spell.Blink) {
-                        if (TryGetBlinkPoint(ctx.TargetPoint, out Vector3 destination)) {
+                        if (TryGetBlinkPoint(origin, ctx.TargetPoint, out Vector3 destination)) {
                             Ring(origin, 0.8f, spell.Color);
                             caster.GetComponent<CharacterMovement>().Teleport(destination);
                             Ring(destination, 0.8f, spell.Color);
