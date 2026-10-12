@@ -33,6 +33,7 @@ namespace Containers {
         public RunHudView runHud;
         public AugmentPanel augmentPanel;
         public AugmentsView augmentsView;
+        public BossHudView bossHud;
         public RunEndPanel runEndPanel;
         public ShopPanel shopPanel;
         public AnvilPanel anvilPanel;
@@ -81,6 +82,7 @@ namespace Containers {
             if (runHud != null) builder.RegisterComponent(runHud);
             if (augmentPanel != null) builder.RegisterComponent(augmentPanel);
             if (augmentsView != null) builder.RegisterComponent(augmentsView);
+            if (bossHud != null) builder.RegisterComponent(bossHud);
             if (runEndPanel != null) builder.RegisterComponent(runEndPanel);
             builder.RegisterInstance(stage);
             builder.RegisterComponent(runStateMachine);

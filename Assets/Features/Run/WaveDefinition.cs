@@ -6,7 +6,8 @@ namespace Features.Run {
     /// <summary>
     /// One wave (design doc §9.1): a timer AND a kill quota end it. Enemies spawn continuously from
     /// its table; once the quota is reached they still come (gold only, no more XP) until the end of
-    /// the timer. WaveScaling multiplies the enemies' health and damage.
+    /// the timer. WaveScaling multiplies the enemies' health and damage. A boss wave also needs its
+    /// boss dead to end (design doc §9.1, §9.6).
     /// </summary>
     [CreateAssetMenu(menuName = "Game/Run/Wave Definition", fileName = "Wave_")]
     public class WaveDefinition : ScriptableObject {
@@ -21,6 +22,11 @@ namespace Features.Run {
         [SerializeField, Min(0.05f)] private float postQuotaSpawnInterval = 2.5f;
         [SerializeField, Min(1)] private int maxAlive = 20;
 
+        [Header("Boss (optional)")]
+        [Tooltip("Spawned when the wave starts; the wave cannot end before it dies.")]
+        [SerializeField] private BossDefinition boss;
+        [SerializeField] private Characters.Character bossPrefab;
+
         [Header("Scaling (WaveScaling)")]
         [Tooltip("1 = enemy stats as in their definition.")]
         [SerializeField, Min(0.1f)] private float healthMultiplier = 1f;
@@ -34,5 +40,8 @@ namespace Features.Run {
         public int MaxAlive => maxAlive;
         public float HealthMultiplier => healthMultiplier;
         public float DamageMultiplier => damageMultiplier;
+        public BossDefinition Boss => boss;
+        public Characters.Character BossPrefab => bossPrefab;
+        public bool HasBoss => boss != null && bossPrefab != null;
     }
 }

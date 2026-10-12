@@ -104,6 +104,13 @@ namespace Features.Enemies {
             return Spawn(entry.Prefab, entry.Definition, spot);
         }
 
+        /// <summary>Spawns <paramref name="definition"/> on the spawn ring around the player (wave boss). Null if no spot.</summary>
+        public Character SpawnNearPlayer(Character prefab, EnemyDefinition definition) {
+            Character player = _director.Player;
+            if (player == null || prefab == null || definition == null) return null;
+            return TryFindSpot(player.transform.position, definition, out Vector3 spot) ? Spawn(prefab, definition, spot) : null;
+        }
+
         public Character Spawn(Character prefab, EnemyDefinition definition, Vector3 position) {
             Character enemy = _pool.Get(prefab);
             enemy.GetComponent<Movement.CharacterMovement>().Teleport(position);

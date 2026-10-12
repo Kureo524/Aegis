@@ -33,6 +33,7 @@ namespace Features.Run {
         private float _timer;            // PreWave: countdown; Combat: wave time left; Overtime: next life loss
         private float _nextStatus;
         private bool _halted;
+        private bool _bossAlive;
         private bool _ended;
 
         public RunState State => _machine.CurrentState;
@@ -43,6 +44,9 @@ namespace Features.Run {
         public bool IsBonusWave => _waveIndex >= _stage.Waves.Length;
         public WaveDefinition CurrentWave => WaveAt(_waveIndex);
         public bool QuotaReached => CurrentWave != null && _kills >= CurrentWave.KillQuota;
+        public bool BossAlive => _bossAlive;
+        /// <summary>The wave may end: quota reached and no boss left.</summary>
+        public bool WaveCleared => QuotaReached && !_bossAlive;
 
         public RunDirector(StageDefinition stage, RunStateMachine machine, HordeSpawner spawner, IEventBus eventBus) {
             _stage = stage;
@@ -65,6 +69,7 @@ namespace Features.Run {
             }));
             _subscriptions.Add(_eventBus.Subscribe<RewardClosedEvent>(_ => OnRewardClosed()));
             _subscriptions.Add(_eventBus.Subscribe<SkipWaveRequestedEvent>(_ => SkipWave()));
+            _subscriptions.Add(_eventBus.Subscribe<BossDefeatedEvent>(_ => OnBossDefeated()));
 
             _spawner.SetSpawning(false);
             _timer = _stage.FirstWaveCountdown;
@@ -89,7 +94,7 @@ namespace Features.Run {
                     break;
                 case RunState.Combat:
                     _timer -= Time.deltaTime;
-                    if (_timer <= 0f) _machine.TryChange(QuotaReached ? RunState.Reward : RunState.Overtime);
+                    if (_timer <= 0f) _machine.TryChange(WaveCleared ? RunState.Reward : RunState.Overtime);
                     break;
                 case RunState.Overtime:
                     _timer -= Time.deltaTime;
@@ -125,6 +130,8 @@ namespace Features.Run {
             _timer = wave.TimeLimit;
             _spawner.Configure(wave.SpawnTable, wave.SpawnInterval, wave.MaxAlive, wave.HealthMultiplier, wave.DamageMultiplier);
             _spawner.SetSpawning(true);
+            _bossAlive = false;
+            if (wave.HasBoss && _spawner.SpawnNearPlayer(wave.BossPrefab, wave.Boss) != null) _bossAlive = true;
         }
 
         private void OnWaveKill() {
@@ -132,7 +139,7 @@ namespace Features.Run {
             _kills++;
             if (_kills == CurrentWave.KillQuota) {
                 _spawner.SetInterval(CurrentWave.PostQuotaSpawnInterval);   // gold only from now on
-                if (State == RunState.Overtime) _machine.TryChange(RunState.Reward);
+                if (State == RunState.Overtime && WaveCleared) _machine.TryChange(RunState.Reward);
             }
             PublishStatus();
         }
@@ -153,6 +160,13 @@ namespace Features.Run {
                     : _stage.RewardSchedule.AfterWave(_waveIndex);
             }
             _eventBus.Publish(new WaveRewardEvent(WaveNumber, IsBonusWave, rewards));
+        }
+
+        private void OnBossDefeated() {
+            if (!_bossAlive) return;
+            _bossAlive = false;
+            if (State == RunState.Overtime && WaveCleared) _machine.TryChange(RunState.Reward);
+            PublishStatus();
         }
 
         private void OnRewardClosed() {
@@ -187,6 +201,7 @@ namespace Features.Run {
             }
             if (State == RunState.Combat || State == RunState.Overtime) {
                 _kills = Mathf.Max(_kills, CurrentWave.KillQuota);
+                _bossAlive = false;
                 _machine.TryChange(RunState.Reward);
             }
         }

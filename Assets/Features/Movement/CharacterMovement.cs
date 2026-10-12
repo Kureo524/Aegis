@@ -32,6 +32,8 @@ namespace Features.Movement {
         private Vector3 _destination;
         private bool _hasDestination;
         private bool _steering;
+        private float _dashUntil = -1f;
+        private float _dashSpeed;
         private int _currentCorner;
         private Vector3 _moveDirection;
         private Stat _moveSpeed;
@@ -102,6 +104,19 @@ namespace Features.Movement {
             _corners = System.Array.Empty<Vector3>();
         }
 
+        /// <summary>Straight dash (boss charge): <paramref name="speed"/> for <paramref name="duration"/> seconds, ignoring MoveSpeed.</summary>
+        public void Dash(Vector3 direction, float speed, float duration) {
+            direction.y = 0f;
+            if (direction.sqrMagnitude < 1e-6f || duration <= 0f) return;
+            Stop();
+            _moveDirection = direction.normalized;
+            _dashSpeed = speed;
+            _dashUntil = Time.time + duration;
+            _hasDestination = true;
+        }
+
+        public bool IsDashing => _dashUntil > Time.time;
+
         /// <summary>Instant move (blink): no path, keeps physics and agent in sync.</summary>
         public void Teleport(Vector3 position) {
             Stop();
@@ -113,6 +128,7 @@ namespace Features.Movement {
         public void Stop() {
             _hasDestination = false;
             _steering = false;
+            _dashUntil = -1f;
             _moveDirection = Vector3.zero;
             _corners = System.Array.Empty<Vector3>();
             SetHorizontalVelocity(Vector3.zero);
@@ -121,6 +137,16 @@ namespace Features.Movement {
         private void FixedUpdate() {
             if (_agent.isOnNavMesh) _agent.nextPosition = _rb.position;
             if (!_hasDestination) return;
+
+            if (_dashUntil > 0f) {
+                if (Time.time >= _dashUntil) {
+                    Stop();
+                    return;
+                }
+                SetHorizontalVelocity(_moveDirection * _dashSpeed);
+                FaceMoveDirection();
+                return;
+            }
 
             if (_steering) {
                 SetHorizontalVelocity(_moveDirection * MoveSpeed);
