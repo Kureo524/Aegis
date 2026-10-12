@@ -112,6 +112,29 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
+        public IEnumerator Player_IsSpawnedFromPrefab_SpriteFacesCamera_AndFlips() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = Object.FindFirstObjectByType<Features.Characters.Character>();
+            var camera = Object.FindFirstObjectByType<CameraController>();
+            Assert.IsNotNull(player, "Player not spawned");
+            Assert.AreEqual(player.transform, camera.target, "Camera received the player through PlayerSpawnedEvent");
+
+            var visual = player.GetComponentInChildren<Features.Characters.CharacterVisual>();
+            var movement = player.GetComponent<Features.Movement.CharacterMovement>();
+            Assert.AreEqual(player.Definition.Sprite, visual.Renderer.sprite, "Sprite comes from the definition");
+
+            movement.SetDestination(player.transform.position - camera.transform.right * 6f);   // left on screen
+            yield return new WaitForSeconds(0.3f);   // time, not frames: batchmode runs uncapped
+            Assert.IsTrue(visual.FacesLeft, "Flipped when moving left");
+            Assert.Less(Quaternion.Angle(camera.transform.rotation, visual.transform.rotation), 0.5f, "Billboard faces the camera");
+
+            movement.SetDestination(player.transform.position + camera.transform.right * 6f);   // right on screen
+            yield return new WaitForSeconds(0.3f);   // time, not frames: batchmode runs uncapped
+            Assert.IsFalse(visual.FacesLeft, "Faces right when moving right");
+        }
+
+        [UnityTest]
         public IEnumerator Menu_Play_LoadsGameScene() {
             yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
             var machine = Root.Resolve<GameFlowStateMachine>();
