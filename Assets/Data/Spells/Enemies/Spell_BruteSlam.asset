@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_BruteSlam
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: Fracas
+  icon: {fileID: 0}
+  color: {r: 0.95, g: 0.45, b: 0.25, a: 1}
+  recipe: []
+  targeting: 2
+  range: 4
+  radius: 2.2
+  coneAngle: 60
+  castTime: 0.9
+  canMoveWhileCasting: 0
+  cooldownOverride: 0
+  kind: 1
+  powerRatio: 0.6
+  scaling:
+    Base: 60
+    PerElementLevel: 0
+  buffs: []
+  projectileSpeed: 18
+  pierce: 0
+  blink: 0
+  fixedRange: 0

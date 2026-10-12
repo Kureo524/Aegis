@@ -53,6 +53,12 @@ namespace Features.Combat {
         public Character Target => _target;
         public bool IsAttacking => _state != State.Idle;
         public bool IsAttackMoving => _attackMoving;
+        public bool IsWindingUp => _state == State.Windup;
+        /// <summary>
+        /// False: a target out of range is not chased, whoever drives the character moves it
+        /// (enemy AI, §9.6). The attack resumes as soon as the target is back in range.
+        /// </summary>
+        public bool ChasesTarget { get; set; } = true;
 
         /// <summary>Raised on each landed basic attack (target, damage taken). CharacterEvents §8.1.</summary>
         public event Action<Character, float> Hit;
@@ -141,6 +147,7 @@ namespace Features.Combat {
                     break;
 
                 case State.Chasing when !inRange:
+                    if (!ChasesTarget) break;
                     if (Time.time >= _nextRepath) {
                         movement.SetDestination(_target.transform.position);
                         _nextRepath = Time.time + repathInterval;

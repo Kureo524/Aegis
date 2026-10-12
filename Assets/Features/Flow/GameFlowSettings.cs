@@ -7,8 +7,11 @@ namespace Features.Flow {
     public class GameFlowSettings : ScriptableObject {
         [SerializeField] private string menuScene = "Menu";
         [SerializeField] private string gameScene = "TestScene";
+        [Tooltip("Until the stage lives and the game over (phase 7): the dead player comes back at the spawn after this delay.")]
+        [SerializeField, Min(0f)] private float playerRespawnDelay = 3f;
 
         public string MenuScene => menuScene;
         public string GameScene => gameScene;
+        public float PlayerRespawnDelay => playerRespawnDelay;
     }
 }

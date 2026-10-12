@@ -2167,6 +2167,7 @@ MonoBehaviour:
   playerPrefab: {fileID: 2741926576527142607, guid: fb3437a0fcc310b0c975aaac8a66cd45, type: 3}
   playerDefinition: {fileID: 11400000, guid: 982e78e197d784f50af3cc6d28e6a8c9, type: 2}
   playerSpawn: {fileID: 1835320288}
+  hordeSettings: {fileID: 11400000, guid: e0bc3826823b08435a1449e844322bd0, type: 2}
   enemySpawns:
   - Prefab: {fileID: 8647018052464086203, guid: 1caa158eb367debe2b07af1252609b79, type: 3}
     Definition: {fileID: 11400000, guid: 71f51e7c6f724290ebf865e4dcb59bcf, type: 2}
@@ -2847,6 +2848,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game.Features::Features.UI.DebugTools.CharacterDebugPanel
   xpPerClick: 100
+  hordeBurst: 50
   shownStats: 0000000002000000040000000500000006000000070000000e0000000f00000012000000
 --- !u!4 &2032925266
 Transform:

@@ -10,7 +10,7 @@ namespace Features.UI {
     /// Bottom-center player HUD (UI Toolkit), fed only by bus events:
     /// feedback line, resolved spell + mana cost, element slots (ElementBarView), level badge,
     /// HP bar, mana bar with the cost of the current selection previewed on it (§7.3), XP bar,
-    /// signature ability slot (F) and spell cooldowns (§7.9).
+    /// signature ability slot (F), spell cooldowns (§7.9) and the run's gold (§9.2).
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class PlayerHud : MonoBehaviour {
@@ -22,7 +22,8 @@ namespace Features.UI {
         private IEventBus _eventBus;
         private readonly DisposableBag _subscriptions = new();
         private VisualElement _hpFill, _manaFill, _manaCost, _xpFill;
-        private Label _hpText, _manaText, _level, _spell, _feedback;
+        private Label _hpText, _manaText, _level, _spell, _feedback, _gold;
+        private int _goldValue;
         private ElementBarView _elements;
         private float _feedbackUntil;
         private VisualElement _signatureSlot, _signatureIcon, _signatureShade;
@@ -56,6 +57,10 @@ namespace Features.UI {
                 Refresh();
             }));
             _subscriptions.Add(eventBus.Subscribe<GameplayFeedbackEvent>(e => ShowFeedback(e.Message)));
+            _subscriptions.Add(eventBus.Subscribe<GoldChangedEvent>(e => {
+                _goldValue = e.Gold;
+                if (_gold != null) _gold.text = $"{_goldValue} or";
+            }));
             _subscriptions.Add(eventBus.Subscribe<SignatureAssignedEvent>(e => { _signature = e.Spell; RefreshSignature(); }));
             _subscriptions.Add(eventBus.Subscribe<CooldownStartedEvent>(e => {
                 float readyAt = Time.time + e.Duration;
@@ -91,6 +96,7 @@ namespace Features.UI {
             _level = UiStyles.Text("1", 20, Color.white);
             _level.style.width = _level.style.height = 44;
             _level.style.marginRight = 8;
+            _level.style.marginLeft = 28;   // balances the gold label on the right
             _level.style.unityTextAlign = TextAnchor.MiddleCenter;
             _level.style.backgroundColor = new Color(0.12f, 0.12f, 0.18f, 0.9f);
             UiStyles.Border(_level, 2, new Color(0.85f, 0.70f, 0.30f), 22);
@@ -115,8 +121,13 @@ namespace Features.UI {
             bars.Add(hpBar);
             bars.Add(manaBar);
             bars.Add(xpBar);
+            _gold = UiStyles.Text($"{_goldValue} or", 16, new Color(1f, 0.82f, 0.30f));
+            _gold.style.width = 70;
+            _gold.style.marginLeft = 10;
+
             row.Add(_level);
             row.Add(bars);
+            row.Add(_gold);
 
             column.Add(_feedback);
             column.Add(_spell);

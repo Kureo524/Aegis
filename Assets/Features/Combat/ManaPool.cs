@@ -38,6 +38,14 @@ namespace Features.Combat {
             Changed?.Invoke(Current, Max);
         }
 
+        /// <summary>Sets the current mana (enemy TFT mana going back to its start value, §9.6).</summary>
+        public void Set(float amount) {
+            Current = Math.Clamp(amount, 0f, Max);
+            Changed?.Invoke(Current, Max);
+        }
+
+        public bool IsFull => Current >= Max - 0.0001f;
+
         public void Detach() => _max.Changed -= OnMaxChanged;
 
         private void OnMaxChanged(float newMax) {

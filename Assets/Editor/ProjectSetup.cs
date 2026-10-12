@@ -6,6 +6,7 @@ using Containers;
 using Features.CameraControl;
 using Features.Characters;
 using Features.Combat;
+using Features.Enemies;
 using Features.Progression;
 using Features.Spells;
 using Features.Stats;
@@ -89,11 +90,13 @@ namespace EditorTools {
             AssignMissingHeroSignature();
             CreateTrainingDummy();
             Character dummyPrefab = CharacterPrefabSetup.CreateDummyPrefab();
+            Character enemyPrefab = CharacterPrefabSetup.CreateEnemyPrefab();
+            HordeSettings hordeSettings = EnemySetup.Run(enemyPrefab);
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
             SetBuildScenes();
             MigrateMenuScene();
-            MigrateTestScene(playerPrefab, dummyPrefab);
+            MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings);
 
             AssetDatabase.SaveAssets();
             Debug.Log("[ProjectSetup] Done.");
@@ -517,7 +520,7 @@ namespace EditorTools {
             if (dirty) EditorSceneManager.SaveScene(scene);
         }
 
-        private static void MigrateTestScene(Character playerPrefab, Character dummyPrefab) {
+        private static void MigrateTestScene(Character playerPrefab, Character dummyPrefab, HordeSettings hordeSettings) {
             var scene = EditorSceneManager.OpenScene(TestScenePath, OpenSceneMode.Single);
             var scope = Object.FindFirstObjectByType<GameLifetimeScope>();
             if (scope == null) {
@@ -532,6 +535,7 @@ namespace EditorTools {
             TestSceneSetup.MigrateToSpawnedPlayer(scope, playerPrefab,
                                                   AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath));
             TestSceneSetup.WireCombat(scope, dummyPrefab, AssetDatabase.LoadAssetAtPath<CharacterDefinition>(DummyPath));
+            if (scope.hordeSettings == null) scope.hordeSettings = hordeSettings;
             EditorUtility.SetDirty(scope);
             EditorSceneManager.SaveScene(scene);
         }
