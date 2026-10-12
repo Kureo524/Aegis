@@ -26,6 +26,7 @@ namespace Features.Characters {
         [SerializeField] private StatGrowth growthPerLevel;
 
         [Header("Combat")]
+        [Tooltip("Optional: null = never attacks (training dummy…).")]
         [SerializeField] private BasicAttackDefinition basicAttack;
 
         public string DisplayName => displayName;
@@ -41,7 +42,8 @@ namespace Features.Characters {
             if (sprite == null) Debug.LogWarning($"[CharacterDefinition] {name}: no sprite.", this);
             if (bodySize.x <= 0f || bodySize.y <= 0f) Debug.LogWarning($"[CharacterDefinition] {name}: body size must be positive.", this);
             if (baseStats == null) Debug.LogWarning($"[CharacterDefinition] {name}: no base stats.", this);
-            if (basicAttack == null) Debug.LogWarning($"[CharacterDefinition] {name}: no basic attack.", this);
+            if (basicAttack == null && faction == Faction.Player)
+                Debug.LogWarning($"[CharacterDefinition] {name}: the player needs a basic attack.", this);
         }
 #endif
     }

@@ -32,6 +32,13 @@ namespace Features.Characters {
 
         public void SetSprite(Sprite sprite) => _renderer.sprite = sprite;
 
+        /// <summary>Turns the sprite towards a world direction (attacking while standing still).</summary>
+        public void Face(Vector3 worldDirection) {
+            if (_camera == null) return;
+            float side = Vector3.Dot(worldDirection, _camera.right);
+            if (Mathf.Abs(side) > 0.01f) _renderer.flipX = side < 0f;
+        }
+
         // TODO(phase 6): hundreds of enemies → one central billboard update instead of one LateUpdate each.
         private void LateUpdate() {
             if (_camera == null) return;

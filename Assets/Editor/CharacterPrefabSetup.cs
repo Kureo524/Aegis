@@ -1,8 +1,10 @@
 #if UNITY_EDITOR
 using System.IO;
 using Features.Characters;
+using Features.Combat;
 using Features.Controls;
 using Features.Movement;
+using Features.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
@@ -15,13 +17,16 @@ namespace EditorTools {
     ///   Character.prefab   generic base: physics root (Rigidbody, BoxCollider, NavMeshAgent,
     ///                      CharacterMovement, Character) + "Visual" child (billboard sprite)
     ///   Player.prefab      variant of Character + PlayerCommandInput
+    ///   TrainingDummy.prefab  variant of Character + RespawnOnDeath
     /// Enemies will be another variant (+ AI). What differs between two characters of the same
     /// kind (sprite, size, stats) stays in their CharacterDefinition, never in a variant.
     /// </summary>
     public static class CharacterPrefabSetup {
         public const string BasePrefabPath = "Assets/Prefabs/Characters/Character.prefab";
         public const string PlayerPrefabPath = "Assets/Prefabs/Characters/Player.prefab";
+        public const string DummyPrefabPath = "Assets/Prefabs/Characters/TrainingDummy.prefab";
         public const string PlaceholderSpritePath = "Assets/GraphicAssets/Sprites/Characters/Placeholder_Hero.png";
+        public const string WhiteSpritePath = "Assets/GraphicAssets/Sprites/UI/White.png";
         private const string ClickMarkerPath = "Assets/Prefabs/ClickMarker.prefab";
 
         private const int SpriteWidth = 64;
@@ -30,6 +35,7 @@ namespace EditorTools {
 
         public static Character CreatePlayerPrefab() {
             CreateBasePrefab();
+            UpgradeBasePrefab();
             if (!File.Exists(PlayerPrefabPath)) {
                 var basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BasePrefabPath);
                 var instance = (GameObject)PrefabUtility.InstantiatePrefab(basePrefab);
@@ -43,7 +49,110 @@ namespace EditorTools {
                 PrefabUtility.SaveAsPrefabAsset(instance, PlayerPrefabPath);
                 Object.DestroyImmediate(instance);
             }
+
+            EditPrefab(PlayerPrefabPath, root => {
+                var input = root.GetComponent<PlayerCommandInput>();
+                input.character = root.GetComponent<Character>();
+                input.attacker = root.GetComponent<BasicAttacker>();
+            });
             return AssetDatabase.LoadAssetAtPath<Character>(PlayerPrefabPath);
+        }
+
+        public static Character CreateDummyPrefab() {
+            CreatePlayerPrefab();   // makes sure the base exists and is up to date
+            if (!File.Exists(DummyPrefabPath)) {
+                var basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BasePrefabPath);
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(basePrefab);
+                instance.name = "TrainingDummy";
+                var respawn = instance.AddComponent<RespawnOnDeath>();
+                var so = new SerializedObject(respawn);
+                so.FindProperty("character").objectReferenceValue = instance.GetComponent<Character>();
+                so.ApplyModifiedPropertiesWithoutUndo();
+                PrefabUtility.SaveAsPrefabAsset(instance, DummyPrefabPath);
+                Object.DestroyImmediate(instance);
+            }
+            return AssetDatabase.LoadAssetAtPath<Character>(DummyPrefabPath);
+        }
+
+        // Adds what later phases put on every character (basic attack, HP bar). Idempotent, keeps edits.
+        private static void UpgradeBasePrefab() {
+            EditPrefab(BasePrefabPath, root => {
+                var character = root.GetComponent<Character>();
+                var movement = root.GetComponent<CharacterMovement>();
+                var visual = root.GetComponentInChildren<CharacterVisual>(true);
+
+                if (!root.TryGetComponent(out BasicAttacker attacker)) attacker = root.AddComponent<BasicAttacker>();
+                var attackerSo = new SerializedObject(attacker);
+                attackerSo.FindProperty("owner").objectReferenceValue = character;
+                attackerSo.FindProperty("movement").objectReferenceValue = movement;
+                attackerSo.FindProperty("visual").objectReferenceValue = visual;
+                attackerSo.ApplyModifiedPropertiesWithoutUndo();
+
+                HealthBarView bar = root.GetComponentInChildren<HealthBarView>(true);
+                if (bar == null) bar = CreateHealthBar(root.transform);
+
+                var characterSo = new SerializedObject(character);
+                characterSo.FindProperty("attacker").objectReferenceValue = attacker;
+                characterSo.FindProperty("healthBar").objectReferenceValue = bar;
+                characterSo.ApplyModifiedPropertiesWithoutUndo();
+            });
+        }
+
+        private static HealthBarView CreateHealthBar(Transform parent) {
+            Sprite white = CreateWhiteSprite();
+            var barGo = new GameObject("HealthBar");
+            barGo.transform.SetParent(parent, false);
+            barGo.transform.localPosition = new Vector3(0f, 2.15f, 0f);
+
+            SpriteRenderer Part(string name, Color color, Vector3 scale, int order) {
+                var go = new GameObject(name);
+                go.transform.SetParent(barGo.transform, false);
+                go.transform.localScale = scale;
+                var r = go.AddComponent<SpriteRenderer>();
+                r.sprite = white;
+                r.color = color;
+                r.sortingOrder = order;   // drawn over character sprites
+                return r;
+            }
+
+            var background = Part("Background", new Color(0.05f, 0.05f, 0.08f, 0.85f), new Vector3(1.06f, 0.16f, 1f), 100);
+            var fill = Part("Fill", Color.green, new Vector3(1f, 0.1f, 1f), 101);
+
+            var bar = barGo.AddComponent<HealthBarView>();
+            var so = new SerializedObject(bar);
+            so.FindProperty("background").objectReferenceValue = background;
+            so.FindProperty("fill").objectReferenceValue = fill;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return bar;
+        }
+
+        private static Sprite CreateWhiteSprite() {
+            if (!File.Exists(WhiteSpritePath)) {
+                Directory.CreateDirectory(Path.GetDirectoryName(WhiteSpritePath)!);
+                var texture = new Texture2D(4, 4, TextureFormat.RGBA32, false);
+                var pixels = new Color32[16];
+                for (int i = 0; i < pixels.Length; i++) pixels[i] = new Color32(255, 255, 255, 255);
+                texture.SetPixels32(pixels);
+                File.WriteAllBytes(WhiteSpritePath, texture.EncodeToPNG());
+                AssetDatabase.ImportAsset(WhiteSpritePath);
+                var importer = (TextureImporter)AssetImporter.GetAtPath(WhiteSpritePath);
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spritePixelsPerUnit = 4;   // 1 world unit
+                importer.filterMode = FilterMode.Point;
+                importer.SaveAndReimport();
+            }
+            return AssetDatabase.LoadAssetAtPath<Sprite>(WhiteSpritePath);
+        }
+
+        private static void EditPrefab(string path, System.Action<GameObject> edit) {
+            GameObject root = PrefabUtility.LoadPrefabContents(path);
+            try {
+                edit(root);
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+            }
+            finally {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
         }
 
         private static void CreateBasePrefab() {

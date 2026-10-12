@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Features.CameraControl;
 using Features.Characters;
 using Features.Flow;
@@ -18,6 +19,8 @@ namespace Containers {
         public CameraController cameraController;
         public QuitOverlay quitOverlay;
         public CharacterDebugPanel characterDebugPanel;
+        public PlayerHud playerHud;
+        public DamageNumbersView damageNumbers;
 
         [Header("Player")]
         [Tooltip("Player prefab variant (Assets/Prefabs/Characters/Player).")]
@@ -25,16 +28,24 @@ namespace Containers {
         public CharacterDefinition playerDefinition;
         public Transform playerSpawn;
 
+        [Header("Enemies")]
+        [Tooltip("Fixed characters spawned at scene start (training dummies).")]
+        public List<CharacterSpawn> enemySpawns = new();
+
         protected override void Configure(IContainerBuilder builder) {
             builder.RegisterComponent(mainCamera);
             builder.RegisterComponent(cameraController);
             if (quitOverlay != null) builder.RegisterComponent(quitOverlay);
             if (characterDebugPanel != null) builder.RegisterComponent(characterDebugPanel);
+            if (playerHud != null) builder.RegisterComponent(playerHud);
+            if (damageNumbers != null) builder.RegisterComponent(damageNumbers);
 
             builder.RegisterEntryPoint<PlayerSpawner>()
                 .WithParameter(playerPrefab)
                 .WithParameter(playerDefinition)
                 .WithParameter(playerSpawn);
+            builder.RegisterEntryPoint<EnemySpawner>()
+                .WithParameter<IReadOnlyList<CharacterSpawn>>(enemySpawns);
 
             builder.RegisterEntryPoint<SceneEntryPoint>().WithParameter(GameState.Game);
         }

@@ -77,8 +77,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c382b89c0ec0b9358636c1ad2083199, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Features::Features.Controls.PlayerCommandInput
+  character: {fileID: 2741926576527142607}
   characterMovement: {fileID: 8163094588334372168}
+  attacker: {fileID: 8519835409735304813}
+  pickRadius: 0.8
   clickMarkerPrefab: {fileID: 2112780572453488847, guid: da59e8ed04ff4d17587df37f01b9c0fe, type: 3}
+--- !u!114 &2741926576527142607 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6418502472124908383, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
+  m_PrefabInstance: {fileID: 9159862373885062544}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906976849958185452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbb4ff8638dafc74da6f4d01691017ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Features::Features.Characters.Character
 --- !u!114 &8163094588334372168 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1033432127841491160, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
@@ -90,3 +104,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69c4c857e2b22accfa9cbb35ee502a2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Features::Features.Movement.CharacterMovement
+--- !u!114 &8519835409735304813 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 658325328853462013, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
+  m_PrefabInstance: {fileID: 9159862373885062544}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906976849958185452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8736054b7c4e9574e93264be3da1a2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Features::Features.Combat.BasicAttacker

@@ -40,6 +40,9 @@ namespace EditorTools {
         private const string ExperienceCurvePath = "Assets/Data/Progression/ExperienceCurve.asset";
         private const string TestHeroDir = "Assets/Data/Characters/TestHero";
         public const string TestHeroPath = TestHeroDir + "/Char_TestHero.asset";
+        private const string DummyDir = "Assets/Data/Characters/TrainingDummy";
+        public const string DummyPath = DummyDir + "/Enemy_TrainingDummy.asset";
+        private const string DummySpritePath = "Assets/GraphicAssets/Sprites/Characters/Training_Dummy.png";
 
         public const string MenuScenePath = "Assets/Scenes/Releases/Menu.unity";
         public const string TestScenePath = "Assets/Scenes/Tests/TestScene.unity";
@@ -65,11 +68,13 @@ namespace EditorTools {
             CreateTestHero();
             Character playerPrefab = CharacterPrefabSetup.CreatePlayerPrefab();
             AssignMissingHeroSprite();
+            CreateTrainingDummy();
+            Character dummyPrefab = CharacterPrefabSetup.CreateDummyPrefab();
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve);
             RegisterVContainerSettings(rootPrefab);
             SetBuildScenes();
             MigrateMenuScene();
-            MigrateTestScene(playerPrefab);
+            MigrateTestScene(playerPrefab, dummyPrefab);
 
             AssetDatabase.SaveAssets();
             Debug.Log("[ProjectSetup] Done.");
@@ -133,6 +138,30 @@ namespace EditorTools {
             heroSo.FindProperty("growthPerLevel").objectReferenceValue = growth;
             heroSo.FindProperty("basicAttack").objectReferenceValue = attack;
             heroSo.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Training target: lots of HP, no regen, never attacks, respawns (TrainingDummy prefab).
+        private static void CreateTrainingDummy() {
+            if (AssetDatabase.LoadAssetAtPath<EnemyDefinition>(DummyPath) != null) return;
+
+            var stats = CreateAsset<StatBlock>(DummyDir + "/StatBlock_TrainingDummy.asset");
+            SetList(stats, "entries", new (StatType, float)[] {
+                (StatType.MaxHealth, 1000f), (StatType.Armor, 30f), (StatType.MagicResist, 30f),
+            }, (e, v) => {
+                e.FindPropertyRelative("Type").enumValueIndex = (int)v.Item1;
+                e.FindPropertyRelative("Value").floatValue = v.Item2;
+            });
+
+            var dummy = CreateAsset<EnemyDefinition>(DummyPath);
+            var so = new SerializedObject(dummy);
+            so.FindProperty("displayName").stringValue = "Training Dummy";
+            so.FindProperty("faction").enumValueIndex = (int)Faction.Enemy;
+            so.FindProperty("sprite").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(DummySpritePath);
+            so.FindProperty("bodySize").vector2Value = new Vector2(0.9f, 1.6f);
+            so.FindProperty("baseStats").objectReferenceValue = stats;
+            so.FindProperty("xpReward").intValue = 150;
+            so.FindProperty("goldReward").intValue = 25;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         // Only fills an empty sprite slot: never replaces art chosen by hand.
@@ -237,7 +266,7 @@ namespace EditorTools {
             if (dirty) EditorSceneManager.SaveScene(scene);
         }
 
-        private static void MigrateTestScene(Character playerPrefab) {
+        private static void MigrateTestScene(Character playerPrefab, Character dummyPrefab) {
             var scene = EditorSceneManager.OpenScene(TestScenePath, OpenSceneMode.Single);
             var scope = Object.FindFirstObjectByType<GameLifetimeScope>();
             if (scope == null) {
@@ -251,6 +280,7 @@ namespace EditorTools {
 
             TestSceneSetup.MigrateToSpawnedPlayer(scope, playerPrefab,
                                                   AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath));
+            TestSceneSetup.WireCombat(scope, dummyPrefab, AssetDatabase.LoadAssetAtPath<CharacterDefinition>(DummyPath));
             EditorUtility.SetDirty(scope);
             EditorSceneManager.SaveScene(scene);
         }
