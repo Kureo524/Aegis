@@ -251,6 +251,51 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
+        public IEnumerator Elements_UnlockWithSkillPoints_StackAndResolveToASpell() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var caster = player.GetComponent<Features.Spells.ElementCaster>();
+            var bus = Root.Resolve<IEventBus>();
+
+            string feedback = null;
+            Features.Events.ElementSelectionChangedEvent selection = default;
+            using (bus.Subscribe<Features.Events.GameplayFeedbackEvent>(e => feedback = e.Message))
+            using (bus.Subscribe<Features.Events.ElementSelectionChangedEvent>(e => selection = e)) {
+                // Locked element: no stack, feedback
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));
+                Assert.AreEqual(0, caster.Selection.Total);
+                Assert.IsNotNull(feedback, "Locked element gives feedback");
+
+                // Ctrl + A: spends the level 1 skill point, Fire unlocked
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0, levelUp: true));
+                Assert.IsTrue(caster.Levels.IsUnlocked(0));
+                Assert.AreEqual(0, player.Level.SkillPoints);
+
+                // A, A → Fire x2
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));
+                Assert.AreEqual(2, selection.Stacks0);
+                Assert.IsNotNull(selection.Spell, "Fire x2 resolves to a spell");
+                Assert.AreEqual("Grande boule de feu", selection.Spell.DisplayName);
+                Assert.AreEqual(10f * 2f * 1.5f, selection.ManaCost, 1e-3f, "2 stacks of Fire (10) × 1.5");
+
+                // Second element: refused at level 2, allowed at level 3
+                bus.Publish(new Features.Events.XpGrantedEvent(player.Level.XpToNext));   // level 2
+                bus.Publish(new Features.Events.ElementLevelUpRequestedEvent(1));
+                Assert.IsFalse(caster.Levels.IsUnlocked(1), "2nd element waits for level 3");
+                bus.Publish(new Features.Events.XpGrantedEvent(player.Level.XpToNext));   // level 3
+                bus.Publish(new Features.Events.ElementLevelUpRequestedEvent(1));
+                Assert.IsTrue(caster.Levels.IsUnlocked(1));
+
+                // T clears the selection
+                bus.Publish(new Systems.Inputs.Events.ResetElementsEvent());
+                Assert.AreEqual(0, selection.Total);
+                Assert.IsNull(selection.Spell);
+            }
+        }
+
+        [UnityTest]
         public IEnumerator Menu_Play_LoadsGameScene() {
             yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
             var machine = Root.Resolve<GameFlowStateMachine>();
