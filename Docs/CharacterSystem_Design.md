@@ -1132,6 +1132,16 @@ Les nouveaux modules du §10 (Combat, Spells, Items, Run, AI…) vont dans `Feat
 
 **Fichiers fournis** : `.gitignore` (Unity + IDE + OS) et `.gitattributes` (normalisation des fins de ligne, **Git LFS** pour textures, audio, modèles 3D, vidéos, polices).
 
+> État actuel : `.gitattributes` force LF sur le code et le YAML Unity, branche Smart Merge sur les assets YAML et marque les assets lourds en `binary`. **Git LFS n'est pas encore actif** (`git-lfs` non installé) : `sudo pacman -S git-lfs && git lfs install`, puis remplacer `binary` par `filter=lfs diff=lfs merge=lfs -text` dans `.gitattributes` et `git add --renormalize .`. À faire **avant** le premier asset lourd (sprites, sons).
+>
+> Smart Merge, une fois par clone :
+> ```
+> git config merge.unityyamlmerge.name "Unity SmartMerge (UnityYAMLMerge)"
+> git config merge.unityyamlmerge.driver "<Editor>/Data/Tools/UnityYAMLMerge merge -p %O %B %A %A"
+> git config merge.unityyamlmerge.recursive binary
+> ```
+> `TestScene.unity` et son NavMesh sont binaires : déclarés `binary`, jamais fusionnés.
+
 **Workflow**
 - Branches : `main` (stable, taguée par jalon, ex. `v0.1-phase1`), `develop` (intégration), `feature/<module>-<sujet>`, `fix/<sujet>`. Fusion par **pull request** vers `develop`.
 - **Commits atomiques** au format *Conventional Commits* : `feat(stats): ajoute les StatModifier`, `fix(nav): corrige le clic hors NavMesh`, `data(spells): ajoute Spell_Fire_x1`, `docs: met à jour le design doc`, `refactor`, `test`, `chore`.
