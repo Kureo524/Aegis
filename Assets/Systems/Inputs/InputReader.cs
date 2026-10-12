@@ -14,19 +14,23 @@ namespace Systems.Inputs {
     /// Single owner of the generated action maps. Translates raw input into typed events on the
     /// <see cref="IEventBus"/> (design doc §14.3, §14.9). Every map starts disabled; which map is
     /// active is decided by the game state (see Features.Flow.InputMapSwitcher).
+    /// Letter bindings are remapped to the configured <see cref="KeyboardLayout"/> at startup.
     /// Registered as an entry point in the RootLifetimeScope.
     /// </summary>
     public sealed class InputReader : IInitializable, IDisposable {
         private readonly IEventBus _eventBus;
+        private readonly ControlsSettings _settings;
         private GameActionMaps _input;
         private Vector2 _pointerPosition;
 
-        public InputReader(IEventBus eventBus) {
+        public InputReader(IEventBus eventBus, ControlsSettings settings) {
             _eventBus = eventBus;
+            _settings = settings;
         }
 
         public void Initialize() {
             _input = new GameActionMaps();
+            ApplyKeyboardLayout(_input.asset, _settings != null ? _settings.KeyboardLayout : KeyboardLayout.Qwerty);
             GameActionMaps.GameplayActions g = _input.Gameplay;
 
             g.PointerPosition.performed += OnPointerPosition;
@@ -35,6 +39,7 @@ namespace Systems.Inputs {
             g.Confirm.performed         += OnConfirm;
             g.Cancel.performed          += OnCancel;
             g.AttackMove.performed      += OnAttackMove;
+            g.AttackMove.canceled       += OnAttackMove;
             g.Element1.performed        += OnElement1;
             g.Element2.performed        += OnElement2;
             g.Element3.performed        += OnElement3;
@@ -73,6 +78,7 @@ namespace Systems.Inputs {
             g.Confirm.performed         -= OnConfirm;
             g.Cancel.performed          -= OnCancel;
             g.AttackMove.performed      -= OnAttackMove;
+            g.AttackMove.canceled       -= OnAttackMove;
             g.Element1.performed        -= OnElement1;
             g.Element2.performed        -= OnElement2;
             g.Element3.performed        -= OnElement3;
@@ -85,7 +91,9 @@ namespace Systems.Inputs {
             g.Zoom.canceled             -= OnZoom;
 
             _input.Disable();
-            _input.Dispose();
+            // The generated Dispose() uses Object.Destroy, which is refused outside Play mode (tests)
+            if (Application.isPlaying) _input.Dispose();
+            else UnityEngine.Object.DestroyImmediate(_input.asset);
             _input = null;
         }
 
@@ -97,7 +105,7 @@ namespace Systems.Inputs {
         private void OnPointerCommand(InputAction.CallbackContext ctx) => _eventBus.Publish(new PointerCommandEvent(_pointerPosition));
         private void OnConfirm(InputAction.CallbackContext ctx)        => _eventBus.Publish(new ConfirmEvent(_pointerPosition));
         private void OnCancel(InputAction.CallbackContext ctx)         => _eventBus.Publish(new CancelEvent());
-        private void OnAttackMove(InputAction.CallbackContext ctx)     => _eventBus.Publish(new AttackMoveEvent());
+        private void OnAttackMove(InputAction.CallbackContext ctx)     => _eventBus.Publish(new AttackMoveEvent(ctx.performed));
         private void OnElement1(InputAction.CallbackContext ctx)       => _eventBus.Publish(new ElementKeyEvent(0));
         private void OnElement2(InputAction.CallbackContext ctx)       => _eventBus.Publish(new ElementKeyEvent(1));
         private void OnElement3(InputAction.CallbackContext ctx)       => _eventBus.Publish(new ElementKeyEvent(2));
@@ -106,6 +114,24 @@ namespace Systems.Inputs {
         private void OnResetElements(InputAction.CallbackContext ctx)  => _eventBus.Publish(new ResetElementsEvent());
         private void OnStop(InputAction.CallbackContext ctx)           => _eventBus.Publish(new StopEvent());
         private void OnCameraLock(InputAction.CallbackContext ctx)     => _eventBus.Publish(new CameraLockEvent());
+        /// <summary>Moves every single-letter keyboard binding to where that letter is on <paramref name="layout"/>.</summary>
+        public static void ApplyKeyboardLayout(InputActionAsset asset, KeyboardLayout layout) {
+            const string prefix = "<Keyboard>/";
+            foreach (InputActionMap map in asset.actionMaps) {
+                foreach (InputAction action in map.actions) {
+                    for (int i = 0; i < action.bindings.Count; i++) {
+                        string path = action.bindings[i].path;
+                        if (path == null || path.Length != prefix.Length + 1 || !path.StartsWith(prefix)) continue;
+                        char letter = path[prefix.Length];
+                        if (letter < 'a' || letter > 'z') continue;
+
+                        string key = KeyboardLayouts.PhysicalKey(layout, letter);
+                        if (key.Length != 1 || key[0] != letter) action.ApplyBindingOverride(i, prefix + key);
+                    }
+                }
+            }
+        }
+
         private void OnZoom(InputAction.CallbackContext ctx)           => _eventBus.Publish(new ZoomEvent(ctx.ReadValue<Vector2>().y));
     }
 }

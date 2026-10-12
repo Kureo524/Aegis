@@ -186,6 +186,71 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
+        public IEnumerator RangedAttack_FiresPooledProjectiles() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var dummy = FindDummy(player);
+
+            int hits = 0;
+            var attacker = player.GetComponent<Features.Combat.BasicAttacker>();
+            attacker.Hit += (_, _) => hits++;
+            attacker.Attack(dummy);
+            yield return new WaitForSeconds(5f);
+
+            int instances = Object.FindObjectsByType<Features.Combat.Projectile>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length;
+            Assert.Greater(hits, 2, "Projectiles reached the dummy");
+            Assert.Less(dummy.Health.Current, dummy.Health.Max);
+            Assert.Greater(instances, 0, "Hits come from projectiles");
+            Assert.Less(instances, hits, "Projectiles are pooled, not one instance per shot");
+        }
+
+        [UnityTest]
+        public IEnumerator AttackMove_AttacksEnemiesInRange_ThenWalksToThePoint() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var attacker = player.GetComponent<Features.Combat.BasicAttacker>();
+
+            // Dummies in range on the way: one of them gets attacked
+            Assert.IsTrue(attacker.AttackMove(new Vector3(5f, 0f, -3f)));
+            yield return new WaitForSeconds(2f);
+            Assert.IsNotNull(attacker.Target, "Acquired an enemy in range");
+            Assert.Less(attacker.Target.Health.Current, attacker.Target.Health.Max, "and attacked it");
+
+            // No enemy left: walks to the point and the order completes
+            foreach (var c in Object.FindObjectsByType<Features.Characters.Character>(FindObjectsSortMode.None))
+                if (!c.IsPlayer) c.TakeDamage(new Features.Combat.DamageInfo(1e6f, Features.Combat.DamageType.True, false, false, null));
+            yield return WaitFor(() => !attacker.IsAttackMoving, timeout: 1.9f);   // before the dummies respawn
+
+            Vector3 delta = player.transform.position - new Vector3(5f, 0f, -3f);
+            delta.y = 0f;
+            Assert.Less(delta.magnitude, 0.5f, "Arrived at the attack-move point");
+        }
+
+        [UnityTest]
+        public IEnumerator HoldingAttackMove_ShowsTheAttackRange_ReleasingHidesIt() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var indicator = player.GetComponentInChildren<Features.Controls.RangeIndicator>(true);
+            var bus = Root.Resolve<IEventBus>();
+            Assert.IsFalse(indicator.IsShown, "Hidden by default");
+
+            bus.Publish(new Systems.Inputs.Events.AttackMoveEvent(true));
+            yield return null;
+            Assert.IsTrue(indicator.IsShown, "Shown while Q is held");
+            Assert.AreEqual(player.Stats.Value(Features.Stats.StatType.AttackRange), indicator.Radius, 1e-3f);
+            var line = indicator.GetComponent<LineRenderer>();
+            Assert.Greater(line.positionCount, 8);
+            Assert.AreEqual(indicator.Radius, new Vector2(line.GetPosition(0).x, line.GetPosition(0).z).magnitude, 1e-3f);
+
+            bus.Publish(new Systems.Inputs.Events.AttackMoveEvent(false));
+            yield return null;
+            Assert.IsFalse(indicator.IsShown, "Hidden when Q is released");
+        }
+
+        [UnityTest]
         public IEnumerator Menu_Play_LoadsGameScene() {
             yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
             var machine = Root.Resolve<GameFlowStateMachine>();

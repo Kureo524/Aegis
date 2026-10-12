@@ -10,14 +10,17 @@ namespace Features.Combat {
     public class BasicAttackDefinition : ScriptableObject {
         [Tooltip("Share of the attack interval spent before the hit lands (0..1).")]
         [SerializeField, Range(0f, 1f)] private float windupPercent = 0.25f;
-        [Tooltip("Null = instant melee hit.")]
-        [SerializeField] private GameObject projectilePrefab;
+        [Tooltip("Null = instant melee hit. Otherwise a homing projectile (must carry a Projectile).")]
+        [SerializeField] private Projectile projectilePrefab;
+        [Tooltip("World units per second.")]
+        [SerializeField] private float projectileSpeed = 20f;
         [Tooltip("Multiplier applied to the scaling attack stat.")]
         [SerializeField] private float damageRatio = 1f;
         [SerializeField] private DamageType damageType = DamageType.Physical;
 
         public float WindupPercent => windupPercent;
-        public GameObject ProjectilePrefab => projectilePrefab;
+        public Projectile ProjectilePrefab => projectilePrefab;
+        public float ProjectileSpeed => projectileSpeed;
         public bool IsRanged => projectilePrefab != null;
         public float DamageRatio => damageRatio;
         public DamageType DamageType => damageType;

@@ -408,6 +408,8 @@ MonoBehaviour:
   movement: {fileID: 1033432127841491160}
   visual: {fileID: 2057097052179799622}
   repathInterval: 0.2
+  scanInterval: 0.1
+  muzzleHeight: 0.6
 --- !u!1 &8512342472237346293
 GameObject:
   m_ObjectHideFlags: 0

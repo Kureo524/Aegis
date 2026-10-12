@@ -8,6 +8,7 @@ using Features.Characters;
 using Features.Combat;
 using Features.Progression;
 using Features.Stats;
+using Systems.Inputs;
 using Features.Flow;
 using Features.StateMachines;
 using Features.UI;
@@ -35,6 +36,7 @@ namespace EditorTools {
         private const string SettingsDir = "Assets/Data/Settings";
         private const string GameFlowSettingsPath = SettingsDir + "/GameFlowSettings.asset";
         private const string CameraSettingsPath = SettingsDir + "/CameraSettings.asset";
+        private const string ControlsSettingsPath = SettingsDir + "/ControlsSettings.asset";
         private const string VContainerSettingsPath = SettingsDir + "/VContainerSettings.asset";
         private const string RootPrefabPath = "Assets/Prefabs/RootLifetimeScope.prefab";
         private const string ExperienceCurvePath = "Assets/Data/Progression/ExperienceCurve.asset";
@@ -65,12 +67,14 @@ namespace EditorTools {
             var flowSettings = LoadOrCreate<GameFlowSettings>(GameFlowSettingsPath);
             var cameraSettings = LoadOrCreate<CameraSettings>(CameraSettingsPath);
             var experienceCurve = CreateExperienceCurve();
+            var controlsSettings = LoadOrCreate<ControlsSettings>(ControlsSettingsPath);
             CreateTestHero();
             Character playerPrefab = CharacterPrefabSetup.CreatePlayerPrefab();
             AssignMissingHeroSprite();
+            AssignMissingHeroProjectile();
             CreateTrainingDummy();
             Character dummyPrefab = CharacterPrefabSetup.CreateDummyPrefab();
-            RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve);
+            RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings);
             RegisterVContainerSettings(rootPrefab);
             SetBuildScenes();
             MigrateMenuScene();
@@ -164,6 +168,16 @@ namespace EditorTools {
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        // Ranged hero: its basic attack fires the arcane bolt. Only fills an empty slot.
+        private static void AssignMissingHeroProjectile() {
+            var attack = AssetDatabase.LoadAssetAtPath<BasicAttackDefinition>(TestHeroDir + "/BasicAttack_TestHero.asset");
+            if (attack == null || attack.ProjectilePrefab != null) return;
+            var so = new SerializedObject(attack);
+            so.FindProperty("projectilePrefab").objectReferenceValue = CharacterPrefabSetup.CreateArcaneBoltPrefab();
+            so.FindProperty("projectileSpeed").floatValue = 20f;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         // Only fills an empty sprite slot: never replaces art chosen by hand.
         private static void AssignMissingHeroSprite() {
             var hero = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath);
@@ -198,7 +212,7 @@ namespace EditorTools {
         }
 
         private static RootLifetimeScope CreateOrUpdateRootPrefab(GameFlowSettings flowSettings, CameraSettings cameraSettings,
-                                                                   ExperienceCurve experienceCurve) {
+                                                                   ExperienceCurve experienceCurve, ControlsSettings controlsSettings) {
             bool exists = File.Exists(RootPrefabPath);
             GameObject root = exists
                 ? PrefabUtility.LoadPrefabContents(RootPrefabPath)
@@ -228,6 +242,7 @@ namespace EditorTools {
             scopeSo.FindProperty("gameFlowSettings").objectReferenceValue = flowSettings;
             scopeSo.FindProperty("cameraSettings").objectReferenceValue = cameraSettings;
             scopeSo.FindProperty("experienceCurve").objectReferenceValue = experienceCurve;
+            scopeSo.FindProperty("controlsSettings").objectReferenceValue = controlsSettings;
             scopeSo.ApplyModifiedPropertiesWithoutUndo();
 
             PrefabUtility.SaveAsPrefabAsset(root, RootPrefabPath);

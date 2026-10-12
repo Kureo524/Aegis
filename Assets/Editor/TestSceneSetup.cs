@@ -146,15 +146,19 @@ namespace EditorTools {
         /// numbers) in the test scene. Idempotent.
         /// </summary>
         public static void WireCombat(GameLifetimeScope scope, Character dummyPrefab, CharacterDefinition dummyDefinition) {
-            var existing = GameObject.Find(DummiesRoot);
-            if (existing != null) Object.DestroyImmediate(existing);
-            var root = new GameObject(DummiesRoot);
+            // Reuses the existing points: recreating them would rewrite their IDs in the scene file
+            // on every run (noisy diffs). Positions moved by hand are kept.
+            var root = GameObject.Find(DummiesRoot) ?? new GameObject(DummiesRoot);
 
             scope.enemySpawns = new List<CharacterSpawn>();
             for (int i = 0; i < DummyPositions.Length; i++) {
-                var point = new GameObject($"DummySpawn_{i + 1}").transform;
-                point.SetParent(root.transform);
-                point.position = DummyPositions[i];
+                string pointName = $"DummySpawn_{i + 1}";
+                Transform point = root.transform.Find(pointName);
+                if (point == null) {
+                    point = new GameObject(pointName).transform;
+                    point.SetParent(root.transform);
+                    point.position = DummyPositions[i];
+                }
                 scope.enemySpawns.Add(new CharacterSpawn { Prefab = dummyPrefab, Definition = dummyDefinition, Point = point });
             }
 
@@ -302,6 +306,9 @@ namespace EditorTools {
                     Check(scope.playerDefinition.Faction == Faction.Player, "player definition is in the Player faction");
                     Check(scope.playerDefinition.BaseStats != null, "player definition has base stats");
                     Check(scope.playerDefinition.Sprite != null, "player definition has a sprite");
+                    var attack = scope.playerDefinition.BasicAttack;
+                    Check(attack != null && attack.ProjectilePrefab != null && attack.ProjectileSpeed > 0f,
+                          "player basic attack fires a projectile");
                 }
                 if (scope.playerPrefab != null) {
                     Character prefab = scope.playerPrefab;
@@ -315,6 +322,7 @@ namespace EditorTools {
                         Check(input.characterMovement != null, "Player prefab: input.characterMovement wired");
                         Check(input.clickMarkerPrefab != null, "Player prefab: input.clickMarkerPrefab wired");
                         Check(input.character != null && input.attacker != null, "Player prefab: input.character / attacker wired");
+                        Check(input.rangeIndicator != null, "Player prefab: input.rangeIndicator wired");
                     }
 
                     var rb = prefab.GetComponent<Rigidbody>();
@@ -341,6 +349,7 @@ namespace EditorTools {
                 Check(rootSo.FindProperty("gameFlowSettings").objectReferenceValue != null, "root.gameFlowSettings wired");
                 Check(rootSo.FindProperty("cameraSettings").objectReferenceValue != null, "root.cameraSettings wired");
                 Check(rootSo.FindProperty("experienceCurve").objectReferenceValue != null, "root.experienceCurve wired");
+                Check(rootSo.FindProperty("controlsSettings").objectReferenceValue != null, "root.controlsSettings wired");
             }
 
             if (errors.Length > 0) {

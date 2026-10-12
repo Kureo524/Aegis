@@ -21,6 +21,7 @@ namespace Containers {
         [SerializeField] private GameFlowSettings gameFlowSettings;
         [SerializeField] private CameraSettings cameraSettings;
         [SerializeField] private ExperienceCurve experienceCurve;
+        [SerializeField] private ControlsSettings controlsSettings;
 
         protected override void Configure(IContainerBuilder builder) {
             // Infrastructure
@@ -32,6 +33,7 @@ namespace Containers {
             builder.RegisterInstance(gameFlowSettings);
             builder.RegisterInstance(cameraSettings);
             builder.RegisterInstance(experienceCurve);
+            builder.RegisterInstance(controlsSettings);
 
             // Game flow
             builder.RegisterComponent(stateMachine);

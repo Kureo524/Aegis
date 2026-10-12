@@ -31,7 +31,11 @@ namespace Systems.Inputs.Events {
     
     public readonly struct CancelEvent : IEvent { }
     
-    public readonly struct AttackMoveEvent : IEvent { }
+    /// <summary>Attack-move key (Q) pressed or released: aiming lasts while it is held.</summary>
+    public readonly struct AttackMoveEvent : IEvent {
+        public readonly bool Pressed;
+        public AttackMoveEvent(bool pressed) => Pressed = pressed;
+    }
     
     public readonly struct ElementKeyEvent : IEvent {
         public readonly int Slot; // 0, 1, 2

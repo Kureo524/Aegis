@@ -108,7 +108,7 @@ Le prefab de base porte aussi `BasicAttacker` et une **barre de PV** (`HealthBar
 |---|---|
 | **Clic droit sur le sol** | `MoveCommand(point)` |
 | **Clic droit sur un ennemi** | `AttackTargetCommand(ennemi)` : le perso se rapproche jusqu'à sa portée puis attaque en boucle |
-| **Q**, puis **clic gauche** | *Attack-move* (§4.6) : affiche la portée d'attaque ; marche vers le point en attaquant ce qui croise sa route |
+| **Maintenir Q** + **clic gauche** | *Attack-move* (§4.6) : affiche la portée d'attaque tant que Q est maintenu ; le clic lance la marche vers le point en attaquant ce qui croise sa route |
 | **A / Z / E** | Active / désactive l'élément 1 / 2 / 3 (§7) |
 | **R** | Lance le sort correspondant aux éléments actifs (visée puis clic gauche, §7.4) |
 | **F** | Compétence propre du personnage (visée puis clic gauche, §7.8) |
@@ -166,15 +166,15 @@ Machine à états : `Idle → Chasing → Windup → Cooldown → (re-attaque si
 - **Mêlée vs distance** : `BasicAttackDefinition` (ScriptableObject) avec `WindupPercent`, `ProjectilePrefab` (null = coup instantané), `DamageRatio`, `DamageType`. Chaque `CharacterDefinition` référence la sienne. La **portée** n'y figure pas : c'est la stat `AttackRange` (une seule source de vérité, elle évolue avec les niveaux et modificateurs).
 - **Cible invalide** (morte, hors jeu) : avec un clic droit (`AttackTargetCommand`), le perso s'arrête. Pas d'attaque automatique en idle côté joueur. En attack-move, voir §4.6.
 
-> **En place** : `BasicAttacker` (sur le prefab `Character`) implémente `Idle → Chasing → Windup → impact`, la portée centre à centre moins le rayon de la cible, la poursuite (chemin rafraîchi toutes les 0,2 s), la cadence `1 / AttackSpeed`, le windup perdu si un ordre de déplacement arrive, le crit (`CritChance` / `CritDamage`) et le sprite tourné vers la cible. `PlayerCommandInput` : clic droit sur un ennemi (raycast, sinon le plus proche dans `pickRadius` autour du point cliqué) → attaque, marqueur rouge ; clic droit au sol → déplacement, attaque annulée. *Reste : `CommandController` / commandes (§4.2), attack-move Q (§4.6), projectiles (les attaques à distance touchent instantanément pour l'instant).*
+> **En place** : `BasicAttacker` (sur le prefab `Character`) implémente `Idle → Chasing → Windup → impact`, la portée centre à centre moins le rayon de la cible, la poursuite (chemin rafraîchi toutes les 0,2 s), la cadence `1 / AttackSpeed`, le windup perdu si un ordre de déplacement arrive, le crit (`CritChance` / `CritDamage`) et le sprite tourné vers la cible. `PlayerCommandInput` : clic droit sur un ennemi (raycast, sinon le plus proche dans `pickRadius` autour du point cliqué) → attaque, marqueur rouge ; clic droit au sol → déplacement, attaque annulée. **Projectiles** : si `BasicAttackDefinition.ProjectilePrefab` est renseigné, l'impact tire un `Projectile` **à tête chercheuse** (une auto-attaque LoL ne rate pas) vers le torse de la cible, à `ProjectileSpeed`, avec les dégâts figés au tir ; il disparaît si la cible meurt en vol. Instances **poolées** (`ProjectileLauncher`, service du `GameLifetimeScope`, `ObjectPool` par prefab, création via le conteneur). Test Hero : `Projectile_ArcaneBolt` (orbe face caméra + traînée). *Reste : `CommandController` / commandes (§4.2).*
 
 ### 4.6 Q + clic gauche : attack-move (comportement LoL)
 
 **Saisie**
-1. Appui sur **Q** → état `Targeting` : cercle d'indicateur de **portée d'attaque** (`AttackRange`) autour du perso.
+1. **Maintenir Q** → état `Targeting` : cercle d'indicateur de **portée d'attaque** (`AttackRange`) autour du perso, **tant que Q est enfoncé** (relâcher Q annule la visée).
 2. **Clic gauche** → `AttackMoveCommand(point, preferredTarget)` :
    - `preferredTarget` = l'ennemi le **plus proche du point cliqué** dans un rayon `AttackMoveSelectRadius`, ou `null` s'il n'y en a pas.
-3. **Clic droit / Échap** : annule la visée sans rien ordonner.
+3. **Relâcher Q / clic droit / Échap** : annule la visée sans rien ordonner. Tant que Q reste enfoncé, chaque clic gauche donne un nouvel ordre.
 
 **Exécution (boucle de l'attack-move)**
 
@@ -206,13 +206,21 @@ Machine à états : `Idle → Chasing → Windup → Cooldown → (re-attaque si
 - Pas d'attaque automatique en dehors d'un attack-move : en `Idle` ou après un clic droit de déplacement, le perso n'attaque **jamais** seul.
 - Performance : le scan utilise `Physics.OverlapSphereNonAlloc` sur le layer `Enemy`, à intervalle (ex. toutes les 0,1 s), pas à chaque frame.
 
+> **En place** : `BasicAttacker.AttackMove(point, preferredTarget)` et la visée dans `PlayerCommandInput` (Q affiche le cercle de portée `RangeIndicator`, clic gauche valide, clic droit / Échap annule sans ordre ; `preferredTarget` = ennemi le plus proche du clic dans `attackMoveSelectRadius`, 2 par défaut). Scan toutes les 0,1 s (`OverlapSphereNonAlloc`, sans layers pour l'instant), règle de priorité `ITargetSelector` (`NearestTargetSelector`). Une cible **acquise** qui sort de portée est lâchée et la marche reprend ; une cible **désignée** (preferred) est poursuivie comme un clic droit. L'ordre se termine à l'arrivée. *Reste : un seul mode de visée à la fois avec R et F (phase 5c), layers physiques.*
+
 ### 4.7 Mapping clavier AZERTY
 
-Avec le **New Input System**, `<Keyboard>/q` désigne la touche à la position physique du Q américain (donc le A sur AZERTY). Pour lier aux **lettres affichées sur le clavier du joueur**, utiliser la syntaxe par nom d'affichage : `<Keyboard>/#(a)`, `#(z)`, `#(e)`, `#(r)`, `#(f)`, `#(t)`, `#(q)`, `#(s)` (à vérifier dans l'éditeur de bindings). Prévoir un **menu de rebind** dès le début.
+Avec le **New Input System**, `<Keyboard>/q` désigne la touche à la **position physique** du Q américain (donc le A sur AZERTY).
 
-> En place : les touches lettres du gameplay (Q, A, Z, E, R, F, T, S) sont liées par **caractère affiché** (`<Keyboard>/#(a)`…), vérifié par `AzertyBindingTests` (clavier simulé en AZERTY). Le debug `Move` (WASD) reste en position physique.
->
-> ⚠️ Résoudre un binding `#(x)` interroge le système pour le nom des touches : l'éditeur Linux **segfault en `-batchmode -nographics`** (pas d'affichage, GDK). Lancer les tests et les builds en ligne de commande **sans `-nographics`** (un affichage, même virtuel type `xvfb-run`, est nécessaire en CI).
+**Choix retenu** : les bindings des lettres sont écrits pour la **lettre voulue à sa position QWERTY** (`<Keyboard>/q` = attack-move…), puis **remappés au démarrage** selon la disposition du joueur : réglage `KeyboardLayout` (`Qwerty` / `Azerty`, **AZERTY par défaut**) dans le SO `ControlsSettings` (`Assets/Data/Settings`), appliqué par `InputReader` via des *binding overrides* (A ↔ Q, Z ↔ W, M → `;`). Vérifié par `KeyboardLayoutTests` à travers le vrai `InputReader`.
+
+**Rejeté** : les bindings par nom affiché (`<Keyboard>/#(a)`). Le player Linux ne remonte pas la disposition de l'OS (il retombe sur les noms QWERTY : en jeu, « Q » se retrouvait sur la touche A), et l'éditeur Linux segfault en `-batchmode -nographics` en les résolvant.
+
+À venir : le choix du joueur (`UserOptions`, JSON) par-dessus `ControlsSettings`, puis un **menu de rebind** complet.
+
+> **Wrapper C#** : `GameActionMaps.cs` est **généré** par l'Input System depuis le `.inputactions`. Après toute modification des actions : *Tools > Regenerate Input Actions Code*, et committer les deux fichiers ensemble. (L'ancien fichier était un stub écrit à la main que Unity refusait d'écraser ; le `.meta` de l'importer avait aussi des noms de champs invalides, ce qui désactivait la génération.)
+
+---
 
 ### 4.8 Caméra (en place)
 
@@ -908,7 +916,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **2** ✅ | `Stat` / `StatModifier` / `StatController` + toutes les stats + tests unitaires | Stats modifiables |
 | **3** ✅ | `CharacterDefinition`, `Character.Init`, `BasicAttackDefinition`, `CharacterLevel` (XP, points de compétence, croissance), vitesse lue depuis `MoveSpeed`. Sprite et taille du corps depuis la définition. | Un perso configurable par données |
 | **4** 🟡 | `Health`, `DamageInfo`, formules, régénération des PV, barres de PV, chiffres de dégâts ✅. *Reste : bouclier, CC et ténacité.* | Dégâts corrects |
-| **5** 🟡 | Clic droit sur ennemi, `BasicAttacker` ✅, dummies d'entraînement (XP au kill). *Reste : `CommandController`, Q + clic gauche (attack-move), projectiles.* | Attaque de base façon LoL |
+| **5** 🟡 | Clic droit sur ennemi, `BasicAttacker`, projectiles poolés, Q + clic gauche (attack-move) ✅, dummies d'entraînement (XP au kill). *Reste : `CommandController`.* | Attaque de base façon LoL |
 | **5b** | `ManaPool`, `ElementSelection` (A/Z/E, T reset), `SpellBook` + `SpellResolver`, coût en mana + UI, déblocage d'éléments par points (niv. 1/3/5) | Éléments activables, coût affiché |
 | **5c** | R + visée + indicateurs, sorts Magic/Physical/Buff, niveaux d'éléments, cooldown par lancement, compétence propre F (Flash) | Sorts lancés à la souris |
 | **6** | `EnemyDefinition`, `EnemyAI` (flow field + NavMesh pour élites), mana TFT + sort spécial, spawner, XP/gold au kill | Un combat complet avec des hordes |
@@ -1086,7 +1094,7 @@ public sealed class EventBus : IEventBus {
 |---|---|---|
 | `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
 | `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `SceneEntryPoint(Menu)` |
-| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **En place** : la `Camera` principale, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
+| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` en plus (§4.7). **Game, en place** : la `Camera` principale, `ProjectileLauncher`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
 
 VContainer crée le root **une fois**, avant le premier scope de scène, et le garde entre les chargements (`DontDestroyOnLoad`) ; un scope de scène sans `parentReference` en devient automatiquement l'enfant. Les services du root **ne doivent jamais être ré-enregistrés** dans un scope de scène (sinon deux `EventBus` coexistent et les événements se perdent).
 
@@ -1141,13 +1149,14 @@ Assets/
 │   │                        InputMapSwitcher, TimeScaleService, CursorConfinement
 │   ├── StateMachines/       GameState, GameFlowStateMachine
 │   ├── Events/              GameStateChangedEvent, PlayRequested/QuitRequested, StatChangedEvent
-│   ├── CameraControl/       CameraController, CameraSettings (SO)
+│   ├── CameraControl/       CameraController, CameraSettings (SO), Billboard
 │   ├── Characters/          Character, CharacterDefinition / EnemyDefinition (SO), CharacterVisual, Faction,
 │   │                        PlayerSpawner, EnemySpawner, RespawnOnDeath
 │   ├── Progression/         CharacterLevel, StatGrowth (SO), ExperienceCurve (SO)
-│   ├── Combat/              BasicAttacker, BasicAttackDefinition (SO), DamageInfo, DamageCalculator, Health, DamageType
+│   ├── Combat/              BasicAttacker, BasicAttackDefinition (SO), DamageInfo, DamageCalculator, Health, DamageType,
+│   │                        Projectile, ProjectileLauncher, ITargetSelector / NearestTargetSelector
 │   ├── Movement/            CharacterMovement
-│   ├── Controls/            PlayerCommandInput, ClickMarker
+│   ├── Controls/            PlayerCommandInput, ClickMarker, RangeIndicator
 │   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO)…
 │   └── UI/                  PlayerHud, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
 │                            Panels/MainMenuPanel, DebugTools/CharacterDebugPanel
@@ -1157,8 +1166,9 @@ Assets/
 │                            Progression/ExperienceCurve, Characters/TestHero/ (Char_TestHero…),
 │                            Characters/TrainingDummy/ (Enemy_TrainingDummy : 1000 PV, 30 armure/RM, 150 XP)
 ├── GameAssets/ActionMaps/   Game.Input — GameActionMaps (.inputactions + C# généré)
-├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy)
-├── GraphicAssets/Sprites/   Characters/ (Placeholder_Hero, Chibi_Explorer, Training_Dummy), UI/White
+├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy),
+│                            Combat/Projectile_ArcaneBolt
+├── GraphicAssets/           Sprites/ (Characters/…, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
 ├── Scenes/                  Releases/Menu, Tests/TestScene (+ Releases/Game : ancienne scène WASD, hors build)
 ├── Tests/                   EditMode/, PlayMode/
 └── UI Toolkit/   Settings/
@@ -1222,8 +1232,9 @@ Points restants (connus) :
 - *Tools > Project Setup* (`EditorTools.ProjectSetup.Run`) : crée / répare le prefab root, ses règles de transition, les SO de réglages, `VContainerSettings`, la liste de scènes du build. Idempotent.
 - *Tools > Create Test Scene* / *Validate Test Scene* : régénère / vérifie `TestScene`.
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
-- *Tools > Build Linux (Test Scene)* : build standalone de test.
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, bindings AZERTY, `CharacterLevel`, formules de dégâts, `Health`), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn).
+- *Tools > Build Linux (Test Scene)* / *(Game)* : builds standalone.
+- *Tools > Regenerate Input Actions Code* : régénère `GameActionMaps.cs` (§4.7).
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move).
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 
@@ -1235,7 +1246,7 @@ Map **Gameplay** (les actions `Move`, `Look`, `Jump`… du template ne sont plus
 | `PointerCommand` | Button | clic droit (déplacement ou attaque) |
 | `Confirm` | Button | clic gauche (valide une visée) |
 | `Cancel` | Button | Échap (annule la visée, sinon ouvre la pause) |
-| `AttackMove` | Button | Q |
+| `AttackMove` | Button | Q (maintenu ; `AttackMoveEvent.Pressed` vrai à l'appui, faux au relâchement) |
 | `Element1`, `Element2`, `Element3` | Button | A, Z, E |
 | `CastSpell` | Button | R |
 | `Signature` | Button | F |
@@ -1244,4 +1255,4 @@ Map **Gameplay** (les actions `Move`, `Look`, `Jump`… du template ne sont plus
 | `CameraLock` | Button | Espace, clic molette |
 | `Zoom` | Value (Vector2) | molette |
 
-Les bindings suivent les **lettres du clavier du joueur** (AZERTY) via la syntaxe par nom d'affichage, par exemple `<Keyboard>/#(a)` (à vérifier dans l'éditeur). Prévoir le **rebind** (`UserOptions`).
+Les lettres sont remappées selon `ControlsSettings.KeyboardLayout` (§4.7). Prévoir le **rebind** (`UserOptions`).
