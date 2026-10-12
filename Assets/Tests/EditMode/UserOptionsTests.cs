@@ -24,28 +24,28 @@ namespace Game.Tests.EditMode {
         }
 
         [Test]
-        public void QuickCast_IsOffByDefault_ThenSavedAndPublished() {
+        public void CastMode_DefaultsToQuickWithIndicator_ThenSavedAndPublished() {
             var bus = new EventBus();
             int published = 0;
             bus.Subscribe<UserOptionsChangedEvent>(_ => published++);
 
             var options = new UserOptions(_defaults, bus, _path);
-            Assert.IsFalse(options.QuickCast, "default from ControlsSettings");
+            Assert.AreEqual(CastMode.QuickWithIndicator, options.CastMode, "default from ControlsSettings");
             Assert.IsFalse(File.Exists(_path), "nothing saved until a change");
 
-            options.QuickCast = true;
-            options.QuickCast = true;   // no change: no save, no event
+            options.CastMode = CastMode.Quick;
+            options.CastMode = CastMode.Quick;   // no change: no save, no event
             Assert.AreEqual(1, published);
             Assert.IsTrue(File.Exists(_path));
 
-            Assert.IsTrue(new UserOptions(_defaults, new EventBus(), _path).QuickCast, "reloaded from the JSON");
+            Assert.AreEqual(CastMode.Quick, new UserOptions(_defaults, new EventBus(), _path).CastMode, "reloaded from the JSON");
         }
 
         [Test]
         public void CorruptFile_KeepsTheDefaults() {
             File.WriteAllText(_path, "{ not json");
             UnityEngine.TestTools.LogAssert.Expect(LogType.Warning, new System.Text.RegularExpressions.Regex("UserOptions"));
-            Assert.IsFalse(new UserOptions(_defaults, new EventBus(), _path).QuickCast);
+            Assert.AreEqual(CastMode.QuickWithIndicator, new UserOptions(_defaults, new EventBus(), _path).CastMode);
         }
     }
 }

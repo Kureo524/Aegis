@@ -402,8 +402,8 @@ namespace Game.Tests.PlayMode {
             yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
             yield return null;
             var options = Root.Resolve<Features.Options.UserOptions>();
-            bool previous = options.QuickCast;
-            options.QuickCast = true;
+            Systems.Inputs.CastMode previous = options.CastMode;
+            options.CastMode = Systems.Inputs.CastMode.Quick;
             try {
                 var player = FindPlayer();
                 var dummy = FindDummy(player);
@@ -424,7 +424,55 @@ namespace Game.Tests.PlayMode {
                 Assert.Less(dummy.Health.Current, dummy.Health.Max, "Fireball hit the dummy under the cursor");
             }
             finally {
-                options.QuickCast = previous;
+                options.CastMode = previous;
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator QuickCastWithIndicator_AimsWhileHeld_CastsOnRelease() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var options = Root.Resolve<Features.Options.UserOptions>();
+            Systems.Inputs.CastMode previous = options.CastMode;
+            options.CastMode = Systems.Inputs.CastMode.QuickWithIndicator;
+            try {
+                var player = FindPlayer();
+                var dummy = FindDummy(player);
+                var caster = player.GetComponent<Features.Spells.ElementCaster>();
+                var targeting = player.GetComponent<Features.Spells.SpellTargeting>();
+                var signature = player.GetComponent<Features.Spells.SignatureAbility>();
+                var bus = Root.Resolve<IEventBus>();
+
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0, levelUp: true));
+                bus.Publish(new Systems.Inputs.Events.ElementKeyEvent(0));
+                float manaBefore = player.Mana.Current;
+                bus.Publish(new Systems.Inputs.Events.PointerPositionEvent(ScreenOf(dummy.transform.position)));
+
+                bus.Publish(new Systems.Inputs.Events.CastSpellEvent());                 // R held: range shown
+                Assert.IsTrue(targeting.IsAiming, "aiming while R is held");
+                yield return null;
+                Assert.Less(manaBefore - player.Mana.Current, 1f, "nothing paid while held");
+                bus.Publish(new Systems.Inputs.Events.CastSpellEvent(released: true));   // R released: cast
+                Assert.IsFalse(targeting.IsAiming);
+                Assert.Greater(caster.CooldownRemaining, 0f, "cast on release");
+                yield return new WaitForSeconds(1f);
+                Assert.Less(dummy.Health.Current, dummy.Health.Max, "Fireball hit the dummy under the cursor");
+
+                // Escape while holding F: releasing it afterwards casts nothing
+                bus.Publish(new Systems.Inputs.Events.SignatureEvent());
+                bus.Publish(new Systems.Inputs.Events.CancelEvent());
+                bus.Publish(new Systems.Inputs.Events.SignatureEvent(released: true));
+                Assert.AreEqual(0f, signature.CooldownRemaining, "cancelled: no Flash");
+
+                // Normal mode: releasing the key keeps the aim, the left click casts
+                options.CastMode = Systems.Inputs.CastMode.Normal;
+                bus.Publish(new Systems.Inputs.Events.SignatureEvent());
+                bus.Publish(new Systems.Inputs.Events.SignatureEvent(released: true));
+                Assert.IsTrue(targeting.IsAiming, "Normal: still aiming after the release");
+                targeting.Cancel();
+            }
+            finally {
+                options.CastMode = previous;
             }
         }
 
