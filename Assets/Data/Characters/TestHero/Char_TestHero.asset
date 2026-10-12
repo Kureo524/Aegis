@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.CharacterDefinition
   displayName: Test Hero
   faction: 0
-  sprite: {fileID: 21300000, guid: 44919ee5176edc04faf964350bfcb531, type: 3}
+  sprite: {fileID: 21300000, guid: 486aa9c1d749412595e7a2c07c70dc85, type: 3}
   bodySize: {x: 0.8, y: 1.8}
   baseStats: {fileID: 11400000, guid: 678c37d837112de6d9c82309cb4b4bb1, type: 2}
   growthPerLevel: {fileID: 11400000, guid: f56a6bbecec94666a9f39d0ac4101af0, type: 2}
