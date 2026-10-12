@@ -10,7 +10,7 @@ namespace Features.Spells {
     /// <summary>
     /// The character's own ability on F (design doc §7.8): a spell outside the spell book, cooldown
     /// only (CooldownOverride, reduced by AbilityHaste), no mana, no element. Same aiming and casting
-    /// as R. Flash for the test hero: blink of fixed length (FixedRange) towards
+    /// as R (quick cast included). Flash for the test hero: blink of fixed length (FixedRange) towards
     /// the cursor, onto the farthest walkable spot of that line; refused only if there is none.
     /// Player prefab variant. (Picked-up summoner spells replacing it come with phase 8.)
     /// </summary>
@@ -54,7 +54,7 @@ namespace Features.Spells {
             if (CooldownRemaining > 0f) return Feedback($"{spell.DisplayName} en recharge");
             if (caster.IsCasting) return Feedback("Incantation en cours");
 
-            if (spell.NeedsAim) targeting.BeginAim(spell, AimMode.Signature, Confirm);
+            if (spell.NeedsAim) targeting.Aim(spell, AimMode.Signature, Confirm);
             else Confirm(new CastContext { Origin = owner.transform.position, Direction = owner.transform.forward, TargetPoint = owner.transform.position });
             return true;
         }

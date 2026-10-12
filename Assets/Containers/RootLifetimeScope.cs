@@ -1,5 +1,6 @@
 using Features.CameraControl;
 using Features.Flow;
+using Features.Options;
 using Features.Progression;
 using Features.Spells;
 using Features.StateMachines;
@@ -37,6 +38,7 @@ namespace Containers {
             builder.RegisterInstance(experienceCurve);
             builder.RegisterInstance(controlsSettings);
             builder.RegisterInstance(spellSettings);
+            builder.Register<UserOptions>(Lifetime.Singleton);   // player's choices (JSON) over the defaults
 
             // Game flow
             builder.RegisterComponent(stateMachine);

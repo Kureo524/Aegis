@@ -13,6 +13,7 @@ using Systems.Inputs;
 using Features.Flow;
 using Features.StateMachines;
 using Features.UI;
+using Features.UI.Panels;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -495,12 +496,22 @@ namespace EditorTools {
         }
 
         // The Menu scene used to hold its own GameFlowStateMachine; it now lives on the root prefab.
+        // It also gets the options screen (Settings button) above the main menu.
         private static void MigrateMenuScene() {
             var scene = EditorSceneManager.OpenScene(MenuScenePath, OpenSceneMode.Single);
             bool dirty = false;
             foreach (GameObject go in scene.GetRootGameObjects()) {
                 if (go.GetComponent<GameFlowStateMachine>() == null) continue;
                 Object.DestroyImmediate(go);
+                dirty = true;
+            }
+
+            var scope = Object.FindFirstObjectByType<MenuLifetimeScope>();
+            if (scope != null && scope.optionsPanel == null) {
+                var options = Object.FindFirstObjectByType<OptionsPanel>();
+                if (options == null) options = TestSceneSetup.CreateOverlayDocument<OptionsPanel>("OptionsPanel");
+                scope.optionsPanel = options;
+                EditorUtility.SetDirty(scope);
                 dirty = true;
             }
             if (dirty) EditorSceneManager.SaveScene(scene);

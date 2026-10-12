@@ -30,6 +30,9 @@ namespace Systems.Inputs.Events {
     }
     
     public readonly struct CancelEvent : IEvent { }
+
+    /// <summary>Escape while a menu has the input (UI map): back / close.</summary>
+    public readonly struct UiCancelEvent : IEvent { }
     
     /// <summary>Attack-move key (Q) pressed or released: aiming lasts while it is held.</summary>
     public readonly struct AttackMoveEvent : IEvent {

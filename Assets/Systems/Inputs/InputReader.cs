@@ -50,6 +50,7 @@ namespace Systems.Inputs {
             g.CameraLock.performed      += OnCameraLock;
             g.Zoom.performed            += OnZoom;
             g.Zoom.canceled             += OnZoom;
+            _input.UI.Cancel.performed  += OnUiCancel;
 
             _input.Disable();
         }
@@ -89,6 +90,7 @@ namespace Systems.Inputs {
             g.CameraLock.performed      -= OnCameraLock;
             g.Zoom.performed            -= OnZoom;
             g.Zoom.canceled             -= OnZoom;
+            _input.UI.Cancel.performed  -= OnUiCancel;
 
             _input.Disable();
             // The generated Dispose() uses Object.Destroy, which is refused outside Play mode (tests)
@@ -116,6 +118,7 @@ namespace Systems.Inputs {
         private void OnResetElements(InputAction.CallbackContext ctx)  => _eventBus.Publish(new ResetElementsEvent());
         private void OnStop(InputAction.CallbackContext ctx)           => _eventBus.Publish(new StopEvent());
         private void OnCameraLock(InputAction.CallbackContext ctx)     => _eventBus.Publish(new CameraLockEvent());
+        private void OnUiCancel(InputAction.CallbackContext ctx)       => _eventBus.Publish(new UiCancelEvent());
         /// <summary>Moves every single-letter keyboard binding to where that letter is on <paramref name="layout"/>.</summary>
         public static void ApplyKeyboardLayout(InputActionAsset asset, KeyboardLayout layout) {
             const string prefix = "<Keyboard>/";

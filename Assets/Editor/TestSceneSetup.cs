@@ -11,6 +11,7 @@ using Features.Controls;
 using Features.Movement;
 using Features.UI;
 using Features.UI.DebugTools;
+using Features.UI.Panels;
 using UnityEngine.UIElements;
 using VContainer.Unity;
 
@@ -172,7 +173,20 @@ namespace EditorTools {
             }
             scope.playerHud = hud;
             scope.damageNumbers = hud.GetComponent<DamageNumbersView>();
+
+            var pause = Object.FindFirstObjectByType<PauseMenu>();
+            if (pause == null) pause = CreateOverlayDocument<PauseMenu>("PauseMenu");
+            scope.pauseMenu = pause;
             EditorUtility.SetDirty(scope);
+        }
+
+        /// <summary>Menu drawn above the HUD / main menu: its own UIDocument with a higher sorting order.</summary>
+        public static T CreateOverlayDocument<T>(string name) where T : Component {
+            var go = new GameObject(name);
+            var document = go.AddComponent<UIDocument>();
+            document.panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
+            document.sortingOrder = 100;
+            return go.AddComponent<T>();
         }
 
         private const string ObstaclesRoot = "=== Obstacles ===";
@@ -294,6 +308,8 @@ namespace EditorTools {
                 Check(scope.playerPrefab != null, "scope.playerPrefab wired");
                 Check(scope.playerHud != null, "scope.playerHud wired");
                 Check(scope.damageNumbers != null, "scope.damageNumbers wired");
+                Check(scope.pauseMenu != null && scope.pauseMenu.GetComponent<UIDocument>().panelSettings != null,
+                      "scope.pauseMenu wired, with panel settings");
                 Check(scope.playerHud != null && scope.playerHud.GetComponent<UIDocument>().panelSettings != null,
                       "game HUD has panel settings");
                 Check(scope.enemySpawns.Count == DummyPositions.Length, "training dummies listed in scope.enemySpawns");

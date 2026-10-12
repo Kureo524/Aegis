@@ -8,6 +8,7 @@ using Features.Flow;
 using Features.StateMachines;
 using Features.UI;
 using Features.UI.DebugTools;
+using Features.UI.Panels;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -23,6 +24,7 @@ namespace Containers {
         public QuitOverlay quitOverlay;
         public CharacterDebugPanel characterDebugPanel;
         public PlayerHud playerHud;
+        public PauseMenu pauseMenu;
         public DamageNumbersView damageNumbers;
 
         [Header("Player")]
@@ -45,6 +47,8 @@ namespace Containers {
             if (characterDebugPanel != null) builder.RegisterComponent(characterDebugPanel);
             if (playerHud != null) builder.RegisterComponent(playerHud);
             if (damageNumbers != null) builder.RegisterComponent(damageNumbers);
+            if (pauseMenu != null) builder.RegisterComponent(pauseMenu);
+            builder.RegisterEntryPoint<PauseInput>();
 
             builder.RegisterEntryPoint<PlayerSpawner>()
                 .WithParameter(playerPrefab)

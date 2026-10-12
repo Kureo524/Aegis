@@ -98,7 +98,7 @@ namespace Features.Spells {
             return Feedback($"Prochain élément au niveau {Levels.NextUnlockLevel}");
         }
 
-        /// <summary>R: checks, then aims (or casts at once for a Self spell).</summary>
+        /// <summary>R: checks, then aims (or casts at once: Self spell, quick cast option).</summary>
         public bool TryCast() {
             if (Selection == null || !owner.IsAlive) return false;
             if (Selection.IsEmpty) return Feedback("Aucun élément");
@@ -108,7 +108,7 @@ namespace Features.Spells {
             if (!owner.Mana.CanSpend(CurrentManaCost)) return Feedback("Mana insuffisant");
             if (caster.IsCasting) return Feedback("Incantation en cours");
 
-            if (spell.NeedsAim) targeting.BeginAim(spell, AimMode.Spell, Confirm);
+            if (spell.NeedsAim) targeting.Aim(spell, AimMode.Spell, Confirm);
             else Confirm(new CastContext { Origin = owner.transform.position, Direction = owner.transform.forward, TargetPoint = owner.transform.position });
             return true;
         }
