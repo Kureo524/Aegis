@@ -109,7 +109,8 @@ Le prefab de base porte aussi `BasicAttacker` et une **barre de PV** (`HealthBar
 | **Clic droit sur le sol** | `MoveCommand(point)` |
 | **Clic droit sur un ennemi** | `AttackTargetCommand(ennemi)` : le perso se rapproche jusqu'à sa portée puis attaque en boucle |
 | **Maintenir Q** + **clic gauche** | *Attack-move* (§4.6) : affiche la portée d'attaque tant que Q est maintenu ; le clic lance la marche vers le point en attaquant ce qui croise sa route |
-| **A / Z / E** | Active / désactive l'élément 1 / 2 / 3 (§7) |
+| **A / Z / E** | Ajoute un stack de l'élément 1 / 2 / 3 (§7) |
+| **Ctrl + A / Z / E** | Dépense un point de compétence sur l'élément (le débloque au premier point, §7.8) ; aussi via le bouton « + » du HUD |
 | **R** | Lance le sort correspondant aux éléments actifs (visée puis clic gauche, §7.4) |
 | **F** | Compétence propre du personnage (visée puis clic gauche, §7.8) |
 | **T** | Reset : vide la sélection d'éléments |
@@ -465,6 +466,8 @@ public class ElementSelection {
 
 **Données / runtime** : un SO est **partagé**, donc on n'y stocke jamais de cooldown. Le cooldown en cours vit dans l'instance runtime `Spell`, créée par `CreateRuntime`.
 
+> **En place (phase 5b)** : `ElementDefinition`, `SpellDefinition` (pour l'instant : nom, icône, `SpellKind`, recette ; ciblage, cast, puissance et runtime `Spell` arrivent en 5c), `SpellBook`, `SpellSettings` (`MaxTotalStacks`, `MaxStacksPerElement`, `CostCurve`, `MaxElementLevel`, enregistré dans le root), `ElementSelection` (clé `Σ stacks × 4^i`), `SpellResolver` (clé → sort selon l'ordre A/Z/E **du perso** ; signale doublons, éléments étrangers et recettes manquantes ; calcule le coût). `CharacterDefinition.OnValidate` vérifie que le grimoire couvre les 19 recettes. Contenu de test : `Elem_Fire` (10 mana), `Elem_Electricity` (12), `Elem_Wind` (8), 19 sorts nommés et `SpellBook_FireElectricityWind` (`Assets/Data/Elements`, `Assets/Data/Spells/FireElectricityWind`).
+
 ### 7.3 Mana et coût
 
 `ManaPool` : `Current`, `Max` (= stat `MaxMana`), régénération (`ManaRegen`/s), events `Changed`.
@@ -486,6 +489,8 @@ La courbe croît plus vite que le nombre de stacks pour que chaque ajout coûte 
 
 - Le coût est **calculé en direct** pour l'UI (prévisualisation sur la barre de mana).
 - Le mana est **débité à la confirmation du cast** (clic gauche), pas à l'appui sur R. S'il est insuffisant à ce moment : cast refusé + feedback, **la sélection est conservée**.
+
+> **En place** : `ManaPool` (sur chaque `Character` : max = `MaxMana`, un gain de max ajoute autant de mana courant, régénération `ManaRegen`/s), coût calculé en direct (`SpellResolver.ManaCost`, avec `ManaCostReduction`) et **prévisualisé sur la barre de mana** du HUD (portion claire, rouge si le mana manque). Le débit au cast arrive en 5c.
 
 ### 7.4 Machine à états du lanceur
 
@@ -580,6 +585,8 @@ public struct CastContext {
 
 **Éléments du personnage** : chaque perso a **exactement 3 éléments** (personnage de test : **Feu, Électricité, Vent**), chacun avec **sa touche fixe** selon son ordre dans la définition (A = élément 1, Z = élément 2, E = élément 3).
 
+> **En place** : `ElementLevels` (points dépensés via `CharacterLevel.TrySpendSkillPoint`, verrous 1/3/5 lus dans `CharacterDefinition.ElementUnlockLevels`, niveau max `SpellSettings.MaxElementLevel`). Entrée : **Ctrl + A/Z/E** ou bouton « + » du HUD. Feedback si refusé (« Aucun point de compétence », « Prochain élément au niveau 3 », « Niveau maximum »). *Reste : surcharge (méta, §9.7).*
+
 **Points de compétence (comme LoL)** : **1 point par niveau de 1 à 15**. Les **niveaux 16, 17 et 18 n'augmentent que les stats**, sauf pour un élément dont la **surcharge est débloquée** dans l'arbre méta (§9.7) : ils donnent alors des points de **surcharge** (ci-dessous). Les points servent **uniquement à monter le niveau des éléments** :
 - Un élément est à **niveau 0 (verrouillé)** ; y mettre un premier point le **débloque** (niveau 1), puis chaque point supplémentaire monte son niveau (`MaxElementLevel = 5` : 3 × 5 = 15 points, soit exactement les niveaux 1 à 15).
 - **Verrous façon LoL** : on peut débloquer **un élément dès le niveau 1**, un **deuxième à partir du niveau 3**, le **troisième à partir du niveau 5** (`ElementUnlockLevels = {1, 3, 5}`). Aux niveaux 1 et 3 le joueur **choisit** quel élément débloquer ; au niveau 5 il ne reste que le dernier.
@@ -626,6 +633,8 @@ public struct CastContext {
 
 - **Code** : `ElementCaster` (éléments actifs, R/T, validation mana/cooldown), `SpellResolver`, `Spell` (runtime), `ManaPool`, `SpellIndicator` (LineRenderer/decal selon le type), `PlayerCommandInput` (étendu pour A/Z/E/R/F/T), petit **buffer d'input** (~0,15 s).
 - **UI** : 3 icônes d'éléments avec **compteur de stacks** (0–3) et touche affichée, **cadenas + niveau requis** sur les slots verrouillés, **nom et icône du sort résolu**, barre de mana avec **prévisualisation du coût**, cooldown du sort, icône de portée de Q.
+
+> **En place** : `ElementCaster` (sur le variant `Player` seulement ; les ennemis lancent sans éléments) relie input, sélection, niveaux et grimoire, et publie `PlayerElementsEvent`, `ElementSelectionChangedEvent`, `ElementLevelsChangedEvent`, `GameplayFeedbackEvent`. HUD (`PlayerHud` + `ElementBarView`) : 3 slots (icône, touche, pastilles de stacks, pastilles de niveau, voile + « Niv. N » si verrouillé, « + » si un point peut être dépensé), nom du sort résolu et coût (rouge si le mana manque), barre de mana avec prévisualisation, messages de feedback. Pas encore d'icônes de sorts ni de cooldown (5c).
 ---
 
 ## 8. CharacterDefinition (le "preset" de perso)
@@ -917,7 +926,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **3** ✅ | `CharacterDefinition`, `Character.Init`, `BasicAttackDefinition`, `CharacterLevel` (XP, points de compétence, croissance), vitesse lue depuis `MoveSpeed`. Sprite et taille du corps depuis la définition. | Un perso configurable par données |
 | **4** 🟡 | `Health`, `DamageInfo`, formules, régénération des PV, barres de PV, chiffres de dégâts ✅. *Reste : bouclier, CC et ténacité.* | Dégâts corrects |
 | **5** 🟡 | Clic droit sur ennemi, `BasicAttacker`, projectiles poolés, Q + clic gauche (attack-move) ✅, dummies d'entraînement (XP au kill). *Reste : `CommandController`.* | Attaque de base façon LoL |
-| **5b** | `ManaPool`, `ElementSelection` (A/Z/E, T reset), `SpellBook` + `SpellResolver`, coût en mana + UI, déblocage d'éléments par points (niv. 1/3/5) | Éléments activables, coût affiché |
+| **5b** ✅ | `ManaPool`, `ElementSelection` (A/Z/E, T reset), `SpellBook` + `SpellResolver`, coût en mana + UI, déblocage d'éléments par points (niv. 1/3/5, Ctrl + A/Z/E) | Éléments activables, coût affiché |
 | **5c** | R + visée + indicateurs, sorts Magic/Physical/Buff, niveaux d'éléments, cooldown par lancement, compétence propre F (Flash) | Sorts lancés à la souris |
 | **6** | `EnemyDefinition`, `EnemyAI` (flow field + NavMesh pour élites), mana TFT + sort spécial, spawner, XP/gold au kill | Un combat complet avec des hordes |
 | **7** | `RunDirector` (timer + quota, fin de vague = timer ET quota, vies), `Wallet`, `Inventory` (6 slots), `WaveRewardSchedule`, boutiques, enclumes, élixirs, items | Boucle de run + économie |
@@ -1072,7 +1081,7 @@ public sealed class EventBus : IEventBus {
 |---|---|---|
 | `GameStateChangedEvent` (`From` nullable, `To`) | `GameFlowController` | `MainMenuPanel`, `GameHUD`, `TimeScaleService`, `InputMapSwitcher`, audio |
 | `PlayRequestedEvent`, `QuitRequestedEvent` | `MainMenuPanel`, `QuitOverlay` | `GameFlowController` |
-| `PointerPositionEvent`, `PointerCommandEvent` (position **écran**), `ConfirmEvent`, `CancelEvent`, `AttackMoveEvent`, `ElementKeyEvent`, `CastSpellEvent`, `SignatureEvent`, `ResetElementsEvent`, `StopEvent` | `InputReader` | `PlayerCommandInput`, `CameraController`, `QuitOverlay`, plus tard `ElementCaster` |
+| `PointerPositionEvent`, `PointerCommandEvent` (position **écran**), `ConfirmEvent`, `CancelEvent`, `AttackMoveEvent`, `ElementKeyEvent` (slot, `LevelUp` si Ctrl), `CastSpellEvent`, `SignatureEvent`, `ResetElementsEvent`, `StopEvent` | `InputReader` | `PlayerCommandInput`, `CameraController`, `QuitOverlay`, plus tard `ElementCaster` |
 | `CameraLockEvent`, `ZoomEvent` | `InputReader` | `CameraController` |
 | `WaveStartedEvent`, `WaveEndedEvent`, `LifeLostEvent` | `RunDirector` | HUD, audio, `WaveSpawner` |
 | `StageClearedEvent`, `StageFailedEvent` | `RunDirector` | `GameFlowController`, méta-progression |
@@ -1082,7 +1091,10 @@ public sealed class EventBus : IEventBus {
 | `PlayerSpawnedEvent` (transform du joueur) | `PlayerSpawner` | `CameraController` |
 | `XpGrantedEvent` | `CharacterDebugPanel` (plus tard : kills) | `Character` joueur |
 | `XpChangedEvent`, `LevelUpEvent`, `StatChangedEvent` | `Character` joueur | `PlayerHud`, `CharacterDebugPanel` |
-| `ElementLevelChangedEvent` | `ElementCaster` | HUD, `SpellBook` |
+| `PlayerElementsEvent`, `ElementSelectionChangedEvent` (stacks, sort résolu, coût), `ElementLevelsChangedEvent` (niveaux, « + » possibles, points, prochain déblocage) | `ElementCaster` | `PlayerHud` |
+| `ElementLevelUpRequestedEvent` | bouton « + » du HUD | `ElementCaster` |
+| `GameplayFeedbackEvent` (message) | `ElementCaster` (plus tard : sorts, boutiques…) | `PlayerHud` |
+| `PlayerManaChangedEvent` | `Character` joueur | `PlayerHud` |
 | `SpellCastEvent`, `SpellHitEvent` | `ElementCaster`, `Spell` | passifs, audio, VFX |
 | `GoldChangedEvent`, `ItemPurchasedEvent`, `AugmentChosenEvent` | `Wallet`, `Shop`, `AugmentController` | HUD, `PassiveController` |
 
@@ -1094,7 +1106,7 @@ public sealed class EventBus : IEventBus {
 |---|---|---|
 | `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
 | `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `SceneEntryPoint(Menu)` |
-| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` en plus (§4.7). **Game, en place** : la `Camera` principale, `ProjectileLauncher`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
+| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `ProjectileLauncher`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
 
 VContainer crée le root **une fois**, avant le premier scope de scène, et le garde entre les chargements (`DontDestroyOnLoad`) ; un scope de scène sans `parentReference` en devient automatiquement l'enfant. Les services du root **ne doivent jamais être ré-enregistrés** dans un scope de scène (sinon deux `EventBus` coexistent et les événements se perdent).
 
@@ -1153,22 +1165,25 @@ Assets/
 │   ├── Characters/          Character, CharacterDefinition / EnemyDefinition (SO), CharacterVisual, Faction,
 │   │                        PlayerSpawner, EnemySpawner, RespawnOnDeath
 │   ├── Progression/         CharacterLevel, StatGrowth (SO), ExperienceCurve (SO)
-│   ├── Combat/              BasicAttacker, BasicAttackDefinition (SO), DamageInfo, DamageCalculator, Health, DamageType,
+│   ├── Combat/              BasicAttacker, BasicAttackDefinition (SO), DamageInfo, DamageCalculator, Health, ManaPool, DamageType,
 │   │                        Projectile, ProjectileLauncher, ITargetSelector / NearestTargetSelector
+│   ├── Spells/              ElementDefinition, SpellDefinition, SpellBook, SpellSettings (SO), ElementSelection,
+│   │                        SpellResolver, ElementLevels, ElementCaster
 │   ├── Movement/            CharacterMovement
 │   ├── Controls/            PlayerCommandInput, ClickMarker, RangeIndicator
 │   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO)…
-│   └── UI/                  PlayerHud, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
+│   └── UI/                  PlayerHud, ElementBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
 │                            Panels/MainMenuPanel, DebugTools/CharacterDebugPanel
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
 ├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, TestSceneSetup, BuildScript
-├── Data/                    Settings/ (GameFlowSettings, CameraSettings, VContainerSettings),
+├── Data/                    Settings/ (GameFlowSettings, CameraSettings, ControlsSettings, SpellSettings, VContainerSettings),
+│                            Elements/ (Elem_Fire…), Spells/FireElectricityWind/ (19 Spell_…, SpellBook_…),
 │                            Progression/ExperienceCurve, Characters/TestHero/ (Char_TestHero…),
 │                            Characters/TrainingDummy/ (Enemy_TrainingDummy : 1000 PV, 30 armure/RM, 150 XP)
 ├── GameAssets/ActionMaps/   Game.Input — GameActionMaps (.inputactions + C# généré)
 ├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy),
 │                            Combat/Projectile_ArcaneBolt
-├── GraphicAssets/           Sprites/ (Characters/…, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
+├── GraphicAssets/           Sprites/ (Characters/…, Elements/…, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
 ├── Scenes/                  Releases/Menu, Tests/TestScene (+ Releases/Game : ancienne scène WASD, hors build)
 ├── Tests/                   EditMode/, PlayMode/
 └── UI Toolkit/   Settings/
@@ -1234,7 +1249,7 @@ Points restants (connus) :
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
 - *Tools > Build Linux (Test Scene)* / *(Game)* : builds standalone.
 - *Tools > Regenerate Input Actions Code* : régénère `GameActionMaps.cs` (§4.7).
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move).
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset).
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 
@@ -1252,6 +1267,7 @@ Map **Gameplay** (les actions `Move`, `Look`, `Jump`… du template ne sont plus
 | `Signature` | Button | F |
 | `ResetElements` | Button | T |
 | `Stop` | Button | S |
+| `LevelUpModifier` | Button | Ctrl gauche / droit (maintenu avec A/Z/E : dépense un point) |
 | `CameraLock` | Button | Espace, clic molette |
 | `Zoom` | Value (Vector2) | molette |
 
