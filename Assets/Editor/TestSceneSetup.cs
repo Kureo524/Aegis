@@ -211,9 +211,9 @@ namespace EditorTools {
                 runHud = scope.playerHud.gameObject.AddComponent<RunHudView>();
             scope.runHud = scope.playerHud != null ? scope.playerHud.GetComponent<RunHudView>() : null;
 
-            var reward = Object.FindFirstObjectByType<WaveRewardPanel>();
-            if (reward == null) reward = CreateOverlayDocument<WaveRewardPanel>("WaveRewardPanel");
-            scope.waveRewardPanel = reward;
+            // The augment placeholder screen of phase 7 was replaced by the AugmentPanel (phase 8)
+            GameObject oldReward = GameObject.Find("WaveRewardPanel");
+            if (oldReward != null) Object.DestroyImmediate(oldReward);
             var end = Object.FindFirstObjectByType<RunEndPanel>();
             if (end == null) end = CreateOverlayDocument<RunEndPanel>("RunEndPanel");
             scope.runEndPanel = end;
@@ -227,6 +227,20 @@ namespace EditorTools {
             document.panelSettings = AssetDatabase.LoadAssetAtPath<PanelSettings>(PanelSettingsPath);
             document.sortingOrder = sortingOrder;
             return go.AddComponent<T>();
+        }
+
+        /// <summary>Augments and loot of the test scene (design doc §9.4, §9.5): catalogs, draft screen, augment slots on the HUD. Idempotent.</summary>
+        public static void WireAugments(GameLifetimeScope scope, Features.Augments.AugmentCatalog catalog, Features.Loot.LootSettings loot) {
+            if (scope.augmentCatalog == null) scope.augmentCatalog = catalog;
+            if (scope.lootSettings == null) scope.lootSettings = loot;
+            var panel = Object.FindFirstObjectByType<AugmentPanel>();
+            if (panel == null) panel = CreateOverlayDocument<AugmentPanel>("AugmentPanel");
+            scope.augmentPanel = panel;
+            if (scope.playerHud != null) {
+                if (!scope.playerHud.TryGetComponent(out AugmentsView view)) view = scope.playerHud.gameObject.AddComponent<AugmentsView>();
+                scope.augmentsView = view;
+            }
+            EditorUtility.SetDirty(scope);
         }
 
         /// <summary>Shops of the test scene (design doc §9.3): catalog, shop and anvil screens, inventory on the HUD. Idempotent.</summary>
@@ -372,7 +386,17 @@ namespace EditorTools {
                 Check(scope.anvilPanel == null || scope.shopPanel == null
                       || scope.anvilPanel.GetComponent<UIDocument>().sortingOrder > scope.shopPanel.GetComponent<UIDocument>().sortingOrder,
                       "anvil screen drawn above the shop");
-                Check(scope.runHud != null && scope.waveRewardPanel != null && scope.runEndPanel != null, "run HUD and run screens wired");
+                Check(scope.runHud != null && scope.runEndPanel != null, "run HUD and run end screen wired");
+                Check(scope.augmentCatalog != null && scope.augmentCatalog.Augments.Count >= 3 && scope.augmentCatalog.FullSlotsAnvil != null,
+                      "scope.augmentCatalog: augments and full-slots anvil");
+                Check(scope.augmentPanel != null && scope.augmentsView != null, "augment screen and augment slots wired");
+                Check(scope.lootSettings != null && scope.lootSettings.StatAnvilSprite != null && scope.lootSettings.SummonerSpells.Length > 0,
+                      "scope.lootSettings: sprites and summoner spells");
+                if (scope.augmentCatalog != null) {
+                    bool ok = true;
+                    foreach (var a in scope.augmentCatalog.Augments) ok &= a != null && a.Passive != null && a.Icon != null;
+                    Check(ok, "every augment has a passive and an icon");
+                }
                 Check(scope.stage != null && scope.stage.Waves.Length > 0 && scope.stage.RewardSchedule != null,
                       "scope.stage: waves and reward schedule");
                 if (scope.stage != null) {

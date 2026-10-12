@@ -152,7 +152,7 @@ namespace EditorTools {
         private static Sprite Icon(string id) => AssetDatabase.LoadAssetAtPath<Sprite>($"{IconsDir}/{id}.png");
 
         // UI icons: single sprite, pixel art, centered. Idempotent.
-        private static void ConfigureIcon(string path) {
+        public static void ConfigureIcon(string path) {
             var importer = AssetImporter.GetAtPath(path) as TextureImporter;
             if (importer == null || (importer.textureType == TextureImporterType.Sprite && importer.filterMode == FilterMode.Point)) return;
             importer.textureType = TextureImporterType.Sprite;
