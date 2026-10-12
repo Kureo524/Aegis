@@ -9,6 +9,8 @@ namespace Features.UI.Panels {
     /// <summary>
     /// Victory / defeat screen (design doc §9.1), shown in GameState.Win / GameOver: replay the
     /// stage from wave 1 (PlayRequestedEvent → Loading) or back to the main menu. Own UIDocument.
+    /// Victory or defeat comes from the game state itself: the state changes while RunEndedEvent is
+    /// being handled, before this panel receives it, so the summary is refreshed when it does.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class RunEndPanel : MonoBehaviour {
@@ -20,18 +22,22 @@ namespace Features.UI.Panels {
         private int _waves, _level, _gold;
 
         public bool IsOpen { get; private set; }
+        public string Title => _title != null ? _title.text : "";
 
         [Inject]
         public void Construct(IEventBus eventBus) {
             _eventBus = eventBus;
             _subscriptions.Add(eventBus.Subscribe<RunEndedEvent>(e => {
-                _won = e.Won;
                 _waves = e.WavesCleared;
+                if (IsOpen) Show(true);
             }));
             _subscriptions.Add(eventBus.Subscribe<LevelUpEvent>(e => _level = e.Level));
             _subscriptions.Add(eventBus.Subscribe<XpChangedEvent>(e => _level = e.Level));
             _subscriptions.Add(eventBus.Subscribe<GoldChangedEvent>(e => _gold = e.Gold));
-            _subscriptions.Add(eventBus.Subscribe<GameStateChangedEvent>(e => Show(e.To is GameState.Win or GameState.GameOver)));
+            _subscriptions.Add(eventBus.Subscribe<GameStateChangedEvent>(e => {
+                _won = e.To == GameState.Win;
+                Show(e.To is GameState.Win or GameState.GameOver);
+            }));
         }
 
         private void Start() {
