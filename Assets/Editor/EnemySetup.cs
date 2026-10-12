@@ -36,17 +36,17 @@ namespace EditorTools {
 
             var goblin = EnemyOnce(GoblinPath, "Gobelin", "Enemy_Goblin", new Vector2(0.7f, 1.25f), melee, EnemyNavigation.FlowField,
                 xp: 18, gold: 3, special: null, new (StatType, float)[] {
-                    (StatType.MaxHealth, 140f), (StatType.PhysicalAttack, 10f), (StatType.AttackSpeed, 0.8f),
+                    (StatType.MaxHealth, 90f), (StatType.PhysicalAttack, 10f), (StatType.AttackSpeed, 0.8f),
                     (StatType.AttackRange, 0.9f), (StatType.Armor, 10f), (StatType.MagicResist, 10f), (StatType.MoveSpeed, 3.4f),
                 });
             var archer = EnemyOnce(ArcherPath, "Archer squelette", "Enemy_SkeletonArcher", new Vector2(0.7f, 1.6f), archerShot, EnemyNavigation.FlowField,
                 xp: 22, gold: 4, special: null, new (StatType, float)[] {
-                    (StatType.MaxHealth, 100f), (StatType.PhysicalAttack, 12f), (StatType.AttackSpeed, 0.6f),
+                    (StatType.MaxHealth, 70f), (StatType.PhysicalAttack, 12f), (StatType.AttackSpeed, 0.6f),
                     (StatType.AttackRange, 6f), (StatType.Armor, 5f), (StatType.MagicResist, 15f), (StatType.MoveSpeed, 3f),
                 });
             var brute = EnemyOnce(BrutePath, "Brute", "Enemy_Brute", new Vector2(1.3f, 2.3f), melee, EnemyNavigation.NavMesh,
                 xp: 120, gold: 20, special: slam, new (StatType, float)[] {
-                    (StatType.MaxHealth, 900f), (StatType.PhysicalAttack, 40f), (StatType.AttackSpeed, 0.5f),
+                    (StatType.MaxHealth, 600f), (StatType.PhysicalAttack, 40f), (StatType.AttackSpeed, 0.5f),
                     (StatType.AttackRange, 1.3f), (StatType.Armor, 40f), (StatType.MagicResist, 25f), (StatType.MoveSpeed, 2.6f),
                     (StatType.MaxMana, 100f),
                 });

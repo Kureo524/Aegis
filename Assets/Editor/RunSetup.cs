@@ -26,15 +26,15 @@ namespace EditorTools {
 
         // (quota, seconds, goblin / archer / brute weights, spawn interval, max alive, health ×, damage ×)
         private static readonly (int quota, float time, float g, float a, float b, float interval, int max, float hp, float dmg)[] Waves = {
-            (12, 40f, 1f, 0f, 0f, 1.6f, 12, 1f,   1f),
-            (16, 45f, 3f, 1f, 0f, 1.4f, 14, 1.1f, 1.05f),
-            (20, 50f, 3f, 2f, 0f, 1.3f, 16, 1.2f, 1.1f),
-            (24, 55f, 3f, 2f, 1f, 1.2f, 18, 1.35f, 1.2f),
-            (28, 60f, 3f, 2f, 1f, 1.1f, 20, 1.5f, 1.3f),
+            (8,  60f, 1f, 0f, 0f, 1.4f, 12, 1f,   1f),
+            (10, 65f, 3f, 1f, 0f, 1.3f, 14, 1.1f, 1.05f),
+            (13, 70f, 3f, 2f, 0f, 1.2f, 16, 1.2f, 1.1f),
+            (16, 75f, 3f, 2f, 1f, 1.1f, 18, 1.3f, 1.15f),
+            (20, 80f, 3f, 2f, 1f, 1.0f, 20, 1.45f, 1.25f),
         };
         private static readonly (int quota, float time, float g, float a, float b, float interval, int max, float hp, float dmg)[] BonusWaves = {
-            (32, 60f, 3f, 2f, 1f, 1.0f, 22, 1.8f, 1.5f),
-            (36, 60f, 3f, 2f, 1.5f, 0.9f, 24, 2.1f, 1.7f),
+            (24, 85f, 3f, 2f, 1f, 0.9f, 22, 1.6f, 1.35f),
+            (28, 90f, 3f, 2f, 1.5f, 0.85f, 24, 1.8f, 1.5f),
         };
 
         public static StageDefinition Run(Character enemyPrefab) {

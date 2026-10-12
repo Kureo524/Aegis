@@ -126,7 +126,7 @@ namespace EditorTools {
             var stats = CreateAsset<StatBlock>(TestHeroDir + "/StatBlock_TestHero.asset");
             SetList(stats, "entries", new (StatType, float)[] {
                 (StatType.MaxHealth, 600f), (StatType.HealthRegen, 1.5f),
-                (StatType.MaxMana, 400f), (StatType.ManaRegen, 1.5f),
+                (StatType.MaxMana, 400f), (StatType.ManaRegen, 8f),
                 (StatType.PhysicalAttack, 55f), (StatType.MagicAttack, 0f),
                 (StatType.AttackSpeed, 0.65f), (StatType.AttackRange, 5.5f),
                 (StatType.CritDamage, 1.75f),
@@ -143,7 +143,7 @@ namespace EditorTools {
             growthSo.ApplyModifiedPropertiesWithoutUndo();
             SetList(growth, "entries", new (StatType, float, ModifierType)[] {
                 (StatType.MaxHealth, 100f, ModifierType.Flat), (StatType.HealthRegen, 0.1f, ModifierType.Flat),
-                (StatType.MaxMana, 30f, ModifierType.Flat), (StatType.ManaRegen, 0.08f, ModifierType.Flat),
+                (StatType.MaxMana, 30f, ModifierType.Flat), (StatType.ManaRegen, 0.4f, ModifierType.Flat),
                 (StatType.PhysicalAttack, 3f, ModifierType.Flat), (StatType.AttackSpeed, 0.02f, ModifierType.PercentAdd),
                 (StatType.Armor, 4f, ModifierType.Flat), (StatType.MagicResist, 1.3f, ModifierType.Flat),
             }, (e, v) => {

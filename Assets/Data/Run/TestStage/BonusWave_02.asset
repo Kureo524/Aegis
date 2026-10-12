@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ad72bd34412455f5a1d8be5f2808a3d, type: 3}
   m_Name: BonusWave_02
   m_EditorClassIdentifier: Game.Features::Features.Run.WaveDefinition
-  killQuota: 36
-  timeLimit: 60
+  killQuota: 28
+  timeLimit: 90
   spawnTable:
   - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
     Definition: {fileID: 11400000, guid: 23239040d5a7166a99e4fa9d9e6a5c6a, type: 2}
@@ -24,8 +24,8 @@ MonoBehaviour:
   - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
     Definition: {fileID: 11400000, guid: 237e0af517b7483daaa55405833d8852, type: 2}
     Weight: 1.5
-  spawnInterval: 0.9
-  postQuotaSpawnInterval: 1.6199999
+  spawnInterval: 0.85
+  postQuotaSpawnInterval: 1.53
   maxAlive: 24
-  healthMultiplier: 2.1
-  damageMultiplier: 1.7
+  healthMultiplier: 1.8
+  damageMultiplier: 1.5

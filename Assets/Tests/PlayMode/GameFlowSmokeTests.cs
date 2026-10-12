@@ -329,7 +329,9 @@ namespace Game.Tests.PlayMode {
 
             yield return new WaitForSeconds(1f);
             Assert.Less(dummy.Health.Current, dummy.Health.Max, "Fireball hit the dummy");
-            Assert.AreEqual(manaBefore - cost, player.Mana.Current, 2.5f, "mana paid (plus ~1 s of regen at 1.5/s)");
+            float regen = player.Stats.Value(Features.Stats.StatType.ManaRegen);
+            Assert.GreaterOrEqual(player.Mana.Current, manaBefore - cost - 0.01f, "mana paid");
+            Assert.LessOrEqual(player.Mana.Current, manaBefore - cost + regen * 1.3f, "mana paid (plus ~1 s of regen)");
             Assert.AreEqual(0, caster.Selection.Total, "selection cleared after the cast");
             Assert.Greater(caster.CooldownRemaining, 0f, "shared elemental cooldown");
 
