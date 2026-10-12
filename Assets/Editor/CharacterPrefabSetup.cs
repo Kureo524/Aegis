@@ -5,6 +5,7 @@ using Features.Characters;
 using Features.Combat;
 using Features.Controls;
 using Features.Movement;
+using Features.Spells;
 using Features.UI;
 using UnityEditor;
 using UnityEngine;
@@ -58,6 +59,11 @@ namespace EditorTools {
                 var input = root.GetComponent<PlayerCommandInput>();
                 input.character = root.GetComponent<Character>();
                 input.attacker = root.GetComponent<BasicAttacker>();
+
+                if (!root.TryGetComponent(out ElementCaster caster)) caster = root.AddComponent<ElementCaster>();
+                var casterSo = new SerializedObject(caster);
+                casterSo.FindProperty("owner").objectReferenceValue = root.GetComponent<Character>();
+                casterSo.ApplyModifiedPropertiesWithoutUndo();
 
                 RangeIndicator indicator = root.GetComponentInChildren<RangeIndicator>(true);
                 if (indicator == null) indicator = CreateRangeIndicator(root.transform);

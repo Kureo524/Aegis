@@ -7,6 +7,7 @@ using Features.CameraControl;
 using Features.Characters;
 using Features.Combat;
 using Features.Progression;
+using Features.Spells;
 using Features.Stats;
 using Systems.Inputs;
 using Features.Flow;
@@ -37,6 +38,11 @@ namespace EditorTools {
         private const string GameFlowSettingsPath = SettingsDir + "/GameFlowSettings.asset";
         private const string CameraSettingsPath = SettingsDir + "/CameraSettings.asset";
         private const string ControlsSettingsPath = SettingsDir + "/ControlsSettings.asset";
+        private const string SpellSettingsPath = SettingsDir + "/SpellSettings.asset";
+        private const string ElementsDir = "Assets/Data/Elements";
+        private const string SpellsDir = "Assets/Data/Spells/FireElectricityWind";
+        public const string TestSpellBookPath = SpellsDir + "/SpellBook_FireElectricityWind.asset";
+        private const string ElementIconsDir = "Assets/GraphicAssets/Sprites/Elements";
         private const string VContainerSettingsPath = SettingsDir + "/VContainerSettings.asset";
         private const string RootPrefabPath = "Assets/Prefabs/RootLifetimeScope.prefab";
         private const string ExperienceCurvePath = "Assets/Data/Progression/ExperienceCurve.asset";
@@ -68,13 +74,16 @@ namespace EditorTools {
             var cameraSettings = LoadOrCreate<CameraSettings>(CameraSettingsPath);
             var experienceCurve = CreateExperienceCurve();
             var controlsSettings = LoadOrCreate<ControlsSettings>(ControlsSettingsPath);
+            var spellSettings = LoadOrCreate<SpellSettings>(SpellSettingsPath);
+            CreateTestElementsAndSpells();
             CreateTestHero();
             Character playerPrefab = CharacterPrefabSetup.CreatePlayerPrefab();
             AssignMissingHeroSprite();
             AssignMissingHeroProjectile();
+            AssignMissingHeroElements();
             CreateTrainingDummy();
             Character dummyPrefab = CharacterPrefabSetup.CreateDummyPrefab();
-            RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings);
+            RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
             SetBuildScenes();
             MigrateMenuScene();
@@ -168,6 +177,88 @@ namespace EditorTools {
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        // Test character elements (design doc §7.8): Fire / Electricity / Wind, 19 recipes. Created once.
+        private static readonly (string id, string name, float cost, Color color)[] TestElements = {
+            ("Fire", "Feu", 10f, new Color(1f, 0.45f, 0.15f)),
+            ("Electricity", "Électricité", 12f, new Color(1f, 0.88f, 0.25f)),
+            ("Wind", "Vent", 8f, new Color(0.55f, 0.95f, 0.9f)),
+        };
+
+        // (stacks Fire, Electricity, Wind, display name, kind). Placeholder content, tuned in the assets.
+        private static readonly (int f, int e, int w, string name, SpellKind kind)[] TestSpells = {
+            (1, 0, 0, "Boule de feu", SpellKind.Magic),        (0, 1, 0, "Étincelle", SpellKind.Magic),
+            (0, 0, 1, "Rafale", SpellKind.Physical),
+            (2, 0, 0, "Grande boule de feu", SpellKind.Magic), (0, 2, 0, "Arc électrique", SpellKind.Magic),
+            (0, 0, 2, "Bourrasque", SpellKind.Buff),           (1, 1, 0, "Plasma", SpellKind.Magic),
+            (1, 0, 1, "Tornade de feu", SpellKind.Magic),      (0, 1, 1, "Orage", SpellKind.Magic),
+            (3, 0, 0, "Météore", SpellKind.Magic),             (0, 3, 0, "Foudre", SpellKind.Magic),
+            (0, 0, 3, "Cyclone", SpellKind.Physical),          (2, 1, 0, "Lance de plasma", SpellKind.Magic),
+            (2, 0, 1, "Tempête de feu", SpellKind.Magic),      (1, 2, 0, "Surcharge", SpellKind.Buff),
+            (0, 2, 1, "Tempête électrique", SpellKind.Magic),  (1, 0, 2, "Souffle ardent", SpellKind.Magic),
+            (0, 1, 2, "Ouragan statique", SpellKind.Physical), (1, 1, 1, "Cataclysme", SpellKind.Magic),
+        };
+
+        private static void CreateTestElementsAndSpells() {
+            if (AssetDatabase.LoadAssetAtPath<SpellBook>(TestSpellBookPath) != null) return;
+
+            var elements = new ElementDefinition[TestElements.Length];
+            for (int i = 0; i < TestElements.Length; i++) {
+                var (id, displayName, cost, color) = TestElements[i];
+                elements[i] = CreateAsset<ElementDefinition>($"{ElementsDir}/Elem_{id}.asset");
+                var so = new SerializedObject(elements[i]);
+                so.FindProperty("displayName").stringValue = displayName;
+                so.FindProperty("icon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>($"{ElementIconsDir}/Elem_{id}.png");
+                so.FindProperty("color").colorValue = color;
+                so.FindProperty("manaCost").floatValue = cost;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            var spells = new List<SpellDefinition>();
+            foreach (var (f, e, w, displayName, kind) in TestSpells) {
+                int[] stacks = { f, e, w };
+                var parts = new List<string>();
+                var recipe = new List<(ElementDefinition, int)>();
+                for (int i = 0; i < stacks.Length; i++) {
+                    if (stacks[i] == 0) continue;
+                    parts.Add(stacks[i] > 1 ? $"{TestElements[i].id}_x{stacks[i]}" : TestElements[i].id);
+                    recipe.Add((elements[i], stacks[i]));
+                }
+                var spell = CreateAsset<SpellDefinition>($"{SpellsDir}/Spell_{string.Join("_", parts)}.asset");
+                var so = new SerializedObject(spell);
+                so.FindProperty("displayName").stringValue = displayName;
+                so.FindProperty("kind").enumValueIndex = (int)kind;
+                SerializedProperty list = so.FindProperty("recipe");
+                list.arraySize = recipe.Count;
+                for (int i = 0; i < recipe.Count; i++) {
+                    list.GetArrayElementAtIndex(i).FindPropertyRelative("Element").objectReferenceValue = recipe[i].Item1;
+                    list.GetArrayElementAtIndex(i).FindPropertyRelative("Count").intValue = recipe[i].Item2;
+                }
+                so.ApplyModifiedPropertiesWithoutUndo();
+                spells.Add(spell);
+            }
+
+            var book = CreateAsset<SpellBook>(TestSpellBookPath);
+            var bookSo = new SerializedObject(book);
+            SerializedProperty bookList = bookSo.FindProperty("spells");
+            bookList.arraySize = spells.Count;
+            for (int i = 0; i < spells.Count; i++) bookList.GetArrayElementAtIndex(i).objectReferenceValue = spells[i];
+            bookSo.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Only fills empty slots: never replaces elements or a spell book chosen by hand.
+        private static void AssignMissingHeroElements() {
+            var hero = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath);
+            if (hero == null || hero.SpellBook != null) return;
+            var so = new SerializedObject(hero);
+            SerializedProperty slots = so.FindProperty("elements");
+            slots.arraySize = TestElements.Length;
+            for (int i = 0; i < TestElements.Length; i++)
+                slots.GetArrayElementAtIndex(i).objectReferenceValue =
+                    AssetDatabase.LoadAssetAtPath<ElementDefinition>($"{ElementsDir}/Elem_{TestElements[i].id}.asset");
+            so.FindProperty("spellBook").objectReferenceValue = AssetDatabase.LoadAssetAtPath<SpellBook>(TestSpellBookPath);
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         // Ranged hero: its basic attack fires the arcane bolt. Only fills an empty slot.
         private static void AssignMissingHeroProjectile() {
             var attack = AssetDatabase.LoadAssetAtPath<BasicAttackDefinition>(TestHeroDir + "/BasicAttack_TestHero.asset");
@@ -212,7 +303,8 @@ namespace EditorTools {
         }
 
         private static RootLifetimeScope CreateOrUpdateRootPrefab(GameFlowSettings flowSettings, CameraSettings cameraSettings,
-                                                                   ExperienceCurve experienceCurve, ControlsSettings controlsSettings) {
+                                                                   ExperienceCurve experienceCurve, ControlsSettings controlsSettings,
+                                                                   SpellSettings spellSettings) {
             bool exists = File.Exists(RootPrefabPath);
             GameObject root = exists
                 ? PrefabUtility.LoadPrefabContents(RootPrefabPath)
@@ -243,6 +335,7 @@ namespace EditorTools {
             scopeSo.FindProperty("cameraSettings").objectReferenceValue = cameraSettings;
             scopeSo.FindProperty("experienceCurve").objectReferenceValue = experienceCurve;
             scopeSo.FindProperty("controlsSettings").objectReferenceValue = controlsSettings;
+            scopeSo.FindProperty("spellSettings").objectReferenceValue = spellSettings;
             scopeSo.ApplyModifiedPropertiesWithoutUndo();
 
             PrefabUtility.SaveAsPrefabAsset(root, RootPrefabPath);

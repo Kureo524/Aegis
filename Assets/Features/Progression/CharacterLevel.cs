@@ -25,6 +25,7 @@ namespace Features.Progression {
         public int OverchargePoints { get; private set; }
 
         public event Action<int> LevelChanged;
+        public event Action SkillPointsChanged;
         public event Action XpChanged;
 
         public CharacterLevel(StatController stats, StatGrowth growth, ExperienceCurve curve) {
@@ -47,10 +48,19 @@ namespace Features.Progression {
             XpChanged?.Invoke();
         }
 
+        /// <summary>Consumes one skill point (spent on an element level, §7.8).</summary>
+        public bool TrySpendSkillPoint() {
+            if (SkillPoints <= 0) return false;
+            SkillPoints--;
+            SkillPointsChanged?.Invoke();
+            return true;
+        }
+
         private void LevelUp() {
             Level++;
             if (Level <= _curve.LastSkillPointLevel) SkillPoints++;
             else OverchargePoints++;
+            SkillPointsChanged?.Invoke();
 
             ApplyGrowth();
             LevelChanged?.Invoke(Level);

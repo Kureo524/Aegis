@@ -219,6 +219,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8325014891196843132, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1154830969069360366}
+    - targetCorrespondingSourceObject: {fileID: 8325014891196843132, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6064849061569062957}
   m_SourcePrefab: {fileID: 100100000, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
 --- !u!1 &906976849958185452 stripped
 GameObject:
@@ -244,6 +247,19 @@ MonoBehaviour:
   attackMoveSelectRadius: 2
   rangeIndicator: {fileID: 9182435209059539999}
   clickMarkerPrefab: {fileID: 2112780572453488847, guid: da59e8ed04ff4d17587df37f01b9c0fe, type: 3}
+--- !u!114 &6064849061569062957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906976849958185452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22028b1ec96d6d1f98550abf0cca4b68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Features::Features.Spells.ElementCaster
+  owner: {fileID: 2741926576527142607}
 --- !u!114 &2741926576527142607 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6418502472124908383, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
