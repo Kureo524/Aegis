@@ -31,7 +31,8 @@ namespace EditorTools {
 
             var melee = AttackOnce(EnemiesDir + "/BasicAttack_EnemyMelee.asset", windup: 0.35f, ratio: 1f, projectile: null, speed: 0f);
             var archerShot = AttackOnce(EnemiesDir + "/BasicAttack_EnemyArrow.asset", windup: 0.3f, ratio: 1f,
-                                        projectile: AssetDatabase.LoadAssetAtPath<Projectile>(CharacterPrefabSetup.ArcaneBoltPrefabPath), speed: 14f);
+                                        projectile: AssetDatabase.LoadAssetAtPath<Projectile>(CharacterPrefabSetup.ArcaneBoltPrefabPath), speed: 14f,
+                                        homing: false);   // enemy arrows can be dodged
             SpellDefinition slam = CreateBruteSlam();
 
             var goblin = EnemyOnce(GoblinPath, "Gobelin", "Enemy_Goblin", new Vector2(0.7f, 1.25f), melee, EnemyNavigation.FlowField,
@@ -54,7 +55,7 @@ namespace EditorTools {
             return CreateHordeSettings(enemyPrefab, goblin, archer, brute);
         }
 
-        private static BasicAttackDefinition AttackOnce(string path, float windup, float ratio, Projectile projectile, float speed) {
+        private static BasicAttackDefinition AttackOnce(string path, float windup, float ratio, Projectile projectile, float speed, bool homing = true) {
             var attack = AssetDatabase.LoadAssetAtPath<BasicAttackDefinition>(path);
             if (attack != null) return attack;
             attack = CreateAsset<BasicAttackDefinition>(path);
@@ -63,6 +64,7 @@ namespace EditorTools {
             so.FindProperty("damageRatio").floatValue = ratio;
             so.FindProperty("projectilePrefab").objectReferenceValue = projectile;
             if (speed > 0f) so.FindProperty("projectileSpeed").floatValue = speed;
+            so.FindProperty("homing").boolValue = homing;
             so.ApplyModifiedPropertiesWithoutUndo();
             return attack;
         }

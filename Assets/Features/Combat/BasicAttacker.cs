@@ -15,7 +15,8 @@ namespace Features.Combat {
     /// - Windup: WindupPercent × interval before the hit; cancelling during the windup loses the
     ///   attack (a move order does). After the impact the character may move without losing cadence.
     /// - Interval = 1 / AttackSpeed. Damage = attack stat × DamageRatio, crit on CritChance.
-    ///   Melee hits land at the impact; ranged attacks fire a homing projectile then.
+    ///   Melee hits land at the impact; ranged attacks fire a projectile then: homing, or straight
+    ///   towards the target's position (can be dodged) when the definition is not Homing.
     /// - Attack-move (§4.6): walk to a point, attacking whatever enemy comes within range on the way
     ///   (picked by an ITargetSelector); an acquired target that leaves the range is dropped and the
     ///   walk resumes. Ends on arrival.
@@ -33,6 +34,7 @@ namespace Features.Combat {
         [SerializeField] private float muzzleHeight = 0.6f;
 
         private enum State { Idle, Chasing, Windup }
+        private const float StraightOvershoot = 1.5f;
 
         private ProjectileLauncher _projectiles;
         private readonly ITargetSelector _selector = new NearestTargetSelector();
@@ -242,7 +244,13 @@ namespace Features.Combat {
 
             if (def.IsRanged) {
                 Vector3 muzzle = owner.transform.position + Vector3.up * (owner.Definition.BodySize.y * muzzleHeight);
-                _projectiles.Launch(def.ProjectilePrefab, muzzle, _target, info, def.ProjectileSpeed, OnHit);
+                if (def.Homing) _projectiles.Launch(def.ProjectilePrefab, muzzle, _target, info, def.ProjectileSpeed, OnHit);
+                else {
+                    // Flies a bit past the range, so a target stepping back is not hit for free
+                    Vector3 aim = _target.transform.position + Vector3.up * (_target.Definition.BodySize.y * muzzleHeight);
+                    float range = owner.Stats.Value(StatType.AttackRange) + _target.BodyRadius + StraightOvershoot;
+                    _projectiles.LaunchStraight(def.ProjectilePrefab, muzzle, aim, range, info, def.ProjectileSpeed, OnHit);
+                }
             }
             else {
                 OnHit(_target, _target.TakeDamage(info));

@@ -149,5 +149,28 @@ namespace Game.Tests.PlayMode {
             Assert.LessOrEqual(spawner.Alive, settings.MaxAlive);
             Assert.Greater(closest, settings.MinSpawnDistance - 1.6f, "spawned on the ring, away from the player");
         }
+    
+        [UnityTest]
+        public IEnumerator ArcherArrow_FliesStraight_AndCanBeDodged() {
+            yield return GameFlowSmokeTests.LoadGameScene();
+            Vector3 p = Player.transform.position;
+            Character archer = SpawnEnemy("Enemy_SkeletonArcher", p + new Vector3(5f, 0f, 0f));
+            var attack = archer.Definition.BasicAttack;
+            Assert.IsTrue(attack.IsRanged);
+            Assert.IsFalse(attack.Homing, "enemy arrows are not homing");
+            archer.GetComponent<EnemyAI>().Suspended = true;
+
+            var launcher = Game.Resolve<Features.Combat.ProjectileLauncher>();
+            var info = new Features.Combat.DamageInfo(10f, Features.Combat.DamageType.Physical, false, true, archer);
+            Vector3 muzzle = archer.transform.position + Vector3.up;
+            int hits = 0;
+            launcher.LaunchStraight(attack.ProjectilePrefab, muzzle, p + new Vector3(0f, 1f, 3f), 8f, info, 14f, (_, __) => hits++);
+            yield return new WaitForSeconds(1f);
+            Assert.AreEqual(0, hits, "aimed beside the player: it misses");
+
+            launcher.LaunchStraight(attack.ProjectilePrefab, muzzle, p + Vector3.up, 8f, info, 14f, (t, __) => { if (t == Player) hits++; });
+            yield return new WaitForSeconds(1f);
+            Assert.AreEqual(1, hits, "aimed at the player: it hits");
+        }
     }
 }
