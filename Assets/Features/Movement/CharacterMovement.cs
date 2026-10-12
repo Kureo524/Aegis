@@ -208,8 +208,9 @@ namespace Features.Movement {
             return delta.magnitude;
         }
 
-        // Keeps the vertical component so gravity keeps working.
+        // Keeps the vertical component so gravity keeps working. A dead body is kinematic: no velocity.
         private void SetHorizontalVelocity(Vector3 velocity) {
+            if (_rb.isKinematic) return;
             velocity.y = _rb.linearVelocity.y;
             _rb.linearVelocity = velocity;
         }
