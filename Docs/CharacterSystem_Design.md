@@ -770,7 +770,7 @@ Une **run** est une partie sur un **stage**, **équivalent d'un niveau de BTD6**
 > - **`RunDirector`** (scope Game) pilote la `RunStateMachine` (objet de la scène, règles écrites par *Project Setup*) : `PreWave` (compte à rebours, rien ne spawn) → `Combat` (`HordeSpawner.Configure` avec la vague, spawn continu) → `Reward` si timer écoulé **et** quota atteint, sinon `Overtime` (−1 vie tout de suite, puis toutes les 30 s ; quota atteint → `Reward`). Fin de vague : la horde disparaît, `WaveRewardEvent` annonce la récompense du `WaveRewardSchedule`, le jeu est en pause (`TimeScaleService`, map UI). « Continuer » (`RewardClosedEvent`) → compte à rebours de la vague suivante. Dernière vague bonus terminée → `RunEndedEvent(won)` → `GameState.Win` ; 0 vie → `GameState.GameOver`.
 > - **Quota et XP** : seuls les ennemis du `HordeSpawner` comptent (`WaveEnemyKilledEvent`, pas les mannequins). L'XP de kill passe désormais par le `RunDirector` (`EnemyKilledEvent` → `XpGrantedEvent`), coupée une fois le quota atteint ; le gold reste.
 > - **Mort du joueur** : **game over immédiat** (`StageDefinition.PlayerDeath = GameOver`, validé). L'autre règle (`LoseLife` : une vie, la horde disparaît, respawn au spawn après 3 s) reste disponible par stage ; le respawn sert aussi au bac à sable quand la run est arrêtée.
-> - **UI** : `RunHudView` en haut (vague / bonus, timer ou compte à rebours, kills / quota, vies, bannières « Vague N », « Vie perdue »), les écrans de récompense (boutique, enclume depuis la 7b ; augment depuis la phase 8, qui a remplacé l'écran d'attente `WaveRewardPanel`), `RunEndPanel` (Victoire / Défaite, vagues terminées, niveau, or ; Rejouer = la vague 1 de nouveau, Menu principal, Quitter).
+> - **UI** : `RunHudView` en haut (vague / bonus, timer ou compte à rebours, kills / quota, vies, bannières « Vague N », « Vie perdue »), les écrans de récompense (boutique, enclume depuis la 7b ; augment depuis la phase 8, qui a remplacé l'écran d'attente `WaveRewardPanel`), `RunEndPanel` (Victoire / Défaite d'après l'état de jeu `Win` / `GameOver`, vagues terminées, niveau, or ; Rejouer = la vague 1 de nouveau, Menu principal, Quitter).
 > - **Debug** : bouton « Skip wave » du panneau de test (`SkipWaveRequestedEvent`).
 > - *Reste (7b) : boutiques, élixirs, enclumes, items, `Inventory`. Plus tard : augments (phase 8), boss, `RunSnapshot`.*
 
@@ -931,6 +931,7 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 > - **Debug** : le panneau de la scène de test affiche le nombre d'ennemis, arrête / relance le spawn et ajoute 50 ennemis d'un coup (`HordeDebugEvent`).
 > - Perf mesurée : 200 ennemis ≈ 1,6 ms par frame dans l'éditeur (IA, physique, rendu).
 > - **Phase 9b** : Fracas de la Brute ralentit (−40 %), le coup de massue de Grokk étourdit 0,75 s, son onde royale ralentit.
+> - **Tirs ennemis esquivables** : `BasicAttackDefinition.Homing` (vrai par défaut, les auto-attaques du joueur ne ratent pas comme dans LoL) ; à faux (flèches de l'archer squelette), `Projectile.LaunchStraight` part en ligne droite vers la position de la cible au moment du tir, touche le premier ennemi du tireur sur sa route et disparaît après la portée + 1,5.
 > - *Reste : `WaveScaling` et vagues (phase 7), IA à fréquence réduite pour les ennemis lointains, boss (`PatternRunner`).*
 
 ### 9.7 Méta-progression (rogue-lite)
