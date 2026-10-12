@@ -33,7 +33,9 @@ namespace Features.Economy {
         public bool TryAdd(ItemDefinition item) {
             if (!CanAdd(item)) return false;
             _items.Add(item);
-            _upgrades.ApplyPermanent(item.Stats, new Slot(_items.Count - 1, item));
+            var slot = new Slot(_items.Count - 1, item);
+            _upgrades.ApplyPermanent(item.Stats, slot);
+            _upgrades.AddPassive(item.Passive, slot);
             Publish();
             return true;
         }

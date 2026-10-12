@@ -88,10 +88,13 @@ namespace Game.Tests.PlayMode {
             Assert.IsTrue(reward.HasValue);
             Assert.AreEqual(RewardKind.Augment, reward.Value.Rewards[0], "wave 1 → augment (schedule prelude)");
             yield return null;
-            var panel = Object.FindFirstObjectByType<WaveRewardPanel>();
-            Assert.IsTrue(panel.IsOpen);
+            var augments = Game.Resolve<Features.Augments.AugmentController>();
+            Assert.AreEqual(AugmentDraftPhase.Choose, augments.Phase, "wave 1 → augment draft");
+            Assert.AreEqual(3, augments.Choices.Count);
+            Assert.IsTrue(Object.FindFirstObjectByType<AugmentPanel>().IsOpen);
 
-            panel.Close();
+            augments.Pick(0);
+            Assert.AreEqual(1, augments.Owned.Count, "augment taken");
             Assert.AreEqual(RunState.PreWave, run.State);
             Assert.AreEqual(2, run.WaveNumber);
             Assert.AreEqual(1f, Time.timeScale);
@@ -104,7 +107,11 @@ namespace Game.Tests.PlayMode {
             for (int guard = 0; guard < 10 && run.State == RunState.Reward; guard++) {
                 if (shop.AnvilOpen) shop.Choose(0);
                 else if (shop.IsOpen) shop.Close();
-                else Object.FindFirstObjectByType<WaveRewardPanel>().Close();
+                else {
+                    var augments = Game.Resolve<Features.Augments.AugmentController>();
+                    if (augments.Phase == AugmentDraftPhase.SlotsFull) augments.ChooseFullSlotsOption(FullSlotsOption.SlotOrGold, 0);
+                    else augments.Pick(0);
+                }
             }
         }
 
@@ -121,7 +128,7 @@ namespace Game.Tests.PlayMode {
                 yield return null;
                 Bus.Publish(new SkipWaveRequestedEvent());
                 yield return null;
-                if (wave == 0) Object.FindFirstObjectByType<WaveRewardPanel>().Close();   // augment (phase 8)
+                if (wave == 0) Game.Resolve<Features.Augments.AugmentController>().Pick(0);   // augment
             }
             Assert.IsTrue(shop.AnvilOpen, "wave 2 → free prismatic anvil");
             yield return null;
@@ -196,7 +203,6 @@ namespace Game.Tests.PlayMode {
             var run = Game.Resolve<RunDirector>();
             var machine = Root.Resolve<GameFlowStateMachine>();
             var stage = Game.Resolve<StageDefinition>();
-            var panel = Object.FindFirstObjectByType<WaveRewardPanel>();
 
             for (int wave = 0; wave < stage.TotalWaves; wave++) {
                 Bus.Publish(new SkipWaveRequestedEvent());   // countdown

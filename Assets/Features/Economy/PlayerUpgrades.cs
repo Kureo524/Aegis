@@ -18,13 +18,17 @@ namespace Features.Economy {
         private readonly DisposableBag _subscriptions = new();
         private readonly List<(Stat stat, StatModifier modifier)> _elixirModifiers = new();
         private StatController _stats;
+        private Passives.PassiveController _passives;
         private bool _elixirFoughtAWave;
 
         public ElixirDefinition ActiveElixir { get; private set; }
 
         public PlayerUpgrades(IEventBus eventBus) {
             _eventBus = eventBus;
-            _subscriptions.Add(eventBus.Subscribe<PlayerSpawnedEvent>(e => Bind(e.Player.GetComponent<Character>().Stats)));
+            _subscriptions.Add(eventBus.Subscribe<PlayerSpawnedEvent>(e => {
+                var player = e.Player.GetComponent<Character>();
+                Bind(player.Stats, player.Passives);
+            }));
             _subscriptions.Add(eventBus.Subscribe<RunStateChangedEvent>(e => {
                 if (ActiveElixir == null) return;
                 if (e.To == RunState.Combat) _elixirFoughtAWave = true;
@@ -33,7 +37,21 @@ namespace Features.Economy {
         }
 
         /// <summary>Whose stats get the bonuses (the spawned player; tests bind their own).</summary>
-        public void Bind(StatController stats) => _stats = stats;
+        public void Bind(StatController stats, Passives.PassiveController passives = null) {
+            _stats = stats;
+            _passives = passives;
+        }
+
+        /// <summary>Adds a passive to the player (items, augments). Null when there is no player passive controller.</summary>
+        public Passives.Passive AddPassive(Passives.PassiveDefinition passive, object source) =>
+            passive != null ? _passives?.Add(passive, source) : null;
+
+        public void RemovePassive(Passives.Passive passive) => _passives?.Remove(passive);
+
+        public void RemovePermanent(object source) {
+            if (_stats == null) return;
+            foreach (Stat stat in _stats.Stats.Values) stat.RemoveAllFromSource(source);
+        }
 
         public void ApplyPermanent(IReadOnlyList<StatBonus> bonuses, object source) {
             if (_stats == null) return;

@@ -55,6 +55,9 @@ namespace Features.Economy {
                     case RewardKind.LightShop: Open(full: false); break;
                     case RewardKind.FullShop: Open(full: true); break;
                     case RewardKind.FreePrismaticAnvil: OpenAnvil(_catalog.FreeAnvil, endsStep: true); break;
+                    case RewardKind.FreeStatAnvil:
+                        OpenAnvil(_catalog.StatAnvils.Count > 0 ? _catalog.StatAnvils[0] : null, endsStep: true);
+                        break;
                 }
             }));
             _subscriptions.Add(_eventBus.Subscribe<ShopBuyRequestedEvent>(e => TryBuy(e.Offer)));
@@ -133,8 +136,11 @@ namespace Features.Economy {
             return true;
         }
 
-        /// <summary>Opens <paramref name="anvil"/>; with <paramref name="endsStep"/> its resolution ends the reward step.</summary>
-        public void OpenAnvil(AnvilDefinition anvil, bool endsStep) {
+        /// <summary>
+        /// Opens <paramref name="anvil"/>; with <paramref name="endsStep"/> its resolution ends the reward
+        /// step. <paramref name="forcedRarity"/>: stat anvil of that rarity instead of a drawn one (augments, §9.4).
+        /// </summary>
+        public void OpenAnvil(AnvilDefinition anvil, bool endsStep, RarityTier? forcedRarity = null) {
             if (anvil == null) {
                 if (endsStep) _eventBus.Publish(new RewardStepDoneEvent());
                 return;
@@ -143,7 +149,7 @@ namespace Features.Economy {
             _anvilEndsStep = endsStep;
             _choices.Clear();
             _rerolls.Clear();
-            _rarity = anvil.Kind == AnvilKind.Stat ? DrawRarity(anvil.RarityWeights) : RarityTier.Prismatic;
+            _rarity = anvil.Kind == AnvilKind.Stat ? forcedRarity ?? DrawRarity(anvil.RarityWeights) : RarityTier.Prismatic;
             for (int i = 0; i < anvil.ChoiceCount; i++) {
                 ScriptableObject pick = PickChoice();
                 if (pick == null) break;

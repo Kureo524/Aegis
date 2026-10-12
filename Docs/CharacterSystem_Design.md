@@ -336,6 +336,8 @@ public enum Capability { SpellCrit /*, ... */ }
 
 Exemple : **les sorts ne peuvent pas critiquer par défaut** ; `SpellCrit` (passif de perso, augment du type « Gantelet précieux ») l'active.
 
+> **En place (phase 8)** : `CapabilityController` (`Character.Capabilities`, un compteur de sources par capacité), `Capability.SpellCrit` lu par `SpellExecutor` (crit selon `CritChance`, dégâts × `CritDamage`). Augment « Gantelet serti ».
+
 ### 5.7 Contrôles (CC) et Ténacité
 
 Types : `Stun`, `Root`, `Silence`, `Slow`, `Knockup`. `StatusEffect` calcule la durée effective :
@@ -716,6 +718,13 @@ public enum ResetPolicy { Never /* toute la run */, EndOfWave, EndOfStage, After
 - Les passifs **ne sont pas obligés de stacker sur les sorts** : `Continuous` recalcule périodiquement une valeur (ex. nombre d'ennemis dans un rayon) et met à jour un `StatModifier` (Source = le passif).
 - À chaque changement, le passif met à jour ses `StatModifier` ou un multiplicateur lu par les sorts. Événement `Changed` pour l'UI.
 
+> **En place (phase 8)** :
+> - **`CharacterEvents`** (`Character.Events`) : `BasicAttackHit`, `DamageDealt`, `DamageTaken`, `Kill`, `SpellCast`, `LevelUp`, levés par `Character.TakeDamage`, `BasicAttacker` et `SpellCaster`.
+> - **`PassiveDefinition`** (SO, aucune ligne de code par passif) = briques combinables : `Stats` (statique), `Capabilities`, `Triggers` (`On` = BasicAttackHit / SpellCast / Kill / DamageTaken, `EveryN`, `Chance`, `MinSpellStacks` ; effets `TimedStats`, `BonusDamage` = base + ratio × stat, `DropLoot`), `Stacks` (`StackSource` PerBasicAttack / PerSpellCast / PerKill, `ResetPolicy` Never / EndOfWave / AfterDuration, `Max`, `PerStack`), `NearbyEnemies` (bonus continu par ennemi dans un rayon, recalculé toutes les 0,25 s).
+> - **`Passive`** (runtime : chaque `StatModifier` a pour Source l'instance, retiré proprement) et **`PassiveController`** (`Character.Passives` : passif du perso ajouté par `Init`, puis items et augments ; tick par le perso ; `EndOfWave` au `Reward`).
+> - **Test Hero** : « Surcharge arcanique », une attaque de base sur trois inflige 20 (+35 % PM) dégâts magiques. **Items** : « Salve » (Arc rapide, 1 attaque sur 4) et « Inspiration » (Couronne du mage, +20 PM 3 s après un sort à 2 éléments).
+> - *Reste : valeurs qui évoluent avec le niveau (`Base + PerLevel`), statuts (saignement), soins et boucliers.*
+
 ---
 
 ## 9. Boucle rogue-lite, économie et ennemis
@@ -753,7 +762,7 @@ Une **run** est une partie sur un **stage**, **équivalent d'un niveau de BTD6**
 > - **`RunDirector`** (scope Game) pilote la `RunStateMachine` (objet de la scène, règles écrites par *Project Setup*) : `PreWave` (compte à rebours, rien ne spawn) → `Combat` (`HordeSpawner.Configure` avec la vague, spawn continu) → `Reward` si timer écoulé **et** quota atteint, sinon `Overtime` (−1 vie tout de suite, puis toutes les 30 s ; quota atteint → `Reward`). Fin de vague : la horde disparaît, `WaveRewardEvent` annonce la récompense du `WaveRewardSchedule`, le jeu est en pause (`TimeScaleService`, map UI). « Continuer » (`RewardClosedEvent`) → compte à rebours de la vague suivante. Dernière vague bonus terminée → `RunEndedEvent(won)` → `GameState.Win` ; 0 vie → `GameState.GameOver`.
 > - **Quota et XP** : seuls les ennemis du `HordeSpawner` comptent (`WaveEnemyKilledEvent`, pas les mannequins). L'XP de kill passe désormais par le `RunDirector` (`EnemyKilledEvent` → `XpGrantedEvent`), coupée une fois le quota atteint ; le gold reste.
 > - **Mort du joueur** : coûte une vie de stage (`DeathCostsALife`, choix provisoire à valider, §13), la horde disparaît et le joueur réapparaît au spawn après 3 s ; la vague continue.
-> - **UI** : `RunHudView` en haut (vague / bonus, timer ou compte à rebours, kills / quota, vies, bannières « Vague N », « Vie perdue »), `WaveRewardPanel` (écran d'attente des augments, phase 8 ; boutiques et enclumes ont leurs écrans depuis la 7b), `RunEndPanel` (Victoire / Défaite, vagues terminées, niveau, or ; Rejouer = la vague 1 de nouveau, Menu principal, Quitter).
+> - **UI** : `RunHudView` en haut (vague / bonus, timer ou compte à rebours, kills / quota, vies, bannières « Vague N », « Vie perdue »), les écrans de récompense (boutique, enclume depuis la 7b ; augment depuis la phase 8, qui a remplacé l'écran d'attente `WaveRewardPanel`), `RunEndPanel` (Victoire / Défaite, vagues terminées, niveau, or ; Rejouer = la vague 1 de nouveau, Menu principal, Quitter).
 > - **Debug** : bouton « Skip wave » du panneau de test (`SkipWaveRequestedEvent`).
 > - *Reste (7b) : boutiques, élixirs, enclumes, items, `Inventory`. Plus tard : augments (phase 8), boss, `RunSnapshot`.*
 
@@ -865,6 +874,10 @@ public class ElixirDefinition : ScriptableObject {   // consommable acheté en b
 | **Remplacement** | le nouvel augment remplace un augment possédé selon R : **Argent** → un augment possédé de **rareté supérieure** ; **Or** → un augment possédé de **même rareté** ; **Prismatique** → un augment possédé de **rareté inférieure** |
 | **Slot ou gold** | **+1 slot d'augment** si le joueur a moins de 6 slots, sinon du **gold selon la rareté** |
 
+> **En place (phase 8)** :
+> - `AugmentDefinition` = une rareté + un `PassiveDefinition` (nom, description, icône, effets). `AugmentCatalog` : 12 augments de test (4 Argent, 5 Or, 3 Prismatique : stats, `SpellCrit`, stacks par kill / par attaque, bonus par ennemi proche, sort à 3 éléments → buff, loot), slots 4 → 6, poids de rareté 55 / 33 / 12, **4 relances pour toute la run** (une par slot de base, chacune remplace un choix), relance dorée 5 %, gold par rareté si 6 slots.
+> - `AugmentController` : draft à l'étape `Augment` (rareté tirée, 3 augments non possédés), relances, relance dorée (la première relance donne rareté + 1), slots pleins (enclume à stats de la rareté via `ShopService.OpenAnvil(forcedRarity)`, remplacement selon la règle ci-dessous, +1 slot puis gold). `AugmentPanel` remplace l'écran d'attente de la 7a ; `AugmentsView` affiche les slots au-dessus des items.
+
 Le cas **Argent** permet de **rétrograder** volontairement : un augment de rareté basse peut être très pertinent selon le build (par exemple pour un personnage avec beaucoup de PV), et le joueur doit pouvoir y accéder même quand ses slots sont remplis par des raretés supérieures.
 
 ### 9.5 Loot et sorts d'invocateur
@@ -876,6 +889,8 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
   - on **ne peut pas en ramasser un autre tant qu'on n'a pas utilisé celui-ci** ;
   - une fois utilisé, **F redevient la compétence propre** (le Flash), qui reprend son cooldown propre ;
   - implémentation : un `SummonerSlot` avec `Default` (compétence propre) et `Current` ; `PickUp` n'est possible que si `Current == Default`.
+
+> **En place (phase 8)** : effet de passif `DropLoot` → `LootDropRequestedEvent` (passifs du joueur seulement) → `LootService` (scope Game) : sprites au sol face caméra, ramassés au contact (`LootSettings.PickupRadius`), disparus après 30 s ou en fin de vague. **Enclume à stats** → `BonusRewardEarnedEvent(FreeStatAnvil)`, ouverte gratuitement en fin de vague avant les récompenses prévues (`RewardController`). **Sort d'invocateur** → `SummonerSpellPickedEvent` : `SignatureAbility` le garde sur F pour un usage (sans toucher au cooldown du Flash), un seul à la fois (`SummonerSlotChangedEvent`). Sorts : **Fantôme** (+40 % vitesse 6 s) et **Embrasement** (sort ciblé, 150 + 40 % PM). Augments « Flambeur » (6 % par kill) et « Invocateur » (8 %).
 
 ### 9.6 Ennemis et boss
 
@@ -978,7 +993,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **5c** ✅ | R + visée + indicateurs, sorts Magic/Physical/Buff, niveaux d'éléments, cooldown par lancement, compétence propre F (Flash) | Sorts lancés à la souris |
 | **6** ✅ | `EnemyDefinition`, `EnemyAI` (flow field + NavMesh pour élites), mana TFT + sort spécial, spawner, XP/gold au kill | Un combat complet avec des hordes |
 | **7** ✅ | `RunDirector` (timer + quota, fin de vague = timer ET quota, vies), `Wallet`, `WaveRewardSchedule`, victoire / défaite (7a) ; `Inventory` (6 slots), boutiques, enclumes, élixirs, items (7b) | Boucle de run + économie |
-| **8** | `CharacterEvents`, passifs (`StackCounter`), capacités, augments (4 slots, rerolls), loot | Builds variés |
+| **8** ✅ | `CharacterEvents`, passifs (briques génériques : stats, triggers, stacks, ennemis proches), capacités (`SpellCrit`), augments (4 → 6 slots, relances, relance dorée, slots pleins), passifs d'items, loot (enclume à stats, sorts d'invocateur) | Builds variés |
 | **9** | Boss à patterns et items, contenu : sorts, éléments, passifs, items, augments, ennemis | Prototype riche |
 | **10** | Méta-progression (arbres par élément et par personnage, monnaie persistante, surcharge), `RunSnapshot` (quitter/reprendre), polish, UI, audio | Prototype solide |
 
@@ -1005,7 +1020,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 
 **Résolu** : plan XZ ; reset (T) ; une recette = un sort (19 par perso) ; cooldown par lancement {2, 3.5, 5.5} s ; compétence propre F (Flash 20 s) remplaçable par un sort d'invocateur ; points de compétence aux niveaux 1 à 15 pour monter le niveau des éléments (une fois par sort) ; niveaux 16 à 18 : stats seules, sauf surcharge débloquée en méta ; déblocage des éléments aux niveaux 1 / 3 / 5 ; 3 stacks max par sort ; sorts Magic / Physical / Buff ; passifs à persistance et sources de stacks variables ; XP et gold directs au kill ; fin de vague = timer ET quota ; 3 vies de stage, game over = rejouer le stage depuis la vague 1 ; ordre des fins de vague (augment, enclume prismatique gratuite à 3 choix avec 1 reroll par choix, puis boucle boutique légère / augment / boutique complète) ; vagues bonus : boutique complète après chaque vague et augment toutes les deux vagues ; un élixir max, enclumes à items comptées dans la limite d'un item ; enclumes à stats : une rareté tirée, 3 choix de même rareté ; augments toutes les 3 vagues, reroll doré ~5 % ; méta par arbres d'éléments et de personnages ; quitter/reprendre au début de la vague ; centaines d'ennemis avec creep block ; mana TFT ; boss à patterns avec 3 items ; **pas de crit sur les sorts sauf passif/augment** ; solo, un seul perso de test.
 
-**À valider** : la **mort du joueur** coûte-t-elle une vie de stage ? (en place : oui, `StageDefinition.DeathCostsALife`, la horde disparaît et le joueur réapparaît au spawn 3 s plus tard.)
+**Validé (phase 8)** : 4 slots d'augments de base, 6 maximum avec les augmentations ; 4 relances pour toute la run (une par slot de base). **À valider** : la **mort du joueur** coûte-t-elle une vie de stage ? (en place : oui, `StageDefinition.DeathCostsALife`, la horde disparaît et le joueur réapparaît au spawn 3 s plus tard.)
 
 Il ne reste **aucune question bloquante** pour la phase 1. Les valeurs d'équilibrage (prix, durées, poids de rareté, nombre de vagues, niveaux méta) sont des données à régler plus tard dans les ScriptableObjects.
 
@@ -1160,7 +1175,7 @@ public sealed class EventBus : IEventBus {
 |---|---|---|
 | `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, `UserOptions`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
 | `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `OptionsPanel` (UIDocument « OptionsPanel », au-dessus du menu), `SceneEntryPoint(Menu)` |
-| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `PrefabPool`, `ProjectileLauncher`, `SpellExecutor`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PauseMenu` (UIDocument « PauseMenu ») et `PauseInput`, `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn ; respawn provisoire), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `HordeSettings`, `FlowFieldService`, `EnemyDirector`, `HordeSpawner`, `Wallet`, `StageDefinition`, `RunStateMachine`, `RunDirector`, `RunHudView` (sur « GameHud »), `WaveRewardPanel` et `RunEndPanel` (UIDocuments), `RewardController`, `ShopCatalog`, `PlayerUpgrades`, `Inventory`, `ShopService`, `ShopPanel` et `AnvilPanel` (UIDocuments), `InventoryView` (sur « GameHud »), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `AugmentController`, `RunSnapshotService`, le joueur |
+| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `PrefabPool`, `ProjectileLauncher`, `SpellExecutor`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PauseMenu` (UIDocument « PauseMenu ») et `PauseInput`, `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn ; respawn provisoire), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `HordeSettings`, `FlowFieldService`, `EnemyDirector`, `HordeSpawner`, `Wallet`, `StageDefinition`, `RunStateMachine`, `RunDirector`, `RunHudView` (sur « GameHud »), `RunEndPanel` (UIDocument), `RewardController`, `ShopCatalog`, `PlayerUpgrades`, `Inventory`, `ShopService`, `ShopPanel` et `AnvilPanel` (UIDocuments), `InventoryView` (sur « GameHud »), `AugmentCatalog`, `AugmentController`, `AugmentPanel` (UIDocument), `AugmentsView` (sur « GameHud »), `LootSettings`, `LootService`, `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunSnapshotService`, le joueur |
 
 VContainer crée le root **une fois**, avant le premier scope de scène, et le garde entre les chargements (`DontDestroyOnLoad`) ; un scope de scène sans `parentReference` en devient automatiquement l'enfant. Les services du root **ne doivent jamais être ré-enregistrés** dans un scope de scène (sinon deux `EventBus` coexistent et les événements se perdent).
 
@@ -1218,7 +1233,7 @@ Assets/
 │   ├── StateMachines/       GameState, GameFlowStateMachine
 │   ├── Events/              GameStateChangedEvent, requêtes de flux (Play/Pause/Resume/MainMenu/Quit, Options), StatChangedEvent
 │   ├── CameraControl/       CameraController, CameraSettings (SO), Billboard
-│   ├── Characters/          Character, CharacterDefinition / EnemyDefinition (SO), CharacterVisual, Faction,
+│   ├── Characters/          Character, CharacterEvents, CharacterDefinition / EnemyDefinition (SO), CharacterVisual, Faction,
 │   │                        PlayerSpawner, EnemySpawner, RespawnOnDeath
 │   ├── Progression/         CharacterLevel, StatGrowth (SO), ExperienceCurve (SO)
 │   ├── Combat/              BasicAttacker, BasicAttackDefinition (SO), DamageInfo, DamageCalculator, Health, ManaPool, DamageType,
@@ -1230,25 +1245,30 @@ Assets/
 │   ├── Enemies/             EnemyAI, EnemyDirector, FlowField, FlowFieldService, HordeSpawner, HordeSettings (SO)
 │   ├── Economy/             Wallet, Inventory, PlayerUpgrades, ShopService, StatBonus, ItemDefinition, ElixirDefinition,
 │   │                        StatChoiceDefinition, AnvilDefinition, ShopCatalog (SO)
+│   ├── Passives/            PassiveDefinition (SO), Passive, PassiveController, CapabilityController
+│   ├── Augments/            AugmentDefinition, AugmentCatalog (SO), AugmentController
+│   ├── Loot/                LootService, LootSettings (SO)
 │   ├── Run/                 RunDirector, RunStateMachine, RewardController, StageDefinition, WaveDefinition, WaveRewardSchedule (SO)
 │   ├── Controls/            PlayerCommandInput, ClickMarker, RangeIndicator
 │   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO), TimedModifiers…
 │   └── UI/                  PlayerHud, ElementBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
-│                            Panels/ (MainMenuPanel, PauseMenu, OptionsPanel, OptionsView, WaveRewardPanel, RunEndPanel, ShopPanel, AnvilPanel, OfferCard),
-│                            RunHudView, InventoryView, DebugTools/CharacterDebugPanel
+│                            Panels/ (MainMenuPanel, PauseMenu, OptionsPanel, OptionsView, RunEndPanel, ShopPanel, AnvilPanel, AugmentPanel, OfferCard),
+│                            RunHudView, InventoryView, AugmentsView, DebugTools/CharacterDebugPanel
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
-├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, EnemySetup, RunSetup, EconomySetup, TestSceneSetup, BuildScript
+├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, EnemySetup, RunSetup, EconomySetup, PassiveSetup, TestSceneSetup, BuildScript
 ├── Data/                    Settings/ (GameFlowSettings, CameraSettings, ControlsSettings, SpellSettings, HordeSettings, VContainerSettings),
 │                            Elements/ (Elem_Fire…), Spells/FireElectricityWind/ (19 Spell_…, SpellBook_…), Spells/Signature/Spell_Flash,
 │                            Progression/ExperienceCurve, Characters/TestHero/ (Char_TestHero…),
 │                            Characters/TrainingDummy/ (Enemy_TrainingDummy : 1000 PV, 30 armure/RM, 150 XP),
 │                            Characters/Enemies/ (Enemy_Goblin, Enemy_SkeletonArcher, Enemy_Brute + StatBlock / BasicAttack),
 │                            Spells/Enemies/Spell_BruteSlam, Run/ (WaveRewardSchedule, TestStage/Stage_Test + Wave_01…05, BonusWave_01…02),
-│                            Economy/ (ShopCatalog, Items/, Elixirs/, Anvils/, StatChoices/)
+│                            Economy/ (ShopCatalog, Items/, Elixirs/, Anvils/, StatChoices/),
+│                            Passives/ (Passive_…), Augments/ (AugmentCatalog, Augment_…), Spells/Summoner/ (Ghost, Ignite),
+│                            Settings/LootSettings
 ├── GameAssets/ActionMaps/   Game.Input — GameActionMaps (.inputactions + C# généré)
 ├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy, Enemy),
 │                            Combat/ (Projectile_ArcaneBolt, Projectile_Skillshot, Vfx_SpellShape)
-├── GraphicAssets/           Sprites/ (Characters/…, Elements/…, Items/…, Spells/Spell_Flash, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
+├── GraphicAssets/           Sprites/ (Characters/…, Elements/…, Items/…, Augments/…, Spells/Spell_Flash, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
 ├── Scenes/                  Releases/Menu, Tests/TestScene (+ Releases/Game : ancienne scène WASD, hors build)
 ├── Tests/                   EditMode/, PlayMode/
 └── UI Toolkit/   Settings/
@@ -1314,7 +1334,7 @@ Points restants (connus) :
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
 - *Tools > Build Linux (Test Scene)* / *(Game)* : builds standalone.
 - *Tools > Regenerate Input Actions Code* : régénère `GameActionMaps.cs` (§4.7).
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, quick cast avec indicateur (maintien → visée, relâchement → lancer, Échap pendant le maintien, mode Normal), Flash à distance fixe puis en cooldown, Flash dans un mur, gobelin qui poursuit et frappe, contournement d'un mur par le flow field, archer qui garde sa portée, brute qui lance son sort à mana plein, kill → XP + gold → retour au pool → réutilisation, mort du joueur → horde vidée → respawn, spawn continu borné à `MaxAlive`, vague : compte à rebours → combat → quota (XP coupée, gold gardé) → timer → récompense en pause → vague suivante, overtime → vies perdues → défaite → Rejouer, mort = une vie, toutes les vagues + bonus → victoire, enclume prismatique gratuite après la vague 2 puis boutique légère et enclume à stats, Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (mode de lancement par défaut, sauvegarde / rechargement JSON), le flow field (ligne droite, contournement, coins, cellule enfermée) le `Wallet`, le `WaveRewardSchedule` et la boutique (limites par boutique, enclumes à stats et à items, rerolls, inventaire plein, élixir jusqu'à la fin de la vague suivante, enchaînement des récompenses) et le point visé à portée fixe en EditMode.
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, quick cast avec indicateur (maintien → visée, relâchement → lancer, Échap pendant le maintien, mode Normal), Flash à distance fixe puis en cooldown, Flash dans un mur, gobelin qui poursuit et frappe, contournement d'un mur par le flow field, archer qui garde sa portée, brute qui lance son sort à mana plein, kill → XP + gold → retour au pool → réutilisation, mort du joueur → horde vidée → respawn, spawn continu borné à `MaxAlive`, vague : compte à rebours → combat → quota (XP coupée, gold gardé) → timer → récompense en pause → vague suivante, overtime → vies perdues → défaite → Rejouer, mort = une vie, toutes les vagues + bonus → victoire, enclume prismatique gratuite après la vague 2 puis boutique légère et enclume à stats, draft d'augment après la vague 1, passif du héros (1 attaque sur 3), Frénésie (stacks puis chute), `SpellCrit`, sort d'invocateur ramassé puis utilisé, enclume ramassée ouverte en fin de vague, Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (mode de lancement par défaut, sauvegarde / rechargement JSON), le flow field (ligne droite, contournement, coins, cellule enfermée) le `Wallet`, le `WaveRewardSchedule` et la boutique (limites par boutique, enclumes à stats et à items, rerolls, inventaire plein, élixir jusqu'à la fin de la vague suivante, enchaînement des récompenses) et les augments (draft, relances, relance dorée, slots pleins : remplacement, slot puis gold, enclume) et le point visé à portée fixe en EditMode.
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 

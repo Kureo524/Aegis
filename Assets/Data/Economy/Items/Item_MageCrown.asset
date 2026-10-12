@@ -24,3 +24,4 @@ MonoBehaviour:
     Type: 0
     Value: 10
   unique: 1
+  passive: {fileID: 11400000, guid: 4d727ed1581ad4797a43e1ddb601108f, type: 2}

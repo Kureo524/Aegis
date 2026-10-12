@@ -95,3 +95,35 @@ namespace Features.Events {
     /// <summary>The current reward step is over (shop closed, anvil resolved, augment screen closed).</summary>
     public readonly struct RewardStepDoneEvent : IEvent { }
 }
+
+namespace Features.Events {
+    /// <summary>A passive of the player dropped a loot (LootService spawns it on the ground).</summary>
+    public readonly struct LootDropRequestedEvent : Systems.EventBusses.IEvent {
+        public readonly Passives.LootKind Kind;
+        public readonly UnityEngine.Vector3 Position;
+        public LootDropRequestedEvent(Passives.LootKind kind, UnityEngine.Vector3 position) {
+            Kind = kind;
+            Position = position;
+        }
+    }
+}
+
+namespace Features.Events {
+    /// <summary>A reward earned during the wave, opened at its end before the scheduled ones (loot, §9.5).</summary>
+    public readonly struct BonusRewardEarnedEvent : Systems.EventBusses.IEvent {
+        public readonly Run.RewardKind Kind;
+        public BonusRewardEarnedEvent(Run.RewardKind kind) => Kind = kind;
+    }
+
+    /// <summary>A summoner spell was picked up: it replaces F until used (§9.5).</summary>
+    public readonly struct SummonerSpellPickedEvent : Systems.EventBusses.IEvent {
+        public readonly Spells.SpellDefinition Spell;
+        public SummonerSpellPickedEvent(Spells.SpellDefinition spell) => Spell = spell;
+    }
+
+    /// <summary>Whether F currently holds a picked-up summoner spell (no other one can be picked up then).</summary>
+    public readonly struct SummonerSlotChangedEvent : Systems.EventBusses.IEvent {
+        public readonly bool HoldsConsumable;
+        public SummonerSlotChangedEvent(bool holdsConsumable) => HoldsConsumable = holdsConsumable;
+    }
+}
