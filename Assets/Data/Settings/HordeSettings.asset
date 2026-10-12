@@ -30,7 +30,7 @@ MonoBehaviour:
   - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
     Definition: {fileID: 11400000, guid: 237e0af517b7483daaa55405833d8852, type: 2}
     Weight: 1
-  spawnInterval: 1.2
-  maxAlive: 30
+  spawnInterval: 2
+  maxAlive: 18
   minSpawnDistance: 16
   maxSpawnDistance: 22

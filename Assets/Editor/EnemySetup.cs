@@ -139,8 +139,8 @@ namespace EditorTools {
                 e.FindPropertyRelative("Definition").objectReferenceValue = entries[i].def;
                 e.FindPropertyRelative("Weight").floatValue = entries[i].weight;
             }
-            so.FindProperty("spawnInterval").floatValue = 1.2f;
-            so.FindProperty("maxAlive").intValue = 30;
+            so.FindProperty("spawnInterval").floatValue = 2f;
+            so.FindProperty("maxAlive").intValue = 18;
             so.ApplyModifiedPropertiesWithoutUndo();
             return settings;
         }
