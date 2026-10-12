@@ -89,14 +89,14 @@ Déplacement sur le plan **XZ** (vue de dessus), caméra inclinée, sprites en b
 | `Character` (base) | Racine physique, **pivot aux pieds** : `Rigidbody` (interpolé, rotation X/Z gelée), `BoxCollider`, `NavMeshAgent`, `CharacterMovement`, `Character`. Enfant **`Visual`** : `SpriteRenderer` + `CharacterVisual` |
 | `Player` (variant de `Character`) | + `PlayerCommandInput` |
 | `TrainingDummy` (variant de `Character`) | + `RespawnOnDeath` (réapparaît 2 s après sa mort) |
-| `Enemy` (variant, phase 6) | + IA |
+| `Enemy` (variant de `Character`) | + `EnemyAI` ; collisions discrètes (des centaines de corps) |
 
 Le prefab de base porte aussi `BasicAttacker` et une **barre de PV** (`HealthBarView` : deux sprites face caméra au-dessus de la tête, verte pour le joueur, rouge pour les ennemis ; en sprites plutôt qu'en UI pour rester léger avec des centaines d'entités).
 
 - Ce qui distingue deux persos d'un même type (**sprite**, **taille du corps** `BodySize`, stats…) vient de la `CharacterDefinition`, appliquée par `Character.Init` : jamais un variant par personnage.
-- **`CharacterVisual`** : billboard (copie la rotation de la caméra, donc le sprite est vu à plat, sans déformation de perspective) et `flipX` selon le déplacement horizontal **à l'écran**. Les sprites sont dessinés **tournés vers la droite**, pivot en bas au centre. *Pour les centaines d'ennemis : un `LateUpdate` par entité est à remplacer par une mise à jour centrale (phase 6).*
+- **`CharacterVisual`** : billboard (copie la rotation de la caméra, donc le sprite est vu à plat, sans déformation de perspective) et `flipX` selon le déplacement horizontal **à l'écran**. Les sprites sont dessinés **tournés vers la droite**, pivot en bas au centre. *Pour les centaines d'ennemis : un `LateUpdate` par entité, à centraliser si le profiler le demande (200 ennemis tiennent aujourd'hui en ~1,6 ms par frame dans l'éditeur).*
 - Le joueur n'est **pas posé dans la scène** : `PlayerSpawner` (entry point du `GameLifetimeScope`) l'instancie via `IObjectResolver.Instantiate` au `PlayerSpawn`, appelle `Init` et publie `PlayerSpawnedEvent`, que la caméra écoute pour le suivre.
-- Sprites provisoires (64 × 128, 64 px/unité, `Assets/GraphicAssets/Sprites/Characters/`) : `Placeholder_Hero` (généré par *Project Setup*, aperçu du prefab de base) et **`Chibi_Explorer`**, utilisé par `Char_TestHero` : chibi pixel-art *inspiré* d'Ezreal (League of Legends). Placeholder de prototype uniquement : à remplacer par une art originale avant toute diffusion publique (propriété intellectuelle de Riot Games).
+- Sprites provisoires (64 × 128, 64 px/unité, `Assets/GraphicAssets/Sprites/Characters/`) : `Placeholder_Hero` (généré par *Project Setup*, aperçu du prefab de base) et **`Chibi_Explorer`**, utilisé par `Char_TestHero` : chibi pixel-art *inspiré* d'Ezreal (League of Legends). Placeholder de prototype uniquement : à remplacer par une art originale avant toute diffusion publique (propriété intellectuelle de Riot Games). Ennemis (originaux, provisoires) : `Enemy_Goblin`, `Enemy_SkeletonArcher` (64 × 128) et `Enemy_Brute` (96 × 160).
 
 ---
 
@@ -755,6 +755,8 @@ Une **run** est une partie sur un **stage**, **équivalent d'un niveau de BTD6**
 - **Niveau max en partie : 18** (`MaxLevel`).
 - **Gold** : `Wallet` (valeur, events), dépensé en boutique.
 
+> **En place (phase 6)** : XP au kill via `EnemyKilledEvent` (joueur), gold via `Wallet` (scope Game, remis à 0 à chaque run) → `GoldChangedEvent` → HUD (« N or » à droite des barres). *Reste : quota de vague (XP coupée), boutique (phase 7).*
+
 ### 9.3 Items, boutique et enclumes
 
 ```csharp
@@ -872,6 +874,16 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
   - **Pattern plus complexe** : `PatternDefinition` (SO) en **phases** (seuils de PV), chaque phase = liste d'étapes `PatternStep` (lancer un sort, se déplacer, attendre, invoquer, télégraphier) en séquence ou tirage pondéré, exécutées par un `PatternRunner`.
   - **Jusqu'à 3 items équipés** comme TFT (`ItemDefinition[3]`) : stats et passifs via le même système d'items que le joueur.
 
+> **En place (phase 6)** :
+> - **Données** : `EnemyDefinition` = récompenses, `Navigation` (`FlowField` pour les hordes, `NavMesh` pour les élites) et mana TFT (`SpecialSpell`, `StartMana`, `ManaPerSecond`, `ManaPerAttack`, `ManaPerHitTaken` ; le max est la stat `MaxMana`). Ennemis de test (valeurs provisoires) : **Gobelin** (corps à corps, horde), **Archer squelette** (distance 6, horde), **Brute** (élite NavMesh, 900 PV, sort spécial **Fracas** : zone de 2,2 au sol sur la position du joueur, 0,9 s d'incantation **télégraphiée** par un cercle rouge, donc esquivable).
+> - **IA** (`EnemyAI`, prefab `Enemy`) : Chase → Attack → Cast, via les mêmes composants que le joueur. Pas d'`Update` : `EnemyDirector` (scope Game) fait réfléchir chaque ennemi une fois par `ThinkInterval` (0,1 s), décisions étalées sur les frames. Hors de portée : les hordes suivent le **flow field** (`CharacterMovement.Steer`, `NavMeshAgent` désactivé), les élites leur chemin NavMesh (`RepathInterval`). À portée : `BasicAttacker` prend le relais (il ne poursuit plus lui-même : `ChasesTarget = false`), les ennemis à distance s'arrêtent à leur portée. Le windup n'est pas interrompu par l'IA.
+> - **Flow field** (`FlowField`, C# pur testé ; `FlowFieldService`) : grille de `HordeSettings` (100 × 100, cellules de 1), murs lus une fois dans le NavMesh baké, Dijkstra 8 voisins sans couper les coins de mur, recalculé au plus toutes les 0,25 s et seulement si le joueur a changé de cellule.
+> - **Creep block** : collisions physiques entre corps (layer par défaut) ; pas de séparation custom tant que le profiler ne le demande pas.
+> - **Spawn** (`HordeSpawner`) : un ennemi toutes les `SpawnInterval` (1,2 s), tiré au poids dans `SpawnTable` (gobelin 6, archer 3, brute 1), sur un anneau de 16 à 22 autour du joueur (hors écran), sur le NavMesh et atteignable par le flow field, jusqu'à `MaxAlive` (30). Pooling (`PrefabPool`), retour au pool `DespawnDelay` après la mort. La mort du joueur vide la horde ; le joueur réapparaît au spawn après `GameFlowSettings.PlayerRespawnDelay` (3 s) — **provisoire** jusqu'aux vies de stage et au game over (phase 7).
+> - **Debug** : le panneau de la scène de test affiche le nombre d'ennemis, arrête / relance le spawn et ajoute 50 ennemis d'un coup (`HordeDebugEvent`).
+> - Perf mesurée : 200 ennemis ≈ 1,6 ms par frame dans l'éditeur (IA, physique, rendu).
+> - *Reste : `WaveScaling` et vagues (phase 7), CC / ténacité, IA à fréquence réduite pour les ennemis lointains, boss (`PatternRunner`).*
+
 ### 9.7 Méta-progression (rogue-lite)
 
 - **Monnaie persistante** : gagnée **à la fin d'une partie si le stage est clear** (full clear, vagues bonus comprises).
@@ -947,7 +959,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **5** 🟡 | Clic droit sur ennemi, `BasicAttacker`, projectiles poolés, Q + clic gauche (attack-move) ✅, dummies d'entraînement (XP au kill). *Reste : `CommandController`.* | Attaque de base façon LoL |
 | **5b** ✅ | `ManaPool`, `ElementSelection` (A/Z/E, T reset), `SpellBook` + `SpellResolver`, coût en mana + UI, déblocage d'éléments par points (niv. 1/3/5, Ctrl + A/Z/E) | Éléments activables, coût affiché |
 | **5c** ✅ | R + visée + indicateurs, sorts Magic/Physical/Buff, niveaux d'éléments, cooldown par lancement, compétence propre F (Flash) | Sorts lancés à la souris |
-| **6** | `EnemyDefinition`, `EnemyAI` (flow field + NavMesh pour élites), mana TFT + sort spécial, spawner, XP/gold au kill | Un combat complet avec des hordes |
+| **6** ✅ | `EnemyDefinition`, `EnemyAI` (flow field + NavMesh pour élites), mana TFT + sort spécial, spawner, XP/gold au kill | Un combat complet avec des hordes |
 | **7** | `RunDirector` (timer + quota, fin de vague = timer ET quota, vies), `Wallet`, `Inventory` (6 slots), `WaveRewardSchedule`, boutiques, enclumes, élixirs, items | Boucle de run + économie |
 | **8** | `CharacterEvents`, passifs (`StackCounter`), capacités, augments (4 slots, rerolls), loot | Builds variés |
 | **9** | Boss à patterns et items, contenu : sorts, éléments, passifs, items, augments, ennemis | Prototype riche |
@@ -1128,7 +1140,7 @@ public sealed class EventBus : IEventBus {
 |---|---|---|
 | `RootLifetimeScope` | toute l'application (prefab `Assets/Prefabs/RootLifetimeScope.prefab`, référencé par `Assets/Data/Settings/VContainerSettings.asset`, lui-même dans les *Preloaded Assets*) | **En place** : `IEventBus`, `IPanelManager`, `InputReader`, `GameFlowStateMachine`, `GameFlowController`, `InputMapSwitcher`, `TimeScaleService`, `CursorConfinement`, `UserOptions`, SO `GameFlowSettings`, `CameraSettings` et `ExperienceCurve`. **Plus tard** : `SaveService` / `MetaSave`, catalogues |
 | `MenuLifetimeScope` | scène `Menu` | `MainMenuPanel`, `OptionsPanel` (UIDocument « OptionsPanel », au-dessus du menu), `SceneEntryPoint(Menu)` |
-| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `PrefabPool`, `ProjectileLauncher`, `SpellExecutor`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PauseMenu` (UIDocument « PauseMenu ») et `PauseInput`, `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Wallet`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
+| `GameLifetimeScope` | **un stage** (aujourd'hui `TestScene`) | **Root** : `ControlsSettings` (§4.7) et `SpellSettings` (§7.2) en plus. **Game, en place** : la `Camera` principale, `PrefabPool`, `ProjectileLauncher`, `SpellExecutor`, `CameraController`, `QuitOverlay`, `CharacterDebugPanel`, `PlayerHud` et `DamageNumbersView` (UIDocument « GameHud »), `PauseMenu` (UIDocument « PauseMenu ») et `PauseInput`, `PlayerSpawner` (prefab `Player`, `CharacterDefinition`, point de spawn ; respawn provisoire), `EnemySpawner` (liste `CharacterSpawn` : prefab + définition + point, aujourd'hui les 3 dummies), `HordeSettings`, `FlowFieldService`, `EnemyDirector`, `HordeSpawner`, `Wallet`, `SceneEntryPoint(Game)`. Le joueur spawné est injecté par le conteneur (`PlayerCommandInput`, `CharacterVisual`…). **Plus tard** : `RunStateMachine`, `RunDirector`, `WaveSpawner`, `Inventory`, `Shop`, `AugmentController`, `RunSnapshotService`, le joueur |
 
 VContainer crée le root **une fois**, avant le premier scope de scène, et le garde entre les chargements (`DontDestroyOnLoad`) ; un scope de scène sans `parentReference` en devient automatiquement l'enfant. Les services du root **ne doivent jamais être ré-enregistrés** dans un scope de scène (sinon deux `EventBus` coexistent et les événements se perdent).
 
@@ -1195,18 +1207,22 @@ Assets/
 │   │                        SpellResolver, ElementLevels, ElementCaster, SpellMath, SpellCaster, SpellExecutor,
 │   │                        SpellTargeting, SpellIndicator, SignatureAbility, SpellVfx
 │   ├── Movement/            CharacterMovement
+│   ├── Enemies/             EnemyAI, EnemyDirector, FlowField, FlowFieldService, HordeSpawner, HordeSettings (SO)
+│   ├── Economy/             Wallet
 │   ├── Controls/            PlayerCommandInput, ClickMarker, RangeIndicator
 │   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO), TimedModifiers…
 │   └── UI/                  PlayerHud, ElementBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
 │                            Panels/ (MainMenuPanel, PauseMenu, OptionsPanel, OptionsView), DebugTools/CharacterDebugPanel
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
-├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, TestSceneSetup, BuildScript
-├── Data/                    Settings/ (GameFlowSettings, CameraSettings, ControlsSettings, SpellSettings, VContainerSettings),
+├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, EnemySetup, TestSceneSetup, BuildScript
+├── Data/                    Settings/ (GameFlowSettings, CameraSettings, ControlsSettings, SpellSettings, HordeSettings, VContainerSettings),
 │                            Elements/ (Elem_Fire…), Spells/FireElectricityWind/ (19 Spell_…, SpellBook_…), Spells/Signature/Spell_Flash,
 │                            Progression/ExperienceCurve, Characters/TestHero/ (Char_TestHero…),
-│                            Characters/TrainingDummy/ (Enemy_TrainingDummy : 1000 PV, 30 armure/RM, 150 XP)
+│                            Characters/TrainingDummy/ (Enemy_TrainingDummy : 1000 PV, 30 armure/RM, 150 XP),
+│                            Characters/Enemies/ (Enemy_Goblin, Enemy_SkeletonArcher, Enemy_Brute + StatBlock / BasicAttack),
+│                            Spells/Enemies/Spell_BruteSlam
 ├── GameAssets/ActionMaps/   Game.Input — GameActionMaps (.inputactions + C# généré)
-├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy),
+├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy, Enemy),
 │                            Combat/ (Projectile_ArcaneBolt, Projectile_Skillshot, Vfx_SpellShape)
 ├── GraphicAssets/           Sprites/ (Characters/…, Elements/…, Spells/Spell_Flash, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
 ├── Scenes/                  Releases/Menu, Tests/TestScene (+ Releases/Game : ancienne scène WASD, hors build)
@@ -1274,7 +1290,7 @@ Points restants (connus) :
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
 - *Tools > Build Linux (Test Scene)* / *(Game)* : builds standalone.
 - *Tools > Regenerate Input Actions Code* : régénère `GameActionMaps.cs` (§4.7).
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, quick cast avec indicateur (maintien → visée, relâchement → lancer, Échap pendant le maintien, mode Normal), Flash à distance fixe puis en cooldown, Flash dans un mur, Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (mode de lancement par défaut, sauvegarde / rechargement JSON) et le point visé à portée fixe en EditMode.
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, quick cast avec indicateur (maintien → visée, relâchement → lancer, Échap pendant le maintien, mode Normal), Flash à distance fixe puis en cooldown, Flash dans un mur, gobelin qui poursuit et frappe, contournement d'un mur par le flow field, archer qui garde sa portée, brute qui lance son sort à mana plein, kill → XP + gold → retour au pool → réutilisation, mort du joueur → horde vidée → respawn, spawn continu borné à `MaxAlive`, Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (mode de lancement par défaut, sauvegarde / rechargement JSON), le flow field (ligne droite, contournement, coins, cellule enfermée) et le `Wallet` et le point visé à portée fixe en EditMode.
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 
