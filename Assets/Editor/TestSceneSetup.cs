@@ -5,9 +5,11 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using Containers;
 using Features.CameraControl;
+using Features.Characters;
 using Features.Controls;
 using Features.Movement;
 using Features.UI;
+using Features.UI.DebugTools;
 using VContainer.Unity;
 
 namespace EditorTools {
@@ -58,7 +60,6 @@ namespace EditorTools {
             agent.autoBraking = false;
 
             var movement = player.AddComponent<CharacterMovement>();
-            movement.moveSpeed = 5f;
 
             var input = player.AddComponent<PlayerCommandInput>();
             input.characterMovement = movement;
@@ -111,12 +112,34 @@ namespace EditorTools {
             scope.playerCommandInput = input;
             scope.cameraController = cameraController;
             scope.quitOverlay = quit;
+            WirePlayer(scope, movement, AssetDatabase.LoadAssetAtPath<CharacterDefinition>(ProjectSetup.TestHeroPath));
 
             // Save scene
             System.IO.Directory.CreateDirectory("Assets/Scenes/Tests");
             EditorSceneManager.SaveScene(scene, ScenePath);
 
             Debug.Log($"[TestSceneSetup] Test scene created at {ScenePath}");
+        }
+
+        /// <summary>
+        /// Makes the scene's player a data-driven <see cref="Character"/> (design doc §8) and adds
+        /// the character debug panel. Idempotent.
+        /// </summary>
+        public static void WirePlayer(GameLifetimeScope scope, CharacterMovement movement, CharacterDefinition definition) {
+            GameObject player = movement.gameObject;
+            if (!player.TryGetComponent(out Character character)) character = player.AddComponent<Character>();
+
+            var so = new SerializedObject(character);
+            so.FindProperty("movement").objectReferenceValue = movement;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            var panel = Object.FindFirstObjectByType<CharacterDebugPanel>();
+            if (panel == null) panel = new GameObject("CharacterDebugPanel").AddComponent<CharacterDebugPanel>();
+
+            scope.player = character;
+            scope.playerDefinition = definition;
+            scope.characterDebugPanel = panel;
+            EditorUtility.SetDirty(scope);
         }
 
         private const string ObstaclesRoot = "=== Obstacles ===";
@@ -239,6 +262,17 @@ namespace EditorTools {
                 Check(scope.playerCommandInput != null, "scope.playerCommandInput wired");
                 Check(scope.cameraController != null, "scope.cameraController wired");
                 Check(scope.quitOverlay != null, "scope.quitOverlay wired");
+                Check(scope.characterDebugPanel != null, "scope.characterDebugPanel wired");
+                Check(scope.player != null, "scope.player (Character) wired");
+                Check(scope.playerDefinition != null, "scope.playerDefinition wired");
+                if (scope.playerDefinition != null) {
+                    Check(scope.playerDefinition.Faction == Faction.Player, "player definition is in the Player faction");
+                    Check(scope.playerDefinition.BaseStats != null, "player definition has base stats");
+                }
+                if (scope.player != null) {
+                    var characterSo = new SerializedObject(scope.player);
+                    Check(characterSo.FindProperty("movement").objectReferenceValue != null, "player.movement wired");
+                }
             }
 
             // Root scope: the scene relies on it for every shared service
@@ -251,6 +285,7 @@ namespace EditorTools {
                 Check(rootSo.FindProperty("stateMachine").objectReferenceValue != null, "root.stateMachine wired");
                 Check(rootSo.FindProperty("gameFlowSettings").objectReferenceValue != null, "root.gameFlowSettings wired");
                 Check(rootSo.FindProperty("cameraSettings").objectReferenceValue != null, "root.cameraSettings wired");
+                Check(rootSo.FindProperty("experienceCurve").objectReferenceValue != null, "root.experienceCurve wired");
             }
 
             if (input != null) {

@@ -77,3 +77,4 @@ MonoBehaviour:
   stateMachine: {fileID: 6002295589862436142}
   gameFlowSettings: {fileID: 11400000, guid: 37406ca206fc202eb9e565f11e0d97c7, type: 2}
   cameraSettings: {fileID: 11400000, guid: e8583fb67373cb210b7c51f1d39214e9, type: 2}
+  experienceCurve: {fileID: 11400000, guid: 0448e4c82aa8e2eb0ad2164b74bb46bc, type: 2}

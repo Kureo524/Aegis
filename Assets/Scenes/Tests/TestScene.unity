@@ -883,6 +883,7 @@ GameObject:
   - component: {fileID: 397952099}
   - component: {fileID: 397952098}
   - component: {fileID: 397952097}
+  - component: {fileID: 397952104}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -932,7 +933,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69c4c857e2b22accfa9cbb35ee502a2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Systems::Systems.Characters.CharacterMovement
-  moveSpeed: 5
   stopDistance: 0.1
   rotationSpeed: 15
 --- !u!195 &397952099
@@ -1064,6 +1064,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 397952095}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &397952104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 397952095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbb4ff8638dafc74da6f4d01691017ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Features::Features.Characters.Character
+  movement: {fileID: 397952098}
 --- !u!1 &450279453
 GameObject:
   m_ObjectHideFlags: 0
@@ -2271,6 +2284,9 @@ MonoBehaviour:
   playerCommandInput: {fileID: 397952097}
   cameraController: {fileID: 87022998}
   quitOverlay: {fileID: 572920932}
+  characterDebugPanel: {fileID: 2032925265}
+  player: {fileID: 397952104}
+  playerDefinition: {fileID: 11400000, guid: 982e78e197d784f50af3cc6d28e6a8c9, type: 2}
 --- !u!4 &1628898089
 Transform:
   m_ObjectHideFlags: 0
@@ -2818,6 +2834,52 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2025520309}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &2032925264
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2032925266}
+  - component: {fileID: 2032925265}
+  m_Layer: 0
+  m_Name: CharacterDebugPanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2032925265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032925264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7097e7263e274a0d59d9abd57e77e2e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Features::Features.UI.DebugTools.CharacterDebugPanel
+  xpPerClick: 100
+  shownStats: 0000000002000000040000000500000006000000070000000e0000000f00000012000000
+--- !u!4 &2032925266
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032925264}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -2829,3 +2891,4 @@ SceneRoots:
   - {fileID: 1628898089}
   - {fileID: 572920933}
   - {fileID: 450279454}
+  - {fileID: 2032925266}

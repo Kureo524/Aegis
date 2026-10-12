@@ -4,6 +4,11 @@ using System.IO;
 using System.Linq;
 using Containers;
 using Features.CameraControl;
+using Features.Characters;
+using Features.Combat;
+using Features.Movement;
+using Features.Progression;
+using Features.Stats;
 using Features.Flow;
 using Features.StateMachines;
 using Features.UI;
@@ -21,7 +26,10 @@ namespace EditorTools {
     /// - RootLifetimeScope prefab with the GameFlowStateMachine and its transition rules (§14.2)
     /// - VContainerSettings asset pointing to that prefab, registered as a preloaded asset
     /// - build scene list: Menu, then TestScene
-    /// - scene migrations (Menu: drop its old local state machine; TestScene: wire QuitOverlay)
+    /// - ExperienceCurve and the test hero data (Char_TestHero + its stats, growth, basic attack).
+    ///   Created once with placeholder values: later runs never overwrite designer edits.
+    /// - scene migrations (Menu: drop its old local state machine; TestScene: wire QuitOverlay,
+    ///   player Character, debug panel)
     /// </summary>
     public static class ProjectSetup {
         private const string SettingsDir = "Assets/Data/Settings";
@@ -29,6 +37,9 @@ namespace EditorTools {
         private const string CameraSettingsPath = SettingsDir + "/CameraSettings.asset";
         private const string VContainerSettingsPath = SettingsDir + "/VContainerSettings.asset";
         private const string RootPrefabPath = "Assets/Prefabs/RootLifetimeScope.prefab";
+        private const string ExperienceCurvePath = "Assets/Data/Progression/ExperienceCurve.asset";
+        private const string TestHeroDir = "Assets/Data/Characters/TestHero";
+        public const string TestHeroPath = TestHeroDir + "/Char_TestHero.asset";
 
         public const string MenuScenePath = "Assets/Scenes/Releases/Menu.unity";
         public const string TestScenePath = "Assets/Scenes/Tests/TestScene.unity";
@@ -50,7 +61,9 @@ namespace EditorTools {
 
             var flowSettings = LoadOrCreate<GameFlowSettings>(GameFlowSettingsPath);
             var cameraSettings = LoadOrCreate<CameraSettings>(CameraSettingsPath);
-            RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings);
+            var experienceCurve = CreateExperienceCurve();
+            CreateTestHero();
+            RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve);
             RegisterVContainerSettings(rootPrefab);
             SetBuildScenes();
             MigrateMenuScene();
@@ -58,6 +71,82 @@ namespace EditorTools {
 
             AssetDatabase.SaveAssets();
             Debug.Log("[ProjectSetup] Done.");
+        }
+
+        // Placeholder balance values, tuned later in the assets themselves.
+        private static ExperienceCurve CreateExperienceCurve() {
+            var curve = AssetDatabase.LoadAssetAtPath<ExperienceCurve>(ExperienceCurvePath);
+            if (curve != null) return curve;
+
+            curve = CreateAsset<ExperienceCurve>(ExperienceCurvePath);
+            var so = new SerializedObject(curve);
+            SerializedProperty xp = so.FindProperty("xpToNextLevel");
+            xp.arraySize = 17;   // max level 18
+            for (int i = 0; i < xp.arraySize; i++) xp.GetArrayElementAtIndex(i).intValue = 280 + 100 * i;
+            so.FindProperty("lastSkillPointLevel").intValue = 15;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return curve;
+        }
+
+        // Test character of design doc §7.8 (Fire / Electricity / Wind mage, added with the elements).
+        private static void CreateTestHero() {
+            if (AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath) != null) return;
+
+            var stats = CreateAsset<StatBlock>(TestHeroDir + "/StatBlock_TestHero.asset");
+            SetList(stats, "entries", new (StatType, float)[] {
+                (StatType.MaxHealth, 600f), (StatType.HealthRegen, 1.5f),
+                (StatType.MaxMana, 400f), (StatType.ManaRegen, 1.5f),
+                (StatType.PhysicalAttack, 55f), (StatType.MagicAttack, 0f),
+                (StatType.AttackSpeed, 0.65f), (StatType.AttackRange, 5.5f),
+                (StatType.CritDamage, 1.75f),
+                (StatType.Armor, 25f), (StatType.MagicResist, 30f),
+                (StatType.MoveSpeed, 5f), (StatType.HealShieldPower, 1f),
+            }, (e, v) => {
+                e.FindPropertyRelative("Type").enumValueIndex = (int)v.Item1;
+                e.FindPropertyRelative("Value").floatValue = v.Item2;
+            });
+
+            var growth = CreateAsset<StatGrowth>(TestHeroDir + "/StatGrowth_TestHero.asset");
+            var growthSo = new SerializedObject(growth);
+            growthSo.FindProperty("mode").enumValueIndex = (int)GrowthMode.LoL;
+            growthSo.ApplyModifiedPropertiesWithoutUndo();
+            SetList(growth, "entries", new (StatType, float, ModifierType)[] {
+                (StatType.MaxHealth, 100f, ModifierType.Flat), (StatType.HealthRegen, 0.1f, ModifierType.Flat),
+                (StatType.MaxMana, 30f, ModifierType.Flat), (StatType.ManaRegen, 0.08f, ModifierType.Flat),
+                (StatType.PhysicalAttack, 3f, ModifierType.Flat), (StatType.AttackSpeed, 0.02f, ModifierType.PercentAdd),
+                (StatType.Armor, 4f, ModifierType.Flat), (StatType.MagicResist, 1.3f, ModifierType.Flat),
+            }, (e, v) => {
+                e.FindPropertyRelative("Stat").enumValueIndex = (int)v.Item1;
+                e.FindPropertyRelative("GainPerLevel").floatValue = v.Item2;
+                e.FindPropertyRelative("Type").enumValueIndex = (int)v.Item3;
+            });
+
+            var attack = CreateAsset<BasicAttackDefinition>(TestHeroDir + "/BasicAttack_TestHero.asset");
+
+            var hero = CreateAsset<CharacterDefinition>(TestHeroPath);
+            var heroSo = new SerializedObject(hero);
+            heroSo.FindProperty("displayName").stringValue = "Test Hero";
+            heroSo.FindProperty("faction").enumValueIndex = (int)Faction.Player;
+            heroSo.FindProperty("baseStats").objectReferenceValue = stats;
+            heroSo.FindProperty("growthPerLevel").objectReferenceValue = growth;
+            heroSo.FindProperty("basicAttack").objectReferenceValue = attack;
+            heroSo.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static T CreateAsset<T>(string path) where T : ScriptableObject {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            var asset = ScriptableObject.CreateInstance<T>();
+            AssetDatabase.CreateAsset(asset, path);
+            return asset;
+        }
+
+        private static void SetList<TValue>(Object target, string property, TValue[] values,
+                                            System.Action<SerializedProperty, TValue> write) {
+            var so = new SerializedObject(target);
+            SerializedProperty list = so.FindProperty(property);
+            list.arraySize = values.Length;
+            for (int i = 0; i < values.Length; i++) write(list.GetArrayElementAtIndex(i), values[i]);
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static T LoadOrCreate<T>(string path) where T : ScriptableObject {
@@ -68,7 +157,8 @@ namespace EditorTools {
             return asset;
         }
 
-        private static RootLifetimeScope CreateOrUpdateRootPrefab(GameFlowSettings flowSettings, CameraSettings cameraSettings) {
+        private static RootLifetimeScope CreateOrUpdateRootPrefab(GameFlowSettings flowSettings, CameraSettings cameraSettings,
+                                                                   ExperienceCurve experienceCurve) {
             bool exists = File.Exists(RootPrefabPath);
             GameObject root = exists
                 ? PrefabUtility.LoadPrefabContents(RootPrefabPath)
@@ -97,6 +187,7 @@ namespace EditorTools {
             scopeSo.FindProperty("stateMachine").objectReferenceValue = machine;
             scopeSo.FindProperty("gameFlowSettings").objectReferenceValue = flowSettings;
             scopeSo.FindProperty("cameraSettings").objectReferenceValue = cameraSettings;
+            scopeSo.FindProperty("experienceCurve").objectReferenceValue = experienceCurve;
             scopeSo.ApplyModifiedPropertiesWithoutUndo();
 
             PrefabUtility.SaveAsPrefabAsset(root, RootPrefabPath);
@@ -146,6 +237,11 @@ namespace EditorTools {
             var quit = Object.FindFirstObjectByType<QuitOverlay>();
             if (quit == null) quit = new GameObject("QuitOverlay").AddComponent<QuitOverlay>();
             scope.quitOverlay = quit;
+
+            var movement = Object.FindFirstObjectByType<CharacterMovement>();
+            if (movement != null) {
+                TestSceneSetup.WirePlayer(scope, movement, AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath));
+            }
             EditorUtility.SetDirty(scope);
             EditorSceneManager.SaveScene(scene);
         }

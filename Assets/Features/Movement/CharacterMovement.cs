@@ -1,3 +1,4 @@
+using Features.Stats;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,12 +10,13 @@ namespace Features.Movement {
     /// The path is computed synchronously with NavMesh.CalculatePath and its corners are followed
     /// by hand; the NavMeshAgent never moves the body (updatePosition = false) and is only kept in
     /// sync with it, so it stays usable for queries and avoidance later.
+    ///
+    /// Speed is the owner's MoveSpeed stat (<see cref="Init"/>): same code for everyone,
+    /// different speed. Does not move before Init.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(NavMeshAgent))]
     public class CharacterMovement : MonoBehaviour {
-        // TODO(phase 3): read from the MoveSpeed stat (CharacterDefinition) instead.
-        [SerializeField] public float moveSpeed = 5f;
         [SerializeField] public float stopDistance = 0.1f;
         [SerializeField] public float rotationSpeed = 15f;
 
@@ -28,6 +30,9 @@ namespace Features.Movement {
         private bool _hasDestination;
         private int _currentCorner;
         private Vector3 _moveDirection;
+        private Stat _moveSpeed;
+
+        private float MoveSpeed => _moveSpeed?.Value ?? 0f;
 
         public bool IsMoving => _hasDestination;
         public Vector3 Destination => _destination;
@@ -42,7 +47,6 @@ namespace Features.Movement {
 
             _agent.updatePosition = false;
             _agent.updateRotation = false;
-            _agent.speed = moveSpeed;
             _agent.stoppingDistance = stopDistance;
             _agent.acceleration = 1000f;
             _agent.autoBraking = false;
@@ -54,6 +58,15 @@ namespace Features.Movement {
                 _agent.Warp(hit.position);
             }
         }
+
+        public void Init(Stat moveSpeed) {
+            if (_moveSpeed != null) _moveSpeed.Changed -= OnMoveSpeedChanged;
+            _moveSpeed = moveSpeed;
+            if (_moveSpeed != null) _moveSpeed.Changed += OnMoveSpeedChanged;
+            OnMoveSpeedChanged(MoveSpeed);
+        }
+
+        private void OnMoveSpeedChanged(float speed) => _agent.speed = speed;
 
         public void SetDestination(Vector3 point) {
             // Clicks outside the NavMesh go to the closest walkable point
@@ -88,7 +101,7 @@ namespace Features.Movement {
             Vector3 toWaypoint = waypoint - _rb.position;
             toWaypoint.y = 0f;
             _moveDirection = toWaypoint.normalized;
-            SetHorizontalVelocity(_moveDirection * moveSpeed);
+            SetHorizontalVelocity(_moveDirection * MoveSpeed);
             FaceMoveDirection();
         }
 
