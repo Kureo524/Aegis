@@ -229,6 +229,28 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
+        public IEnumerator HoldingAttackMove_ShowsTheAttackRange_ReleasingHidesIt() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = FindPlayer();
+            var indicator = player.GetComponentInChildren<Features.Controls.RangeIndicator>(true);
+            var bus = Root.Resolve<IEventBus>();
+            Assert.IsFalse(indicator.IsShown, "Hidden by default");
+
+            bus.Publish(new Systems.Inputs.Events.AttackMoveEvent(true));
+            yield return null;
+            Assert.IsTrue(indicator.IsShown, "Shown while Q is held");
+            Assert.AreEqual(player.Stats.Value(Features.Stats.StatType.AttackRange), indicator.Radius, 1e-3f);
+            var line = indicator.GetComponent<LineRenderer>();
+            Assert.Greater(line.positionCount, 8);
+            Assert.AreEqual(indicator.Radius, new Vector2(line.GetPosition(0).x, line.GetPosition(0).z).magnitude, 1e-3f);
+
+            bus.Publish(new Systems.Inputs.Events.AttackMoveEvent(false));
+            yield return null;
+            Assert.IsFalse(indicator.IsShown, "Hidden when Q is released");
+        }
+
+        [UnityTest]
         public IEnumerator Menu_Play_LoadsGameScene() {
             yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
             var machine = Root.Resolve<GameFlowStateMachine>();
