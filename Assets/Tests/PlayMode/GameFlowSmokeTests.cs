@@ -91,6 +91,27 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
+        public IEnumerator Player_IsInitializedFromItsDefinition_AndLevelsUpFromBusXp() {
+            yield return SceneManager.LoadSceneAsync(GameScene, LoadSceneMode.Single);
+            yield return null;
+            var player = Object.FindFirstObjectByType<Features.Characters.Character>();
+            Assert.IsNotNull(player.Definition, "Player not initialized");
+            Assert.IsTrue(player.IsPlayer);
+            Assert.Greater(player.Stats.Value(Features.Stats.StatType.MoveSpeed), 0f, "MoveSpeed comes from the stats");
+
+            int reportedLevel = 0;
+            var bus = Root.Resolve<IEventBus>();
+            using (bus.Subscribe<LevelUpEvent>(e => reportedLevel = e.Level)) {
+                float attackBefore = player.Stats.Value(Features.Stats.StatType.PhysicalAttack);
+                bus.Publish(new XpGrantedEvent(player.Level.XpToNext));
+
+                Assert.AreEqual(2, player.Level.Level);
+                Assert.AreEqual(2, reportedLevel);
+                Assert.Greater(player.Stats.Value(Features.Stats.StatType.PhysicalAttack), attackBefore, "Stat growth applied");
+            }
+        }
+
+        [UnityTest]
         public IEnumerator Menu_Play_LoadsGameScene() {
             yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
             var machine = Root.Resolve<GameFlowStateMachine>();
