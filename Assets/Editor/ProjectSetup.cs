@@ -153,6 +153,9 @@ namespace EditorTools {
             });
 
             var attack = CreateAsset<BasicAttackDefinition>(TestHeroDir + "/BasicAttack_TestHero.asset");
+            var attackSo = new SerializedObject(attack);
+            attackSo.FindProperty("windupPercent").floatValue = 0.18f;   // LoL marksman-like
+            attackSo.ApplyModifiedPropertiesWithoutUndo();
 
             var hero = CreateAsset<CharacterDefinition>(TestHeroPath);
             var heroSo = new SerializedObject(hero);

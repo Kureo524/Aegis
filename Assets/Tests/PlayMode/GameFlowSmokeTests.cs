@@ -537,6 +537,26 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
+        public IEnumerator CancelledWindup_DoesNotSpendTheAttack() {
+            yield return LoadGameScene();
+            var player = FindPlayer();
+            var attacker = player.GetComponent<Features.Combat.BasicAttacker>();
+            var dummy = FindDummy(player);
+            player.GetComponent<Features.Movement.CharacterMovement>()
+                  .Teleport(dummy.transform.position + new Vector3(-3f, 0f, 0f));   // in range
+            yield return null;
+
+            attacker.Attack(dummy);
+            yield return null;
+            Assert.IsTrue(attacker.IsWindingUp, "in range: the windup starts at once");
+            attacker.Cancel();                                                   // a move order during the windup
+            yield return null;
+            attacker.Attack(dummy);
+            yield return null;
+            Assert.IsTrue(attacker.IsWindingUp, "the cancelled attack was not put on cooldown");
+        }
+
+        [UnityTest]
         public IEnumerator Menu_Play_LoadsGameScene() {
             yield return SceneManager.LoadSceneAsync(MenuScene, LoadSceneMode.Single);
             var machine = Root.Resolve<GameFlowStateMachine>();

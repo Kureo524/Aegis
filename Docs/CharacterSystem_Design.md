@@ -162,7 +162,7 @@ public interface ICommandSource { void Tick(CommandController controller); }
 Machine à états : `Idle → Chasing → Windup → Cooldown → (re-attaque si la cible est toujours valide)`.
 
 - **Poursuite** : tant que `distance(cible) > AttackRange`, mise à jour de la destination vers la position actuelle de la cible. La poursuite s'arrête dès que la cible est à portée.
-- **Windup** : délai avant l'impact (`WindupPercent × intervalle`). Un nouvel ordre de déplacement **annule** l'attaque pendant le windup (comme LoL : l'attaque est perdue). Après l'impact, on peut bouger sans perdre la cadence.
+- **Windup** : délai avant l'impact (`WindupPercent × intervalle`). Un nouvel ordre de déplacement **annule** l'attaque pendant le windup (comme LoL : l'attaque ne part pas, mais **son timer n'est pas consommé** : on peut relancer une attaque aussitôt). Après l'impact, on peut bouger sans perdre la cadence. Test Hero : `WindupPercent` = **0,18** (≈ 0,28 s à 0,65 AS, proche d'un tireur de LoL). **Feedback visuel** (`CharacterVisual`, sans Animator) : pendant le windup le sprite se penche en arrière et se tasse, à l'impact il se fend vers la cible ; sans lui, le windup se lisait comme une pause.
 - **Cadence** : `intervalle = 1 / AttackSpeed` (stat finale).
 - **Impact** : crée un `DamageInfo` avec `IsBasicAttack = true` (→ déclenche le `Lifesteal`, voir §6), scaling sur `PhysicalAttack`.
 - **Mêlée vs distance** : `BasicAttackDefinition` (ScriptableObject) avec `WindupPercent`, `ProjectilePrefab` (null = coup instantané), `DamageRatio`, `DamageType`. Chaque `CharacterDefinition` référence la sienne. La **portée** n'y figure pas : c'est la stat `AttackRange` (une seule source de vérité, elle évolue avec les niveaux et modificateurs).
