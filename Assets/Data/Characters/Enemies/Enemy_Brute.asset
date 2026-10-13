@@ -26,8 +26,8 @@ MonoBehaviour:
   elementUnlockLevels: 010000000300000005000000
   spellBook: {fileID: 0}
   signatureAbility: {fileID: 0}
-  xpReward: 120
-  goldReward: 20
+  xpReward: 540
+  goldReward: 50
   navigation: 1
   specialSpell: {fileID: 11400000, guid: 8da266adb18d0a52284b2ddaca362d35, type: 2}
   startMana: 0

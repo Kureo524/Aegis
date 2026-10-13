@@ -27,8 +27,8 @@ MonoBehaviour:
   spellBook: {fileID: 0}
   signatureAbility: {fileID: 0}
   passive: {fileID: 0}
-  xpReward: 26
-  goldReward: 5
+  xpReward: 117
+  goldReward: 12
   navigation: 0
   specialSpell: {fileID: 11400000, guid: 3bc32c0fbd53a08c5a790cebffb205d8, type: 2}
   startMana: 0
