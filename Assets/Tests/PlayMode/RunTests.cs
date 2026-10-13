@@ -203,11 +203,14 @@ namespace Game.Tests.PlayMode {
             yield return null;
             Assert.IsTrue(Object.FindFirstObjectByType<RunEndPanel>().IsOpen);
             Assert.AreEqual("Défaite", Object.FindFirstObjectByType<RunEndPanel>().Title);
+            StringAssert.StartsWith("Termine le stage", Object.FindFirstObjectByType<RunEndPanel>().Reward, "a defeat pays no meta currency");
         }
 
         [UnityTest]
         public IEnumerator ClearingEveryWave_IncludingTheBonusWaves_WinsTheStage() {
             yield return LoadRun();
+            var meta = Root.Resolve<Features.Meta.MetaProgress>();
+            int currency = meta.Currency;
             var run = Game.Resolve<RunDirector>();
             var machine = Root.Resolve<GameFlowStateMachine>();
             var stage = Game.Resolve<StageDefinition>();
@@ -225,6 +228,11 @@ namespace Game.Tests.PlayMode {
             var panel = Object.FindFirstObjectByType<RunEndPanel>();
             Assert.IsTrue(panel.IsOpen);
             Assert.AreEqual("Victoire !", panel.Title, "the victory screen, not the defeat one");
+            int reward = meta.Settings.Reward(true, stage.TotalWaves);
+            Assert.Greater(reward, 0);
+            Assert.AreEqual(currency + reward, meta.Currency, "the full clear pays the meta currency");
+            Assert.AreEqual($"+{reward} {meta.Settings.CurrencyName}", panel.Reward);
+            MetaSaveFixture.Clear();
         }
     }
 }
