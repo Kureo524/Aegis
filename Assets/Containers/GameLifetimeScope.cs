@@ -32,12 +32,10 @@ namespace Containers {
         public PauseMenu pauseMenu;
         public RunHudView runHud;
         public AugmentPanel augmentPanel;
-        public AugmentsView augmentsView;
         public BossHudView bossHud;
         public RunEndPanel runEndPanel;
         public ShopPanel shopPanel;
         public AnvilPanel anvilPanel;
-        public InventoryView inventoryView;
 
         [Header("Run")]
         [Tooltip("The stage played in this scene: waves, bonus waves, lives (design doc §9.1).")]
@@ -81,7 +79,6 @@ namespace Containers {
             if (pauseMenu != null) builder.RegisterComponent(pauseMenu);
             if (runHud != null) builder.RegisterComponent(runHud);
             if (augmentPanel != null) builder.RegisterComponent(augmentPanel);
-            if (augmentsView != null) builder.RegisterComponent(augmentsView);
             if (bossHud != null) builder.RegisterComponent(bossHud);
             if (runEndPanel != null) builder.RegisterComponent(runEndPanel);
             builder.RegisterInstance(stage);
@@ -94,7 +91,6 @@ namespace Containers {
             builder.RegisterEntryPoint<ShopService>().AsSelf();
             if (shopPanel != null) builder.RegisterComponent(shopPanel);
             if (anvilPanel != null) builder.RegisterComponent(anvilPanel);
-            if (inventoryView != null) builder.RegisterComponent(inventoryView);
             builder.RegisterInstance(augmentCatalog);
             builder.RegisterEntryPoint<AugmentController>().AsSelf();
             builder.RegisterInstance(lootSettings);

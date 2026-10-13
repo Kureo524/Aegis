@@ -171,6 +171,7 @@ namespace Features.Characters {
             if (!IsAlive) return;   // killed by a damage over time
             Health.Tick(Time.deltaTime);
             Passives.Tick();
+            if (IsPlayer && Time.unscaledTime >= _nextBuffs) PublishBuffs();
             Health.Heal(Stats.Value(StatType.HealthRegen) * Time.deltaTime);
             Mana.Restore(Stats.Value(StatType.ManaRegen) * Time.deltaTime);
         }
@@ -302,11 +303,33 @@ namespace Features.Characters {
                 stat.Changed += value => _eventBus.Publish(new StatChangedEvent(type, value));
             }
 
+            _eventBus.Publish(new PlayerChampionEvent(Definition.DisplayName, Definition.Sprite, Definition.Passive));
+            _lastBuffs = "?";   // the buff bar starts from a fresh snapshot
+
             // Initial snapshot for whoever displays it
             foreach (Stat stat in Stats.Stats.Values) _eventBus.Publish(new StatChangedEvent(stat.Type, stat.Value));
             _eventBus.Publish(new PlayerHealthChangedEvent(health.Current, health.Max, health.Shield));
             _eventBus.Publish(new PlayerManaChangedEvent(mana.Current, mana.Max));
             PublishXp();
+        }
+
+        // HUD buff bar: passives with stacks or a charge (§7.9), only when that changes
+        private float _nextBuffs;
+        private string _lastBuffs = "";
+
+        private void PublishBuffs() {
+            _nextBuffs = Time.unscaledTime + 0.2f;
+            var buffs = new System.Collections.Generic.List<PlayerBuff>();
+            var key = new System.Text.StringBuilder();
+            foreach (Passive p in Passives.All) {
+                if (p.Stacks <= 0 && !p.IsCharged) continue;
+                buffs.Add(new PlayerBuff(p.Definition.DisplayName, p.Definition.Description, p.Definition.Icon, p.Stacks, p.IsCharged));
+                key.Append(p.Definition.name).Append(p.Stacks).Append(p.IsCharged ? '*' : '-');
+            }
+            string k = key.ToString();
+            if (k == _lastBuffs) return;
+            _lastBuffs = k;
+            _eventBus.Publish(new PlayerBuffsEvent(buffs.ToArray()));
         }
 
         private void PublishXp() => _eventBus.Publish(new XpChangedEvent(Level.Level, Level.Xp, Level.XpToNext));

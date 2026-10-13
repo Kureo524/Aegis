@@ -69,8 +69,8 @@ namespace Features.UI {
             bar.style.width = 520;
             bar.style.height = 16;
             bar.style.marginTop = 3;
-            bar.style.backgroundColor = new Color(0.1f, 0.05f, 0.06f, 0.9f);
-            UiStyles.Border(bar, 2, new Color(0f, 0f, 0f, 0.8f), 4);
+            bar.AddToClassList("ae-bar");
+            bar.AddToClassList("ae-bossbar");
             _fill = new VisualElement { pickingMode = PickingMode.Ignore };
             _fill.style.height = Length.Percent(100);
             _fill.style.backgroundColor = barColor;

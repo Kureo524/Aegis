@@ -57,68 +57,59 @@ namespace Features.UI.Panels {
     }
 
     /// <summary>Inline styles of the code-built menus (pause, options).</summary>
+    /// <summary>
+    /// Building blocks of the menus and screens (pause, options, end of run, shop, anvils,
+    /// augments), styled by the USS theme classes (Assets/UI/AegisTheme.uss): no colors here.
+    /// </summary>
     public static class MenuStyles {
-        private static readonly Color Panel = new(0.08f, 0.09f, 0.13f, 0.96f);
-        private static readonly Color ButtonColor = new(0.20f, 0.24f, 0.34f);
-        private static readonly Color Accent = new(0.95f, 0.80f, 0.40f);
-
         /// <summary>Full-screen dimmed layer that blocks clicks to what is behind, with a centered box.</summary>
         public static VisualElement Overlay(out VisualElement box) {
             var overlay = new VisualElement();
+            overlay.AddToClassList("ae-root");
+            overlay.AddToClassList("ae-overlay");
             UiStyles.Fill(overlay);
-            overlay.style.backgroundColor = new Color(0f, 0f, 0f, 0.55f);
             overlay.style.alignItems = Align.Center;
             overlay.style.justifyContent = Justify.Center;
 
             box = new VisualElement();
+            box.AddToClassList("ae-panel");
+            box.AddToClassList("ae-window");
             box.style.width = 420;
-            box.style.backgroundColor = Panel;
-            box.style.paddingLeft = box.style.paddingRight = 26;
-            box.style.paddingTop = box.style.paddingBottom = 22;
-            UiStyles.Border(box, 2, new Color(1f, 1f, 1f, 0.15f), 10);
             overlay.Add(box);
             return overlay;
         }
 
         public static Label Title(string text) {
-            Label title = UiStyles.Text(text, 26, Accent);
-            title.style.unityTextAlign = TextAnchor.MiddleCenter;
-            title.style.marginBottom = 16;
+            var title = new Label(text);
+            title.AddToClassList("ae-title");
+            title.style.marginBottom = 14;
             return title;
         }
 
         public static Label Hint(string text) {
-            Label hint = UiStyles.Text(text, 14, new Color(0.80f, 0.83f, 0.90f), bold: false);
-            hint.style.unityTextOutlineWidth = 0f;
+            var hint = new Label(text);
+            hint.AddToClassList("ae-label");
+            hint.AddToClassList("ae-dim");
             hint.style.whiteSpace = WhiteSpace.Normal;
             hint.style.marginTop = 2;
-            hint.style.marginLeft = 4;
             return hint;
         }
 
         public static Button Button(string text, Action onClick) {
             var button = new Button(onClick) { text = text };
-            button.style.height = 40;
-            button.style.marginTop = button.style.marginBottom = 5;
-            button.style.marginLeft = button.style.marginRight = 0;
-            button.style.fontSize = 17;
-            button.style.color = Color.white;
-            button.style.unityFontStyleAndWeight = FontStyle.Bold;
-            button.style.backgroundColor = ButtonColor;
-            UiStyles.Border(button, 1, new Color(1f, 1f, 1f, 0.2f), 6);
+            button.AddToClassList("ae-button");
+            button.style.height = 38;
             return button;
         }
 
         public static Label Section(string text) {
-            Label section = UiStyles.Text(text, 16, Color.white);
+            var section = new Label(text);
+            section.AddToClassList("ae-subtitle");
             section.style.marginBottom = 4;
             return section;
         }
 
         /// <summary>Highlights the chosen entry of a list of choices.</summary>
-        public static void Select(Button button, bool selected) {
-            button.style.backgroundColor = selected ? new Color(0.45f, 0.36f, 0.12f) : ButtonColor;
-            UiStyles.Border(button, selected ? 2 : 1, selected ? Accent : new Color(1f, 1f, 1f, 0.2f), 6);
-        }
+        public static void Select(Button button, bool selected) => button.EnableInClassList("ae-button--primary", selected);
     }
 }

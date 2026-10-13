@@ -33,7 +33,7 @@ namespace Features.UI.Panels {
 
         private void Start() {
             _overlay = MenuStyles.Overlay(out VisualElement box);
-            box.style.width = 3 * (OfferCard.Width + 10) + 60;
+            box.style.width = 3 * (OfferCard.Width + 16) + 60;
             _title = MenuStyles.Title("");
             _title.style.marginBottom = 2;
             box.Add(_title);
