@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
+  m_Name: Enemy_SkeletonMage
+  m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
+  displayName: Mage squelette
+  faction: 1
+  sprite: {fileID: 21300000, guid: d3951675c609aa8a6821efc6e079de56, type: 3}
+  bodySize: {x: 0.7, y: 1.7}
+  baseStats: {fileID: 11400000, guid: 18ba909816080e321a8d2fc92f58af2e, type: 2}
+  growthPerLevel: {fileID: 0}
+  basicAttack: {fileID: 11400000, guid: 596890bcea050194bb67fe78db41c412, type: 2}
+  elements:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  elementUnlockLevels: 010000000300000005000000
+  spellBook: {fileID: 0}
+  signatureAbility: {fileID: 0}
+  passive: {fileID: 0}
+  xpReward: 26
+  goldReward: 5
+  navigation: 0
+  specialSpell: {fileID: 11400000, guid: 3bc32c0fbd53a08c5a790cebffb205d8, type: 2}
+  startMana: 0
+  manaPerSecond: 8
+  manaPerAttack: 15
+  manaPerHitTaken: 1

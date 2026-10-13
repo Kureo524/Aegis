@@ -23,8 +23,9 @@ namespace Features.Spells {
     /// - UnitTarget: homing projectile to the chosen enemy.
     /// Damage = Scaling(element levels) + attack stat × PowerRatio; Magic vs MagicResist, Physical vs
     /// Armor. Spells only crit with the SpellCrit capability (§5.6). Buffs and the self heal /
-    /// shield are applied to the caster whatever the targeting; statuses (§5.7) to every enemy hit,
-    /// which also raises the caster's SpellHit event (passives).
+    /// shield are applied to the caster whatever the targeting (and to its allies within Radius with
+    /// AffectsAllies); statuses (§5.7) to every enemy hit, which also raises the caster's SpellHit
+    /// event (passives).
     /// </summary>
     public sealed class SpellExecutor {
         private const float VfxDuration = 0.45f;
@@ -73,9 +74,13 @@ namespace Features.Spells {
         /// </summary>
         public void Telegraph(SpellDefinition spell, CastContext ctx, float duration) {
             if (duration <= 0f) return;
-            Color color = new(1f, 0.25f, 0.2f, 0.9f);
+            // Red: dodge it. Green: a support spell on the caster's side
+            Color color = spell.DealsDamage ? new Color(1f, 0.25f, 0.2f, 0.9f) : new Color(0.35f, 1f, 0.45f, 0.9f);
             SpellVfx vfx = _pool.Get(_settings.ShapeVfx);
             switch (spell.Targeting) {
+                case TargetingType.Skillshot:
+                    vfx.PlayLine(ctx.Origin, ctx.Direction, spell.Range, Mathf.Max(spell.Radius, 0.3f), color, duration, _pool.Release);
+                    break;
                 case TargetingType.GroundPoint:
                     vfx.PlayRing(ctx.TargetPoint, Mathf.Max(spell.Radius, 0.5f), color, duration, _pool.Release);
                     break;
@@ -143,8 +148,14 @@ namespace Features.Spells {
                     break;
             }
 
-            ApplyBuffs(caster, spell);
-            ApplySelfSustain(caster, spell);
+            ApplyBuffs(caster, caster, spell);
+            ApplySelfSustain(caster, caster, spell);
+            if (spell.AffectsAllies) {
+                foreach (Character ally in Allies(caster, origin, Mathf.Max(spell.Radius, 1f)).ToArray()) {
+                    ApplyBuffs(caster, ally, spell);
+                    ApplySelfSustain(caster, ally, spell);
+                }
+            }
             _eventBus.Publish(new SpellCastEvent(spell, caster.IsPlayer));
         }
 
@@ -160,9 +171,9 @@ namespace Features.Spells {
                 stats.Value(StatType.MagicPenFlat), stats.Value(StatType.MagicPenPercent));
         }
 
-        private static void ApplyBuffs(Character caster, SpellDefinition spell) {
+        private static void ApplyBuffs(Character caster, Character target, SpellDefinition spell) {
             foreach (BuffEffect buff in spell.Buffs) {
-                caster.Buffs.Apply(caster.Stats.Get(buff.Stat), buff.Value, buff.Type, spell, buff.Duration);
+                target.Buffs.Apply(target.Stats.Get(buff.Stat), buff.Value, buff.Type, spell, buff.Duration);
             }
         }
 
@@ -178,12 +189,26 @@ namespace Features.Spells {
             if (caster != null) caster.Events.RaiseSpellHit(target, taken);
         }
 
-        private static void ApplySelfSustain(Character caster, SpellDefinition spell) {
+        private static void ApplySelfSustain(Character caster, Character target, SpellDefinition spell) {
             SelfSustain s = spell.SelfSustain;
             if (s.IsEmpty) return;
             float bonus = s.PowerRatio * caster.Stats.Value(StatType.MagicAttack);
-            if (s.Heal > 0f || (s.PowerRatio > 0f && s.Shield <= 0f)) caster.ReceiveHeal(s.Heal + bonus, caster);
-            if (s.Shield > 0f) caster.ReceiveShield(s.Shield + bonus, s.ShieldDuration, caster);
+            if (s.Heal > 0f || (s.PowerRatio > 0f && s.Shield <= 0f)) target.ReceiveHeal(s.Heal + bonus, caster);
+            if (s.Shield > 0f) target.ReceiveShield(s.Shield + bonus, s.ShieldDuration, caster);
+        }
+
+        // Living allies of the caster (same faction, not itself) within radius
+        private List<Character> Allies(Character caster, Vector3 center, float radius) {
+            _targets.Clear();
+            int count = Physics.OverlapSphereNonAlloc(center, radius + 2f, _hits);
+            for (int i = 0; i < count; i++) {
+                Character c = _hits[i].GetComponentInParent<Character>();
+                if (c == null || c == caster || !c.IsAlive || c.Faction != caster.Faction || _targets.Contains(c)) continue;
+                Vector3 d = c.transform.position - center;
+                d.y = 0f;
+                if (d.magnitude - c.BodyRadius <= radius) _targets.Add(c);
+            }
+            return _targets;
         }
 
         private List<Character> InCircle(Character caster, Vector3 center, float radius) {

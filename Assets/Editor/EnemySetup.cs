@@ -55,7 +55,7 @@ namespace EditorTools {
             return CreateHordeSettings(enemyPrefab, goblin, archer, brute);
         }
 
-        private static BasicAttackDefinition AttackOnce(string path, float windup, float ratio, Projectile projectile, float speed, bool homing = true) {
+        internal static BasicAttackDefinition AttackOnce(string path, float windup, float ratio, Projectile projectile, float speed, bool homing = true) {
             var attack = AssetDatabase.LoadAssetAtPath<BasicAttackDefinition>(path);
             if (attack != null) return attack;
             attack = CreateAsset<BasicAttackDefinition>(path);
@@ -89,7 +89,7 @@ namespace EditorTools {
             return spell;
         }
 
-        private static EnemyDefinition EnemyOnce(string path, string displayName, string sprite, Vector2 body,
+        internal static EnemyDefinition EnemyOnce(string path, string displayName, string sprite, Vector2 body,
                                                  BasicAttackDefinition attack, EnemyNavigation navigation, int xp, int gold,
                                                  SpellDefinition special, (StatType, float)[] stats) {
             var enemy = AssetDatabase.LoadAssetAtPath<EnemyDefinition>(path);
