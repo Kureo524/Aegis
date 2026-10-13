@@ -32,6 +32,8 @@ namespace Features.Characters {
 
         private IEventBus _eventBus;
         private ExperienceCurve _experienceCurve;
+        private ProjectileLauncher _projectiles;
+        private Spells.SpellSettings _spellSettings;
         private Rigidbody _rigidbody;
         private readonly DisposableBag _busSubscriptions = new();
 
@@ -74,10 +76,46 @@ namespace Features.Characters {
         public event Action<Character> Initialized;
 
         [Inject]
-        public void Construct(IEventBus eventBus, ExperienceCurve experienceCurve) {
+        public void Construct(IEventBus eventBus, ExperienceCurve experienceCurve, ProjectileLauncher projectiles, Spells.SpellSettings spellSettings) {
             _eventBus = eventBus;
             _experienceCurve = experienceCurve;
+            _projectiles = projectiles;
+            _spellSettings = spellSettings;
         }
+
+        /// <summary>A homing bolt from this character to <paramref name="target"/> (item and augment passives: Runaan, Luden…).</summary>
+        public void FireBolt(Character target, in DamageInfo damage, Color color) {
+            if (_projectiles == null || _spellSettings == null || target == null || !target.IsAlive) return;
+            Vector3 muzzle = transform.position + Vector3.up * (Definition.BodySize.y * 0.6f);
+            _projectiles.Launch(_spellSettings.HomingProjectile, muzzle, target, damage, 22f, null, color);
+        }
+
+        // ---- Adaptive force (§5.1): AD × 0.6 or AP × 1, whichever bonus is higher (AD on a tie) ----
+        private readonly object _adaptiveSource = new();
+        private bool _updatingAdaptive;
+
+        private void BindAdaptiveForce() {
+            foreach (StatType type in new[] { StatType.AdaptiveForce, StatType.PhysicalAttack, StatType.MagicAttack })
+                Stats.Get(type).Changed += _ => UpdateAdaptiveForce();
+            UpdateAdaptiveForce();
+        }
+
+        private void UpdateAdaptiveForce() {
+            if (_updatingAdaptive) return;
+            _updatingAdaptive = true;
+            Stat ad = Stats.Get(StatType.PhysicalAttack), ap = Stats.Get(StatType.MagicAttack);
+            ad.RemoveAllFromSource(_adaptiveSource);
+            ap.RemoveAllFromSource(_adaptiveSource);
+            float force = Stats.Value(StatType.AdaptiveForce);
+            if (force > 0f) {
+                bool toAp = BonusStat(StatType.MagicAttack) > BonusStat(StatType.PhysicalAttack);
+                (toAp ? ap : ad).AddModifier(new StatModifier(toAp ? force : force * 0.6f, ModifierType.Flat, _adaptiveSource));
+            }
+            _updatingAdaptive = false;
+        }
+
+        /// <summary>Where the adaptive force goes now (UI).</summary>
+        public bool AdaptiveForceIsMagic => BonusStat(StatType.MagicAttack) > BonusStat(StatType.PhysicalAttack);
 
         private void Awake() {
             _rigidbody = GetComponent<Rigidbody>();
@@ -111,6 +149,7 @@ namespace Features.Characters {
             // Order matters (§12): stats first, everything else reads them.
             Stats.Init(definition.BaseStats);
             Level = new CharacterLevel(Stats, definition.GrowthPerLevel, _experienceCurve);
+            BindAdaptiveForce();
             Health = new Health(Stats.Get(StatType.MaxHealth));
             Health.Died += OnDied;
             Mana = new ManaPool(Stats.Get(StatType.MaxMana));
@@ -158,7 +197,7 @@ namespace Features.Characters {
 
             _eventBus.Publish(new DamageDealtEvent(HeadPosition, taken, info.Type, info.IsCrit, IsPlayer));
             Damaged?.Invoke(this, taken);
-            Events.RaiseDamageTaken(taken);
+            Events.RaiseDamageTaken(taken, info.Source);
             if (info.Source != null) {
                 info.Source.OnDamageDealt(taken, info.IsBasicAttack);
                 info.Source.Events.RaiseDamageDealt(this, taken, info);
