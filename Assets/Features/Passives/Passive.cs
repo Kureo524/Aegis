@@ -60,7 +60,11 @@ namespace Features.Passives {
             events.Kill += OnKill;
             events.DamageTaken += OnDamageTaken;
             events.SpellHit += OnSpellHit;
+            events.DamageDealt += OnDamageDealt;
+            events.Blink += OnBlink;
             _nextAura = Time.time + Mathf.Max(0.1f, Definition.Aura.Interval);
+            for (int i = 0; i < _readyAt.Length; i++)   // periodic triggers wait one interval first
+                if (Definition.Triggers[i].On == PassiveEvent.Periodic) _readyAt[i] = Time.time + Mathf.Max(0.5f, Definition.Triggers[i].Cooldown);
         }
 
         public void Detach() {
@@ -75,6 +79,8 @@ namespace Features.Passives {
             events.Kill -= OnKill;
             events.DamageTaken -= OnDamageTaken;
             events.SpellHit -= OnSpellHit;
+            events.DamageDealt -= OnDamageDealt;
+            events.Blink -= OnBlink;
         }
 
         public void Tick() {
@@ -86,6 +92,13 @@ namespace Features.Passives {
             if (slowTick) _nextNearby = Time.time + NearbyInterval;
             if (nearby.Radius > 0f && slowTick) UpdateNearby(nearby);
             if (slowTick && Definition.Conversions.Length > 0) UpdateConversions();
+
+            PassiveTrigger[] triggers = Definition.Triggers;
+            for (int i = 0; i < triggers.Length; i++) {
+                if (triggers[i].On != PassiveEvent.Periodic || Time.time < _readyAt[i]) continue;
+                _readyAt[i] = Time.time + Mathf.Max(0.5f, triggers[i].Cooldown);
+                Apply(triggers[i], null);
+            }
 
             AuraSettings aura = Definition.Aura;
             if (aura.Radius > 0f && Time.time >= _nextAura) {
@@ -103,6 +116,7 @@ namespace Features.Passives {
                 hit++;
             }
             if (hit > 0 && aura.HealPerEnemy > 0f) _owner.ReceiveHeal(aura.HealPerEnemy * hit, _owner);
+            if (hit > 0) _owner.PlayRing(_owner.transform.position, aura.Radius, new Color(1f, 0.55f, 0.25f, 0.35f));
         }
 
         private void UpdateConversions() {
@@ -126,9 +140,23 @@ namespace Features.Passives {
                 s.Value(StatType.MagicPenFlat), s.Value(StatType.MagicPenPercent));
         }
 
-        // Base + stat ratio + shares of the target's HP (BotRK, Liandry…)
+        /// <summary>Outgoing damage multiplier of this passive on <paramref name="target"/> (DamageModifiers).</summary>
+        public float OutgoingMultiplier(Character target, in DamageInfo info) {
+            DamageModifiers d = Definition.Damage;
+            if (d.OutgoingPercent == 0f) return 1f;
+            if (d.AppliesTo == DamageScope.Abilities && info.IsBasicAttack) return 1f;
+            if (d.AppliesTo == DamageScope.BasicAttacks && !info.IsBasicAttack) return 1f;
+            if (d.TargetHealthBelow > 0f && (target.Health == null || target.Health.Ratio > d.TargetHealthBelow)) return 1f;
+            return 1f + d.OutgoingPercent;
+        }
+
+        public float IncomingMultiplier => 1f + Definition.Damage.IncomingPercent;
+
+        // Base + stat ratio + shares of the target's HP (BotRK, Liandry…) + share of the triggering damage
+        private float _triggerDamage;
+
         private float RawDamage(in PassiveTrigger t, Character target) {
-            float raw = t.Damage + t.DamageRatio * _owner.Stats.Value(t.ScalingStat);
+            float raw = t.Damage + t.DamageRatio * _owner.Stats.Value(t.ScalingStat) + t.DamageDealtRatio * _triggerDamage;
             if (target != null && target.Health != null)
                 raw += t.TargetMaxHealthRatio * target.Health.Max + t.TargetCurrentHealthRatio * target.Health.Current;
             return raw;
@@ -161,7 +189,9 @@ namespace Features.Passives {
 
         private void OnSpellCast(SpellDefinition spell) {
             if (Definition.Stacks.Source == StackSource.PerSpellCast) AddStack();
+            _castSpell = spell;
             Fire(PassiveEvent.SpellCast, null);
+            _castSpell = null;
         }
 
         private void OnKill(Character victim) {
@@ -176,11 +206,23 @@ namespace Features.Passives {
             Fire(PassiveEvent.SpellHit, target);
         }
 
+        private void OnDamageDealt(Character target, float damage, DamageInfo info) {
+            if (info.IsCrit && info.IsBasicAttack && Definition.Stacks.Source == StackSource.PerCrit) AddStack();
+            _triggerDamage = damage;
+            Fire(PassiveEvent.DamageDealt, target);
+            _triggerDamage = 0f;
+        }
+
+        private void OnBlink(Vector3 from, Vector3 to) => Fire(PassiveEvent.Blink, null);
+
+        private SpellDefinition _castSpell;
+
         private void Fire(PassiveEvent happened, Character target) {
             PassiveTrigger[] triggers = Definition.Triggers;
             for (int i = 0; i < triggers.Length; i++) {
                 PassiveTrigger t = triggers[i];
-                if (t.On != happened) continue;
+                if (t.On != happened || happened == PassiveEvent.Periodic) continue;
+                if (t.UltimateOnly && !IsUltimate(_castSpell)) continue;
                 if (t.HealthBelow > 0f && (_owner.Health == null || _owner.Health.Ratio > t.HealthBelow)) continue;
                 if (Time.time < _readyAt[i]) continue;
                 if (t.ConsumesCharge && Time.time >= _chargedUntil) continue;
@@ -226,6 +268,19 @@ namespace Features.Passives {
                 case PassiveEffectKind.Charge:
                     _chargedUntil = Time.time + t.Duration;
                     break;
+                case PassiveEffectKind.Nova: {
+                    Vector3 center = _owner.transform.position;
+                    foreach (Character enemy in EnemiesAround(center, t.Radius, null).ToArray()) {
+                        float raw = RawDamage(t, enemy);
+                        if (raw > 0f) enemy.TakeDamage(Hit(raw, t.DamageType));
+                        if (t.Status.Duration > 0f) enemy.ApplyStatus(t.Status, _owner, this);
+                    }
+                    _owner.PlayRing(center, t.Radius, t.BoltColor.a > 0f ? t.BoltColor : new Color(1f, 0.9f, 0.5f, 0.8f));
+                    break;
+                }
+                case PassiveEffectKind.ProcOnHit:
+                    if (target != null && target.IsAlive) _owner.Events.RaiseBasicAttackHit(target, 0f);
+                    break;
                 case PassiveEffectKind.DropLoot:
                     LootDropped?.Invoke(t.Loot, target != null ? target.transform.position : _owner.transform.position);
                     break;
@@ -240,6 +295,11 @@ namespace Features.Passives {
                     break;
             }
         }
+
+        // The ultimate is the 4th ability of the owner's definition
+        private bool IsUltimate(SpellDefinition spell) =>
+            spell != null && _owner.Definition != null && _owner.Definition.Abilities.Count > Spells.AbilitySlots.Ultimate
+            && _owner.Definition.Abilities[Spells.AbilitySlots.Ultimate] == spell;
 
         private float Amount(in PassiveTrigger t) => t.Amount + t.AmountRatio * _owner.Stats.Value(t.AmountStat);
 

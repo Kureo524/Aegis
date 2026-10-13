@@ -19,6 +19,8 @@ namespace Features.Combat {
         Bleed,
         /// <summary>Magic damage over time, stacking.</summary>
         Burn,
+        /// <summary>Armor and magic resist × (1 − Power × stacks), stacking up to MaxStacks (Erosion). Appended: serialized index.</summary>
+        Shred,
     }
 
     /// <summary>One status as written in the data (spells, passives, enemy attacks).</summary>
@@ -27,7 +29,7 @@ namespace Features.Combat {
         public StatusKind Kind;
         [Tooltip("Seconds. CC and slows are shortened by the target's Tenacity, damage over time is not.")]
         [Min(0f)] public float Duration;
-        [Tooltip("Slow: share of move speed removed (0.3 = −30 %). Bleed / Burn: damage per second per stack.")]
+        [Tooltip("Slow: share of move speed removed (0.3 = −30 %). Bleed / Burn: damage per second per stack. Shred: share of armor and MR removed per stack.")]
         public float Power;
         [Tooltip("Bleed / Burn: + Ratio × the applier's ScalingStat, per second per stack.")]
         public StatType ScalingStat;
@@ -69,7 +71,8 @@ namespace Features.Combat {
         private readonly Action<DamageInfo> _takeDamage;
         private readonly float[] _remaining = new float[Enum.GetValues(typeof(StatusKind)).Length];
         private readonly List<DamageOverTime> _dots = new();
-        private bool _wasStunned, _wasRooted, _wasSilenced, _wasSlowed, _wasBleeding, _wasBurning, _wasMarked;
+        private readonly Dictionary<object, int> _shredStacks = new();
+        private bool _wasStunned, _wasRooted, _wasSilenced, _wasSlowed, _wasBleeding, _wasBurning, _wasMarked, _wasShredded;
         private Character _markedBy;
         private Spells.SpellDefinition _markSpell;
         private int _markRank;
@@ -88,6 +91,7 @@ namespace Features.Combat {
         public bool IsSlowed => Remaining(StatusKind.Slow) > 0f;
         public bool IsBleeding => HasDot(StatusKind.Bleed);
         public bool IsBurning => HasDot(StatusKind.Burn);
+        public bool IsShredded => Remaining(StatusKind.Shred) > 0f;
         public bool IsMarked => _markRemaining > 0f && _markedBy != null;
         public bool IsMarkedBy(Character character) => IsMarked && _markedBy == character;
         /// <summary>The spell whose mark the owner carries (its icon is shown), null when unmarked.</summary>
@@ -130,6 +134,16 @@ namespace Features.Combat {
                 case StatusKind.Burn:
                     ApplyDot(status, applier, source);
                     break;
+                case StatusKind.Shred: {
+                    object key = source ?? this;
+                    int stacks = Mathf.Min((_shredStacks.TryGetValue(key, out int s) && Remaining(StatusKind.Shred) > 0f ? s : 0) + 1, Mathf.Max(1, status.MaxStacks));
+                    _shredStacks[key] = stacks;
+                    float reduction = -Mathf.Clamp01(status.Power * stacks);
+                    _buffs.Apply(_stats.Get(StatType.Armor), reduction, ModifierType.PercentAdd, key, status.Duration);
+                    _buffs.Apply(_stats.Get(StatType.MagicResist), reduction, ModifierType.PercentAdd, key, status.Duration);
+                    _remaining[(int)StatusKind.Shred] = status.Duration;
+                    break;
+                }
             }
             NotifyIfChanged();
         }
@@ -189,6 +203,7 @@ namespace Features.Combat {
         public void Clear() {
             Array.Clear(_remaining, 0, _remaining.Length);
             _dots.Clear();
+            _shredStacks.Clear();
             ClearMark();
             NotifyIfChanged();
         }
@@ -233,7 +248,12 @@ namespace Features.Combat {
 
         private void NotifyIfChanged() {
             bool stunned = IsStunned, rooted = IsRooted, silenced = IsSilenced, slowed = IsSlowed, bleeding = IsBleeding, burning = IsBurning;
-            bool marked = IsMarked;
+            bool marked = IsMarked, shredded = IsShredded;
+            if (shredded != _wasShredded) {
+                _wasShredded = shredded;
+                Changed?.Invoke();
+                return;
+            }
             if (stunned == _wasStunned && rooted == _wasRooted && silenced == _wasSilenced && slowed == _wasSlowed
                 && bleeding == _wasBleeding && burning == _wasBurning && marked == _wasMarked) return;
             _wasMarked = marked;

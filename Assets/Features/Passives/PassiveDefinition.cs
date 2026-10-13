@@ -6,7 +6,9 @@ using UnityEngine;
 
 namespace Features.Passives {
     /// <summary>What a passive reacts to (CharacterEvents, design doc §8.1). DamageTaken: the target is the attacker.</summary>
-    public enum PassiveEvent { BasicAttackHit, SpellCast, Kill, DamageTaken, SpellHit }
+    /// <remarks>Periodic: every Cooldown seconds (auto-cast augments). Blink: after a dash / teleport.
+    /// DamageDealt: any damage the owner deals (DamageDealtRatio scales on it).</remarks>
+    public enum PassiveEvent { BasicAttackHit, SpellCast, Kill, DamageTaken, SpellHit, Periodic, Blink, DamageDealt }
 
     /// <summary>What a trigger does.</summary>
     public enum PassiveEffectKind {
@@ -30,6 +32,10 @@ namespace Features.Passives {
         ReduceCooldowns,
         /// <summary>Charges the passive for Duration seconds: a trigger with ConsumesCharge needs it (Spellblade: Sheen, Trinity Force…).</summary>
         Charge,
+        /// <summary>The damage formula (and Status if set) to every enemy within Radius of the owner, with a ring (Self Destruct, Frost Wraith, Earthwake).</summary>
+        Nova,
+        /// <summary>The hit also counts as a basic attack hit: on-hit effects apply (Ethereal Weapon).</summary>
+        ProcOnHit,
     }
 
     /// <summary>Loot that a passive can drop (design doc §9.5).</summary>
@@ -54,6 +60,8 @@ namespace Features.Passives {
         [Min(0f)] public float Cooldown;
         [Tooltip("Only when the passive is charged (Charge effect), and uses the charge up.")]
         public bool ConsumesCharge;
+        [Tooltip("SpellCast / SpellHit: only the ultimate (R).")]
+        public bool UltimateOnly;
         public PassiveEffectKind Effect;
         [Header("TimedStats")]
         public StatBonus[] Stats;
@@ -67,6 +75,8 @@ namespace Features.Passives {
         public float TargetMaxHealthRatio;
         [Tooltip("+ this share of the target's current HP.")]
         public float TargetCurrentHealthRatio;
+        [Tooltip("DamageDealt: + this share of the damage that triggered it (Chain Lightning).")]
+        public float DamageDealtRatio;
         public DamageType DamageType;
         [Tooltip("Bolts: how many. Splash / Bolts: Radius around the target.")]
         [Min(0)] public int Count;
@@ -83,7 +93,22 @@ namespace Features.Passives {
     }
 
     /// <summary>Where stacks come from (design doc §8.1).</summary>
-    public enum StackSource { None, PerBasicAttack, PerSpellCast, PerKill, PerSpellHit }
+    public enum StackSource { None, PerBasicAttack, PerSpellCast, PerKill, PerSpellHit, PerCrit }
+
+    public enum DamageScope { All, Abilities, BasicAttacks }
+
+    /// <summary>
+    /// Damage dealt and taken by the owner (Executioner, Glass Cannon…): outgoing damage × (1 +
+    /// OutgoingPercent) on targets under TargetHealthBelow (0 = any), incoming × (1 + IncomingPercent).
+    /// </summary>
+    [Serializable]
+    public struct DamageModifiers {
+        public float OutgoingPercent;
+        [Range(0f, 1f)] public float TargetHealthBelow;
+        public DamageScope AppliesTo;
+        [Tooltip("Negative = damage reduction.")]
+        public float IncomingPercent;
+    }
 
     /// <summary>When stacks go back to zero.</summary>
     public enum ResetPolicy { Never, EndOfWave, AfterDuration }
@@ -150,6 +175,9 @@ namespace Features.Passives {
         [SerializeField] private NearbyEnemiesBonus nearbyEnemies;
         [SerializeField] private AuraSettings aura;
         [SerializeField] private StatConversion[] conversions = Array.Empty<StatConversion>();
+        [SerializeField] private DamageModifiers damage;
+        [Tooltip("Extra ability haste per ability, Q W E R (Bread and Butter…).")]
+        [SerializeField] private float[] abilityHaste = Array.Empty<float>();
 
         public string DisplayName => displayName;
         public string Description => description;
@@ -161,5 +189,7 @@ namespace Features.Passives {
         public NearbyEnemiesBonus NearbyEnemies => nearbyEnemies;
         public AuraSettings Aura => aura;
         public StatConversion[] Conversions => conversions;
+        public DamageModifiers Damage => damage;
+        public float AbilityHaste(int slot) => abilityHaste != null && slot >= 0 && slot < abilityHaste.Length ? abilityHaste[slot] : 0f;
     }
 }
