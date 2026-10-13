@@ -26,5 +26,9 @@ namespace Features.Combat {
             MagicPenFlat = magicPenFlat;
             MagicPenPercent = magicPenPercent;
         }
+
+        /// <summary>The same hit with another raw amount (damage modifiers).</summary>
+        public DamageInfo WithAmount(float rawAmount) =>
+            new(rawAmount, Type, IsCrit, IsBasicAttack, Source, ArmorPenFlat, ArmorPenPercent, MagicPenFlat, MagicPenPercent);
     }
 }

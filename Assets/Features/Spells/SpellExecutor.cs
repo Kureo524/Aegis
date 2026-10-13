@@ -129,6 +129,7 @@ namespace Features.Spells {
                         if (TryGetBlinkPoint(origin, ctx.TargetPoint, out Vector3 destination)) {
                             Ring(origin, 0.8f, spell.Color);
                             caster.GetComponent<CharacterMovement>().Teleport(destination);
+                            caster.Events.RaiseBlink(origin, destination);   // passives (Earthwake, Shadow Runner…)
                             Ring(destination, 0.8f, spell.Color);
                             if (spell.BlinkBoltRadius > 0f) FireBlinkBolt(caster, spell, destination, BuildDamage(caster, spell, rank), onHit);
                         }

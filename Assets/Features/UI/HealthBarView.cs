@@ -72,6 +72,7 @@ namespace Features.UI {
                     StatusKind.Silence => status.IsSilenced,
                     StatusKind.Slow => status.IsSlowed,
                     StatusKind.Burn => status.IsBurning,
+                    StatusKind.Shred => status.IsShredded,
                     _ => status.IsBleeding,
                 };
                 if (active) icon = statusSprites[i];

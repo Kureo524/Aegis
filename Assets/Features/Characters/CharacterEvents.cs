@@ -20,6 +20,8 @@ namespace Features.Characters {
         public event Action<Character, float> SpellHit;
         /// <summary>This character cast a spell (after its cast time).</summary>
         public event Action<SpellDefinition> SpellCast;
+        /// <summary>This character dashed or teleported (from, to).</summary>
+        public event Action<UnityEngine.Vector3, UnityEngine.Vector3> Blink;
         /// <summary>A hit asks to reduce this character's ability cooldowns (seconds, Ezreal Q).</summary>
         public event Action<float> CooldownRefund;
         /// <summary>This character's level went up (new level).</summary>
@@ -31,6 +33,7 @@ namespace Features.Characters {
         public void RaiseKill(Character victim) => Kill?.Invoke(victim);
         public void RaiseSpellHit(Character target, float damage) => SpellHit?.Invoke(target, damage);
         public void RaiseSpellCast(SpellDefinition spell) => SpellCast?.Invoke(spell);
+        public void RaiseBlink(UnityEngine.Vector3 from, UnityEngine.Vector3 to) => Blink?.Invoke(from, to);
         public void RaiseCooldownRefund(float seconds) => CooldownRefund?.Invoke(seconds);
         public void RaiseLevelUp(int level) => LevelUp?.Invoke(level);
     }

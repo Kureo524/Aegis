@@ -161,7 +161,8 @@ namespace Features.Spells {
                 return;
             }
             float cooldown = spell.Cooldown(rank);
-            if (AbilitySlots.IsAbility(slot)) cooldown = SpellMath.CooldownWithHaste(cooldown, owner.Stats.Value(StatType.AbilityHaste));
+            if (AbilitySlots.IsAbility(slot))   // + the haste of this very ability (Bread and Butter…)
+                cooldown = SpellMath.CooldownWithHaste(cooldown, owner.Stats.Value(StatType.AbilityHaste) + owner.Passives.AbilityHaste(slot));
             _readyAt[slot] = Time.time + cooldown;
             _eventBus.Publish(new CooldownStartedEvent(slot, cooldown));
         }

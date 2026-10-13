@@ -94,6 +94,7 @@ namespace EditorTools {
             BossSetup.Run(enemyPrefab);   // after the items: the boss carries some
             ContentSetup.Run();           // phase 9b: statuses on spells, more items and augments
             EnemyContentSetup.Run(enemyPrefab);   // phase 9c: wolf, skeleton mage, goblin shaman, stone golem
+            ArenaAugmentsSetup.Run();    // augments after LoL Arena (catalog = exactly that list)
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
             UiSetup.Run();               // LoL-style UI: theme on the PanelSettings, stat icons

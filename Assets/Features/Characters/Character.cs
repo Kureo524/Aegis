@@ -34,6 +34,14 @@ namespace Features.Characters {
         private ExperienceCurve _experienceCurve;
         private ProjectileLauncher _projectiles;
         private Spells.SpellSettings _spellSettings;
+        private Systems.Pooling.PrefabPool _pool;
+
+        /// <summary>A flash ring on the ground (passive novas, auras).</summary>
+        public void PlayRing(Vector3 center, float radius, Color color) {
+            if (_pool == null || _spellSettings == null || _spellSettings.ShapeVfx == null) return;
+            Spells.SpellVfx vfx = _pool.Get(_spellSettings.ShapeVfx);
+            vfx.PlayRing(center, radius, color, 0.4f, _pool.Release);
+        }
         private Rigidbody _rigidbody;
         private readonly DisposableBag _busSubscriptions = new();
 
@@ -76,7 +84,9 @@ namespace Features.Characters {
         public event Action<Character> Initialized;
 
         [Inject]
-        public void Construct(IEventBus eventBus, ExperienceCurve experienceCurve, ProjectileLauncher projectiles, Spells.SpellSettings spellSettings) {
+        public void Construct(IEventBus eventBus, ExperienceCurve experienceCurve, ProjectileLauncher projectiles, Spells.SpellSettings spellSettings,
+                              Systems.Pooling.PrefabPool pool) {
+            _pool = pool;
             _eventBus = eventBus;
             _experienceCurve = experienceCurve;
             _projectiles = projectiles;
@@ -193,7 +203,10 @@ namespace Features.Characters {
         public float TakeDamage(in DamageInfo info) {
             if (!IsAlive) return 0f;
 
-            float final = DamageCalculator.Mitigate(info, Stats.Value(StatType.Armor), Stats.Value(StatType.MagicResist));
+            // Damage modifiers of the passives (§8.1): the attacker's, then the target's own
+            float scale = (info.Source != null ? info.Source.Passives.OutgoingMultiplier(this, info) : 1f) * Passives.IncomingMultiplier;
+            DamageInfo hit = scale != 1f ? info.WithAmount(info.RawAmount * scale) : info;
+            float final = DamageCalculator.Mitigate(hit, Stats.Value(StatType.Armor), Stats.Value(StatType.MagicResist));
             float taken = Health.TakeDamage(final);
 
             _eventBus.Publish(new DamageDealtEvent(HeadPosition, taken, info.Type, info.IsCrit, IsPlayer));

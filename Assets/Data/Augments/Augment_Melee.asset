@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1ce3bafaf11545eb9362f02932eaf5b, type: 3}
   m_Name: Augment_Melee
   m_EditorClassIdentifier: Game.Features::Features.Augments.AugmentDefinition
-  rarity: 1
+  rarity: 0
   passive: {fileID: 11400000, guid: 99a7a24e5448bc1e8a862af5216df686, type: 2}

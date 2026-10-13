@@ -155,17 +155,17 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator Bloodletting_BasicAttacksMakeTheTargetBleed() {
+        public IEnumerator Firebrand_BasicAttacksBurnTheTarget() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Player.Passives.Add(Augment("Augment_Bloodletting"), "test");
+            Player.Passives.Add(Augment("Augment_Firebrand"), "test");
             Character dummy = Dummy();
             var attacker = Player.GetComponent<BasicAttacker>();
             Time.timeScale = 3f;
             attacker.Attack(dummy);
             float end = Time.realtimeSinceStartup + 10f;
-            while (!dummy.Status.IsBleeding && Time.realtimeSinceStartup < end) yield return null;
-            Assert.IsTrue(dummy.Status.IsBleeding);
-            Assert.AreEqual(new Color(1f, 0.5f, 0.5f), dummy.GetComponentInChildren<CharacterVisual>().Renderer.color, "bleed tint");
+            while (!dummy.Status.IsBurning && Time.realtimeSinceStartup < end) yield return null;
+            Assert.IsTrue(dummy.Status.IsBurning);
+            Assert.AreEqual(new Color(1f, 0.6f, 0.35f), dummy.GetComponentInChildren<CharacterVisual>().Renderer.color, "burn tint");
         }
 
         [UnityTest]
