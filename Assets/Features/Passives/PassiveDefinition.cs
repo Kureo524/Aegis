@@ -5,7 +5,7 @@ using Features.Stats;
 using UnityEngine;
 
 namespace Features.Passives {
-    /// <summary>What a passive reacts to (CharacterEvents, design doc §8.1).</summary>
+    /// <summary>What a passive reacts to (CharacterEvents, design doc §8.1). DamageTaken: the target is the attacker.</summary>
     public enum PassiveEvent { BasicAttackHit, SpellCast, Kill, DamageTaken, SpellHit }
 
     /// <summary>What a trigger does.</summary>
@@ -22,6 +22,14 @@ namespace Features.Passives {
         Heal,
         /// <summary>Shields the owner for Duration seconds: Amount + AmountRatio × AmountStat.</summary>
         Shield,
+        /// <summary>Count homing bolts at the nearest other enemies within Radius of the target (Runaan, Luden…): the damage formula.</summary>
+        Bolts,
+        /// <summary>The damage formula to every other enemy within Radius of the target (Hydra cleave).</summary>
+        Splash,
+        /// <summary>Takes Amount seconds off the owner's ability cooldowns (Navori).</summary>
+        ReduceCooldowns,
+        /// <summary>Charges the passive for Duration seconds: a trigger with ConsumesCharge needs it (Spellblade: Sheen, Trinity Force…).</summary>
+        Charge,
     }
 
     /// <summary>Loot that a passive can drop (design doc §9.5).</summary>
@@ -44,16 +52,26 @@ namespace Features.Passives {
         [Range(0f, 1f)] public float HealthBelow;
         [Tooltip("Seconds before the trigger can go off again (0 = none).")]
         [Min(0f)] public float Cooldown;
+        [Tooltip("Only when the passive is charged (Charge effect), and uses the charge up.")]
+        public bool ConsumesCharge;
         public PassiveEffectKind Effect;
         [Header("TimedStats")]
         public StatBonus[] Stats;
         [Tooltip("TimedStats, Shield: seconds.")]
         [Min(0f)] public float Duration;
-        [Header("BonusDamage")]
+        [Header("BonusDamage / Bolts / Splash")]
         public float Damage;
         public StatType ScalingStat;
         public float DamageRatio;
+        [Tooltip("+ this share of the target's max HP.")]
+        public float TargetMaxHealthRatio;
+        [Tooltip("+ this share of the target's current HP.")]
+        public float TargetCurrentHealthRatio;
         public DamageType DamageType;
+        [Tooltip("Bolts: how many. Splash / Bolts: Radius around the target.")]
+        [Min(0)] public int Count;
+        [Min(0f)] public float Radius;
+        public Color BoltColor;
         [Header("DropLoot")]
         public LootKind Loot;
         [Header("ApplyStatus")]
@@ -82,6 +100,30 @@ namespace Features.Passives {
         public StatBonus[] PerStack;
     }
 
+    /// <summary>Damage to every enemy around the owner, every Interval seconds (Sunfire Aegis).</summary>
+    [Serializable]
+    public struct AuraSettings {
+        [Tooltip("0 = no aura.")]
+        [Min(0f)] public float Radius;
+        [Min(0.1f)] public float Interval;
+        public float Damage;
+        public StatType ScalingStat;
+        public float Ratio;
+        public DamageType DamageType;
+        [Tooltip("Heals the owner this much per enemy hit (Unending Despair).")]
+        public float HealPerEnemy;
+    }
+
+    /// <summary>A share of a stat added to another one, recomputed continuously (Archangel's: bonus mana → AP).</summary>
+    [Serializable]
+    public struct StatConversion {
+        public StatType From;
+        public StatType To;
+        public float Ratio;
+        [Tooltip("Only the bonus part of From (items, buffs), not the base and level growth.")]
+        public bool BonusOnly;
+    }
+
     /// <summary>Continuous bonus recomputed from the number of enemies around (design doc §8.1).</summary>
     [Serializable]
     public struct NearbyEnemiesBonus {
@@ -106,6 +148,8 @@ namespace Features.Passives {
         [SerializeField] private PassiveTrigger[] triggers = Array.Empty<PassiveTrigger>();
         [SerializeField] private StackSettings stacks;
         [SerializeField] private NearbyEnemiesBonus nearbyEnemies;
+        [SerializeField] private AuraSettings aura;
+        [SerializeField] private StatConversion[] conversions = Array.Empty<StatConversion>();
 
         public string DisplayName => displayName;
         public string Description => description;
@@ -115,5 +159,7 @@ namespace Features.Passives {
         public PassiveTrigger[] Triggers => triggers;
         public StackSettings Stacks => stacks;
         public NearbyEnemiesBonus NearbyEnemies => nearbyEnemies;
+        public AuraSettings Aura => aura;
+        public StatConversion[] Conversions => conversions;
     }
 }

@@ -89,6 +89,7 @@ namespace EditorTools {
             HordeSettings hordeSettings = EnemySetup.Run(enemyPrefab);
             StageDefinition stage = RunSetup.Run(enemyPrefab);
             ShopCatalog shopCatalog = EconomySetup.Run();
+            LolItemsSetup.Run();         // the items, copied from LoL (before the boss: he carries some)
             (Features.Augments.AugmentCatalog augmentCatalog, Features.Loot.LootSettings lootSettings) = PassiveSetup.Run();
             BossSetup.Run(enemyPrefab);   // after the items: the boss carries some
             ContentSetup.Run();           // phase 9b: statuses on spells, more items and augments

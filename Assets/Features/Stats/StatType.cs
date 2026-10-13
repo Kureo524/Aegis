@@ -22,6 +22,10 @@ namespace Features.Stats {
         Omnivamp, Lifesteal, HealShieldPower,
 
         // Utility
-        AbilityHaste, ManaCostReduction
+        AbilityHaste, ManaCostReduction,
+
+        // Converted (appended: stat indices are serialized)
+        /// <summary>Becomes AD (× 0.6) or AP (× 1), whichever the character has more bonus of (§5.1).</summary>
+        AdaptiveForce
     }
 }

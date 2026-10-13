@@ -41,6 +41,7 @@ namespace Features.Economy {
             { StatType.MoveSpeed, "vitesse de déplacement" }, { StatType.Omnivamp, "omnivampirisme" },
             { StatType.Lifesteal, "vol de vie" }, { StatType.HealShieldPower, "puissance des soins" },
             { StatType.AbilityHaste, "accélération" }, { StatType.ManaCostReduction, "coût en mana" },
+            { StatType.AdaptiveForce, "force adaptative" },
         };
 
         // Stats stored as a 0..1 share and shown as a percentage

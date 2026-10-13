@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
+  m_Name: Item_DeathsDance
+  m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
+  displayName: Danse de la mort
+  icon: {fileID: 21300000, guid: c689e474ca4c082508ade56428e082fe, type: 3}
+  cost: 330
+  tier: 0
+  stats:
+  - Stat: 4
+    Type: 0
+    Value: 60
+  - Stat: 14
+    Type: 0
+    Value: 50
+  - Stat: 22
+    Type: 0
+    Value: 15
+  unique: 1
+  uniqueGroup: 
+  passive: {fileID: 11400000, guid: 43d067f8349d14a698cbec37ec247282, type: 2}

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
+  m_Name: Item_RylaisCrystalScepter
+  m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
+  displayName: Sceptre de cristal de Rylai
+  icon: {fileID: 21300000, guid: 6215fbd28b8f7d4569958be3a57f6aae, type: 3}
+  cost: 260
+  tier: 0
+  stats:
+  - Stat: 5
+    Type: 0
+    Value: 65
+  - Stat: 0
+    Type: 0
+    Value: 400
+  unique: 1
+  uniqueGroup: 
+  passive: {fileID: 11400000, guid: 907fbb5cd3ccaaec39693f171989a68d, type: 2}

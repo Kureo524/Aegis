@@ -32,6 +32,8 @@ namespace Features.Combat {
         [Tooltip("Bleed / Burn: + Ratio × the applier's ScalingStat, per second per stack.")]
         public StatType ScalingStat;
         public float Ratio;
+        [Tooltip("Bleed / Burn: + this share of the target's max HP per second per stack (Liandry).")]
+        public float TargetMaxHealthRatio;
         [Tooltip("Bleed / Burn: maximum stacks (each application adds one and refreshes the duration). 0 = 1.")]
         [Min(0)] public int MaxStacks;
 
@@ -198,6 +200,7 @@ namespace Features.Combat {
         private void ApplyDot(in StatusApplication status, Character applier, object source) {
             float perSecond = status.Power;
             if (applier != null && status.Ratio != 0f) perSecond += status.Ratio * applier.Stats.Value(status.ScalingStat);
+            perSecond += status.TargetMaxHealthRatio * _stats.Value(StatType.MaxHealth);   // the owner is the target
             if (perSecond <= 0f) return;
 
             DamageOverTime dot = null;
