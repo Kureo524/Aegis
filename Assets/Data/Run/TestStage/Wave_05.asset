@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ad72bd34412455f5a1d8be5f2808a3d, type: 3}
   m_Name: Wave_05
   m_EditorClassIdentifier: Game.Features::Features.Run.WaveDefinition
-  killQuota: 20
+  killQuota: 16
   timeLimit: 120
   spawnTable:
   - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
@@ -30,9 +30,9 @@ MonoBehaviour:
   - Prefab: {fileID: 5733577519648081543, guid: 3e64cb37613505438afa63978465073d, type: 3}
     Definition: {fileID: 11400000, guid: ecb4b9ecff4be8c76bd4acf1fe8081cb, type: 2}
     Weight: 1
-  spawnInterval: 1
-  postQuotaSpawnInterval: 1.8
-  maxAlive: 20
+  spawnInterval: 1.6
+  postQuotaSpawnInterval: 2.88
+  maxAlive: 12
   boss: {fileID: 11400000, guid: bc49c688fc86436de807ab325e640de9, type: 2}
   bossPrefab: {fileID: 1585771789054228133, guid: 7f7ed2644a10785419ab0b3e4dc0ecbb, type: 3}
   healthMultiplier: 1.45

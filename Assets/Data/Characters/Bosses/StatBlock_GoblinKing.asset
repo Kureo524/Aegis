@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Stats.StatBlock
   entries:
   - Type: 0
-    Value: 3000
+    Value: 2000
   - Type: 4
     Value: 55
   - Type: 6
@@ -22,7 +22,7 @@ MonoBehaviour:
   - Type: 7
     Value: 1.8
   - Type: 14
-    Value: 45
+    Value: 35
   - Type: 15
     Value: 35
   - Type: 18

@@ -23,8 +23,8 @@ MonoBehaviour:
   summonerD: {fileID: 0}
   summonerF: {fileID: 0}
   passive: {fileID: 0}
-  xpReward: 600
-  goldReward: 150
+  xpReward: 2700
+  goldReward: 375
   navigation: 1
   specialSpell: {fileID: 0}
   startMana: 0
