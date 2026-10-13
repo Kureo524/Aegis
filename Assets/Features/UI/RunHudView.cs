@@ -56,7 +56,9 @@ namespace Features.UI {
             _lives = Cell(row, 18, new Color(1f, 0.4f, 0.45f));
 
             _banner = UiStyles.Text("", 26, Color.white);
-            _banner.style.marginTop = 10;
+            _banner.AddToClassList("ae-banner");
+            _banner.style.fontSize = StyleKeyword.Null;   // the theme's
+            _banner.style.color = StyleKeyword.Null;
 
             column.Add(row);
             column.Add(_banner);
@@ -72,14 +74,17 @@ namespace Features.UI {
         }
 
         private void Update() {
-            if (_banner != null && _banner.text.Length > 0 && Time.unscaledTime >= _bannerUntil) _banner.text = "";
+            if (_banner != null && _banner.ClassListContains("ae-banner--show") && Time.unscaledTime >= _bannerUntil)
+                _banner.RemoveFromClassList("ae-banner--show");   // fades out (theme transition)
         }
 
         private void OnDestroy() => _subscriptions.Dispose();
 
         private void Banner(string text) {
             _bannerUntil = Time.unscaledTime + 2.5f;
-            if (_banner != null) _banner.text = text;
+            if (_banner == null) return;
+            _banner.text = text;
+            _banner.AddToClassList("ae-banner--show");
         }
 
         private void Refresh() {
