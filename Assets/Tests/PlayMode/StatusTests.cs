@@ -140,9 +140,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator GuardianShield_ShieldsUnderThreshold_OncePerCooldown() {
+        public IEnumerator Bloodthirster_ShieldsUnderThreshold_OncePerCooldown() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            ItemDefinition guardian = Game.Resolve<ShopCatalog>().Items.First(i => i.name == "Item_GuardianShield");
+            ItemDefinition guardian = Game.Resolve<ShopCatalog>().Items.First(i => i.name == "Item_Bloodthirster");
             Player.Passives.Add(guardian.Passive, guardian);
             Player.TakeDamage(new DamageInfo(Player.Health.Max * 0.3f, DamageType.True, false, false, null));
             Assert.AreEqual(0f, Player.Health.Shield, "above 35 %: nothing");
