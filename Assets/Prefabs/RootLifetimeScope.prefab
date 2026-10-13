@@ -81,3 +81,4 @@ MonoBehaviour:
   controlsSettings: {fileID: 11400000, guid: 5888a8dd4e4ab8bd8b04221b887807b3, type: 2}
   spellSettings: {fileID: 11400000, guid: ef4c3e679943fbe9985d85c5e3814123, type: 2}
   uiTheme: {fileID: 11400000, guid: 21824a93c8ea58f8f814fdfd2b17a474, type: 2}
+  metaSettings: {fileID: 11400000, guid: da822a30ac8b4e64aa3ac1a3cfdb7d9f, type: 2}
