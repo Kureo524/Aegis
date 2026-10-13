@@ -86,9 +86,7 @@ namespace EditorTools {
             so.FindProperty("radius").floatValue = 0.5f;
             so.FindProperty("castTime").floatValue = 0.7f;
             so.FindProperty("kind").enumValueIndex = (int)SpellKind.Magic;
-            so.FindProperty("powerRatio").floatValue = 0.6f;
-            so.FindProperty("scaling").FindPropertyRelative("Base").floatValue = 40f;
-            so.FindProperty("scaling").FindPropertyRelative("PerElementLevel").floatValue = 0f;
+            SpellAssets.SetDamage(so, 40f, 0.6f);
             so.FindProperty("projectileSpeed").floatValue = 13f;
         }, statuses: new[] { new StatusApplication { Kind = StatusKind.Slow, Power = 0.4f, Duration = 2f } });
 
@@ -112,9 +110,7 @@ namespace EditorTools {
             so.FindProperty("radius").floatValue = 3.5f;
             so.FindProperty("castTime").floatValue = 1f;
             so.FindProperty("kind").enumValueIndex = (int)SpellKind.Physical;
-            so.FindProperty("powerRatio").floatValue = 0.5f;
-            so.FindProperty("scaling").FindPropertyRelative("Base").floatValue = 50f;
-            so.FindProperty("scaling").FindPropertyRelative("PerElementLevel").floatValue = 0f;
+            SpellAssets.SetDamage(so, 50f, 0.5f);
         }, statuses: new[] { new StatusApplication { Kind = StatusKind.Root, Duration = 1.2f } });
 
         private static SpellDefinition SpellOnce(string id, string name, Color color, System.Action<SerializedObject> configure,

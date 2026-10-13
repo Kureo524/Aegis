@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_Ezreal_E
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: Transfert arcanique
+  description: "Se t\xE9l\xE9porte vers le curseur puis tire un trait sur l'ennemi
+    le plus proche (en priorit\xE9 celui qui porte le Flux d'essence) : 80/130/180/230/280
+    (+50 % AD bonus) (+75 % AP) d\xE9g\xE2ts magiques."
+  icon: {fileID: 21300000, guid: 55687396492b51b18bee8c0da3127092, type: 3}
+  color: {r: 0.75, g: 0.6, b: 1, a: 1}
+  rankUnlockLevels: 0100000003000000050000000700000009000000
+  baseDamage:
+  - 80
+  - 130
+  - 180
+  - 230
+  - 280
+  cooldowns:
+  - 26
+  - 23
+  - 20
+  - 17
+  - 14
+  manaCosts:
+  - 90
+  targeting: 2
+  range: 4.75
+  radius: 0.5
+  coneAngle: 60
+  castTime: 0.25
+  canMoveWhileCasting: 0
+  kind: 0
+  adRatio: 0
+  bonusAdRatio: 0.5
+  apRatio: 0.75
+  buffs: []
+  statuses: []
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
+  affectsAllies: 0
+  projectileSpeed: 20
+  pierce: 0
+  blink: 1
+  fixedRange: 0
+  appliesOnHit: 0
+  cooldownRefundOnHit: 0
+  mark:
+    Enabled: 0
+    Duration: 0
+    ManaRefund: []
+  blinkBoltRadius: 7.5

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb268d7b3b865bd4fa4aca45803ef906, type: 3}
+  m_Name: Passive_Ezreal_RisingSpellForce
+  m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
+  displayName: Sursaut de puissance
+  description: Toucher un ennemi avec un sort donne +10 % vitesse d'attaque pendant
+    6 s, cumulable 5 fois.
+  icon: {fileID: 21300000, guid: 16f07dcfd7380ea47b91acdd5cdf4ddc, type: 3}
+  stats: []
+  capabilities: 
+  triggers: []
+  stacks:
+    Source: 4
+    Reset: 2
+    Max: 5
+    Duration: 6
+    PerStack:
+    - Stat: 6
+      Type: 1
+      Value: 0.1
+  nearbyEnemies:
+    Radius: 0
+    Max: 0
+    PerEnemy: []

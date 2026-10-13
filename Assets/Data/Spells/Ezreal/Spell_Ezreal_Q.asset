@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_Ezreal_Q
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: Tir mystique
+  description: "Tire un projectile qui inflige 20/45/70/95/120 (+130 % AD) (+15 %
+    AP) d\xE9g\xE2ts physiques au premier ennemi touch\xE9 et applique les effets
+    \xE0 l'impact. Toucher r\xE9duit les d\xE9lais de r\xE9cup\xE9ration d'Ezreal
+    de 1,5 s."
+  icon: {fileID: 21300000, guid: 91f4c39882ec987cf80730a4f9693502, type: 3}
+  color: {r: 0.55, g: 0.85, b: 1, a: 1}
+  rankUnlockLevels: 0100000003000000050000000700000009000000
+  baseDamage:
+  - 20
+  - 45
+  - 70
+  - 95
+  - 120
+  cooldowns:
+  - 5.5
+  - 5.25
+  - 5
+  - 4.75
+  - 4.5
+  manaCosts:
+  - 28
+  - 31
+  - 34
+  - 37
+  - 40
+  targeting: 1
+  range: 12
+  radius: 0.6
+  coneAngle: 60
+  castTime: 0.25
+  canMoveWhileCasting: 0
+  kind: 1
+  adRatio: 1.3
+  bonusAdRatio: 0
+  apRatio: 0.15
+  buffs: []
+  statuses: []
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
+  affectsAllies: 0
+  projectileSpeed: 20
+  pierce: 0
+  blink: 0
+  fixedRange: 0
+  appliesOnHit: 1
+  cooldownRefundOnHit: 1.5
+  mark:
+    Enabled: 0
+    Duration: 0
+    ManaRefund: []
+  blinkBoltRadius: 0

@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_Ezreal_W
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: Flux d'essence
+  description: "Tire un orbe qui s'accroche au premier ennemi touch\xE9 pendant 4
+    s. Une attaque ou un autre sort d'Ezreal sur la cible le fait exploser : 80/135/190/245/300
+    (+60 % AD bonus) (+70 % AP) d\xE9g\xE2ts magiques, et rend 60/70/80/90/100 mana."
+  icon: {fileID: 21300000, guid: c38dfd68b1d8f0d25a01253719ac8ed4, type: 3}
+  color: {r: 1, g: 0.8, b: 0.35, a: 1}
+  rankUnlockLevels: 0100000003000000050000000700000009000000
+  baseDamage:
+  - 80
+  - 135
+  - 190
+  - 245
+  - 300
+  cooldowns:
+  - 8
+  manaCosts:
+  - 50
+  targeting: 1
+  range: 12
+  radius: 0.8
+  coneAngle: 60
+  castTime: 0.25
+  canMoveWhileCasting: 0
+  kind: 0
+  adRatio: 0
+  bonusAdRatio: 0.6
+  apRatio: 0.7
+  buffs: []
+  statuses: []
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
+  affectsAllies: 0
+  projectileSpeed: 17
+  pierce: 0
+  blink: 0
+  fixedRange: 0
+  appliesOnHit: 0
+  cooldownRefundOnHit: 0
+  mark:
+    Enabled: 1
+    Duration: 4
+    ManaRefund:
+    - 60
+    - 70
+    - 80
+    - 90
+    - 100
+  blinkBoltRadius: 0

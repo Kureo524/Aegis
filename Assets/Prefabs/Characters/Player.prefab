@@ -381,13 +381,10 @@ PrefabInstance:
       addedObject: {fileID: 1154830969069360366}
     - targetCorrespondingSourceObject: {fileID: 8325014891196843132, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6064849061569062957}
-    - targetCorrespondingSourceObject: {fileID: 8325014891196843132, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1069285135888132549}
     - targetCorrespondingSourceObject: {fileID: 8325014891196843132, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4937618370601334551}
+      addedObject: {fileID: 3275262289597801925}
   m_SourcePrefab: {fileID: 100100000, guid: 2740ecab6cb2e21b39fcaef55e41bef6, type: 3}
 --- !u!1 &906976849958185452 stripped
 GameObject:
@@ -414,21 +411,6 @@ MonoBehaviour:
   rangeIndicator: {fileID: 9182435209059539999}
   spellCaster: {fileID: 1975739936541631692}
   clickMarkerPrefab: {fileID: 2112780572453488847, guid: da59e8ed04ff4d17587df37f01b9c0fe, type: 3}
---- !u!114 &6064849061569062957
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 906976849958185452}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22028b1ec96d6d1f98550abf0cca4b68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game.Features::Features.Spells.ElementCaster
-  owner: {fileID: 2741926576527142607}
-  targeting: {fileID: 1069285135888132549}
-  caster: {fileID: 1975739936541631692}
 --- !u!114 &1069285135888132549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -445,7 +427,7 @@ MonoBehaviour:
   indicator: {fileID: 3462704289738233424}
   rangeIndicator: {fileID: 9182435209059539999}
   pickRadius: 0.8
---- !u!114 &4937618370601334551
+--- !u!114 &3275262289597801925
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -454,9 +436,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 906976849958185452}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e658de98fd0e31157901ad0be6a379c5, type: 3}
+  m_Script: {fileID: 11500000, guid: d6a600b462a64517da1ba0bda67ddfa7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Features::Features.Spells.SignatureAbility
+  m_EditorClassIdentifier: Game.Features::Features.Spells.AbilityCaster
   owner: {fileID: 2741926576527142607}
   targeting: {fileID: 1069285135888132549}
   caster: {fileID: 1975739936541631692}

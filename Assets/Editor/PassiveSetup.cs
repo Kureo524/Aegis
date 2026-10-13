@@ -14,8 +14,7 @@ using UnityEngine;
 
 namespace EditorTools {
     /// <summary>
-    /// Phase 8 content (design doc §8.1, §9.4, §9.5), called by <see cref="ProjectSetup"/>: the test
-    /// hero's passive, 12 augments (4 Silver, 5 Gold, 3 Prismatic), two item passives, the summoner
+    /// Phase 8 content (design doc §8.1, §9.4, §9.5), called by <see cref="ProjectSetup"/>: 12 augments (4 Silver, 5 Gold, 3 Prismatic), two item passives, the summoner
     /// spells and the loot settings, with their icons. Everything is a PassiveDefinition built from
     /// the generic bricks: no code per augment. Created once, never overwritten; values are
     /// placeholders, names are original.
@@ -59,8 +58,8 @@ namespace EditorTools {
                 Triggers = new[] { new PassiveTrigger { On = PassiveEvent.Kill, EveryN = 1, Chance = 0.06f, Effect = PassiveEffectKind.DropLoot, Loot = LootKind.StatAnvil } } }),
             (RarityTier.Gold, new P { Id = "Melee", Name = "Au cœur de la mêlée", Description = "+3 attaque physique et +5 puissance magique par ennemi à moins de 5 m (8 max).",
                 Nearby = new NearbyEnemiesBonus { Radius = 5f, Max = 8, PerEnemy = new[] { B(StatType.PhysicalAttack, 3), B(StatType.MagicAttack, 5) } } }),
-            (RarityTier.Prismatic, new P { Id = "ArcaneStorm", Name = "Tempête arcanique", Description = "Après un sort à 3 éléments : +30 % vitesse de déplacement et +40 puissance magique pendant 4 s.",
-                Triggers = new[] { new PassiveTrigger { On = PassiveEvent.SpellCast, EveryN = 1, Chance = 1f, MinSpellStacks = 3, Effect = PassiveEffectKind.TimedStats, Duration = 4f,
+            (RarityTier.Prismatic, new P { Id = "ArcaneStorm", Name = "Tempête arcanique", Description = "Un sort lancé sur trois : +30 % vitesse de déplacement et +40 puissance magique pendant 4 s.",
+                Triggers = new[] { new PassiveTrigger { On = PassiveEvent.SpellCast, EveryN = 3, Chance = 1f, Effect = PassiveEffectKind.TimedStats, Duration = 4f,
                                                         Stats = new[] { B(StatType.MoveSpeed, 0.3f, ModifierType.PercentAdd), B(StatType.MagicAttack, 40) } } } }),
             (RarityTier.Prismatic, new P { Id = "Vampirism", Name = "Vampirisme", Description = "+15 % omnivampirisme, +20 attaque physique, +30 puissance magique.",
                 Stats = new[] { B(StatType.Omnivamp, 0.15f), B(StatType.PhysicalAttack, 20), B(StatType.MagicAttack, 30) } }),
@@ -69,33 +68,18 @@ namespace EditorTools {
                 Triggers = new[] { new PassiveTrigger { On = PassiveEvent.Kill, EveryN = 1, Chance = 0.08f, Effect = PassiveEffectKind.DropLoot, Loot = LootKind.SummonerSpell } } }),
         };
 
-        private static readonly P HeroPassive = new() {
-            Id = "ArcaneOvercharge", Name = "Surcharge arcanique",
-            Description = "Une attaque de base sur trois inflige 20 (+35 % puissance magique) dégâts magiques en plus.",
-            Triggers = new[] { new PassiveTrigger { On = PassiveEvent.BasicAttackHit, EveryN = 3, Chance = 1f, Effect = PassiveEffectKind.BonusDamage,
-                                                    Damage = 20f, ScalingStat = StatType.MagicAttack, DamageRatio = 0.35f, DamageType = DamageType.Magic } },
-        };
-
         // (item asset id, passive): item passives on top of their stats
         private static readonly (string item, P passive)[] ItemPassives = {
             ("SwiftBow", new P { Id = "Item_SwiftBow", Name = "Salve", Description = "Une attaque de base sur quatre inflige 15 (+30 % attaque physique) dégâts physiques en plus.",
                 Triggers = new[] { new PassiveTrigger { On = PassiveEvent.BasicAttackHit, EveryN = 4, Chance = 1f, Effect = PassiveEffectKind.BonusDamage,
                                                         Damage = 15f, ScalingStat = StatType.PhysicalAttack, DamageRatio = 0.3f, DamageType = DamageType.Physical } } }),
-            ("MageCrown", new P { Id = "Item_MageCrown", Name = "Inspiration", Description = "Après un sort à 2 éléments ou plus : +20 puissance magique pendant 3 s.",
-                Triggers = new[] { new PassiveTrigger { On = PassiveEvent.SpellCast, EveryN = 1, Chance = 1f, MinSpellStacks = 2, Effect = PassiveEffectKind.TimedStats,
+            ("MageCrown", new P { Id = "Item_MageCrown", Name = "Inspiration", Description = "Après un sort : +20 puissance magique pendant 3 s.",
+                Triggers = new[] { new PassiveTrigger { On = PassiveEvent.SpellCast, EveryN = 1, Chance = 1f, Effect = PassiveEffectKind.TimedStats,
                                                         Duration = 3f, Stats = new[] { B(StatType.MagicAttack, 20) } } } }),
         };
 
         public static (AugmentCatalog augments, LootSettings loot) Run() {
             foreach (string png in Directory.GetFiles(IconsDir, "*.png")) EconomySetup.ConfigureIcon(png.Replace('\\', '/'));
-
-            // Hero passive (only filled when missing: a passive chosen by hand is kept)
-            var hero = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(ProjectSetup.TestHeroPath);
-            if (hero != null && hero.Passive == null) {
-                var so = new SerializedObject(hero);
-                so.FindProperty("passive").objectReferenceValue = Passive(HeroPassive, "Passive_ArcaneOvercharge");
-                so.ApplyModifiedPropertiesWithoutUndo();
-            }
 
             foreach ((string itemId, P passive) in ItemPassives) {
                 var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"{EconomySetup.Dir}/Items/Item_{itemId}.asset");
@@ -177,7 +161,7 @@ namespace EditorTools {
             so.FindProperty("kind").enumValueIndex = (int)SpellKind.Buff;
             so.FindProperty("canMoveWhileCasting").boolValue = true;
             so.FindProperty("castTime").floatValue = 0f;   // summoner spells are instant
-            so.FindProperty("cooldownOverride").floatValue = 1f;
+            SpellAssets.SetCooldown(so, 1f);
             SerializedProperty buffs = so.FindProperty("buffs");
             buffs.arraySize = 1;
             SerializedProperty b = buffs.GetArrayElementAtIndex(0);
@@ -202,11 +186,9 @@ namespace EditorTools {
             so.FindProperty("range").floatValue = 7f;
             so.FindProperty("castTime").floatValue = 0f;
             so.FindProperty("kind").enumValueIndex = (int)SpellKind.Magic;
-            so.FindProperty("powerRatio").floatValue = 0.4f;
-            so.FindProperty("scaling").FindPropertyRelative("Base").floatValue = 150f;
-            so.FindProperty("scaling").FindPropertyRelative("PerElementLevel").floatValue = 0f;
+            SpellAssets.SetDamage(so, 150f, 0.4f);
             so.FindProperty("projectileSpeed").floatValue = 30f;
-            so.FindProperty("cooldownOverride").floatValue = 1f;
+            SpellAssets.SetCooldown(so, 1f);
             so.ApplyModifiedPropertiesWithoutUndo();
             return spell;
         }
