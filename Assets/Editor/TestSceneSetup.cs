@@ -240,10 +240,8 @@ namespace EditorTools {
             var panel = Object.FindFirstObjectByType<AugmentPanel>();
             if (panel == null) panel = CreateOverlayDocument<AugmentPanel>("AugmentPanel");
             scope.augmentPanel = panel;
-            if (scope.playerHud != null) {
-                if (!scope.playerHud.TryGetComponent(out AugmentsView view)) view = scope.playerHud.gameObject.AddComponent<AugmentsView>();
-                scope.augmentsView = view;
-            }
+            // The augment slots and the items are part of the PlayerHud now (LoL-style HUD)
+            if (scope.playerHud != null) GameObjectUtility.RemoveMonoBehavioursWithMissingScript(scope.playerHud.gameObject);
             EditorUtility.SetDirty(scope);
         }
 
@@ -256,10 +254,6 @@ namespace EditorTools {
             var anvil = Object.FindFirstObjectByType<AnvilPanel>();
             if (anvil == null) anvil = CreateOverlayDocument<AnvilPanel>("AnvilPanel", 110);   // above the shop
             scope.anvilPanel = anvil;
-            if (scope.playerHud != null) {
-                if (!scope.playerHud.TryGetComponent(out InventoryView inventory)) inventory = scope.playerHud.gameObject.AddComponent<InventoryView>();
-                scope.inventoryView = inventory;
-            }
             EditorUtility.SetDirty(scope);
         }
 
@@ -386,14 +380,14 @@ namespace EditorTools {
                 Check(scope.runStateMachine != null, "scope.runStateMachine wired");
                 Check(scope.shopCatalog != null && scope.shopCatalog.Items.Count > 0 && scope.shopCatalog.FreeAnvil != null,
                       "scope.shopCatalog: items and free anvil");
-                Check(scope.shopPanel != null && scope.anvilPanel != null && scope.inventoryView != null, "shop, anvil and inventory UI wired");
+                Check(scope.shopPanel != null && scope.anvilPanel != null, "shop and anvil screens wired (items: PlayerHud)");
                 Check(scope.anvilPanel == null || scope.shopPanel == null
                       || scope.anvilPanel.GetComponent<UIDocument>().sortingOrder > scope.shopPanel.GetComponent<UIDocument>().sortingOrder,
                       "anvil screen drawn above the shop");
                 Check(scope.runHud != null && scope.runEndPanel != null, "run HUD and run end screen wired");
                 Check(scope.augmentCatalog != null && scope.augmentCatalog.Augments.Count >= 3 && scope.augmentCatalog.FullSlotsAnvil != null,
                       "scope.augmentCatalog: augments and full-slots anvil");
-                Check(scope.augmentPanel != null && scope.augmentsView != null, "augment screen and augment slots wired");
+                Check(scope.augmentPanel != null, "augment screen wired (augment slots: PlayerHud)");
                 Check(scope.bossHud != null, "boss bar wired");
                 if (scope.stage != null) {
                     bool bossesOk = true;

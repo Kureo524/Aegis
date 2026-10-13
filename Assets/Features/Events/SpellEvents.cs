@@ -21,6 +21,42 @@ namespace Features.Events {
         }
     }
 
+    /// <summary>The player's champion (HUD portrait): published when the player is bound to the bus.</summary>
+    public readonly struct PlayerChampionEvent : IEvent {
+        public readonly string Name;
+        public readonly UnityEngine.Sprite Portrait;
+        public readonly Passives.PassiveDefinition Passive;
+
+        public PlayerChampionEvent(string name, UnityEngine.Sprite portrait, Passives.PassiveDefinition passive) {
+            Name = name;
+            Portrait = portrait;
+            Passive = passive;
+        }
+    }
+
+    /// <summary>One passive of the player that shows on the HUD buff bar (stacks, charged spellblade…).</summary>
+    public readonly struct PlayerBuff {
+        public readonly string Name;
+        public readonly string Description;
+        public readonly UnityEngine.Sprite Icon;
+        public readonly int Stacks;
+        public readonly bool Charged;
+
+        public PlayerBuff(string name, string description, UnityEngine.Sprite icon, int stacks, bool charged) {
+            Name = name;
+            Description = description;
+            Icon = icon;
+            Stacks = stacks;
+            Charged = charged;
+        }
+    }
+
+    /// <summary>The player's active stacks and charges (HUD buff bar), published when they change.</summary>
+    public readonly struct PlayerBuffsEvent : IEvent {
+        public readonly PlayerBuff[] Buffs;
+        public PlayerBuffsEvent(PlayerBuff[] buffs) => Buffs = buffs;
+    }
+
     /// <summary>Spend a skill point on an ability (the HUD "+" button; Ctrl + key goes through AbilityKeyEvent).</summary>
     public readonly struct AbilityRankUpRequestedEvent : IEvent {
         public readonly int Slot;
