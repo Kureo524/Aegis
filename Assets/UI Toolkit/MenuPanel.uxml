@@ -5,6 +5,7 @@
             <ui:Label text="AEGIS" class="menu-title"/>
             <ui:Label text="La Horde" class="menu-subtitle"/>
             <ui:Button text="Jouer" name="PlayButton" class="button ae-button ae-button--primary"/>
+            <ui:Button text="Progression" name="ProgressionButton" class="button ae-button"/>
             <ui:Button text="Paramètres" name="SettingsButton" class="button ae-button"/>
             <ui:Button text="Quitter" name="QuitButton" class="button ae-button"/>
         </ui:VisualElement>

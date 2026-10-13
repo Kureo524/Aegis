@@ -442,3 +442,23 @@
 .ae-card--gold { background-color: rgba(60, 46, 16, 0.95); border-color: #ffcc4d; }
 .ae-card--prismatic { background-color: rgba(48, 22, 70, 0.95); border-color: #d08cff; }
 .ae-card--augment:hover { translate: 0 -8px; scale: 1.03 1.03; }
+
+/* ---- meta progression ---- */
+.ae-meta { width: 1080px; padding: 18px 22px; background-color: rgb(8, 14, 28); }
+.ae-meta__tree { margin: 16px auto 14px auto; align-self: center; }
+.ae-meta__node {
+    padding: 8px 10px;
+    background-color: rgba(10, 20, 40, 0.95);
+    border-width: 2px;
+    border-color: var(--gold-dark);
+    border-radius: 5px;
+    transition-property: border-color, translate;
+    transition-duration: 0.12s;
+}
+.ae-meta__node:hover { border-color: var(--gold); translate: 0 -2px; }
+.ae-meta__node--owned { border-color: var(--gold); background-color: rgba(40, 32, 12, 0.95); }
+.ae-meta__node--max { border-color: #ffe080; }
+.ae-meta__node--locked { opacity: 0.5; }
+.ae-meta__icon { width: 40px; height: 40px; margin-right: 8px; -unity-background-scale-mode: scale-to-fit; }
+.ae-meta__name { -unity-font: url("project://database/Assets/UI/Fonts/NotoSerif-Bold.ttf"); font-size: 14px; color: var(--gold-light); white-space: normal; }
+.ae-reward { -unity-font: url("project://database/Assets/UI/Fonts/NotoSerif-Bold.ttf"); font-size: 20px; color: #c8a0ff; margin-bottom: 10px; -unity-text-align: middle-center; }
