@@ -45,10 +45,8 @@ namespace Features.UI {
             var row = new VisualElement { pickingMode = PickingMode.Ignore };
             row.style.flexDirection = FlexDirection.Row;
             row.style.alignItems = Align.Center;
-            row.style.paddingLeft = row.style.paddingRight = 14;
-            row.style.paddingTop = row.style.paddingBottom = 6;
-            row.style.backgroundColor = new Color(0.06f, 0.07f, 0.1f, 0.75f);
-            UiStyles.Border(row, 1, new Color(1f, 1f, 1f, 0.15f), 8);
+            row.AddToClassList("ae-panel");
+            row.AddToClassList("ae-runhud");
 
             _wave = Cell(row, 18, new Color(0.95f, 0.8f, 0.4f));
             _timer = Cell(row, 22, Color.white);
