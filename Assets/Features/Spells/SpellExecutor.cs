@@ -13,16 +13,17 @@ namespace Features.Spells {
     /// <summary>
     /// Applies a spell's effect once its cast time is over (design doc §7.5–7.6). Purely data
     /// driven: what happens follows the definition's Targeting and Kind, never the spell's name.
-    /// Game scope service, used by every SpellCaster (player now, enemies in phase 6).
+    /// Game scope service, used by every SpellCaster (player and enemies).
     ///
     /// - Self: buffs on the caster.
     /// - Skillshot: straight projectile (first enemy hit, or all with Pierce).
     /// - GroundPoint: every enemy in Radius around the point; Blink teleports the caster there
-    ///   (or to the farthest walkable spot before it).
+    ///   (or to the farthest walkable spot before it), then may fire a bolt (BlinkBoltRadius).
     /// - Cone: every enemy in the sector.
     /// - UnitTarget: homing projectile to the chosen enemy.
-    /// Damage = Scaling(element levels) + attack stat × PowerRatio; Magic vs MagicResist, Physical vs
-    /// Armor. Spells only crit with the SpellCrit capability (§5.6). Buffs and the self heal /
+    /// Damage = base (rank) + AD / bonus AD / AP ratios; Magic vs MagicResist, Physical vs Armor.
+    /// On hit: statuses, mark (applied, or detonated by another hit), on-hit effects, cooldown
+    /// refund (§7.6). Spells only crit with the SpellCrit capability (§5.6). Buffs and the self heal /
     /// shield are applied to the caster whatever the targeting (and to its allies within Radius with
     /// AffectsAllies); statuses (§5.7) to every enemy hit, which also raises the caster's SpellHit
     /// event (passives).
@@ -102,11 +103,13 @@ namespace Features.Spells {
             vfx.PlayLine(origin, direction, length, halfWidth, new Color(1f, 0.25f, 0.2f, 0.9f), duration, _pool.Release);
         }
 
-        public void Execute(Character caster, SpellDefinition spell, CastContext ctx, int levelsAboveOne) {
+        /// <param name="rank">Rank of the ability (1-based; 0 or 1 for spells without ranks).</param>
+        public void Execute(Character caster, SpellDefinition spell, CastContext ctx, int rank) {
             if (caster == null || !caster.IsAlive) return;
             Vector3 origin = caster.transform.position;
-            DamageInfo damage = BuildDamage(caster, spell, levelsAboveOne);
-            System.Action<Character, float> onHit = (target, taken) => OnSpellHit(caster, spell, target, taken);
+            // A marking spell (Ezreal W) deals its damage when the mark is detonated, not on hit
+            DamageInfo damage = spell.Mark.Enabled ? default : BuildDamage(caster, spell, rank);
+            System.Action<Character, float> onHit = (target, taken) => OnSpellHit(caster, spell, rank, target, taken);
 
             switch (spell.Targeting) {
                 case TargetingType.Self:
@@ -127,6 +130,7 @@ namespace Features.Spells {
                             Ring(origin, 0.8f, spell.Color);
                             caster.GetComponent<CharacterMovement>().Teleport(destination);
                             Ring(destination, 0.8f, spell.Color);
+                            if (spell.BlinkBoltRadius > 0f) FireBlinkBolt(caster, spell, destination, BuildDamage(caster, spell, rank), onHit);
                         }
                         break;
                     }
@@ -159,9 +163,40 @@ namespace Features.Spells {
             _eventBus.Publish(new SpellCastEvent(spell, caster.IsPlayer));
         }
 
-        private static DamageInfo BuildDamage(Character caster, SpellDefinition spell, int levelsAboveOne) {
+        // Arcane Shift: a homing bolt at the nearest enemy around the landing spot, a marked one first
+        private void FireBlinkBolt(Character caster, SpellDefinition spell, Vector3 from, DamageInfo damage, System.Action<Character, float> onHit) {
+            Character best = null;
+            float bestScore = float.MaxValue;
+            foreach (Character c in InCircle(caster, from, spell.BlinkBoltRadius)) {
+                Vector3 d = c.transform.position - from;
+                d.y = 0f;
+                float score = d.magnitude - (c.Status.IsMarkedBy(caster) ? 1000f : 0f);
+                if (score < bestScore) {
+                    bestScore = score;
+                    best = c;
+                }
+            }
+            if (best == null) return;
+            Vector3 muzzle = from + Vector3.up * (caster.Definition.BodySize.y * 0.6f);
+            _projectiles.Launch(_settings.HomingProjectile, muzzle, best, damage, spell.ProjectileSpeed, onHit, spell.Color);
+        }
+
+        /// <summary>
+        /// A hit of <paramref name="attacker"/> (basic attack, or a spell other than the marking one)
+        /// on a target it marked: the mark goes off for the marking spell's damage and gives back its
+        /// mana (Ezreal W, §7.6).
+        /// </summary>
+        public static void TryDetonateMark(Character attacker, Character target, SpellDefinition hitBy) {
+            if (attacker == null || target == null || !target.IsAlive) return;
+            if (!target.Status.TryConsumeMark(attacker, hitBy, out SpellDefinition markSpell, out int rank)) return;
+            target.TakeDamage(BuildDamage(attacker, markSpell, rank));
+            attacker.Mana.Restore(markSpell.MarkManaRefund(rank));
+        }
+
+        private static DamageInfo BuildDamage(Character caster, SpellDefinition spell, int rank) {
             StatController stats = caster.Stats;
-            float raw = SpellMath.RawDamage(spell, levelsAboveOne, stats.Value(StatType.MagicAttack), stats.Value(StatType.PhysicalAttack));
+            float raw = SpellMath.RawDamage(spell, rank, stats.Value(StatType.PhysicalAttack), caster.BonusStat(StatType.PhysicalAttack),
+                                            stats.Value(StatType.MagicAttack));
             DamageType type = spell.Kind == SpellKind.Physical ? DamageType.Physical : DamageType.Magic;
             // Spells only crit with the SpellCrit capability (passive, augment: design doc §5.6)
             bool crit = caster.Capabilities.Has(Passives.Capability.SpellCrit) && Random.value < stats.Value(StatType.CritChance);
@@ -183,10 +218,15 @@ namespace Features.Spells {
             foreach (Character target in snapshot) onHit(target, target.TakeDamage(damage));
         }
 
-        private static void OnSpellHit(Character caster, SpellDefinition spell, Character target, float taken) {
+        private static void OnSpellHit(Character caster, SpellDefinition spell, int rank, Character target, float taken) {
             if (target == null || (taken <= 0f && !target.IsAlive)) return;   // already dead
             foreach (StatusApplication status in spell.Statuses) target.ApplyStatus(status, caster, spell);
-            if (caster != null) caster.Events.RaiseSpellHit(target, taken);
+            if (caster == null) return;
+            if (spell.Mark.Enabled) target.Status.ApplyMark(caster, spell, rank, spell.Mark.Duration);
+            else TryDetonateMark(caster, target, spell);
+            caster.Events.RaiseSpellHit(target, taken);
+            if (spell.AppliesOnHit) caster.Events.RaiseBasicAttackHit(target, taken);
+            if (spell.CooldownRefundOnHit > 0f) caster.Events.RaiseCooldownRefund(spell.CooldownRefundOnHit);
         }
 
         private static void ApplySelfSustain(Character caster, Character target, SpellDefinition spell) {

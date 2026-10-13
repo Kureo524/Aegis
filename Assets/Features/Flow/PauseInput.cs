@@ -25,7 +25,7 @@ namespace Features.Flow {
         public void Initialize() {
             _subscriptions.Add(_eventBus.Subscribe<AimModeEvent>(e => {
                 if (_spellAim && e.Mode == AimMode.None) _aimEndedFrame = Time.frameCount;
-                _spellAim = e.Mode is AimMode.Spell or AimMode.Signature;
+                _spellAim = e.Mode == AimMode.Ability;
             }));
             _subscriptions.Add(_eventBus.Subscribe<AttackMoveEvent>(e => _attackMoveHeld = e.Pressed));
             _subscriptions.Add(_eventBus.Subscribe<CancelEvent>(_ => OnCancel()));

@@ -115,13 +115,13 @@ namespace Features.Events {
         public BonusRewardEarnedEvent(Run.RewardKind kind) => Kind = kind;
     }
 
-    /// <summary>A summoner spell was picked up: it replaces F until used (§9.5).</summary>
+    /// <summary>A summoner spell was picked up: it fills D until used, if D is empty (§9.5).</summary>
     public readonly struct SummonerSpellPickedEvent : Systems.EventBusses.IEvent {
         public readonly Spells.SpellDefinition Spell;
         public SummonerSpellPickedEvent(Spells.SpellDefinition spell) => Spell = spell;
     }
 
-    /// <summary>Whether F currently holds a picked-up summoner spell (no other one can be picked up then).</summary>
+    /// <summary>Whether D currently holds a picked-up summoner spell (no other one can be picked up then).</summary>
     public readonly struct SummonerSlotChangedEvent : Systems.EventBusses.IEvent {
         public readonly bool HoldsConsumable;
         public SummonerSlotChangedEvent(bool holdsConsumable) => HoldsConsumable = holdsConsumable;

@@ -51,7 +51,7 @@ namespace Features.Combat {
                 Character c = _hits[i].GetComponentInParent<Character>();
                 if (c == null || !c.IsAlive || _caster == null || !_caster.IsHostileTo(c) || !_alreadyHit.Add(c)) continue;
 
-                float taken = c.TakeDamage(_damage);
+                float taken = _damage.RawAmount > 0f ? c.TakeDamage(_damage) : 0f;   // a marking shot deals nothing on hit
                 _onHit?.Invoke(c, taken);
                 if (!_pierce) {
                     Release();

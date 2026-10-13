@@ -51,6 +51,16 @@ namespace Features.Characters {
         /// <summary>The character's passives: its own (definition), items', augments' (§8.1).</summary>
         public PassiveController Passives { get; private set; }
         public bool IsAlive => Health != null && !Health.IsDead;
+
+        /// <summary>
+        /// Bonus part of a stat (items, augments, buffs): total minus base and level growth, like
+        /// LoL's "bonus AD" (§5.1). Ability ratios and adaptive force use it.
+        /// </summary>
+        public float BonusStat(StatType type) {
+            if (Definition == null) return 0f;
+            float baseValue = (Definition.BaseStats != null ? Definition.BaseStats.Get(type) : 0f) + (Level?.FlatGrowth(type) ?? 0f);
+            return Stats.Value(type) - baseValue;
+        }
         public bool IsPlayer => Definition != null && Definition.Faction == Faction.Player;
         public Faction Faction => Definition != null ? Definition.Faction : Faction.Neutral;
         public float BodyRadius => Definition != null ? Definition.BodySize.x / 2f : 0.5f;
