@@ -49,12 +49,6 @@ namespace EditorTools {
 
         // ---- Augments ----
         private static readonly (RarityTier rarity, P passive)[] Augments = {
-            (RarityTier.Silver, new P { Id = "IronWill", Name = "Volonté de fer", Description = "+25 % ténacité, +100 PV.",
-                Stats = new[] { B(StatType.Tenacity, 0.25f), B(StatType.MaxHealth, 100) } }),
-            (RarityTier.Silver, new P { Id = "Healer", Name = "Main guérisseuse", Description = "+25 % puissance des soins et boucliers, +2 régénération de PV.",
-                Stats = new[] { B(StatType.HealShieldPower, 0.25f), B(StatType.HealthRegen, 2) } }),
-            (RarityTier.Gold, new P { Id = "Bloodletting", Name = "Saignée", Description = "Tes attaques de base font saigner : 10 (+20 % attaque physique) par seconde pendant 3 s, cumulable 4 fois.",
-                Triggers = new[] { OnHitStatus(PassiveEvent.BasicAttackHit, 1, Bleed(10f, 0.2f, 3f, 4)) } }),
             (RarityTier.Gold, new P { Id = "StaticShock", Name = "Choc statique", Description = "Un coup de sort sur six étourdit la cible 0,75 s.",
                 Triggers = new[] { OnHitStatus(PassiveEvent.SpellHit, 6, Stun(0.75f)) } }),
             (RarityTier.Gold, new P { Id = "ArcaneBarrier", Name = "Barrière arcanique", Description = "Après un sort : bouclier de 40 (+25 % puissance magique) pendant 3 s. Recharge 4 s.",
@@ -63,8 +57,6 @@ namespace EditorTools {
             (RarityTier.Prismatic, new P { Id = "Phoenix", Name = "Phénix", Description = "Touché sous 30 % de PV : rend 30 % de tes PV max. Recharge 90 s.",
                 Triggers = new[] { new PassiveTrigger { On = PassiveEvent.DamageTaken, EveryN = 1, Chance = 1f, HealthBelow = 0.3f, Cooldown = 90f,
                                                         Effect = PassiveEffectKind.Heal, AmountStat = StatType.MaxHealth, AmountRatio = 0.3f } } }),
-            (RarityTier.Prismatic, new P { Id = "Inferno", Name = "Brasier éternel", Description = "Tes sorts brûlent : 20 (+20 % puissance magique) par seconde pendant 4 s, cumulable 5 fois.",
-                Triggers = new[] { OnHitStatus(PassiveEvent.SpellHit, 1, Burn(20f, 0.2f, 4f, 5)) } }),
         };
 
         public static void Run() {

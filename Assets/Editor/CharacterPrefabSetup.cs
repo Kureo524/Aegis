@@ -323,14 +323,15 @@ namespace EditorTools {
         // Phase 9b: status icon left of the bar (added to existing prefabs too)
         private static void AddStatusIcon(HealthBarView bar) {
             var so = new SerializedObject(bar);
-            if (so.FindProperty("statusIcon").objectReferenceValue != null) return;
-            var go = new GameObject("StatusIcon");
-            go.transform.SetParent(bar.transform, false);
-            go.transform.localPosition = new Vector3(-0.68f, 0f, -0.002f);
-            var icon = go.AddComponent<SpriteRenderer>();
-            icon.sortingOrder = 102;
-            icon.enabled = false;
-            so.FindProperty("statusIcon").objectReferenceValue = icon;
+            if (so.FindProperty("statusIcon").objectReferenceValue == null) {
+                var go = new GameObject("StatusIcon");
+                go.transform.SetParent(bar.transform, false);
+                go.transform.localPosition = new Vector3(-0.68f, 0f, -0.002f);
+                var icon = go.AddComponent<SpriteRenderer>();
+                icon.sortingOrder = 102;
+                icon.enabled = false;
+                so.FindProperty("statusIcon").objectReferenceValue = icon;
+            }
             string[] names = System.Enum.GetNames(typeof(Features.Combat.StatusKind));
             SerializedProperty sprites = so.FindProperty("statusSprites");
             sprites.arraySize = names.Length;

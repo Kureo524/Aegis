@@ -36,23 +36,14 @@ namespace EditorTools {
             public StackSettings Stacks;
             public NearbyEnemiesBonus Nearby;
             public AuraSettings Aura;
+            public DamageModifiers DamageMods;
+            public float[] AbilityHaste = System.Array.Empty<float>();
             public StatConversion[] Conversions = System.Array.Empty<StatConversion>();
         }
 
         private static readonly (RarityTier rarity, P passive)[] Augments = {
-            (RarityTier.Silver, new P { Id = "StrongArm", Name = "Gros bras", Description = "+12 % vitesse d'attaque, +8 attaque physique.",
-                Stats = new[] { B(StatType.AttackSpeed, 0.12f, ModifierType.PercentAdd), B(StatType.PhysicalAttack, 8) } }),
-            (RarityTier.Silver, new P { Id = "Stoneskin", Name = "Peau de pierre", Description = "+25 armure, +25 résistance magique.",
-                Stats = new[] { B(StatType.Armor, 25), B(StatType.MagicResist, 25) } }),
-            (RarityTier.Silver, new P { Id = "Focus", Name = "Concentration", Description = "+15 accélération.",
-                Stats = new[] { B(StatType.AbilityHaste, 15) } }),
-            (RarityTier.Silver, new P { Id = "HotBlood", Name = "Sang chaud", Description = "+180 PV, +2 régénération de PV.",
-                Stats = new[] { B(StatType.MaxHealth, 180), B(StatType.HealthRegen, 2) } }),
             (RarityTier.Gold, new P { Id = "JeweledGauntlet", Name = "Gantelet serti", Description = "Tes sorts peuvent infliger des coups critiques. +15 % chances de critique.",
                 Stats = new[] { B(StatType.CritChance, 0.15f) }, Capabilities = new[] { Capability.SpellCrit } }),
-            (RarityTier.Gold, new P { Id = "SoulCollector", Name = "Collectionneur d'âmes", Description = "Chaque kill donne +1 puissance magique et +0,5 attaque physique, pour toute la partie.",
-                Stacks = new StackSettings { Source = StackSource.PerKill, Reset = ResetPolicy.Never,
-                                             PerStack = new[] { B(StatType.MagicAttack, 1), B(StatType.PhysicalAttack, 0.5f) } } }),
             (RarityTier.Gold, new P { Id = "Frenzy", Name = "Frénésie", Description = "Chaque attaque de base donne +6 % vitesse d'attaque (6 max), perdus après 3 s sans attaquer.",
                 Stacks = new StackSettings { Source = StackSource.PerBasicAttack, Reset = ResetPolicy.AfterDuration, Max = 6, Duration = 3f,
                                              PerStack = new[] { B(StatType.AttackSpeed, 0.06f, ModifierType.PercentAdd) } } }),
@@ -60,11 +51,6 @@ namespace EditorTools {
                 Triggers = new[] { new PassiveTrigger { On = PassiveEvent.Kill, EveryN = 1, Chance = 0.06f, Effect = PassiveEffectKind.DropLoot, Loot = LootKind.StatAnvil } } }),
             (RarityTier.Gold, new P { Id = "Melee", Name = "Au cœur de la mêlée", Description = "+3 attaque physique et +5 puissance magique par ennemi à moins de 5 m (8 max).",
                 Nearby = new NearbyEnemiesBonus { Radius = 5f, Max = 8, PerEnemy = new[] { B(StatType.PhysicalAttack, 3), B(StatType.MagicAttack, 5) } } }),
-            (RarityTier.Prismatic, new P { Id = "ArcaneStorm", Name = "Tempête arcanique", Description = "Un sort lancé sur trois : +30 % vitesse de déplacement et +40 puissance magique pendant 4 s.",
-                Triggers = new[] { new PassiveTrigger { On = PassiveEvent.SpellCast, EveryN = 3, Chance = 1f, Effect = PassiveEffectKind.TimedStats, Duration = 4f,
-                                                        Stats = new[] { B(StatType.MoveSpeed, 0.3f, ModifierType.PercentAdd), B(StatType.MagicAttack, 40) } } } }),
-            (RarityTier.Prismatic, new P { Id = "Vampirism", Name = "Vampirisme", Description = "+15 % omnivampirisme, +20 attaque physique, +30 puissance magique.",
-                Stats = new[] { B(StatType.Omnivamp, 0.15f), B(StatType.PhysicalAttack, 20), B(StatType.MagicAttack, 30) } }),
             (RarityTier.Prismatic, new P { Id = "Summoner", Name = "Invocateur", Description = "8 % de chances par kill de faire tomber un sort d'invocateur (usage unique sur F). +10 accélération.",
                 Stats = new[] { B(StatType.AbilityHaste, 10) },
                 Triggers = new[] { new PassiveTrigger { On = PassiveEvent.Kill, EveryN = 1, Chance = 0.08f, Effect = PassiveEffectKind.DropLoot, Loot = LootKind.SummonerSpell } } }),
@@ -126,6 +112,8 @@ namespace EditorTools {
             SetField(passive, "nearbyEnemies", p.Nearby);
             SetField(passive, "aura", p.Aura);
             SetField(passive, "conversions", p.Conversions);
+            SetField(passive, "damage", p.DamageMods);
+            SetField(passive, "abilityHaste", p.AbilityHaste);
             EditorUtility.SetDirty(passive);
             return passive;
         }
