@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_Ezreal_R
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: "Barrage de pr\xE9cision"
+  description: "Apr\xE8s 1 s de canalisation, tire une immense vague d'\xE9nergie
+    qui traverse tout sur son passage : 350/550/750 (+100 % AD bonus) (+90 % AP)
+    d\xE9g\xE2ts magiques."
+  icon: {fileID: 21300000, guid: b015c7b42ce2d02c48bb9d39ec0228f2, type: 3}
+  color: {r: 1, g: 0.9, b: 0.45, a: 1}
+  rankUnlockLevels: 060000000b00000010000000
+  baseDamage:
+  - 350
+  - 550
+  - 750
+  cooldowns:
+  - 120
+  - 105
+  - 90
+  manaCosts:
+  - 100
+  targeting: 1
+  range: 30
+  radius: 1.6
+  coneAngle: 60
+  castTime: 1
+  canMoveWhileCasting: 0
+  kind: 0
+  adRatio: 0
+  bonusAdRatio: 1
+  apRatio: 0.9
+  buffs: []
+  statuses: []
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
+  affectsAllies: 0
+  projectileSpeed: 20
+  pierce: 1
+  blink: 0
+  fixedRange: 0
+  appliesOnHit: 0
+  cooldownRefundOnHit: 0
+  mark:
+    Enabled: 0
+    Duration: 0
+    ManaRefund: []
+  blinkBoltRadius: 0

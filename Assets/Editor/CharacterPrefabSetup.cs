@@ -65,10 +65,8 @@ namespace EditorTools {
                 input.character = root.GetComponent<Character>();
                 input.attacker = root.GetComponent<BasicAttacker>();
 
-                if (!root.TryGetComponent(out ElementCaster caster)) caster = root.AddComponent<ElementCaster>();
-                var casterSo = new SerializedObject(caster);
-                casterSo.FindProperty("owner").objectReferenceValue = root.GetComponent<Character>();
-                casterSo.ApplyModifiedPropertiesWithoutUndo();
+                // The element caster and the F-only signature ability are gone (champion abilities, §7)
+                GameObjectUtility.RemoveMonoBehavioursWithMissingScript(root);
 
                 RangeIndicator indicator = root.GetComponentInChildren<RangeIndicator>(true);
                 if (indicator == null) indicator = CreateRangeIndicator(root.transform);
@@ -83,10 +81,8 @@ namespace EditorTools {
 
                 if (!root.TryGetComponent(out SpellTargeting targeting)) targeting = root.AddComponent<SpellTargeting>();
                 SetRefs(targeting, ("owner", character), ("indicator", shape), ("rangeIndicator", indicator));
-                SetRefs(caster, ("owner", character), ("targeting", targeting), ("caster", spellCaster));
-
-                if (!root.TryGetComponent(out SignatureAbility signature)) signature = root.AddComponent<SignatureAbility>();
-                SetRefs(signature, ("owner", character), ("targeting", targeting), ("caster", spellCaster));
+                if (!root.TryGetComponent(out AbilityCaster abilities)) abilities = root.AddComponent<AbilityCaster>();
+                SetRefs(abilities, ("owner", character), ("targeting", targeting), ("caster", spellCaster));
             });
             return AssetDatabase.LoadAssetAtPath<Character>(PlayerPrefabPath);
         }

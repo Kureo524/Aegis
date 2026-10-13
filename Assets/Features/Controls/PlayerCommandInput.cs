@@ -65,7 +65,7 @@ namespace Features.Controls {
             _subscriptions.Add(_eventBus.Subscribe<ConfirmEvent>(OnConfirm));
             _subscriptions.Add(_eventBus.Subscribe<CancelEvent>(_ => StopAiming()));
             _subscriptions.Add(_eventBus.Subscribe<AimModeEvent>(e => {
-                _otherAimActive = e.Mode is AimMode.Spell or AimMode.Signature;
+                _otherAimActive = e.Mode == AimMode.Ability;
                 if (_otherAimActive && _aimingAttackMove) StopAiming();
             }));
         }
@@ -74,7 +74,7 @@ namespace Features.Controls {
 
         private void StartAimingAttackMove() {
             if (!character.IsAlive) return;
-            _eventBus.Publish(new AimModeEvent(AimMode.AttackMove));   // cancels an R / F aim
+            _eventBus.Publish(new AimModeEvent(AimMode.AttackMove));   // cancels a spell aim
             _aimingAttackMove = true;
             if (rangeIndicator != null) rangeIndicator.Show(character.Stats.Value(StatType.AttackRange));
         }

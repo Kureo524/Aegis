@@ -40,8 +40,6 @@ namespace Features.Passives {
         [Min(1)] public int EveryN;
         [Tooltip("Chance per occurrence (0..1).")]
         [Range(0f, 1f)] public float Chance;
-        [Tooltip("SpellCast: only spells of at least this many elements (0 = any).")]
-        [Min(0)] public int MinSpellStacks;
         [Tooltip("Only while the owner's HP share is at most this (0 = always).")]
         [Range(0f, 1f)] public float HealthBelow;
         [Tooltip("Seconds before the trigger can go off again (0 = none).")]
@@ -67,7 +65,7 @@ namespace Features.Passives {
     }
 
     /// <summary>Where stacks come from (design doc §8.1).</summary>
-    public enum StackSource { None, PerBasicAttack, PerSpellCast, PerKill }
+    public enum StackSource { None, PerBasicAttack, PerSpellCast, PerKill, PerSpellHit }
 
     /// <summary>When stacks go back to zero.</summary>
     public enum ResetPolicy { Never, EndOfWave, AfterDuration }

@@ -1,5 +1,6 @@
 using System;
 using Features.Events;
+using Systems.Inputs;
 using Systems.EventBusses;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -7,10 +8,9 @@ using VContainer;
 
 namespace Features.UI {
     /// <summary>
-    /// Bottom-center player HUD (UI Toolkit), fed only by bus events:
-    /// feedback line, resolved spell + mana cost, element slots (ElementBarView), level badge,
-    /// HP bar, mana bar with the cost of the current selection previewed on it (§7.3), XP bar,
-    /// signature ability slot (F), spell cooldowns (§7.9) and the run's gold (§9.2).
+    /// Bottom-center player HUD (UI Toolkit), fed only by bus events: feedback line, the spell bar
+    /// (AbilityBarView: Q W E R + D F, ranks, "+", cooldowns, §7.9), level badge, HP bar (with
+    /// shield), mana bar, XP bar and the run's gold (§9.2).
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class PlayerHud : MonoBehaviour {
@@ -20,52 +20,39 @@ namespace Features.UI {
         [SerializeField] private float feedbackDuration = 1.5f;
 
         private IEventBus _eventBus;
+        private ControlsSettings _controls;
         private readonly DisposableBag _subscriptions = new();
-        private VisualElement _hpFill, _shieldFill, _manaFill, _manaCost, _xpFill;
-        private Label _hpText, _manaText, _level, _spell, _feedback, _gold;
+        private VisualElement _hpFill, _shieldFill, _manaFill, _xpFill;
+        private Label _hpText, _manaText, _level, _feedback, _gold;
         private int _goldValue;
-        private ElementBarView _elements;
+        private AbilityBarView _abilities;
         private float _feedbackUntil;
-        private VisualElement _signatureSlot, _signatureIcon, _signatureShade;
-        private Label _signatureCooldown;
-        private float _elementalReadyAt, _signatureReadyAt;
-        private Spells.SpellDefinition _signature;
 
         // Last known values: events can arrive before the UI is built
         private float _hp, _hpMax, _shield, _mana, _manaMax;
         private XpChangedEvent _xp;
-        private ElementSelectionChangedEvent _selection;
-        private PlayerElementsEvent? _elementDefs;
-        private ElementLevelsChangedEvent? _levels;
-        private bool _hasElements;
+        private AbilitiesChangedEvent? _abilityState;
+        private readonly float[] _cooldownEnds = new float[Spells.AbilitySlots.Count];
 
         [Inject]
-        public void Construct(IEventBus eventBus) {
+        public void Construct(IEventBus eventBus, ControlsSettings controls) {
             _eventBus = eventBus;
+            _controls = controls;
             _subscriptions.Add(eventBus.Subscribe<PlayerHealthChangedEvent>(e => { _hp = e.Current; _hpMax = e.Max; _shield = e.Shield; Refresh(); }));
             _subscriptions.Add(eventBus.Subscribe<PlayerManaChangedEvent>(e => { _mana = e.Current; _manaMax = e.Max; Refresh(); }));
             _subscriptions.Add(eventBus.Subscribe<XpChangedEvent>(e => { _xp = e; Refresh(); }));
-            _subscriptions.Add(eventBus.Subscribe<PlayerElementsEvent>(e => {
-                _elementDefs = e;
-                _hasElements = true;
-                if (_elements != null) { _elements.SetElements(e); ShowElements(); }
+            _subscriptions.Add(eventBus.Subscribe<AbilitiesChangedEvent>(e => {
+                _abilityState = e;
+                _abilities?.SetAbilities(e);
             }));
-            _subscriptions.Add(eventBus.Subscribe<ElementLevelsChangedEvent>(e => { _levels = e; _elements?.SetLevels(e); }));
-            _subscriptions.Add(eventBus.Subscribe<ElementSelectionChangedEvent>(e => {
-                _selection = e;
-                _elements?.SetSelection(e);
-                Refresh();
+            _subscriptions.Add(eventBus.Subscribe<CooldownStartedEvent>(e => {
+                if (e.Slot >= 0 && e.Slot < _cooldownEnds.Length) _cooldownEnds[e.Slot] = Time.time + e.Duration;
+                _abilities?.StartCooldown(e.Slot, e.Duration);
             }));
             _subscriptions.Add(eventBus.Subscribe<GameplayFeedbackEvent>(e => ShowFeedback(e.Message)));
             _subscriptions.Add(eventBus.Subscribe<GoldChangedEvent>(e => {
                 _goldValue = e.Gold;
                 if (_gold != null) _gold.text = $"{_goldValue} or";
-            }));
-            _subscriptions.Add(eventBus.Subscribe<SignatureAssignedEvent>(e => { _signature = e.Spell; RefreshSignature(); }));
-            _subscriptions.Add(eventBus.Subscribe<CooldownStartedEvent>(e => {
-                float readyAt = Time.time + e.Duration;
-                if (e.Slot == CooldownSlot.Elemental) _elementalReadyAt = readyAt;
-                else _signatureReadyAt = readyAt;
             }));
         }
 
@@ -81,13 +68,11 @@ namespace Features.UI {
 
             _feedback = UiStyles.Text("", 15, new Color(1f, 0.55f, 0.45f));
             _feedback.style.marginBottom = 6;
-            _spell = UiStyles.Text("", 15, Color.white);
-            _spell.style.marginBottom = 4;
 
-            _elements = new ElementBarView();
-            _elements.Root.style.marginBottom = 8;
-            _elements.LevelUpClicked += slot => _eventBus.Publish(new ElementLevelUpRequestedEvent(slot));
-            _elements.Root.Add(BuildSignatureSlot());
+            _abilities = new AbilityBarView();
+            _abilities.Root.style.marginBottom = 8;
+            _abilities.RankUpClicked += slot => _eventBus.Publish(new AbilityRankUpRequestedEvent(slot));
+            _abilities.SetKeys(KeyLabels(_controls != null ? _controls.KeyboardLayout : KeyboardLayout.Azerty));
 
             var row = new VisualElement { pickingMode = PickingMode.Ignore };
             row.style.flexDirection = FlexDirection.Row;
@@ -115,10 +100,6 @@ namespace Features.UI {
 
             var manaBar = Bar(14, out _manaFill, manaColor);
             manaBar.style.marginTop = 3;
-            _manaCost = new VisualElement { pickingMode = PickingMode.Ignore };
-            _manaCost.style.position = Position.Absolute;
-            _manaCost.style.top = _manaCost.style.bottom = 0;
-            manaBar.Add(_manaCost);
             _manaText = BarText(manaBar, 10);
 
             var xpBar = Bar(6, out _xpFill, xpColor);
@@ -136,77 +117,26 @@ namespace Features.UI {
             row.Add(_gold);
 
             column.Add(_feedback);
-            column.Add(_spell);
-            column.Add(_elements.Root);
+            column.Add(_abilities.Root);
             column.Add(row);
             root.Add(column);
 
-            if (_elementDefs.HasValue) _elements.SetElements(_elementDefs.Value);
-            if (_levels.HasValue) _elements.SetLevels(_levels.Value);
-            _elements.SetSelection(_selection);
-            ShowElements();
-            RefreshSignature();
+            if (_abilityState.HasValue) _abilities.SetAbilities(_abilityState.Value);
+            for (int slot = 0; slot < _cooldownEnds.Length; slot++) _abilities.StartCooldown(slot, _cooldownEnds[slot] - Time.time);
             Refresh();
         }
 
-        private VisualElement BuildSignatureSlot() {
-            _signatureSlot = new VisualElement { pickingMode = PickingMode.Ignore };
-            _signatureSlot.style.width = _signatureSlot.style.height = 44;
-            _signatureSlot.style.marginLeft = 14;
-            _signatureSlot.style.alignSelf = Align.FlexEnd;
-            _signatureSlot.style.marginBottom = 9;
-            _signatureSlot.style.backgroundColor = new Color(0.08f, 0.08f, 0.12f, 0.9f);
-            UiStyles.Border(_signatureSlot, 2, new Color(0.85f, 0.70f, 0.30f), 22);
-
-            _signatureIcon = new VisualElement { pickingMode = PickingMode.Ignore };
-            UiStyles.Fill(_signatureIcon);
-            _signatureIcon.style.left = _signatureIcon.style.right = _signatureIcon.style.top = _signatureIcon.style.bottom = 6;
-            _signatureIcon.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
-            _signatureSlot.Add(_signatureIcon);
-
-            _signatureShade = new VisualElement { pickingMode = PickingMode.Ignore };
-            UiStyles.Fill(_signatureShade);
-            _signatureShade.style.backgroundColor = new Color(0f, 0f, 0f, 0.6f);
-            UiStyles.Border(_signatureShade, 0, Color.clear, 22);
-            _signatureSlot.Add(_signatureShade);
-
-            _signatureCooldown = UiStyles.Text("", 15, Color.white);
-            UiStyles.Fill(_signatureCooldown);
-            _signatureCooldown.style.unityTextAlign = TextAnchor.MiddleCenter;
-            _signatureSlot.Add(_signatureCooldown);
-
-            var key = UiStyles.Text("F", 11, Color.white);
-            key.style.position = Position.Absolute;
-            key.style.right = 2;
-            key.style.bottom = 0;
-            _signatureSlot.Add(key);
-            return _signatureSlot;
-        }
-
-        private void RefreshSignature() {
-            if (_signatureSlot == null) return;
-            _signatureSlot.style.display = _signature != null ? DisplayStyle.Flex : DisplayStyle.None;
-            if (_signature != null && _signature.Icon != null) _signatureIcon.style.backgroundImage = new StyleBackground(_signature.Icon);
-        }
+        // The keys sit at the QWERTY positions Q W E R (A Z E R on AZERTY), then D F
+        private static string[] KeyLabels(KeyboardLayout layout) =>
+            layout == KeyboardLayout.Azerty ? new[] { "A", "Z", "E", "R", "D", "F" } : new[] { "Q", "W", "E", "R", "D", "F" };
 
         private void Update() {
             if (_feedback == null) return;
             if (_feedback.text.Length > 0 && Time.unscaledTime >= _feedbackUntil) _feedback.text = "";
-
-            float signatureLeft = _signatureReadyAt - Time.time;
-            _signatureShade.style.display = signatureLeft > 0f ? DisplayStyle.Flex : DisplayStyle.None;
-            _signatureCooldown.text = signatureLeft > 0f ? Mathf.CeilToInt(signatureLeft).ToString() : "";
-            if (_elementalReadyAt > 0f) Refresh();   // spell line shows the elemental cooldown
+            _abilities.Tick();
         }
 
         private void OnDestroy() => _subscriptions.Dispose();
-
-        private void ShowElements() {
-            if (_elements == null) return;
-            DisplayStyle display = _hasElements ? DisplayStyle.Flex : DisplayStyle.None;
-            _elements.Root.style.display = display;
-            _spell.style.display = display;
-        }
 
         private void ShowFeedback(string message) {
             _feedbackUntil = Time.unscaledTime + feedbackDuration;
@@ -225,28 +155,6 @@ namespace Features.UI {
 
             _manaFill.style.width = Percent(_mana, _manaMax);
             _manaText.text = $"{Mathf.FloorToInt(_mana)} / {Mathf.CeilToInt(_manaMax)}";
-
-            // Cost preview: the part of the current mana the spell would consume (red if not enough)
-            float cost = _selection.Total > 0 ? _selection.ManaCost : 0f;
-            bool affordable = cost <= _mana + 0.0001f;
-            _manaCost.style.display = cost > 0f ? DisplayStyle.Flex : DisplayStyle.None;
-            if (cost > 0f && _manaMax > 0f) {
-                float start = Mathf.Max(0f, (affordable ? _mana - cost : 0f) / _manaMax);
-                float width = Mathf.Min(cost, affordable ? cost : _manaMax) / _manaMax;
-                _manaCost.style.left = Length.Percent(start * 100f);
-                _manaCost.style.width = Length.Percent(Mathf.Min(width, 1f - start) * 100f);
-                _manaCost.style.backgroundColor = affordable ? new Color(0.75f, 0.9f, 1f, 0.75f) : new Color(1f, 0.25f, 0.2f, 0.6f);
-            }
-
-            if (_selection.Total == 0) _spell.text = "";
-            else if (_selection.Spell == null) _spell.text = "Aucun sort pour cette combinaison";
-            else {
-                float cooldown = _elementalReadyAt - Time.time;
-                string ready = cooldown > 0f ? $"  ·  {cooldown:0.0} s" : "";
-                _spell.text = $"{_selection.Spell.DisplayName}  ·  {Mathf.CeilToInt(cost)} mana{ready}";
-            }
-            bool onCooldown = _elementalReadyAt - Time.time > 0f;
-            _spell.style.color = !affordable ? new Color(1f, 0.45f, 0.4f) : onCooldown ? new Color(0.7f, 0.7f, 0.75f) : Color.white;
 
             _xpFill.style.width = _xp.XpToNext > 0 ? Length.Percent(Mathf.Clamp01((float)_xp.Xp / _xp.XpToNext) * 100f) : Length.Percent(100f);
             _level.text = Math.Max(_xp.Level, 1).ToString();

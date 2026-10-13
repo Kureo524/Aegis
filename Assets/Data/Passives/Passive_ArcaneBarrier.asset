@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: Passive_ArcaneBarrier
   m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
   displayName: "Barri\xE8re arcanique"
-  description: "Apr\xE8s un sort \xE0 2 \xE9l\xE9ments ou plus : bouclier de 40 (+25
-    % puissance magique) pendant 3 s."
+  description: "Après un sort : bouclier de 40 (+25 % puissance magique) pendant 3 s. Recharge 4 s."
   icon: {fileID: 21300000, guid: a4268092493c0dbfebd6477f3c06ce7d, type: 3}
   stats: []
   capabilities: 
@@ -22,9 +21,8 @@ MonoBehaviour:
   - On: 1
     EveryN: 1
     Chance: 1
-    MinSpellStacks: 2
     HealthBelow: 0
-    Cooldown: 0
+    Cooldown: 4
     Effect: 5
     Stats: []
     Duration: 3

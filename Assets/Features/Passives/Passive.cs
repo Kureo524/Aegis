@@ -87,29 +87,31 @@ namespace Features.Passives {
 
         private void OnBasicAttackHit(Character target, float damage) {
             if (Definition.Stacks.Source == StackSource.PerBasicAttack) AddStack();
-            Fire(PassiveEvent.BasicAttackHit, target, 0);
+            Fire(PassiveEvent.BasicAttackHit, target);
         }
 
         private void OnSpellCast(SpellDefinition spell) {
             if (Definition.Stacks.Source == StackSource.PerSpellCast) AddStack();
-            Fire(PassiveEvent.SpellCast, null, spell.TotalStacks);
+            Fire(PassiveEvent.SpellCast, null);
         }
 
         private void OnKill(Character victim) {
             if (Definition.Stacks.Source == StackSource.PerKill) AddStack();
-            Fire(PassiveEvent.Kill, victim, 0);
+            Fire(PassiveEvent.Kill, victim);
         }
 
-        private void OnDamageTaken(float damage) => Fire(PassiveEvent.DamageTaken, null, 0);
+        private void OnDamageTaken(float damage) => Fire(PassiveEvent.DamageTaken, null);
 
-        private void OnSpellHit(Character target, float damage) => Fire(PassiveEvent.SpellHit, target, 0);
+        private void OnSpellHit(Character target, float damage) {
+            if (Definition.Stacks.Source == StackSource.PerSpellHit) AddStack();
+            Fire(PassiveEvent.SpellHit, target);
+        }
 
-        private void Fire(PassiveEvent happened, Character target, int spellStacks) {
+        private void Fire(PassiveEvent happened, Character target) {
             PassiveTrigger[] triggers = Definition.Triggers;
             for (int i = 0; i < triggers.Length; i++) {
                 PassiveTrigger t = triggers[i];
                 if (t.On != happened) continue;
-                if (happened == PassiveEvent.SpellCast && spellStacks < t.MinSpellStacks) continue;
                 if (t.HealthBelow > 0f && (_owner.Health == null || _owner.Health.Ratio > t.HealthBelow)) continue;
                 if (Time.time < _readyAt[i]) continue;
                 if (++_counters[i] < Mathf.Max(1, t.EveryN)) continue;

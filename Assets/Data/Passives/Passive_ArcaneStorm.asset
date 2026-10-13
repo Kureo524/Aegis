@@ -13,16 +13,14 @@ MonoBehaviour:
   m_Name: Passive_ArcaneStorm
   m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
   displayName: "Temp\xEAte arcanique"
-  description: "Apr\xE8s un sort \xE0 3 \xE9l\xE9ments : +30 % vitesse de d\xE9placement
-    et +40 puissance magique pendant 4 s."
+  description: "Un sort lancé sur trois : +30 % vitesse de déplacement et +40 puissance magique pendant 4 s."
   icon: {fileID: 21300000, guid: 38fd1eb6a3719af729e79a9e81fa8d96, type: 3}
   stats: []
   capabilities: 
   triggers:
   - On: 1
-    EveryN: 1
+    EveryN: 3
     Chance: 1
-    MinSpellStacks: 3
     Effect: 0
     Stats:
     - Stat: 18

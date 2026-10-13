@@ -1,6 +1,5 @@
 using Features.Spells;
 using NUnit.Framework;
-using UnityEditor;
 using UnityEngine;
 
 namespace Game.Tests.EditMode {
@@ -24,33 +23,13 @@ namespace Game.Tests.EditMode {
         }
 
         [Test]
-        public void ElementLevels_CountOncePerDistinctElement() {
-            ElementDefinition fire = SpellTestData.Element("Fire", 10f);
-            ElementDefinition elec = SpellTestData.Element("Elec", 10f);
-            ElementDefinition wind = SpellTestData.Element("Wind", 10f);
-            var slots = new[] { fire, elec, wind };
-            int[] levels = { 3, 2, 5 };
-
-            SpellDefinition fireX3 = SpellTestData.Spell("Meteor", (fire, 3));
-            SpellDefinition fireFireElec = SpellTestData.Spell("Lance", (fire, 2), (elec, 1));
-
-            Assert.AreEqual(2, SpellMath.SumOfLevelsAboveOne(fireX3, slots, s => levels[s]), "Fire x3 counts Fire once");
-            Assert.AreEqual(3, SpellMath.SumOfLevelsAboveOne(fireFireElec, slots, s => levels[s]), "(3-1) + (2-1)");
-            Object.DestroyImmediate(fireX3);
-            Object.DestroyImmediate(fireFireElec);
-        }
-
-        [Test]
-        public void RawDamage_IsScalingPlusStatRatio() {
-            SpellDefinition spell = SpellTestData.Spell("Bolt");
-            var so = new SerializedObject(spell);
-            so.FindProperty("powerRatio").floatValue = 0.5f;
-            so.FindProperty("scaling").FindPropertyRelative("Base").floatValue = 100f;
-            so.FindProperty("scaling").FindPropertyRelative("PerElementLevel").floatValue = 20f;
-            so.ApplyModifiedPropertiesWithoutUndo();
-
-            // 100 + 20 × 2 + 40 (magic attack) × 0.5
-            Assert.AreEqual(160f, SpellMath.RawDamage(spell, 2, magicAttack: 40f, physicalAttack: 999f), 1e-3f);
+        public void RawDamage_IsRankBasePlusAdBonusAdAndApRatios() {
+            SpellDefinition spell = SpellTestData.Spell("Shot", new[] { 1, 3, 5 }, new[] { 20f, 45f, 70f },
+                                                        adRatio: 1.3f, bonusAdRatio: 0.5f, apRatio: 0.15f);
+            // rank 2: 45 + 1.3 × 100 + 0.5 × 40 + 0.15 × 20
+            Assert.AreEqual(198f, SpellMath.RawDamage(spell, 2, attackDamage: 100f, bonusAttackDamage: 40f, abilityPower: 20f), 1e-3f);
+            Assert.AreEqual(70f, SpellMath.RawDamage(spell, 9, 0f, 0f, 0f), 1e-3f, "beyond the table: the last rank");
+            Assert.AreEqual(20f, SpellMath.RawDamage(spell, 0, 0f, 0f, 0f), 1e-3f, "rank 0 (enemy spell): the first rank");
             Object.DestroyImmediate(spell);
         }
 

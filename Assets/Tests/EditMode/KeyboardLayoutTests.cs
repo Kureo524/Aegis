@@ -9,15 +9,16 @@ using UnityEngine.InputSystem;
 
 namespace Game.Tests.EditMode {
     /// <summary>
-    /// Letter bindings follow the configured layout (design doc §4.7), through the real InputReader:
-    /// on AZERTY, the key that types A (physical Q) is Element1 and the one that types Q (physical A)
-    /// is the attack-move, which reports press and release (aim while held).
+    /// Spell keys, attack-move and stop are bound by position (design doc §4.7), through the real
+    /// InputReader: whatever the layout, physical Q W E R are the abilities (A Z E R on AZERTY),
+    /// D F the summoner spells and physical A the attack-move (Q on AZERTY). Keys report press and
+    /// release; Ctrl + ability key ranks the ability up.
     /// </summary>
     public class KeyboardLayoutTests : InputTestFixture {
         private Keyboard _keyboard;
         private ControlsSettings _settings;
         private InputReader _reader;
-        private readonly List<int> _elements = new();
+        private readonly List<AbilityKeyEvent> _abilities = new();
         private readonly List<bool> _attackMoves = new();
 
         private void Boot(KeyboardLayout layout) {
@@ -28,7 +29,7 @@ namespace Game.Tests.EditMode {
             so.ApplyModifiedPropertiesWithoutUndo();
 
             var bus = new EventBus();
-            bus.Subscribe<ElementKeyEvent>(e => _elements.Add(e.Slot));
+            bus.Subscribe<AbilityKeyEvent>(e => _abilities.Add(e));
             bus.Subscribe<AttackMoveEvent>(e => _attackMoves.Add(e.Pressed));
 
             _reader = new InputReader(bus, _settings);
@@ -39,46 +40,58 @@ namespace Game.Tests.EditMode {
         public override void TearDown() {
             _reader?.Dispose();
             Object.DestroyImmediate(_settings);
-            _elements.Clear();
+            _abilities.Clear();
             _attackMoves.Clear();
             base.TearDown();
         }
 
-        [Test]
-        public void Azerty_KeyThatTypesA_IsElement1() {
-            Boot(KeyboardLayout.Azerty);
+        [TestCase(KeyboardLayout.Azerty)]
+        [TestCase(KeyboardLayout.Qwerty)]
+        public void SpellKeys_AreBoundByPosition(KeyboardLayout layout) {
+            Boot(layout);
             Press(_keyboard.qKey);
+            Press(_keyboard.wKey);
+            Press(_keyboard.eKey);
+            Press(_keyboard.rKey);
+            Press(_keyboard.dKey);
+            Press(_keyboard.fKey);
 
-            CollectionAssert.AreEqual(new[] { 0 }, _elements);
+            CollectionAssert.AreEqual(new[] { 0, 1, 2, 3, 4, 5 }, _abilities.ConvertAll(e => e.Slot));
+            Assert.IsTrue(_abilities.TrueForAll(e => !e.Released && !e.LevelUp));
             CollectionAssert.IsEmpty(_attackMoves);
         }
 
         [Test]
-        public void Azerty_KeyThatTypesZ_IsElement2() {
+        public void SpellKey_ReportsItsRelease() {
             Boot(KeyboardLayout.Azerty);
-            Press(_keyboard.wKey);
+            Press(_keyboard.rKey);
+            Release(_keyboard.rKey);
 
-            CollectionAssert.AreEqual(new[] { 1 }, _elements);
+            Assert.AreEqual(2, _abilities.Count);
+            Assert.IsFalse(_abilities[0].Released);
+            Assert.IsTrue(_abilities[1].Released);
+            Assert.AreEqual(3, _abilities[1].Slot);
         }
 
         [Test]
-        public void Azerty_KeyThatTypesQ_IsAttackMove_PressAndRelease() {
+        public void CtrlPlusSpellKey_RanksUp() {
             Boot(KeyboardLayout.Azerty);
+            Press(_keyboard.leftCtrlKey);
+            Press(_keyboard.qKey);
+
+            Assert.AreEqual(1, _abilities.Count);
+            Assert.IsTrue(_abilities[0].LevelUp);
+        }
+
+        [TestCase(KeyboardLayout.Azerty)]
+        [TestCase(KeyboardLayout.Qwerty)]
+        public void AttackMove_IsPhysicalA_PressAndRelease(KeyboardLayout layout) {
+            Boot(layout);
             Press(_keyboard.aKey);
             Release(_keyboard.aKey);
 
             CollectionAssert.AreEqual(new[] { true, false }, _attackMoves);
-            CollectionAssert.IsEmpty(_elements);
-        }
-
-        [Test]
-        public void Qwerty_KeepsDefaultPositions() {
-            Boot(KeyboardLayout.Qwerty);
-            Press(_keyboard.aKey);
-            Press(_keyboard.qKey);
-
-            CollectionAssert.AreEqual(new[] { 0 }, _elements);
-            CollectionAssert.AreEqual(new[] { true }, _attackMoves);
+            CollectionAssert.IsEmpty(_abilities);
         }
 
         [Test]

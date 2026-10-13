@@ -448,14 +448,13 @@ namespace EditorTools {
                     var attack = scope.playerDefinition.BasicAttack;
                     Check(attack != null && attack.ProjectilePrefab != null && attack.ProjectileSpeed > 0f,
                           "player basic attack fires a projectile");
-                    Check(scope.playerDefinition.HasElements, "player has 3 elements and a spell book");
-                    var signature = scope.playerDefinition.SignatureAbility;
-                    Check(signature != null && signature.CooldownOverride > 0f && signature.Icon != null, "player has a signature ability (F) with a cooldown");
-                    if (scope.playerDefinition.HasElements) {
-                        var resolver = new Features.Spells.SpellResolver(scope.playerDefinition.SpellBook, scope.playerDefinition.Elements);
-                        Check(resolver.Problems.Count == 0 && resolver.MissingKeys(3, 3).Count == 0 && resolver.Count == 19,
-                              "player spell book covers the 19 recipes, no duplicate");
-                    }
+                    Check(scope.playerDefinition.HasAbilities, "player has its 4 abilities (Q W E R)");
+                    if (scope.playerDefinition.HasAbilities)
+                        foreach (Features.Spells.SpellDefinition ability in scope.playerDefinition.Abilities)
+                            Check(ability.Icon != null && ability.MaxRank > 1 && ability.Cooldown(1) > 0f,
+                                  $"ability {ability.DisplayName}: icon, ranks and cooldown");
+                    var flash = scope.playerDefinition.SummonerF;
+                    Check(flash != null && flash.Cooldown(1) > 0f && flash.Icon != null, "player has a summoner spell on F with a cooldown");
                 }
                 if (scope.playerPrefab != null) {
                     Character prefab = scope.playerPrefab;
@@ -470,13 +469,9 @@ namespace EditorTools {
                         Check(input.clickMarkerPrefab != null, "Player prefab: input.clickMarkerPrefab wired");
                         Check(input.character != null && input.attacker != null, "Player prefab: input.character / attacker wired");
                         Check(input.rangeIndicator != null, "Player prefab: input.rangeIndicator wired");
-                        var caster = prefab.GetComponent<Features.Spells.ElementCaster>();
-                        Check(caster != null && new SerializedObject(caster).FindProperty("owner").objectReferenceValue != null,
-                              "Player prefab: ElementCaster wired");
                         foreach (var (component, fields) in new (Component, string[])[] {
-                                     (caster, new[] { "targeting", "caster" }),
+                                     (prefab.GetComponent<Features.Spells.AbilityCaster>(), new[] { "owner", "targeting", "caster" }),
                                      (prefab.GetComponent<Features.Spells.SpellTargeting>(), new[] { "owner", "indicator", "rangeIndicator" }),
-                                     (prefab.GetComponent<Features.Spells.SignatureAbility>(), new[] { "owner", "targeting", "caster" }),
                                      (prefab.GetComponent<Features.Spells.SpellCaster>(), new[] { "owner", "movement", "attacker", "visual" }),
                                  }) {
                             bool ok = component != null;

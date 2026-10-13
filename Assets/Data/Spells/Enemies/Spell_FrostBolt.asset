@@ -15,19 +15,24 @@ MonoBehaviour:
   displayName: Trait de givre
   icon: {fileID: 0}
   color: {r: 0.55, g: 0.85, b: 1, a: 1}
-  recipe: []
+  description: 
+  rankUnlockLevels: []
+  baseDamage:
+  - 40
+  cooldowns:
+  - 0
+  manaCosts:
+  - 0
   targeting: 1
   range: 10
   radius: 0.5
   coneAngle: 60
   castTime: 0.7
   canMoveWhileCasting: 0
-  cooldownOverride: 0
   kind: 0
-  powerRatio: 0.6
-  scaling:
-    Base: 40
-    PerElementLevel: 0
+  adRatio: 0
+  bonusAdRatio: 0
+  apRatio: 0.6
   buffs: []
   statuses:
   - Kind: 3

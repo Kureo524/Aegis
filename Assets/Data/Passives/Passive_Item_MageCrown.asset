@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: Passive_Item_MageCrown
   m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
   displayName: Inspiration
-  description: "Apr\xE8s un sort \xE0 2 \xE9l\xE9ments ou plus : +20 puissance magique
-    pendant 3 s."
+  description: "Après un sort : +20 puissance magique pendant 3 s."
   icon: {fileID: 21300000, guid: 9da5eaf40ad819751b24e08d576d72f1, type: 3}
   stats: []
   capabilities: 
@@ -22,7 +21,6 @@ MonoBehaviour:
   - On: 1
     EveryN: 1
     Chance: 1
-    MinSpellStacks: 2
     Effect: 0
     Stats:
     - Stat: 5

@@ -3,43 +3,32 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Game.Tests.EditMode {
-    /// <summary>Builds in-memory element / spell / settings assets for the spell tests.</summary>
+    /// <summary>Builds in-memory spell assets for the spell tests.</summary>
     internal static class SpellTestData {
-        public static ElementDefinition Element(string name, float cost) {
-            var e = ScriptableObject.CreateInstance<ElementDefinition>();
-            e.name = name;
-            var so = new SerializedObject(e);
-            so.FindProperty("manaCost").floatValue = cost;
-            so.ApplyModifiedPropertiesWithoutUndo();
-            return e;
-        }
-
-        public static SpellDefinition Spell(string name, params (ElementDefinition element, int count)[] recipe) {
+        /// <param name="unlockLevels">Champion level per rank (empty: a single rank).</param>
+        public static SpellDefinition Spell(string name, int[] unlockLevels = null, float[] baseDamage = null,
+                                            float adRatio = 0f, float bonusAdRatio = 0f, float apRatio = 0f) {
             var s = ScriptableObject.CreateInstance<SpellDefinition>();
             s.name = name;
             var so = new SerializedObject(s);
             so.FindProperty("displayName").stringValue = name;
-            SerializedProperty list = so.FindProperty("recipe");
-            list.arraySize = recipe.Length;
-            for (int i = 0; i < recipe.Length; i++) {
-                list.GetArrayElementAtIndex(i).FindPropertyRelative("Element").objectReferenceValue = recipe[i].element;
-                list.GetArrayElementAtIndex(i).FindPropertyRelative("Count").intValue = recipe[i].count;
-            }
+            Fill(so.FindProperty("rankUnlockLevels"), unlockLevels ?? new int[0]);
+            Fill(so.FindProperty("baseDamage"), baseDamage ?? new[] { 0f });
+            so.FindProperty("adRatio").floatValue = adRatio;
+            so.FindProperty("bonusAdRatio").floatValue = bonusAdRatio;
+            so.FindProperty("apRatio").floatValue = apRatio;
             so.ApplyModifiedPropertiesWithoutUndo();
             return s;
         }
 
-        public static SpellBook Book(params SpellDefinition[] spells) {
-            var b = ScriptableObject.CreateInstance<SpellBook>();
-            var so = new SerializedObject(b);
-            SerializedProperty list = so.FindProperty("spells");
-            list.arraySize = spells.Length;
-            for (int i = 0; i < spells.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = spells[i];
-            so.ApplyModifiedPropertiesWithoutUndo();
-            return b;
+        private static void Fill(SerializedProperty list, int[] values) {
+            list.arraySize = values.Length;
+            for (int i = 0; i < values.Length; i++) list.GetArrayElementAtIndex(i).intValue = values[i];
         }
 
-        // Defaults of the asset: 3 stacks max, curve 1 / 1.5 / 2.25, element level max 5
-        public static SpellSettings Settings() => ScriptableObject.CreateInstance<SpellSettings>();
+        private static void Fill(SerializedProperty list, float[] values) {
+            list.arraySize = values.Length;
+            for (int i = 0; i < values.Length; i++) list.GetArrayElementAtIndex(i).floatValue = values[i];
+        }
     }
 }

@@ -137,9 +137,7 @@ namespace EditorTools {
             so.FindProperty("radius").floatValue = radius;
             so.FindProperty("castTime").floatValue = castTime;
             so.FindProperty("kind").enumValueIndex = (int)SpellKind.Physical;
-            so.FindProperty("powerRatio").floatValue = ratio;
-            so.FindProperty("scaling").FindPropertyRelative("Base").floatValue = damage;
-            so.FindProperty("scaling").FindPropertyRelative("PerElementLevel").floatValue = 0f;
+            SpellAssets.SetDamage(so, damage, ratio);
             so.ApplyModifiedPropertiesWithoutUndo();
             return spell;
         }

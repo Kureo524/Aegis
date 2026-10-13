@@ -20,5 +20,5 @@ MonoBehaviour:
   edgeScrollSpeed: 15
   scrollSmoothing: 8
   minZoom: 5
-  maxZoom: 20
+  maxZoom: 32
   zoomSpeed: 10

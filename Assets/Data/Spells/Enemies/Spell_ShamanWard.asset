@@ -15,19 +15,24 @@ MonoBehaviour:
   displayName: Protection tribale
   icon: {fileID: 0}
   color: {r: 0.45, g: 1, b: 0.5, a: 1}
-  recipe: []
+  description: 
+  rankUnlockLevels: []
+  baseDamage:
+  - 50
+  cooldowns:
+  - 0
+  manaCosts:
+  - 0
   targeting: 0
   range: 8
   radius: 5
   coneAngle: 60
   castTime: 0.6
   canMoveWhileCasting: 0
-  cooldownOverride: 0
   kind: 2
-  powerRatio: 0.5
-  scaling:
-    Base: 50
-    PerElementLevel: 10
+  adRatio: 0
+  bonusAdRatio: 0
+  apRatio: 0.5
   buffs:
   - Stat: 6
     Type: 1

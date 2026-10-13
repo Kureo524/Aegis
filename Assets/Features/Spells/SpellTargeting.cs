@@ -14,8 +14,8 @@ namespace Features.Spells {
     /// <summary>
     /// Aiming of the player's spells (design doc §7.4–7.5): shows the range and the spell shape under
     /// the cursor; left click confirms (builds the CastContext), right click / Escape cancel.
-    /// Only one aim at a time: starting one publishes AimModeEvent, and any other aim mode (Q
-    /// attack-move…) cancels this one. <see cref="Aim"/> follows the player's CastMode (UserOptions):
+    /// Only one aim at a time: starting one publishes AimModeEvent, and any other aim (attack-move,
+    /// another spell key) cancels this one. <see cref="Aim"/> follows the player's CastMode (UserOptions):
     /// Normal = aim then left click; QuickWithIndicator = aim while the key is held, cast on release
     /// (<see cref="Release"/>); Quick = cast at once towards the cursor. Player prefab variant.
     /// </summary>
@@ -35,14 +35,16 @@ namespace Features.Spells {
         private Plane _ground = new(Vector3.up, Vector3.zero);
 
         private SpellDefinition _spell;
-        private AimMode _mode;
+        private int _slot = -1;
         private Action<CastContext> _onConfirm;
         private Action _onCancel;
         private bool _castOnRelease;
         private Vector2 _pointer;
 
         public bool IsAiming => _spell != null;
-        public AimMode Mode => _spell != null ? _mode : AimMode.None;
+        public AimMode Mode => _spell != null ? AimMode.Ability : AimMode.None;
+        /// <summary>Spell slot being aimed (AbilitySlots), -1 when not aiming.</summary>
+        public int Slot => _spell != null ? _slot : -1;
         public SpellDefinition Spell => _spell;
 
         [Inject]
@@ -58,29 +60,29 @@ namespace Features.Spells {
             _subscriptions.Add(_eventBus.Subscribe<CancelEvent>(_ => Cancel()));
             _subscriptions.Add(_eventBus.Subscribe<PointerCommandEvent>(_ => Cancel()));
             _subscriptions.Add(_eventBus.Subscribe<AimModeEvent>(e => {
-                if (IsAiming && e.Mode != AimMode.None && e.Mode != _mode) Stop(publish: false);   // another aim took over
+                if (IsAiming && e.Mode != AimMode.None && (e.Mode != AimMode.Ability || e.Slot != _slot)) Stop(publish: false);   // another aim took over
             }));
         }
 
         private void OnDestroy() => _subscriptions.Dispose();
 
-        /// <summary>R / F pressed: aims <paramref name="spell"/> or casts it at once, depending on the cast mode.</summary>
-        public void Aim(SpellDefinition spell, AimMode mode, Action<CastContext> onConfirm) {
+        /// <summary>A spell key pressed: aims <paramref name="spell"/> or casts it at once, depending on the cast mode.</summary>
+        public void Aim(SpellDefinition spell, int slot, Action<CastContext> onConfirm) {
             CastMode castMode = _options != null ? _options.CastMode : CastMode.Normal;
             if (castMode == CastMode.Quick) {
                 CastAtCursor(spell, onConfirm);
                 return;
             }
-            BeginAim(spell, mode, onConfirm);
+            BeginAim(spell, slot, onConfirm);
             _castOnRelease = castMode == CastMode.QuickWithIndicator;
         }
 
         /// <summary>
-        /// R / F released: casts the aim started by that key in the "quick cast with indicator" mode.
-        /// Nothing if the aim was already cast (left click), cancelled, or is a plain Normal aim.
+        /// A spell key released: casts the aim started by that key in the "quick cast with indicator"
+        /// mode. Nothing if the aim was already cast (left click), cancelled, or is a plain Normal aim.
         /// </summary>
-        public void Release(AimMode mode) {
-            if (!IsAiming || _mode != mode || !_castOnRelease) return;
+        public void Release(int slot) {
+            if (!IsAiming || _slot != slot || !_castOnRelease) return;
             if (!TryBuildContext(_spell, out CastContext ctx)) {
                 Cancel();   // no valid target under the cursor: the key is up, the aim ends
                 return;
@@ -99,21 +101,14 @@ namespace Features.Spells {
         }
 
         /// <summary>Starts aiming <paramref name="spell"/>; <paramref name="onConfirm"/> receives the cast context.</summary>
-        public void BeginAim(SpellDefinition spell, AimMode mode, Action<CastContext> onConfirm, Action onCancel = null) {
+        public void BeginAim(SpellDefinition spell, int slot, Action<CastContext> onConfirm, Action onCancel = null) {
             if (IsAiming) Stop(publish: false);
-            _mode = mode;
-            _eventBus.Publish(new AimModeEvent(mode));   // first: the others hide their own aim
+            _slot = slot;
+            _eventBus.Publish(new AimModeEvent(AimMode.Ability, slot));   // first: the others hide their own aim
             _spell = spell;
             _onConfirm = onConfirm;
             _onCancel = onCancel;
             _castOnRelease = false;
-            ShowRange();
-        }
-
-        /// <summary>The aimed spell changed (elements added while aiming): re-resolved live (§7.4).</summary>
-        public void UpdateSpell(SpellDefinition spell) {
-            if (!IsAiming || spell == null) return;
-            _spell = spell;
             ShowRange();
         }
 

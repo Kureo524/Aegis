@@ -48,6 +48,8 @@ namespace Features.Combat {
     /// - Bleed / Burn: one entry per (kind, source); each application adds a stack (up to MaxStacks)
     ///   and refreshes the duration. Damage per second is snapshotted from the applier's stats and
     ///   dealt every <see cref="TickInterval"/>s through the usual damage pipeline.
+    /// - Mark (Ezreal W, §7.6): one at a time, kept with the spell and rank that set it; the
+    ///   marker's next hit by anything but that spell consumes it (SpellExecutor.TryDetonateMark).
     /// </summary>
     public sealed class StatusEffects {
         public const float TickInterval = 0.5f;
@@ -65,7 +67,11 @@ namespace Features.Combat {
         private readonly Action<DamageInfo> _takeDamage;
         private readonly float[] _remaining = new float[Enum.GetValues(typeof(StatusKind)).Length];
         private readonly List<DamageOverTime> _dots = new();
-        private bool _wasStunned, _wasRooted, _wasSilenced, _wasSlowed, _wasBleeding, _wasBurning;
+        private bool _wasStunned, _wasRooted, _wasSilenced, _wasSlowed, _wasBleeding, _wasBurning, _wasMarked;
+        private Character _markedBy;
+        private Spells.SpellDefinition _markSpell;
+        private int _markRank;
+        private float _markRemaining;
 
         /// <param name="takeDamage">How damage over time reaches the owner (Character.TakeDamage).</param>
         public StatusEffects(StatController stats, TimedModifiers buffs, Action<DamageInfo> takeDamage) {
@@ -80,6 +86,10 @@ namespace Features.Combat {
         public bool IsSlowed => Remaining(StatusKind.Slow) > 0f;
         public bool IsBleeding => HasDot(StatusKind.Bleed);
         public bool IsBurning => HasDot(StatusKind.Burn);
+        public bool IsMarked => _markRemaining > 0f && _markedBy != null;
+        public bool IsMarkedBy(Character character) => IsMarked && _markedBy == character;
+        /// <summary>The spell whose mark the owner carries (its icon is shown), null when unmarked.</summary>
+        public Spells.SpellDefinition MarkSpell => IsMarked ? _markSpell : null;
         public bool CanMove => !IsStunned && !IsRooted;
         public bool CanAttack => !IsStunned;
         public bool CanCast => !IsStunned && !IsSilenced;
@@ -122,8 +132,41 @@ namespace Features.Combat {
             NotifyIfChanged();
         }
 
+        /// <summary>Marks the owner for <paramref name="duration"/> s (replaces a previous mark).</summary>
+        public void ApplyMark(Character by, Spells.SpellDefinition spell, int rank, float duration) {
+            if (by == null || spell == null || duration <= 0f) return;
+            _markedBy = by;
+            _markSpell = spell;
+            _markRank = rank;
+            _markRemaining = duration;
+            NotifyIfChanged();
+        }
+
+        /// <summary>
+        /// Consumes the mark if <paramref name="attacker"/> set it and the hit does not come from the
+        /// marking spell itself. Returns the marking spell and rank.
+        /// </summary>
+        public bool TryConsumeMark(Character attacker, Spells.SpellDefinition hitBy, out Spells.SpellDefinition spell, out int rank) {
+            spell = _markSpell;
+            rank = _markRank;
+            if (!IsMarkedBy(attacker) || hitBy == _markSpell) return false;
+            ClearMark();
+            NotifyIfChanged();
+            return true;
+        }
+
+        private void ClearMark() {
+            _markedBy = null;
+            _markSpell = null;
+            _markRemaining = 0f;
+        }
+
         public void Tick(float deltaTime) {
             for (int i = 0; i < _remaining.Length; i++) _remaining[i] = Mathf.Max(0f, _remaining[i] - deltaTime);
+            if (_markRemaining > 0f) {
+                _markRemaining -= deltaTime;
+                if (_markRemaining <= 0f) ClearMark();
+            }
 
             for (int i = _dots.Count - 1; i >= 0; i--) {
                 DamageOverTime d = _dots[i];
@@ -144,6 +187,7 @@ namespace Features.Combat {
         public void Clear() {
             Array.Clear(_remaining, 0, _remaining.Length);
             _dots.Clear();
+            ClearMark();
             NotifyIfChanged();
         }
 
@@ -186,8 +230,10 @@ namespace Features.Combat {
 
         private void NotifyIfChanged() {
             bool stunned = IsStunned, rooted = IsRooted, silenced = IsSilenced, slowed = IsSlowed, bleeding = IsBleeding, burning = IsBurning;
+            bool marked = IsMarked;
             if (stunned == _wasStunned && rooted == _wasRooted && silenced == _wasSilenced && slowed == _wasSlowed
-                && bleeding == _wasBleeding && burning == _wasBurning) return;
+                && bleeding == _wasBleeding && burning == _wasBurning && marked == _wasMarked) return;
+            _wasMarked = marked;
             _wasStunned = stunned;
             _wasRooted = rooted;
             _wasSilenced = silenced;

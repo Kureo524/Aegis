@@ -11,8 +11,8 @@ namespace Features.Spells {
     /// which the character stops (unless CanMoveWhileCasting) and the spell is frozen, then
     /// SpellExecutor applies the effect. One cast at a time; dying, a stun or a silence (§5.7)
     /// cancels it, and nothing can be cast while they last.
-    /// On the base Character prefab: the player's element and signature casters and, in phase 6,
-    /// enemy AI all go through it.
+    /// On the base Character prefab: the player's AbilityCaster, enemy AI and boss patterns all go
+    /// through it. The rank is the ability's (0 / 1 for spells without ranks).
     /// </summary>
     public class SpellCaster : MonoBehaviour {
         [SerializeField] private Character owner;
@@ -23,7 +23,7 @@ namespace Features.Spells {
         private SpellExecutor _executor;
         private SpellDefinition _spell;
         private CastContext _context;
-        private int _levels;
+        private int _rank;
         private float _castEnd;
 
         public bool IsCasting => _spell != null;
@@ -35,12 +35,12 @@ namespace Features.Spells {
         [Inject]
         public void Construct(SpellExecutor executor) => _executor = executor;
 
-        public bool Cast(SpellDefinition spell, CastContext context, int levelsAboveOne) {
+        public bool Cast(SpellDefinition spell, CastContext context, int rank) {
             if (spell == null || IsCasting || !owner.IsAlive || !owner.Status.CanCast) return false;
 
             _spell = spell;
             _context = context;
-            _levels = levelsAboveOne;
+            _rank = rank;
             _castEnd = Time.time + spell.CastTime;
 
             if (!spell.CanMoveWhileCasting) {
@@ -65,7 +65,7 @@ namespace Features.Spells {
         private void Resolve() {
             SpellDefinition spell = _spell;
             _spell = null;
-            _executor.Execute(owner, spell, _context, _levels);
+            _executor.Execute(owner, spell, _context, _rank);
             owner.Events.RaiseSpellCast(spell);
             CastCompleted?.Invoke(spell);
         }

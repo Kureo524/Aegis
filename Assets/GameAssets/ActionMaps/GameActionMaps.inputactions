@@ -147,7 +147,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "Element1",
+                    "name": "Ability1",
                     "type": "Button",
                     "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
                     "expectedControlType": "Button",
@@ -157,7 +157,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "Element2",
+                    "name": "Ability2",
                     "type": "Button",
                     "id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
                     "expectedControlType": "Button",
@@ -167,7 +167,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "Element3",
+                    "name": "Ability3",
                     "type": "Button",
                     "id": "b8c9d0e1-f2a3-4567-bcde-678901234567",
                     "expectedControlType": "Button",
@@ -177,7 +177,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "CastSpell",
+                    "name": "Ability4",
                     "type": "Button",
                     "id": "c9d0e1f2-a3b4-5678-cdef-789012345678",
                     "expectedControlType": "Button",
@@ -187,7 +187,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "Signature",
+                    "name": "SummonerF",
                     "type": "Button",
                     "id": "d0e1f2a3-b4c5-6789-defa-890123456789",
                     "expectedControlType": "Button",
@@ -197,7 +197,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "ResetElements",
+                    "name": "SummonerD",
                     "type": "Button",
                     "id": "e1f2a3b4-c5d6-7890-efab-901234567890",
                     "expectedControlType": "Button",
@@ -679,10 +679,10 @@
                 {
                     "name": "",
                     "id": "55555555-5555-5555-5555-555555555555",
-                    "path": "<Keyboard>/q",
+                    "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse",
+                    "groups": "Positional",
                     "action": "AttackMove",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -690,22 +690,22 @@
                 {
                     "name": "",
                     "id": "66666666-6666-6666-6666-666666666666",
-                    "path": "<Keyboard>/a",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Element1",
+                    "groups": "Positional",
+                    "action": "Ability1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "77777777-7777-7777-7777-777777777777",
-                    "path": "<Keyboard>/z",
+                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Element2",
+                    "groups": "Positional",
+                    "action": "Ability2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -715,8 +715,8 @@
                     "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Element3",
+                    "groups": "Positional",
+                    "action": "Ability3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -726,8 +726,8 @@
                     "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "CastSpell",
+                    "groups": "Positional",
+                    "action": "Ability4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -737,19 +737,19 @@
                     "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Signature",
+                    "groups": "Positional",
+                    "action": "SummonerF",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
-                    "path": "<Keyboard>/t",
+                    "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "ResetElements",
+                    "groups": "Positional",
+                    "action": "SummonerD",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -759,7 +759,7 @@
                     "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse",
+                    "groups": "Positional",
                     "action": "Stop",
                     "isComposite": false,
                     "isPartOfComposite": false

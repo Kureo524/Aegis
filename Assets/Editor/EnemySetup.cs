@@ -82,9 +82,7 @@ namespace EditorTools {
             so.FindProperty("radius").floatValue = 2.2f;
             so.FindProperty("castTime").floatValue = 0.9f;
             so.FindProperty("kind").enumValueIndex = (int)SpellKind.Physical;
-            so.FindProperty("powerRatio").floatValue = 0.6f;
-            so.FindProperty("scaling").FindPropertyRelative("Base").floatValue = 60f;
-            so.FindProperty("scaling").FindPropertyRelative("PerElementLevel").floatValue = 0f;
+            SpellAssets.SetDamage(so, 60f, 0.6f);
             so.ApplyModifiedPropertiesWithoutUndo();
             return spell;
         }

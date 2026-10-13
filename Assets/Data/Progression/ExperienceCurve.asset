@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: ExperienceCurve
   m_EditorClassIdentifier: Game.Features::Features.Progression.ExperienceCurve
   xpToNextLevel: 180100007c010000e001000044020000a80200000c03000070030000d4030000380400009c0400000005000064050000c80500002c06000090060000f406000058070000
-  lastSkillPointLevel: 15
+  lastSkillPointLevel: 18

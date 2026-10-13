@@ -15,25 +15,25 @@ MonoBehaviour:
   mode: 1
   entries:
   - Stat: 0
-    GainPerLevel: 100
+    GainPerLevel: 102
     Type: 0
   - Stat: 1
-    GainPerLevel: 0.1
+    GainPerLevel: 0.13
     Type: 0
   - Stat: 2
-    GainPerLevel: 30
+    GainPerLevel: 70
     Type: 0
   - Stat: 3
-    GainPerLevel: 0.4
+    GainPerLevel: 0.15
     Type: 0
   - Stat: 4
-    GainPerLevel: 3
+    GainPerLevel: 2.5
     Type: 0
   - Stat: 6
-    GainPerLevel: 0.02
+    GainPerLevel: 0.025
     Type: 1
   - Stat: 14
-    GainPerLevel: 4
+    GainPerLevel: 4.7
     Type: 0
   - Stat: 15
     GainPerLevel: 1.3

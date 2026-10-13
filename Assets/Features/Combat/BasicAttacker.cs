@@ -258,6 +258,7 @@ namespace Features.Combat {
         }
 
         private void OnHit(Character target, float taken) {
+            Spells.SpellExecutor.TryDetonateMark(owner, target, null);   // Ezreal W (§7.6)
             owner.Events.RaiseBasicAttackHit(target, taken);
             Hit?.Invoke(target, taken);
         }

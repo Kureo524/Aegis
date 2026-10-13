@@ -15,8 +15,7 @@ namespace EditorTools {
     /// <summary>
     /// Phase 9b content (design doc §5.7, §9.3, §9.4), called by <see cref="ProjectSetup"/> after the
     /// boss:
-    /// - statuses on the test spells (fire burns, electricity stuns, wind slows) and self shields /
-    ///   heals on the buff spells; statuses on the enemy spells; tenacity for the brute and Grokk;
+    /// - statuses on the enemy spells; tenacity for the brute and Grokk;
     /// - 12 legendary and 2 prismatic items, 7 augments, built from the generic passive bricks and
     ///   added to the shop and augment catalogs.
     /// Everything is only filled when missing (a spell whose statuses were set by hand is kept), so
@@ -36,33 +35,6 @@ namespace EditorTools {
 
         private static PassiveTrigger OnHitStatus(PassiveEvent on, int everyN, StatusApplication status) =>
             new() { On = on, EveryN = everyN, Chance = 1f, Effect = PassiveEffectKind.ApplyStatus, Status = status };
-
-        // ---- Spells: fire burns, electricity stuns, wind slows (by display name) ----
-        private static readonly Dictionary<string, StatusApplication[]> SpellStatuses = new() {
-            ["Boule de feu"]        = new[] { Burn(10f, 0.05f, 3f, 3) },
-            ["Étincelle"]           = new[] { Stun(0.25f) },
-            ["Rafale"]              = new[] { Slow(0.3f, 1.5f) },
-            ["Grande boule de feu"] = new[] { Burn(18f, 0.08f, 3f, 3) },
-            ["Arc électrique"]      = new[] { Stun(0.4f) },
-            ["Plasma"]              = new[] { Burn(15f, 0.06f, 3f, 3), Stun(0.3f) },
-            ["Tornade de feu"]      = new[] { Burn(15f, 0.06f, 3f, 3), Slow(0.25f, 1.5f) },
-            ["Orage"]               = new[] { Slow(0.35f, 2f), Stun(0.3f) },
-            ["Météore"]             = new[] { Burn(30f, 0.1f, 4f, 2), Stun(0.5f) },
-            ["Foudre"]              = new[] { Stun(0.8f) },
-            ["Cyclone"]             = new[] { Slow(0.45f, 2f) },
-            ["Lance de plasma"]     = new[] { Burn(20f, 0.08f, 3f, 3), Stun(0.35f) },
-            ["Tempête de feu"]      = new[] { Burn(25f, 0.1f, 3f, 3), Slow(0.2f, 1.5f) },
-            ["Tempête électrique"]  = new[] { Stun(0.6f), Slow(0.3f, 2f) },
-            ["Souffle ardent"]      = new[] { Burn(20f, 0.08f, 3f, 3), Slow(0.3f, 2f) },
-            ["Cataclysme"]          = new[] { Burn(30f, 0.12f, 4f, 3), Stun(0.75f) },
-        };
-
-        // (name, heal, shield, power ratio, shield duration) on the buff spells
-        private static readonly Dictionary<string, SelfSustain> SpellSustains = new() {
-            ["Bourrasque"]       = new SelfSustain { Heal = 40f, PowerRatio = 0.2f },
-            ["Surcharge"]        = new SelfSustain { Shield = 80f, PowerRatio = 0.3f, ShieldDuration = 4f },
-            ["Ouragan statique"] = new SelfSustain { Shield = 60f, PowerRatio = 0.25f, ShieldDuration = 5f },
-        };
 
         private static readonly Dictionary<string, StatusApplication[]> EnemySpellStatuses = new() {
             ["Assets/Data/Spells/Enemies/Spell_BruteSlam.asset"] = new[] { Slow(0.4f, 1.5f) },
@@ -140,8 +112,8 @@ namespace EditorTools {
                 Triggers = new[] { OnHitStatus(PassiveEvent.BasicAttackHit, 1, Bleed(10f, 0.2f, 3f, 4)) } }),
             (RarityTier.Gold, new P { Id = "StaticShock", Name = "Choc statique", Description = "Un coup de sort sur six étourdit la cible 0,75 s.",
                 Triggers = new[] { OnHitStatus(PassiveEvent.SpellHit, 6, Stun(0.75f)) } }),
-            (RarityTier.Gold, new P { Id = "ArcaneBarrier", Name = "Barrière arcanique", Description = "Après un sort à 2 éléments ou plus : bouclier de 40 (+25 % puissance magique) pendant 3 s.",
-                Triggers = new[] { new PassiveTrigger { On = PassiveEvent.SpellCast, EveryN = 1, Chance = 1f, MinSpellStacks = 2, Effect = PassiveEffectKind.Shield,
+            (RarityTier.Gold, new P { Id = "ArcaneBarrier", Name = "Barrière arcanique", Description = "Après un sort : bouclier de 40 (+25 % puissance magique) pendant 3 s. Recharge 4 s.",
+                Triggers = new[] { new PassiveTrigger { On = PassiveEvent.SpellCast, EveryN = 1, Chance = 1f, Cooldown = 4f, Effect = PassiveEffectKind.Shield,
                                                         Amount = 40f, AmountStat = StatType.MagicAttack, AmountRatio = 0.25f, Duration = 3f } } }),
             (RarityTier.Prismatic, new P { Id = "Phoenix", Name = "Phénix", Description = "Touché sous 30 % de PV : rend 30 % de tes PV max. Recharge 90 s.",
                 Triggers = new[] { new PassiveTrigger { On = PassiveEvent.DamageTaken, EveryN = 1, Chance = 1f, HealthBelow = 0.3f, Cooldown = 90f,
@@ -158,16 +130,6 @@ namespace EditorTools {
         }
 
         private static void ConfigureSpells() {
-            var book = AssetDatabase.LoadAssetAtPath<SpellBook>(ProjectSetup.TestSpellBookPath);
-            if (book != null) {
-                foreach (SpellDefinition spell in book.Spells) {
-                    if (spell == null) continue;
-                    if (spell.Statuses.Length == 0 && SpellStatuses.TryGetValue(spell.DisplayName, out StatusApplication[] statuses))
-                        Set(spell, "statuses", statuses);
-                    if (spell.SelfSustain.IsEmpty && SpellSustains.TryGetValue(spell.DisplayName, out SelfSustain sustain))
-                        Set(spell, "selfSustain", sustain);
-                }
-            }
             foreach ((string path, StatusApplication[] statuses) in EnemySpellStatuses) {
                 var spell = AssetDatabase.LoadAssetAtPath<SpellDefinition>(path);
                 if (spell != null && spell.Statuses.Length == 0) Set(spell, "statuses", statuses);
