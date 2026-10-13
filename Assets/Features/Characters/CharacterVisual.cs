@@ -35,6 +35,9 @@ namespace Features.Characters {
         [SerializeField] private Color burnTint = new(1f, 0.6f, 0.35f);
         [SerializeField] private Color bleedTint = new(1f, 0.5f, 0.5f);
         [SerializeField] private float stunShake = 4f;
+        [Header("Hit")]
+        [SerializeField] private Color hitTint = new(1f, 0.45f, 0.45f);
+        [SerializeField] private float hitDuration = 0.12f;
 
         private SpriteRenderer _renderer;
         private Transform _camera;
@@ -42,8 +45,12 @@ namespace Features.Characters {
         private Vector3 _basePosition;
         private float _windupStart = -1f, _windupEnd = -1f, _impactTime = -1f;
         private bool _stunned;
+        private Color _statusColor = Color.white;
+        private float _hitTime = -1f;
 
         public SpriteRenderer Renderer => _renderer;
+        /// <summary>Tint of the current status (the hit flash plays on top of it).</summary>
+        public Color StatusColor => _statusColor;
         public bool FacesLeft => _renderer.flipX;
 
         [Inject]
@@ -56,6 +63,9 @@ namespace Features.Characters {
             _baseScale = transform.localScale;
             _basePosition = transform.localPosition;
         }
+
+        /// <summary>Took a hit: short red flash and squash (feedback, §6 step 7).</summary>
+        public void PlayHit() => _hitTime = Time.time;
 
         /// <summary>Basic attack windup of <paramref name="duration"/> seconds starts now.</summary>
         public void PlayWindup(float duration) {
@@ -81,7 +91,7 @@ namespace Features.Characters {
         public void SetStatus(StatusEffects status) {
             _stunned = status.IsStunned;
             if (_stunned) StopAttack();
-            _renderer.color = status.IsStunned ? stunTint
+            _statusColor = status.IsStunned ? stunTint
                 : status.IsRooted ? rootTint
                 : status.IsSilenced ? silenceTint
                 : status.IsSlowed ? slowTint
@@ -124,6 +134,13 @@ namespace Features.Characters {
                 }
             }
             if (_stunned) tilt += Mathf.Sin(Time.time * 40f) * stunShake;   // dazed
+            float hit = _hitTime >= 0f ? 1f - (Time.time - _hitTime) / hitDuration : 0f;
+            if (hit <= 0f) {
+                _hitTime = -1f;
+                hit = 0f;
+            }
+            _renderer.color = Color.Lerp(_statusColor, hitTint, hit);
+            squash -= 0.12f * hit;   // squashed by the blow
             transform.rotation = _camera.rotation * Quaternion.Euler(0f, 0f, tilt);
             transform.localScale = new Vector3(_baseScale.x * (1f - squash), _baseScale.y * (1f + squash * 0.75f), _baseScale.z);
             transform.position = transform.parent.TransformPoint(_basePosition) + _camera.right * lunge;

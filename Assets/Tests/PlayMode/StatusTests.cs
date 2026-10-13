@@ -165,7 +165,7 @@ namespace Game.Tests.PlayMode {
             float end = Time.realtimeSinceStartup + 10f;
             while (!dummy.Status.IsBurning && Time.realtimeSinceStartup < end) yield return null;
             Assert.IsTrue(dummy.Status.IsBurning);
-            Assert.AreEqual(new Color(1f, 0.6f, 0.35f), dummy.GetComponentInChildren<CharacterVisual>().Renderer.color, "burn tint");
+            Assert.AreEqual(new Color(1f, 0.6f, 0.35f), dummy.GetComponentInChildren<CharacterVisual>().StatusColor, "burn tint");
         }
 
         [UnityTest]
