@@ -33,7 +33,8 @@ namespace Features.UI.Panels {
 
         private void Start() {
             _overlay = MenuStyles.Overlay(out VisualElement box);
-            box.style.width = 3 * (OfferCard.Width + 16) + 60;
+            box.style.width = StyleKeyword.Null;
+            box.AddToClassList("ae-draft");   // Arena: big cards straight on the dimmed scene
             _title = MenuStyles.Title("");
             _title.style.marginBottom = 2;
             box.Add(_title);
@@ -77,6 +78,8 @@ namespace Features.UI.Panels {
                     reroll.style.alignSelf = Align.Stretch;
                     reroll.SetEnabled(_draft.RerollsLeft > 0);
                     card.Add(reroll);
+                    card.AddToClassList("ae-card--augment");
+                    card.AddToClassList("ae-card--" + a.Rarity.ToString().ToLowerInvariant());
                     _cards.Add(card);
                 }
                 return;

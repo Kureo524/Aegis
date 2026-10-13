@@ -9,14 +9,17 @@ namespace Features.UI {
     /// <summary>
     /// LoL-style spell bar of the player HUD (design doc §7.9): the champion's passive, Q W E R (icon,
     /// key, rank pips, "+" when a skill point can rank it up, greyed while not learned) and D F.
-    /// Cooldowns: dark veil + seconds left. Hover: tooltip with rank, cost, cooldown and description.
+    /// Cooldowns: LoL-style sweep (CooldownSweep) + seconds left, a flash when the spell is ready again. Hover: tooltip with rank, cost, cooldown and description.
     /// Styled by the theme (.ae-slot…), built in code, fed by PlayerHud.
     /// </summary>
     public sealed class AbilityBarView {
         private const float AbilitySize = 56f, SummonerSize = 42f;
 
         private sealed class Slot {
-            public VisualElement Box, Frame, Icon, Shade, Locked, Pips;
+            public VisualElement Box, Frame, Icon, Locked, Pips;
+            public CooldownSweep Sweep;
+            public float Total, ReadyFlashUntil;
+            public bool WasCooling;
             public Label Cooldown, Key;
             public Button Plus;
             public float ReadyAt;
@@ -99,7 +102,11 @@ namespace Features.UI {
         }
 
         public void StartCooldown(int slot, float duration) {
-            if (slot >= 0 && slot < _slots.Length) _slots[slot].ReadyAt = Time.time + duration;
+            if (slot < 0 || slot >= _slots.Length) return;
+            Slot s = _slots[slot];
+            // A refund (shorter remaining time) keeps the original length of the sweep
+            s.Total = Time.time >= s.ReadyAt ? duration : Mathf.Max(s.Total, duration);
+            s.ReadyAt = Time.time + duration;
         }
 
         /// <summary>Every frame: veils and seconds left.</summary>
@@ -107,8 +114,11 @@ namespace Features.UI {
             foreach (Slot slot in _slots) {
                 float left = slot.ReadyAt - Time.time;
                 bool cooling = left > 0f;
-                slot.Shade.style.display = cooling ? DisplayStyle.Flex : DisplayStyle.None;
+                slot.Sweep.Fraction = cooling && slot.Total > 0f ? left / slot.Total : 0f;
                 slot.Cooldown.text = !cooling ? "" : left < 1f ? left.ToString("0.0") : Mathf.CeilToInt(left).ToString();
+                if (slot.WasCooling && !cooling) slot.ReadyFlashUntil = Time.time + 0.35f;   // ready again: flash
+                slot.WasCooling = cooling;
+                slot.Frame.EnableInClassList("ae-slot--ready", Time.time < slot.ReadyFlashUntil);
             }
         }
 
@@ -150,9 +160,9 @@ namespace Features.UI {
             slot.Icon.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
             slot.Locked = Layer(slot.Frame);
             slot.Locked.AddToClassList("ae-slot__locked");
-            slot.Shade = Layer(slot.Frame);
-            slot.Shade.AddToClassList("ae-slot__cooldown");
-            slot.Shade.style.display = DisplayStyle.None;
+            slot.Sweep = new CooldownSweep();
+            UiStyles.Fill(slot.Sweep);
+            slot.Frame.Add(slot.Sweep);
 
             slot.Cooldown = Text("", ability ? 18 : 14);
             UiStyles.Fill(slot.Cooldown);

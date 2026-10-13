@@ -168,6 +168,7 @@ namespace Features.Characters {
             SetBodyActive(true);
 
             Level.LevelChanged += Events.RaiseLevelUp;
+            Level.LevelChanged += _ => PlayRing(transform.position, 1.6f, new Color(1f, 0.85f, 0.35f, 0.9f));   // level up flash
             Passives.Add(definition.Passive, definition);   // the character's own passive (§8.1)
             if (IsPlayer) BindPlayerToBus();
             Initialized?.Invoke(this);
@@ -210,6 +211,7 @@ namespace Features.Characters {
             float taken = Health.TakeDamage(final);
 
             _eventBus.Publish(new DamageDealtEvent(HeadPosition, taken, info.Type, info.IsCrit, IsPlayer));
+            if (taken > 0f && visual != null) visual.PlayHit();
             Damaged?.Invoke(this, taken);
             Events.RaiseDamageTaken(taken, info.Source);
             if (info.Source != null) {
