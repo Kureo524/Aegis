@@ -15,7 +15,7 @@
 ## 1. Principes d'architecture
 
 1. **Composition > héritage** : pas de `class Player : Character`. Des petits composants indépendants sur un même GameObject.
-2. **Data-driven** : tout ce qui diffère d'un perso à l'autre vit dans des ScriptableObjects (stats de base, sprite, éléments et grimoire de départ…).
+2. **Data-driven** : tout ce qui diffère d'un perso à l'autre vit dans des ScriptableObjects (stats de base, sprite, sorts, passif…).
 3. **Séparation Intention / Exécution** : le mouvement ne sait pas *qui* le commande (joueur, IA, replay). Il reçoit une direction.
 4. **Les stats ne sont jamais modifiées directement** : on ajoute/retire des *modificateurs* (traçables, annulables, temporaires).
 5. **Communication par events** : `IEventBus` entre systèmes (§14.3), `event` C# uniquement à l'intérieur d'un même personnage (`CharacterEvents`).
@@ -38,8 +38,7 @@ Character (prefab)
 │   ├── CharacterMovement    → déplace le Rigidbody vers un point
 │   ├── BasicAttacker        → portée, windup, cadence, auto-attaque d'une cible
 │   ├── ManaPool             → mana courant / max / regen
-│   ├── ElementCaster        → stacks d'éléments (A/Z/E), reset (T), lancer (R), coût en mana
-│   ├── SignatureAbility     → compétence propre du personnage (F, cooldown seul), remplaçable par un sort d'invocateur ramassé
+│   ├── AbilityCaster        → sorts du champion Q W E R (rangs, mana, délais) et d'invocateur D F (§7)
 │   ├── PassiveController    → passif du perso, + passifs d'items et d'augments (CharacterEvents)
 │   ├── CapabilityController → capacités (ex. SpellCrit)
 │   ├── Wallet / Inventory   → gold et items (joueur)
@@ -57,10 +56,10 @@ Character (prefab)
 ```
 CharacterDefinition (SO)  ──►  Character.Init()  ──►  StatController (stats de base)
                                                   ├─►  ManaPool (MaxMana, ManaRegen)
-                                                  └─►  ElementCaster (éléments + grimoire de départ)
+                                                  └─►  AbilityCaster (sorts Q W E R + D F, rangs)
 ICommandSource ──► CommandController ──┬─► CharacterMovement ──► Rigidbody
                                        ├─► BasicAttacker ──► DamageInfo ──► DamageReceiver (cible) ──► Health
-                                       └─► ElementCaster ──► SpellResolver ──► Spell.Cast(CastContext) ──► DamageInfo ──► ...
+                                       └─► AbilityCaster ──► SpellCaster ──► SpellExecutor(CastContext, rang) ──► DamageInfo ──► ...
 ```
 
 ---
@@ -108,12 +107,10 @@ Le prefab de base porte aussi `BasicAttacker` et une **barre de PV** (`HealthBar
 |---|---|
 | **Clic droit sur le sol** | `MoveCommand(point)` |
 | **Clic droit sur un ennemi** | `AttackTargetCommand(ennemi)` : le perso se rapproche jusqu'à sa portée puis attaque en boucle |
-| **Maintenir Q** + **clic gauche** | *Attack-move* (§4.6) : affiche la portée d'attaque tant que Q est maintenu ; le clic lance la marche vers le point en attaquant ce qui croise sa route |
-| **A / Z / E** | Ajoute un stack de l'élément 1 / 2 / 3 (§7) |
-| **Ctrl + A / Z / E** | Dépense un point de compétence sur l'élément (le débloque au premier point, §7.8) ; aussi via le bouton « + » du HUD |
-| **R** | Lance le sort correspondant aux éléments actifs. Par défaut (**rapide avec indicateur**) : maintenir = portée et forme affichées, relâcher = lancer vers le curseur. Selon l'option : visée puis clic gauche (Normal), ou lancer immédiat (Rapide) (§7.4) |
-| **F** | Compétence propre du personnage, même mode de lancement que R (§7.8) |
-| **T** | Reset : vide la sélection d'éléments |
+| **Maintenir Q** (AZERTY ; A en QWERTY) + **clic gauche** | *Attack-move* (§4.6) : affiche la portée d'attaque tant que la touche est maintenue ; le clic lance la marche vers le point en attaquant ce qui croise sa route |
+| **A / Z / E / R** (AZERTY ; Q W E R en QWERTY) | Sorts du champion (§7). Par défaut (**rapide avec indicateur**) : maintenir = portée et forme affichées, relâcher = lancer vers le curseur. Selon l'option : visée puis clic gauche (Normal), ou lancer immédiat (Rapide) |
+| **Ctrl + A / Z / E / R** | Dépense un point de compétence sur le sort (§7.7) ; aussi via le bouton « + » du HUD |
+| **D / F** | Sorts d'invocateur (F = Flash ; D = sort ramassé, §9.5) |
 | **S** | `StopCommand` (annule l'ordre en cours) |
 | **Échap / clic droit** pendant une visée | Annule la visée |
 | **Échap** sans visée | Pause (menu : Reprendre / Options / Menu principal / Quitter) ; dans la pause, Échap revient en arrière puis reprend |
@@ -214,11 +211,11 @@ Machine à états : `Idle → Chasing → Windup → Cooldown → (re-attaque si
 
 Avec le **New Input System**, `<Keyboard>/q` désigne la touche à la **position physique** du Q américain (donc le A sur AZERTY).
 
-**Choix retenu** : les bindings des lettres sont écrits pour la **lettre voulue à sa position QWERTY** (`<Keyboard>/q` = attack-move…), puis **remappés au démarrage** selon la disposition du joueur : réglage `KeyboardLayout` (`Qwerty` / `Azerty`, **AZERTY par défaut**) dans le SO `ControlsSettings` (`Assets/Data/Settings`), appliqué par `InputReader` via des *binding overrides* (A ↔ Q, Z ↔ W, M → `;`). Vérifié par `KeyboardLayoutTests` à travers le vrai `InputReader`.
+**Choix retenu** : les **touches de jeu façon LoL sont liées par position** (groupe de binding `Positional`, jamais remappé) : sorts sur les positions Q W E R (A Z E R en AZERTY), invocateurs D F, attack-move sur la position A (Q en AZERTY), stop sur S. Les autres lettres sont écrites pour la **lettre voulue à sa position QWERTY** et **remappées au démarrage** selon la disposition du joueur : réglage `KeyboardLayout` (`Qwerty` / `Azerty`, **AZERTY par défaut**) dans le SO `ControlsSettings` (`Assets/Data/Settings`), appliqué par `InputReader` via des *binding overrides* (A ↔ Q, Z ↔ W, M → `;`). La disposition sert aussi à afficher les bonnes lettres dans le HUD. Vérifié par `KeyboardLayoutTests` à travers le vrai `InputReader`.
 
 **Rejeté** : les bindings par nom affiché (`<Keyboard>/#(a)`). Le player Linux ne remonte pas la disposition de l'OS (il retombe sur les noms QWERTY : en jeu, « Q » se retrouvait sur la touche A), et l'éditeur Linux segfault en `-batchmode -nographics` en les résolvant.
 
-**Options du joueur** : `UserOptions` (Features/Options, root) garde les choix du joueur en JSON (`persistentDataPath/options.json`, `options.editor.json` dans l'éditeur pour ne jamais toucher aux choix de la build) par-dessus les valeurs par défaut de `ControlsSettings`. Chaque changement est sauvegardé aussitôt et publié (`UserOptionsChangedEvent`) ; les systèmes lisent la valeur au moment où ils en ont besoin. Option en place : **mode de lancement** de R / F (`CastMode` : `Normal`, `QuickWithIndicator`, `Quick` ; défaut `ControlsSettings.CastMode = QuickWithIndicator`). Écran d'options : `OptionsView` (UI Toolkit construit en code), dans le menu pause en jeu et dans `OptionsPanel` (bouton Paramètres du menu principal).
+**Options du joueur** : `UserOptions` (Features/Options, root) garde les choix du joueur en JSON (`persistentDataPath/options.json`, `options.editor.json` dans l'éditeur pour ne jamais toucher aux choix de la build) par-dessus les valeurs par défaut de `ControlsSettings`. Chaque changement est sauvegardé aussitôt et publié (`UserOptionsChangedEvent`) ; les systèmes lisent la valeur au moment où ils en ont besoin. Option en place : **mode de lancement** des sorts (`CastMode` : `Normal`, `QuickWithIndicator`, `Quick` ; défaut `ControlsSettings.CastMode = QuickWithIndicator`). Écran d'options : `OptionsView` (UI Toolkit construit en code), dans le menu pause en jeu et dans `OptionsPanel` (bouton Paramètres du menu principal).
 
 À venir : la disposition clavier dans les options, puis un **menu de rebind** complet.
 
@@ -232,7 +229,7 @@ Avec le **New Input System**, `<Keyboard>/q` désigne la touche à la **position
 
 - **Verrouillée** (défaut, `StartLocked`) : suit le joueur avec un offset fixe, lissé (`FollowSpeed`).
 - **Libre** : le joueur la déplace en amenant le curseur au **bord de l'écran** (`EdgeSize` px, vitesse proportionnelle à la profondeur dans la zone, lissée par `ScrollSmoothing`), sur le plan XZ, comme dans LoL.
-- **Toggle** : `CameraLockEvent` (Espace / clic molette). **Zoom** : `ZoomEvent` (molette), borné par `MinZoom` / `MaxZoom`.
+- **Toggle** : `CameraLockEvent` (Espace / clic molette). **Zoom** : `ZoomEvent` (molette), borné par `MinZoom` / `MaxZoom` (5 à 32 depuis le 13/10/2026 : on dézoome bien plus loin).
 - **Curseur confiné** à la fenêtre en **build uniquement** (`CursorConfinement`), nécessaire à l'edge scrolling. **Jamais dans l'éditeur** : sous Wayland/Hyprland le verrouillage fuit hors de la Game view et décale le pointeur de tout l'éditeur. Ré-appliqué quand la fenêtre reprend le focus.
 ---
 
@@ -349,7 +346,7 @@ S'applique aux CC **et aux ralentissements** (un Slow = `StatModifier` PercentAd
 > **En place (phase 9b)** :
 > - **`StatusApplication`** (struct sérialisable, dans les données des sorts, passifs, items et augments) : `Kind` (`Stun`, `Root`, `Silence`, `Slow`, `Bleed`, `Burn`), `Duration`, `Power` (part de vitesse retirée pour un Slow, dégâts par seconde et par stack pour un DoT), `ScalingStat` + `Ratio` (DoT : + ratio × stat de celui qui l'applique), `MaxStacks`.
 > - **`StatusEffects`** (C# pur, `Character.Status`, tické avec le perso, testé en EditMode) : Stun / Root / Silence durent `durée × (1 − Tenacity)`, un nouveau CC ne fait que **prolonger** le CC en cours ; **Slow** = modificateur **PercentMult** `−Power × (1 − SlowResist)` sur `MoveSpeed` via `TimedModifiers` (multiplicatif comme LoL, même source = rafraîchi), durée réduite par la ténacité ; **Bleed** (physique) / **Burn** (magique) : un DoT par (type, source), chaque application ajoute un stack (jusqu'à `MaxStacks`) et rafraîchit la durée, dégâts figés à l'application et infligés toutes les 0,5 s via `Character.TakeDamage` (crédités à l'applicateur : omnivamp, kills) ; la ténacité ne réduit pas les DoT. Tout est retiré à la mort et à l'`Init`.
-> - **Effets** : Stun → pas de déplacement, d'attaque ni de sort, windup et incantation interrompus ; Root → pas de déplacement (attaques, sorts et Flash permis) ; Silence → pas de sort (F compris). `CharacterMovement.Immobilized` garde l'ordre en cours pour après (une ruée est arrêtée), `BasicAttacker` garde sa cible, `SpellCaster.Cast` refuse, `ElementCaster` / `SignatureAbility` affichent « Étourdi » / « Réduit au silence » sans dépenser mana ni cooldown. `PatternRunner` ne lance pas d'étape pendant un stun du boss.
+> - **Effets** : Stun → pas de déplacement, d'attaque ni de sort, windup et incantation interrompus ; Root → pas de déplacement (attaques, sorts et Flash permis) ; Silence → pas de sort (Flash compris). `CharacterMovement.Immobilized` garde l'ordre en cours pour après (une ruée est arrêtée), `BasicAttacker` garde sa cible, `SpellCaster.Cast` refuse, `AbilityCaster` affiche « Étourdi » / « Réduit au silence » sans dépenser mana ni cooldown. `PatternRunner` ne lance pas d'étape pendant un stun du boss.
 > - **Lisibilité** : icône du statut le plus fort à gauche de la barre de PV (`Sprites/Status`) et teinte du sprite (stun jaune et tremblant, root vert, silence violet, slow bleu, brûlure orange, saignement rouge).
 > - Ténacité des ennemis : Brute 30 %, Grokk 50 %. *Reste : Knockup.*
 
@@ -401,269 +398,95 @@ public struct DamageInfo {
 ```
 cooldownEffectif = cooldownBase × 100 / (100 + AbilityHaste)
 ```
-S'applique au cooldown de chaque lancer de sort élémentaire et à la compétence propre (§7.7). Le coût en mana n'est **pas** affecté par le haste.
+S'applique au délai de chaque sort du champion (§7.4) ; les sorts d'invocateur l'ignorent. Le coût en mana n'est **pas** affecté par le haste.
 `AttackSpeed` : `intervalle = 1 / (AttackSpeedBase × AttackSpeedStat)`.
 
 ---
 
-## 7. Éléments, mana et sorts
+## 7. Sorts de champion (modèle LoL)
 
-### 7.1 Principe
+> **Refonte du 13/10/2026** : la mécanique d'éléments (empiler A/Z/E puis lancer avec R, 19 recettes par perso) est **abandonnée** au profit du modèle de League of Legends : **chaque champion a ses propres sorts** Q W E R, un passif et deux sorts d'invocateur. Personnage d'essai : **Ezreal**.
 
-Le joueur **prépare** un sort en empilant des éléments, puis le **déclenche**.
+### 7.1 Principe et touches
 
-| Touche | Action |
+| Touche (position QWERTY) | AZERTY | Action |
+|---|---|---|
+| **Q / W / E** | A / Z / E | Sorts de base du champion (5 rangs) |
+| **R** | R | Ultime (3 rangs) |
+| **D / F** | D / F | Sorts d'invocateur (F = Flash ; D = sort d'invocateur ramassé, §9.5) |
+| **Ctrl + Q / W / E / R** | Ctrl + A / Z / E / R | Dépense un point de compétence sur le sort (aussi : bouton « + » du HUD) |
+
+- Les touches sont liées **par position** (comme LoL) : un AZERTY joue sur A Z E R, un QWERTY sur Q W E R (§4.7).
+- **Mode de lancement** (option du joueur, §4.7) : *Normal* (visée puis clic gauche), *Rapide avec indicateur* (défaut : maintenir = portée et forme affichées, relâcher = lancer vers le curseur), *Rapide* (lancer immédiat). Clic droit / Échap annulent une visée. Les visées sont exclusives (attack-move, un sort à la fois : `AimModeEvent`).
+- Un **stun / silence** bloque les sorts (§5.7).
+
+### 7.2 Données : `SpellDefinition`
+
+Un seul type de donnée pour tous les sorts (champion, invocateur, ennemis, boss). Les valeurs par rang sont des **tableaux** indexés par rang − 1 (la dernière valeur sert au-delà ; un sort sans table de rangs a un seul rang) :
+
+| Champ | Rôle |
 |---|---|
-| **A / Z / E** | Ajoute **un stack** de l'élément du slot 1 / 2 / 3 (instantané, gratuit) |
-| **R** | Lance le sort correspondant à la sélection (impossible sans élément) |
-| **F** | Lance la **compétence propre** du personnage (indépendante des éléments, §7.8) |
-| **T** | Reset : vide la sélection d'éléments (et annule une visée de R en cours) |
+| `RankUnlockLevels` | niveau du champion requis par rang : **Q W E = 1/3/5/7/9**, **R = 6/11/16** ; vide = un seul rang (invocateurs, ennemis) |
+| `BaseDamage[]`, `Cooldowns[]`, `ManaCosts[]` | dégâts de base, délai de récupération et coût en mana par rang |
+| `AdRatio`, `BonusAdRatio`, `ApRatio` | dégâts = base(rang) + `AdRatio` × AD + `BonusAdRatio` × AD bonus + `ApRatio` × AP |
+| `Targeting`, `Range`, `Radius`, `ConeAngle`, `CastTime`, `CanMoveWhileCasting` | visée et incantation (§7.5) |
+| `Kind` (Magic / Physical / Buff), `Buffs`, `Statuses`, `SelfSustain`, `AffectsAllies` | effet (§7.6, §5.7) |
+| `ProjectileSpeed`, `Pierce`, `Blink`, `FixedRange` | projectile, traversée, téléportation |
+| `AppliesOnHit` | chaque impact compte comme une attaque de base pour les passifs (effets à l'impact) |
+| `CooldownRefundOnHit` | chaque impact réduit les délais de récupération du lanceur (Ezreal Q : 1,5 s) |
+| `Mark` (`Enabled`, `Duration`, `ManaRefund[]`) | le projectile **marque** au lieu de blesser ; la prochaine attaque ou un autre sort du lanceur sur la cible fait exploser la marque (dégâts du sort + mana rendu) — Ezreal W |
+| `BlinkBoltRadius` | après un blink, trait sur l'ennemi le plus proche (marqué en priorité) — Ezreal E |
+| `Description`, `Icon`, `Color` | UI, indicateurs, VFX |
 
-- Un même élément peut être empilé **plusieurs fois** (A, A, A) : le sort garde la même nature mais en **version plus grande** (§7.5).
-- **L'ordre d'activation ne compte pas** : Feu + Eau = Eau + Feu.
-- **Plus il y a de stacks, plus le lancer coûte de mana** (§7.3).
-- **Après un lancer, la sélection se réinitialise** automatiquement. **T** sert à repartir de zéro **avant** de lancer, si le joueur se ravise.
-- Déplacement, attaque de base et Q + clic gauche restent **identiques** (§4).
-
-### 7.2 Données (ScriptableObjects)
-
-```csharp
-[CreateAssetMenu(menuName = "Game/Element")]
-public class ElementDefinition : ScriptableObject {
-    public int Id;                 // 0..31, sert à construire le masque d'éléments
-    public string DisplayName;
-    public Sprite Icon; public Color Color;
-    public float ManaCost;         // coût de base d'UN stack de cet élément
-}
-
-[CreateAssetMenu(menuName = "Game/Spell")]
-public abstract class SpellDefinition : ScriptableObject {
-    public string DisplayName; public Sprite Icon;
-    public ElementCount[] Recipe;                 // ex. { Feu×2, Eau×1 } : une recette = un sort
-    public TargetingType Targeting;               // Self, Skillshot, GroundPoint, Cone, UnitTarget
-    public float Range, CastTime;
-    public float CooldownOverride;                // 0 = table CooldownByStacks (§7.7)
-    public SpellKind Kind;                        // Magic, Physical, Buff (§7.6)
-    public float PowerRatio;                      // ratio de dégâts, ou puissance du buff / soin
-    public SpellScaling Scaling;                  // valeur qui évolue avec le niveau des éléments du sort (§7.6)
-    public bool CanMoveWhileCasting;
-    public abstract Spell CreateRuntime(Character owner);     // fabrique l'instance runtime
-}
-
-[Serializable] public struct ElementCount { public ElementDefinition Element; public int Count; }
-[Serializable] public struct SpellScaling { public float Base; public float PerElementLevel; }
-// valeur = Base + PerElementLevel × Σ (niveau de l'élément − 1), sur les éléments DISTINCTS de la recette
-
-[CreateAssetMenu(menuName = "Game/SpellBook")]
-public class SpellBook : ScriptableObject {
-    public List<SpellDefinition> Spells;          // une entrée par recette (jusqu'à 19 pour 3 éléments)
-}
-```
-
-**Sélection courante** (état du joueur, pas un SO) :
-
-```csharp
-public class ElementSelection {
-    public int[] Stacks;           // un compteur par slot A/Z/E
-    public int Total;              // somme des stacks
-    public int Key;                // Σ Stacks[i] × 4^i  → identifie la recette (0..63)
-    public bool CanAdd(int slot);  // Total < MaxTotalStacks et Stacks[slot] < MaxStacksPerElement
-    public void Add(int slot); public void Clear();
-}
-```
-
-- La **recette** est le nombre de stacks par élément (`Key`) : **l'ordre d'activation n'a aucune influence** (Feu puis Eau = Eau puis Feu), mais Feu×2 + Eau et Feu + Eau×2 sont **deux recettes différentes**.
-- **Une recette = un sort distinct** : pas d'échelle automatique par stack, le design décide de ce que fait chaque combinaison (à confirmer §13).
-- Le nombre total de stacks (`Total`) détermine le **coût en mana** (§7.3) et le **cooldown** (§7.7).
-- **Limites** (`SpellSettings`) : **`MaxTotalStacks = 3`** (un sort = 3 éléments maximum) ; `MaxStacksPerElement = 3`. Avec 3 éléments : **19 recettes** (3 de 1 stack, 6 de 2, 10 de 3).
-- `SpellBook.Init(slotElements)` convertit chaque recette en `Key` selon l'ordre A/Z/E du personnage. Une validation éditeur (`OnValidate`) signale les recettes manquantes ou en double.
-
-**Données / runtime** : un SO est **partagé**, donc on n'y stocke jamais de cooldown. Le cooldown en cours vit dans l'instance runtime `Spell`, créée par `CreateRuntime`.
-
-> **En place (phase 5b)** : `ElementDefinition`, `SpellDefinition` (pour l'instant : nom, icône, `SpellKind`, recette ; ciblage, cast, puissance et runtime `Spell` arrivent en 5c), `SpellBook`, `SpellSettings` (`MaxTotalStacks`, `MaxStacksPerElement`, `CostCurve`, `MaxElementLevel`, enregistré dans le root), `ElementSelection` (clé `Σ stacks × 4^i`), `SpellResolver` (clé → sort selon l'ordre A/Z/E **du perso** ; signale doublons, éléments étrangers et recettes manquantes ; calcule le coût). `CharacterDefinition.OnValidate` vérifie que le grimoire couvre les 19 recettes. Contenu de test : `Elem_Fire` (10 mana), `Elem_Electricity` (12), `Elem_Wind` (8), 19 sorts nommés et `SpellBook_FireElectricityWind` (`Assets/Data/Elements`, `Assets/Data/Spells/FireElectricityWind`).
+L'**AD bonus** = AD total − (base + croissance par niveau) : `Character.BonusStat` (sert aussi à la force adaptative).
 
 ### 7.3 Mana et coût
 
-`ManaPool` : `Current`, `Max` (= stat `MaxMana`), régénération (`ManaRegen`/s), events `Changed`.
+Coût = `ManaCosts[rang]` × (1 − `ManaCostReduction`). Le mana est débité à la confirmation ; refusé s'il manque (« Mana insuffisant »). Les sorts d'invocateur ne coûtent rien.
 
-```
-N      = nombre total de stacks
-base   = Σ (stacks[i] × element[i].ManaCost)
-mult   = CostCurve[N]                              (ex. 1 → ×1, 2 → ×1.5, 3 → ×2.25)
-coût   = base × mult × (1 − ManaCostReduction)
-```
+### 7.4 Lanceur du joueur : `AbilityCaster`
 
-Exemples (Feu 10, Eau 10, Terre 12) :
-- Feu ×1 → `10 × 1 = 10`
-- Feu + Eau → `20 × 1.5 = 30`
-- Feu ×3 → `30 × 2.25 = 67.5`
-- Feu + Eau + Terre → `32 × 2.25 = 72`
+Composant du variant `Player`, 6 emplacements (`AbilitySlots` : Q W E R D F) :
+1. touche pressée (`AbilityKeyEvent`) → vérifications : sort présent, **appris** (rang ≥ 1), délai, mana, incantation en cours, CC ;
+2. visée via `SpellTargeting` selon le mode de lancement (ou lancement immédiat d'un sort `Self`) ;
+3. confirmation → mana payé, `SpellCaster.Cast(sort, contexte, rang)`, délai = `Cooldowns[rang]` × 100 / (100 + `AbilityHaste`) (les invocateurs ignorent le haste).
+- `CharacterEvents.CooldownRefund` réduit les délais des 4 sorts (Ezreal Q).
+- Publie `AbilitiesChangedEvent` (sorts, rangs, « + » possibles, points) et `CooldownStartedEvent(slot, durée)` pour le HUD.
 
-La courbe croît plus vite que le nombre de stacks pour que chaque ajout coûte vraiment plus. `CostCurve` est un tableau dans un SO de réglages (`SpellSettings`) : équilibrage sans recompiler.
+### 7.5 Visée
 
-- Le coût est **calculé en direct** pour l'UI (prévisualisation sur la barre de mana).
-- Le mana est **débité à la confirmation du cast** (clic gauche), pas à l'appui sur R. S'il est insuffisant à ce moment : cast refusé + feedback, **la sélection est conservée**.
+`SpellTargeting` (variant `Player`) dessine la portée et la forme sous le curseur : rectangle d'un skillshot, cercle d'une zone, secteur d'un cône, anneau sous la cible d'un sort ciblé. `SpellExecutor` (scope Game, joueur et ennemis) applique l'effet selon `Targeting` : **Skillshot** (`SkillshotProjectile`, premier ennemi ou traversée), **GroundPoint** (zone, ou **blink** vers le point marchable le plus lointain de la ligne), **Cone**, **UnitTarget** (projectile à tête chercheuse), **Self**. Les sorts ennemis sont télégraphiés pendant leur incantation (§9.6).
 
-> **En place** : `ManaPool` (sur chaque `Character` : max = `MaxMana`, un gain de max ajoute autant de mana courant, régénération `ManaRegen`/s), coût calculé en direct (`SpellResolver.ManaCost`, avec `ManaCostReduction`) et **prévisualisé sur la barre de mana** du HUD (portion claire, rouge si le mana manque). Le débit au cast arrive en 5c.
+### 7.6 Effets
 
-### 7.4 Machine à états du lanceur
+- **Magic / Physical** : contre `MagicResist` / `Armor`, pénétration du lanceur ; crit **uniquement** avec la capacité `SpellCrit` (§5.6) ; omnivamp oui, lifesteal non.
+- **Buff** : `BuffEffect` → `Character.Buffs` (Source = le sort : relancer rafraîchit) ; `SelfSustain` soin / bouclier (+ `PowerRatio` × AP, × `HealShieldPower`) ; `AffectsAllies` les donne aussi aux alliés dans `Radius`.
+- **À l'impact** : statuts (§5.7), marque posée ou déclenchée (`SpellExecutor.TryDetonateMark`, aussi appelé par `BasicAttacker`), `CharacterEvents.SpellHit` (passifs), effets à l'impact (`AppliesOnHit`), réduction de délais (`CooldownRefundOnHit`).
+- La marque est un état de `StatusEffects` (une à la fois, avec le sort et le rang qui l'ont posée) ; l'icône du sort marqueur s'affiche à côté de la barre de PV.
 
-```
- A/Z/E ──► ajoute un stack (si CanAdd), à tout moment
+### 7.7 Rangs et points de compétence
 
- Idle ──[R, Total ≥ 1, sort prêt, mana OK]──► Targeting ──[clic gauche]──► Casting ──► Idle + sélection vidée
-                                                  │
-                          [clic droit / Échap]  → Idle (sélection conservée)
-                          [T]                   → Idle (sélection vidée)
-```
+- **1 point de compétence à chaque niveau, de 1 à 18** (`ExperienceCurve.LastSkillPointLevel = 18`) : 5 + 5 + 5 + 3 = 18.
+- `AbilityRanks` (C# pur, testé) : un rang n'est accessible qu'au niveau écrit dans le sort (Q W E : rang n au niveau 2n − 1 ; R : 6 / 11 / 16) ; un sort au rang 0 ne peut pas être lancé. Refus expliqués (« Disponible au niveau 6 », « Rang maximum », « Aucun point de compétence »).
 
-- **R sans élément** → rien (feedback "aucun élément"). **R sur cooldown ou sans mana** → feedback aussi.
-- **A/Z/E sur un slot verrouillé** → aucun stack, feedback ("Élément non débloqué").
-- Sort de type `Self` → lancé immédiatement sans visée.
-- **Ajouter un stack pendant la visée** : le sort est **re-résolu en direct** (indicateur, taille, portée et coût mis à jour).
-- **Pas de retrait individuel** : on ne peut pas enlever un seul stack, seul **T** vide la sélection (voir §13).
-- **Un seul mode de visée à la fois** : Q (attack-move), R (sort élémentaire) et F (compétence propre) sont exclusifs ; appuyer sur l'un remplace l'autre. A/Z/E/T ne sont pas des modes de visée, donc ne coupent pas Q ni F. La **compétence propre (F)** ne consomme ni ne vide la sélection d'éléments.
-- **Après un cast réussi** : la sélection est **vidée automatiquement** (`ClearAfterCast = true`).
-- **Pendant un cast** (windup) : le joueur peut déjà empiler pour le sort suivant, le sort en cours est figé.
-- **Mode de lancement** (option du joueur, menu Options, `CastMode`) :
-  - **Rapide avec indicateur** (défaut) : tant que R / F est **maintenu**, la portée et la forme du sort suivent le curseur ; au **relâchement**, le sort part vers le curseur. Clic gauche pendant le maintien : lance aussi. Échap / clic droit pendant le maintien : annule, le relâchement ne lance alors rien.
-  - **Normal** : R / F affichent la visée, le clic gauche lance (le relâchement ne fait rien).
-  - **Rapide** : R / F lancent tout de suite vers le curseur, sans rien afficher.
-  - Un sort ciblé sans ennemi à portée sous le curseur est refusé (« Aucune cible »), sans rien consommer ; au relâchement, la visée se termine.
+### 7.8 Ezreal (personnage d'essai)
 
-> **En place (phase 5c)** : `ElementCaster.TryCast` (R) vérifie sélection, sort, cooldown, mana et incantation, puis vise via `SpellTargeting` (ou lance aussitôt un sort `Self`). Clic gauche : le sort résolu **à cet instant** est lancé (il suit les éléments ajoutés pendant la visée), le mana est débité (refus + sélection conservée s'il manque), le cooldown démarre, la sélection est vidée. Clic droit / Échap : visée annulée, sélection conservée ; T : visée annulée et sélection vidée. Exclusivité Q / R / F par `AimModeEvent`. Pendant une incantation (`SpellCaster`, sauf `CanMoveWhileCasting`), les ordres de déplacement / attaque sont ignorés ; on peut empiler des éléments pour le sort suivant. Modes de lancement : `SpellTargeting.Aim` lit `UserOptions.CastMode` : `Quick` → `CastAtCursor` ; sinon visée, marquée « lancer au relâchement » en `QuickWithIndicator`. `InputReader` publie aussi le relâchement de R / F (`CastSpellEvent.Released`, `SignatureEvent.Released`) → `SpellTargeting.Release`. *Reste : buffer d'input.* Stun / silence : §5.7.
+Valeurs de LoL (portées et vitesses / 100), `EzrealSetup` :
 
-### 7.5 Résolution du sort et visée
-
-`SpellResolver.Resolve(key) → SpellDefinition` : lookup dans le dictionnaire du `SpellBook`. Recette sans sort → R inactif avec feedback (la validation éditeur doit l'éviter).
-
-**Grimoire d'un personnage à 3 éléments (19 sorts)**
-
-| Total de stacks | Recettes | Nombre |
-|---|---|---|
-| 1 | A, Z, E | 3 |
-| 2 | A×2, Z×2, E×2, A+Z, A+E, Z+E | 6 |
-| 3 | A×3, Z×3, E×3, A×2+Z, A×2+E, Z×2+A, Z×2+E, E×2+A, E×2+Z, A+Z+E | 10 |
-
-Chaque case est un `SpellDefinition` de type **Magic**, **Physical** ou **Buff** (§7.6). Exemple pour Feu / Eau / Terre : Feu = boule de feu (Magic) ; Terre = pic de pierre (Physical) ; Eau + Terre = armure de boue (Buff) ; Feu + Eau + Terre = éruption (Magic, grosse zone).
-
-**Pointage souris → monde (plan XZ)** (réutilisé pour Q, R et le clic droit) :
-```csharp
-Plane ground = new Plane(Vector3.up, Vector3.zero);
-Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
-if (ground.Raycast(ray, out float d)) targetPoint = ray.GetPoint(d);
-```
-
-**Types de ciblage** (`SpellDefinition.Targeting`) :
-| Type | Indicateur | Exemple |
-|---|---|---|
-| `Self` | aucun (cast direct) | bouclier, aura |
-| `Skillshot` | ligne/rectangle depuis le perso | projectile |
-| `GroundPoint` | cercle au curseur, portée max | zone au sol |
-| `Cone` | secteur devant le perso | souffle |
-| `UnitTarget` | surligne l'ennemi sous le curseur | sort ciblé |
-
-> **En place** : `SpellTargeting` + `SpellIndicator` dessinent la portée et la forme sous le curseur (rectangle d'un skillshot, cercle d'une zone, secteur d'un cône, anneau sous la cible d'un sort ciblé ; « Aucune cible » / « Cible hors de portée » sinon). `SpellExecutor` applique l'effet selon `Targeting` : **skillshot** (`SkillshotProjectile` en ligne droite, s'arrête au premier ennemi ou traverse avec `Pierce`, peut rater), **zone** (tous les ennemis dans `Radius`), **cône**, **ciblé** (projectile à tête chercheuse), **Self** ; flash de forme au sol aux couleurs du sort (`SpellVfx`), projectiles teintés, tout est poolé (`PrefabPool`).
-
-```csharp
-public struct CastContext {
-    public Vector3 Origin;
-    public Vector3 Direction;      // normalisée, plan XZ
-    public Vector3 TargetPoint;    // clampé à la portée max
-    public Character TargetUnit;   // si UnitTarget
-}
-// Spell.Cast(CastContext ctx)
-```
-
-### 7.6 Types de sorts : magique, physique, buff
-
-`SpellKind` détermine **comment le sort se comporte dans le pipeline de dégâts** (§6) :
-
-| Kind | Type de dégâts | Stat de scaling | Pénétration / défense | Effet |
-|---|---|---|---|---|
-| **Magic** | `DamageType.Magic` | `Base(niveaux d'éléments) + MagicAttack × PowerRatio` | `MagicPen` flat/% contre `MagicResist` | dégâts |
-| **Physical** | `DamageType.Physical` | `Base(niveaux d'éléments) + PhysicalAttack × PowerRatio` | `ArmorPen` flat/% contre `Armor` | dégâts |
-| **Buff** | aucun | `MagicAttack` optionnel (soin/bouclier) | — | stats temporaires, soin, bouclier |
-
-- **Magic / Physical** : même mécanique, seule la paire stat/résistance change. Crit **uniquement** si la capacité `SpellCrit` est active (§5.6). **Omnivamp** s'applique aux deux ; **Lifesteal** reste réservé aux attaques de base (§6).
-- **Buff** : liste d'effets appliqués au lanceur ou aux alliés dans la zone :
-  ```csharp
-  public struct BuffEffect { public StatType Stat; public ModifierType Type; public float Value; public float Duration; }
-  // + Heal / Shield optionnels (multipliés par HealShieldPower, §6)
-  ```
-  Chaque effet devient un `StatModifier` temporaire (§5.4, `Source` = le sort, pour pouvoir le retirer ou le rafraîchir). Chaque recette de buff définit ses propres valeurs et durées.
-- **Évolution avec le niveau des éléments** : la valeur d'un sort (dégâts, soin, valeur du buff, durée) vaut `Base + PerElementLevel × Σ (niveau − 1)` calculé sur les **éléments distincts** de sa recette, en plus du scaling sur les stats. **Un même élément compte une seule fois** par sort : Feu ×3 ne profite du niveau de Feu qu'une fois. Le niveau d'un élément vient des points de compétence (§7.8).
-- Un sort **mixte** (dégâts + buff) est possible : `SpellDefinition` peut porter une liste d'effets, mais le `Kind` principal décide du scaling.
-
-> **En place** : dégâts = `Scaling.Evaluate(Σ niveaux − 1 des éléments distincts)` + `MagicAttack` (ou `PhysicalAttack`) × `PowerRatio`, contre `MagicResist` (ou `Armor`) avec la pénétration du lanceur ; omnivamp oui, lifesteal non ; pas de crit (capacité `SpellCrit` à venir). Buffs : `BuffEffect` → `Character.Buffs` (Source = le sort, donc relancer rafraîchit). **Phase 9b** : `Statuses` (liste de `StatusApplication`, §5.7) appliqués à chaque ennemi touché, qui lève aussi `CharacterEvents.SpellHit` ; `SelfSustain` (soin et / ou bouclier du lanceur + `PowerRatio` × `MagicAttack`, × `HealShieldPower`). Sorts de test : le **Feu brûle**, l'**Électricité étourdit**, le **Vent ralentit** (ex. Foudre 0,8 s de stun, Cyclone −45 % 2 s, Météore brûlure + stun) ; Bourrasque soigne, Surcharge et Ouragan statique donnent un bouclier. **Phase 9c** : `AffectsAllies` (sort `Self`) donne aussi les buffs et le `SelfSustain` aux alliés dans `Radius` (chaman). *Reste : valeurs de buff qui évoluent avec le niveau des éléments.* Les 19 sorts du perso de test ont des valeurs **provisoires** (Assets/Data/Spells) ; le héros a 40 de `MagicAttack` de base.
-
-### 7.7 Cooldown, cast et ordres
-
-- **Cooldown par lancement** : après chaque cast de R, un **cooldown commun** à tous les sorts élémentaires démarre ; sa durée dépend du **nombre de stacks du sort lancé** : `CooldownByStacks = {2, 3.5, 5.5}` s (dans `SpellSettings`), donc un sort à 1 élément est rapide à relancer, un sort à 3 éléments beaucoup moins. Surcharge possible par sort (`CooldownOverride`). Réduit par `AbilityHaste` (§6).
-- **Compétence propre (F)** : son **propre cooldown**, indépendant de celui de R (Flash : 20 s).
-- **Cast time** : windup avant l'effet ; interrompt le déplacement/l'attaque en cours sauf `CanMoveWhileCasting`. Après le cast, le perso redevient `Idle`.
-- **Les éléments restent modifiables pendant un cast** (préparation du sort suivant), mais le sort en cours est déjà résolu et figé.
-- Un **stun/silence** bloque R (pas A/Z/E).
-
-> **En place** : cooldown commun dans `ElementCaster` (`SpellSettings.CooldownByStacks` ou `CooldownOverride`, × 100 / (100 + `AbilityHaste`)) ; cooldown propre de F dans `SignatureAbility` ; `CooldownStartedEvent` → HUD (temps restant sur la ligne du sort, compte à rebours sur le slot F). Stun / silence : §5.7.
-
-### 7.8 Identité d'un personnage, points de compétence et éléments
-
-**Éléments du personnage** : chaque perso a **exactement 3 éléments** (personnage de test : **Feu, Électricité, Vent**), chacun avec **sa touche fixe** selon son ordre dans la définition (A = élément 1, Z = élément 2, E = élément 3).
-
-> **En place** : `ElementLevels` (points dépensés via `CharacterLevel.TrySpendSkillPoint`, verrous 1/3/5 lus dans `CharacterDefinition.ElementUnlockLevels`, niveau max `SpellSettings.MaxElementLevel`). Entrée : **Ctrl + A/Z/E** ou bouton « + » du HUD. Feedback si refusé (« Aucun point de compétence », « Prochain élément au niveau 3 », « Niveau maximum »). *Reste : surcharge (méta, §9.7).*
-
-**Points de compétence (comme LoL)** : **1 point par niveau de 1 à 15**. Les **niveaux 16, 17 et 18 n'augmentent que les stats**, sauf pour un élément dont la **surcharge est débloquée** dans l'arbre méta (§9.7) : ils donnent alors des points de **surcharge** (ci-dessous). Les points servent **uniquement à monter le niveau des éléments** :
-- Un élément est à **niveau 0 (verrouillé)** ; y mettre un premier point le **débloque** (niveau 1), puis chaque point supplémentaire monte son niveau (`MaxElementLevel = 5` : 3 × 5 = 15 points, soit exactement les niveaux 1 à 15).
-- **Verrous façon LoL** : on peut débloquer **un élément dès le niveau 1**, un **deuxième à partir du niveau 3**, le **troisième à partir du niveau 5** (`ElementUnlockLevels = {1, 3, 5}`). Aux niveaux 1 et 3 le joueur **choisit** quel élément débloquer ; au niveau 5 il ne reste que le dernier.
-- Les points non dépensés sont conservés.
-- **Surcharge** (niveaux 16, 17, 18) : un point de surcharge ne peut être dépensé que sur un élément **déjà au niveau max** et dont la **surcharge est débloquée dans l'arbre méta de l'élément** (§9.7) ; sinon il est perdu. **Un élément ne peut être surchargé qu'une seule fois** ; la surcharge **augmente le multiplicateur de dégâts de l'élément** (`OverchargeMultiplier`, toujours **une seule fois par sort**), avec éventuellement un rendu distinct dans le sort (couleur, par exemple). 3 éléments, donc **3 surcharges au maximum**.
-- Le niveau d'un élément **augmente les dégâts (ou la valeur) des sorts qui l'utilisent**, **une seule fois par sort**, même si l'élément est empilé 3 fois (§7.6).
-
-| Niveau du perso | Éléments déblocables | Recettes disponibles |
-|---|---|---|
-| 1 | 1 | 3 |
-| ≥ 3 | 2 | 9 |
-| ≥ 5 | 3 | 19 |
-
-- **Slot verrouillé** : la touche n'ajoute aucun stack et affiche un feedback.
-- **Grimoire par personnage** : un `SpellBook` contient les 19 sorts des 3 éléments du perso. Deux persos qui partagent les mêmes éléments peuvent partager le même asset.
-
-**Ce qui distingue deux personnages :**
-
-| Ce qui varie | Où c'est défini |
+| Sort | Effet |
 |---|---|
-| **Les 3 éléments** | `CharacterDefinition.Elements` |
-| **Compétence propre** | `CharacterDefinition.SignatureAbility` |
-| **Passif** | `CharacterDefinition.Passive` (§8.1) |
-| **Attaque de base** : portée, vitesse, dégâts, type, projectile | `BasicAttackDefinition` + stats |
-| **Stats de base et croissance par niveau** | `BaseStats` + `StatGrowth` |
-| **Grimoire** (19 sorts) | `CharacterDefinition.SpellBook` |
+| **Passif — Sursaut de puissance** | chaque sort qui touche donne +10 % vitesse d'attaque pendant 6 s, cumulable 5 fois (stacks `PerSpellHit`) |
+| **Q — Tir mystique** | skillshot (portée 12) : 20/45/70/95/120 + 130 % AD + 15 % AP physiques ; effets à l'impact ; toucher réduit ses délais de 1,5 s ; 5,5 → 4,5 s ; 28 → 40 mana |
+| **W — Flux d'essence** | skillshot qui marque 4 s ; une attaque ou un autre sort fait exploser la marque : 80/135/190/245/300 + 60 % AD bonus + 70 % AP magiques, et rend 60 → 100 mana ; 8 s ; 50 mana |
+| **E — Transfert arcanique** | blink (4,75) puis trait sur l'ennemi le plus proche (marqué en priorité, rayon 7,5) : 80/130/180/230/280 + 50 % AD bonus + 75 % AP ; 26 → 14 s ; 90 mana |
+| **R — Barrage de précision** | 1 s d'incantation, vague large (rayon 1,6) qui traverse tout sur 30 : 350/550/750 + 100 % AD bonus + 90 % AP ; 120/105/90 s ; 100 mana |
+| **F — Flash** | blink de longueur fixe (4,5) vers le curseur, 20 s |
 
-**Compétence propre (F)** : une `SpellDefinition` **hors grimoire**, une par personnage, qui réutilise tout le pipeline (ciblage, `CastContext`, types Magic/Physical/Buff, indicateurs). Elle n'utilise **ni éléments ni stacks**, **cooldown uniquement, aucun coût en mana** (réduit par `AbilityHaste`). **Touche F**, même flux de visée que R. Bloquée par stun/silence comme R. Elle peut être **remplacée temporairement par un sort d'invocateur ramassé** (§9.5).
+Stats : 600 PV (+102), 375 mana (+70), 62 AD (+2,5), 0,625 AS (+2,5 %), portée 5,5, 24 armure (+4,7), 30 RM (+1,3), régénération de mana **3/s (+0,15)** au lieu de 1,7 : les hordes demandent plus de sorts qu'une phase de lane (provisoire).
 
-> **En place** : `CharacterDefinition.SignatureAbility` + `SignatureAbility` (F) : même visée et même incantation que R, cooldown seul, aucun mana. `Spell_Flash` : `GroundPoint`, portée 4,5, `FixedRange` (le point est toujours à la portée complète dans la direction du curseur, `SpellMath.AimPoint`), `Blink` (`SpellExecutor.TryGetBlinkPoint` part de ce point et recule le long de la ligne par pas de `SpellSettings.BlinkTolerance` (0,5) jusqu'au premier point marchable ; téléport via `CharacterMovement.Teleport`). Refusé avec « Destination inaccessible », sans consommer le cooldown, seulement s'il ne reste que la position du perso ; 20 s. *Reste : sort d'invocateur ramassé qui remplace F (§9.5).*
+### 7.9 UI
 
-**Personnage de test**
-- **Éléments** : Feu, Électricité, Vent.
-- **Compétence propre : Flash**, sort `GroundPoint` : téléporte instantanément le perso **toujours à la même distance (sa portée), dans la direction du curseur**, même si le curseur est tout près. **Les murs au milieu ne bloquent pas** ; si le point d'arrivée tombe dans un obstacle (hors NavMesh), le perso atterrit sur le **dernier point marchable** de la ligne avant lui. Refusé seulement s'il n'y en a aucun. **Cooldown : 20 s.**
-- **Passif (façon Veigar, « Mal phénoménal »)** : chaque **sort lancé qui touche** donne **1 stack** ; chaque stack donne **+1 `MagicAttack`**. Les stacks **persistent toute la run** (§8.1).
-
-**Attaque de base** : `BasicAttackDefinition` (§4.5) porte `Range`, `WindupPercent`, `ProjectilePrefab`, `DamageRatio` et `DamageType` (Physical par défaut, Magic possible pour un mage). La **vitesse d'attaque**, les **dégâts** et la **portée** effectifs viennent des stats, donc évoluent avec le niveau et les modificateurs.
-
-**Niveaux** : `CharacterLevel` gère XP, niveau et points. `StatGrowth` ajoute un gain par stat à chaque niveau (§5.5).
-
-**Remplacement à chaud** : les éléments sont fixes ; seul `ElementCaster.SetSpellBook(book)` permet de remplacer le grimoire (objets, évolutions).
-
-**Ennemis** : ils utilisent `Spell.Cast` directement via leur IA, sans éléments (§9.6).
-
-### 7.9 Classes et UI
-
-- **Code** : `ElementCaster` (éléments actifs, R/T, validation mana/cooldown), `SpellResolver`, `Spell` (runtime), `ManaPool`, `SpellIndicator` (LineRenderer/decal selon le type), `PlayerCommandInput` (étendu pour A/Z/E/R/F/T), petit **buffer d'input** (~0,15 s).
-- **UI** : 3 icônes d'éléments avec **compteur de stacks** (0–3) et touche affichée, **cadenas + niveau requis** sur les slots verrouillés, **nom et icône du sort résolu**, barre de mana avec **prévisualisation du coût**, cooldown du sort, icône de portée de Q.
-
-> **En place** : `ElementCaster` (sur le variant `Player` seulement ; les ennemis lancent sans éléments) relie input, sélection, niveaux et grimoire, et publie `PlayerElementsEvent`, `ElementSelectionChangedEvent`, `ElementLevelsChangedEvent`, `GameplayFeedbackEvent`. HUD (`PlayerHud` + `ElementBarView`) : 3 slots (icône, touche, pastilles de stacks, pastilles de niveau, voile + « Niv. N » si verrouillé, « + » si un point peut être dépensé), nom du sort résolu et coût (rouge si le mana manque), barre de mana avec prévisualisation, messages de feedback. Pas encore d'icônes de sorts ni de cooldown (5c).
----
+`PlayerHud` + `AbilityBarView` : Q W E R (icône, touche affichée selon la disposition, pastilles de rang, « + » cliquable quand un point peut y aller, voile tant que le sort n'est pas appris), puis D F ; délais en voile sombre + secondes restantes. Barres de PV (bouclier), mana et XP, niveau, gold. Infobulles et refonte façon LoL : phase suivante.
 
 ## 8. CharacterDefinition (le "preset" de perso)
 
@@ -678,11 +501,9 @@ public class CharacterDefinition : ScriptableObject {
     public StatGrowth GrowthPerLevel;        // gain par stat et par niveau
     public BasicAttackDefinition BasicAttack;
 
-    public ElementDefinition[] Elements = new ElementDefinition[3];   // slots A / Z / E (fixes)
-    public int[] ElementUnlockLevels = { 1, 3, 5 };                   // niveau minimum du 1er / 2e / 3e déblocage
-    public PassiveDefinition Passive;           // passif du perso (§8.1)
-    public SpellDefinition SignatureAbility;    // compétence propre
-    public SpellBook SpellBook;                 // les 19 sorts des 3 éléments du perso
+    public SpellDefinition[] Abilities;      // Q, W, E, R (§7)
+    public SpellDefinition SummonerD, SummonerF;   // sorts d'invocateur (F = Flash)
+    public PassiveDefinition Passive;        // passif du perso (§8.1)
 
     public AIBehaviorDefinition Ai;          // null pour le joueur
     public Faction Faction;                  // Player / Enemy / Neutral
@@ -690,7 +511,7 @@ public class CharacterDefinition : ScriptableObject {
 ```
 
 `Character.Init(CharacterDefinition def)` configure le prefab générique :
-sprite, collider, stats, croissance, attaque de base, éléments, grimoire, compétence propre, comportement. **Un prefab, N personnages.**
+sprite, collider, stats, croissance, attaque de base, sorts, passif, comportement. **Un prefab, N personnages.**
 
 > **En place (phase 3)** : `CharacterDefinition` porte `DisplayName`, `Faction`, `BaseStats` (`StatBlock`), `GrowthPerLevel` (`StatGrowth`) et `BasicAttack` (`BasicAttackDefinition`). Ainsi que `Sprite` et `BodySize` (corps physique et agent). Les autres champs arrivent avec leur phase (éléments 5b, sorts 5c, passif 8, IA 6).
 > - `Character.Init` : sprite et corps → `StatController.Init(BaseStats)` → `CharacterLevel` (applique la croissance) → `CharacterMovement.Init(stat MoveSpeed)`. Ré-appelable (pooling, nouvelle run).
@@ -711,7 +532,7 @@ Chaque personnage a **un passif**, défini par un `PassiveDefinition` (SO) qui f
 | Famille | Exemple |
 |---|---|
 | **Statique** | +50 % de chance de critique ; capacité `SpellCrit` |
-| **Déclenchée** | les attaques de base appliquent un **saignement** ; après un sort à 3 éléments, +MoveSpeed 3 s |
+| **Déclenchée** | les attaques de base appliquent un **saignement** ; un sort sur trois donne +MoveSpeed 3 s |
 | **À stacks** | **Mal phénoménal** (Veigar : +1 `MagicAttack` par stack, permanent) ; **Enthousiasme** (Jinx) / **rythme critique** (stacks remis à zéro en fin de vague) |
 | **Conditionnelle** | gagner de l'AD / AP selon le **nombre d'ennemis autour** (valeur recalculée, sans stacks de sorts) |
 
@@ -729,7 +550,7 @@ public enum ResetPolicy { Never /* toute la run */, EndOfWave, EndOfStage, After
 > - **`CharacterEvents`** (`Character.Events`) : `BasicAttackHit`, `DamageDealt`, `DamageTaken`, `Kill`, `SpellCast`, `LevelUp`, levés par `Character.TakeDamage`, `BasicAttacker` et `SpellCaster`.
 > - **`PassiveDefinition`** (SO, aucune ligne de code par passif) = briques combinables : `Stats` (statique), `Capabilities`, `Triggers` (`On` = BasicAttackHit / SpellCast / Kill / DamageTaken, `EveryN`, `Chance`, `MinSpellStacks` ; effets `TimedStats`, `BonusDamage` = base + ratio × stat, `DropLoot`), `Stacks` (`StackSource` PerBasicAttack / PerSpellCast / PerKill, `ResetPolicy` Never / EndOfWave / AfterDuration, `Max`, `PerStack`), `NearbyEnemies` (bonus continu par ennemi dans un rayon, recalculé toutes les 0,25 s).
 > - **`Passive`** (runtime : chaque `StatModifier` a pour Source l'instance, retiré proprement) et **`PassiveController`** (`Character.Passives` : passif du perso ajouté par `Init`, puis items et augments ; tick par le perso ; `EndOfWave` au `Reward`).
-> - **Test Hero** : « Surcharge arcanique », une attaque de base sur trois inflige 20 (+35 % PM) dégâts magiques. **Items** : « Salve » (Arc rapide, 1 attaque sur 4) et « Inspiration » (Couronne du mage, +20 PM 3 s après un sort à 2 éléments).
+> - **Héros** : « Surcharge arcanique » (une attaque sur trois, 20 + 35 % PM) jusqu'à la refonte LoL ; **Ezreal** a maintenant « Sursaut de puissance » (§7.8, stacks `PerSpellHit`). **Items** : « Salve » (Arc rapide, 1 attaque sur 4) et « Inspiration » (Couronne du mage, +20 PM 3 s après un sort ; avant : un sort à 2 éléments).
 > - **Phase 9b** : événement `SpellHit` (chaque cible touchée par un sort) ; effets `ApplyStatus` (sur la cible d'une attaque ou d'un sort), `Heal` et `Shield` (sur le porteur : `Amount` + `AmountRatio` × `AmountStat`, ex. % des PV max) ; conditions `HealthBelow` (PV du porteur sous un seuil) et `Cooldown` (recharge interne) sur chaque trigger.
 > - *Reste : valeurs qui évoluent avec le niveau (`Base + PerLevel`).*
 
@@ -777,7 +598,7 @@ Une **run** est une partie sur un **stage**, **équivalent d'un niveau de BTD6**
 ### 9.2 XP, niveaux, points de compétence et gold
 
 - **XP et gold sont crédités directement au kill** (`EnemyDefinition.XpReward`, `GoldReward`). Une fois le quota de la vague atteint, l'XP n'est plus donnée (gold seul).
-- **XP** : `ExperienceCurve` (SO). À chaque niveau : croissance des stats (§5.5) et évolution du passif (§8.1). Niveaux **1 à 15** : **+1 point de compétence** (§7.8). Niveaux **16 à 18** : **stats uniquement**, avec **+1 point de surcharge** dépensable uniquement sur un élément dont la surcharge est débloquée en méta (§7.8, §9.7). Pas de pause ni de choix imposé à la montée de niveau.
+- **XP** : `ExperienceCurve` (SO). À chaque niveau : croissance des stats (§5.5) et évolution du passif (§8.1). **+1 point de compétence à chaque niveau, de 1 à 18** (rangs des sorts, §7.7). Pas de pause ni de choix imposé à la montée de niveau.
 - **Niveau max en partie : 18** (`MaxLevel`).
 - **Gold** : `Wallet` (valeur, events), dépensé en boutique.
 
@@ -895,12 +716,11 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 - Les ennemis donnent le gold directement. Les **objets au sol** n'arrivent que par des **effets de passif ou d'augment** : `DropLootOnKill(chance, LootTable)`.
 - `LootDrop` au sol, ramassé **au contact**. Types : **enclume à stats** (augment **Flambeur**) et **sort d'invocateur** (passif façon **Zoé**).
 - **Sort d'invocateur ramassé** (`ConsumableSpell`, usage unique : Flash, Soin, Fantôme…) :
-  - il **remplace la compétence propre (F)**, donc le **Flash** du perso ;
+  - il va sur **D** si D est vide (le Flash reste sur F) ;
   - on **ne peut pas en ramasser un autre tant qu'on n'a pas utilisé celui-ci** ;
-  - une fois utilisé, **F redevient la compétence propre** (le Flash), qui reprend son cooldown propre ;
-  - implémentation : un `SummonerSlot` avec `Default` (compétence propre) et `Current` ; `PickUp` n'est possible que si `Current == Default`.
+  - une fois utilisé, **D redevient vide**.
 
-> **En place (phase 8)** : effet de passif `DropLoot` → `LootDropRequestedEvent` (passifs du joueur seulement) → `LootService` (scope Game) : sprites au sol face caméra, ramassés au contact (`LootSettings.PickupRadius`), disparus après 30 s ou en fin de vague. **Enclume à stats** → `BonusRewardEarnedEvent(FreeStatAnvil)`, ouverte gratuitement en fin de vague avant les récompenses prévues (`RewardController`). **Sort d'invocateur** → `SummonerSpellPickedEvent` : `SignatureAbility` le garde sur F pour un usage (sans toucher au cooldown du Flash), un seul à la fois (`SummonerSlotChangedEvent`). Sorts : **Fantôme** (+40 % vitesse 6 s) et **Embrasement** (sort ciblé, 150 + 40 % PM). Augments « Flambeur » (6 % par kill) et « Invocateur » (8 %).
+> **En place (phase 8)** : effet de passif `DropLoot` → `LootDropRequestedEvent` (passifs du joueur seulement) → `LootService` (scope Game) : sprites au sol face caméra, ramassés au contact (`LootSettings.PickupRadius`), disparus après 30 s ou en fin de vague. **Enclume à stats** → `BonusRewardEarnedEvent(FreeStatAnvil)`, ouverte gratuitement en fin de vague avant les récompenses prévues (`RewardController`). **Sort d'invocateur** → `SummonerSpellPickedEvent` : `AbilityCaster` le garde sur D pour un usage (depuis la refonte LoL ; avant : sur F), un seul à la fois (`SummonerSlotChangedEvent`). Sorts : **Fantôme** (+40 % vitesse 6 s) et **Embrasement** (sort ciblé, 150 + 40 % PM). Augments « Flambeur » (6 % par kill) et « Invocateur » (8 %).
 
 ### 9.6 Ennemis et boss
 
@@ -947,14 +767,13 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 
 | Arbre | Rôle |
 |---|---|
-| **Par élément** (`ElementMetaTree`) | augmente les **dégâts de l'élément** (multiplicateur permanent, appliqué une fois par sort) et **débloque sa surcharge** (§7.8) |
-| **Par personnage** (`CharacterMetaTree`) | améliore la **compétence propre**, les **stats** du perso, le **gold de départ**, la possibilité d'avoir **un augment dès le début**, le **passif**, etc. |
+| **Par personnage** (`CharacterMetaTree`) | améliore les **sorts** du champion, ses **stats**, le **gold de départ**, la possibilité d'avoir **un augment dès le début**, le **passif**, etc. (l'ancien arbre par élément disparaît avec les éléments) |
 
-- **Effets génériques** (`MetaEffect`), jamais limités à cette liste : bonus de stat, bonus de dégâts d'élément, déblocage de surcharge, gold de départ, augment de départ (avec une rareté), amélioration de la compétence propre, amélioration du passif… Ils sont appliqués au **début de la run** (`RunModifiers`, `StatModifier` avec Source = le nœud méta) ou lus par les systèmes concernés.
+- **Effets génériques** (`MetaEffect`), jamais limités à cette liste : bonus de stat, bonus de dégâts d'un sort, gold de départ, augment de départ (avec une rareté), amélioration d'un sort, amélioration du passif… Ils sont appliqués au **début de la run** (`RunModifiers`, `StatModifier` avec Source = le nœud méta) ou lus par les systèmes concernés.
 - Le **nombre de nœuds et de niveaux** est une donnée à définir plus tard.
 - Autres déblocages possibles : items, augments, personnages.
 - **`MetaSave`** (JSON) : monnaie et nœuds achetés.
-- **`RunSnapshot`** : état complet de la run (niveau, XP, niveaux d'éléments, surcharges, stacks de passifs, items, augments, gold, vies, vague en cours) sérialisé en JSON, pris **au début de chaque vague**. Quitter une vague puis reprendre recharge ce snapshot. Tout état de jeu doit donc être sérialisable.
+- **`RunSnapshot`** : état complet de la run (niveau, XP, rangs des sorts, stacks de passifs, items, augments, gold, vies, vague en cours) sérialisé en JSON, pris **au début de chaque vague**. Quitter une vague puis reprendre recharge ce snapshot. Tout état de jeu doit donc être sérialisable.
 - **Solo uniquement**, un seul personnage modulable au prototype.
 
 ### 9.8 Technique & perf
@@ -964,7 +783,7 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 - **Pas de `GetComponent` en boucle** : références mises en cache à l'`Init`.
 - **Éviter l'allocation** : listes réutilisées, `struct` pour `DamageInfo`.
 - **Animations** : privilégier flipbook/sprite swap simple pour les ennemis en masse plutôt qu'un Animator par entité.
-- **UI** : HUD (PV, XP, timer de vague, quota, vies, icônes d'éléments et de sorts), écrans de boutique / enclumes / augments, choix d'éléments, damage numbers (TextMeshPro poolé ou rendu par particules).
+- **UI** : HUD (PV, XP, timer de vague, quota, vies, icônes de sorts), écrans de boutique / enclumes / augments, damage numbers (TextMeshPro poolé ou rendu par particules).
 - **Audio** : pool d'`AudioSource` + limitation du nombre de sons simultanés.
 - **Sauvegarde** : JSON simple (`JsonUtility`) pour la méta-progression.
 
@@ -983,18 +802,18 @@ Assets/
 │   │   ├── Combat/          (Health, DamageInfo, DamageReceiver, DamageCalculator)
 │   │   ├── Movement/        (CharacterMovement)
 │   │   ├── Commands/        (CharacterCommand, CommandController, ICommandSource, BasicAttacker)
-│   │   ├── Spells/          (ElementDefinition, SpellDefinition, SpellBook, SpellResolver, Spell, ElementCaster, ManaPool, CastContext, implémentations/)
+│   │   ├── Spells/          (SpellDefinition, AbilityCaster, AbilityRanks, SpellCaster, SpellExecutor, CastContext…)
 │   │   ├── Input/           (PlayerCommandInput, SpellIndicator, ClickMarker)
 │   │   ├── AI/              (EnemyAI, EnemyDefinition, BossDefinition, PatternRunner, FlowField)
 │   │   ├── Progression/     (ExperienceCurve, StatGrowth)
-│   │   ├── Meta/            (MetaNode, MetaEffect, ElementMetaTree, CharacterMetaTree, MetaSave, RunModifiers)
+│   │   ├── Meta/            (MetaNode, MetaEffect, CharacterMetaTree, MetaSave, RunModifiers)
 │   │   ├── Items/           (ItemDefinition, AnvilDefinition, StatChoiceDefinition, ElixirDefinition, Inventory, Wallet, Shop)
 │   │   ├── Loot/            (LootDrop, LootTable, ConsumableSpell)
 │   │   ├── Augments/        (AugmentDefinition, AugmentController, AugmentDraft)
 │   │   ├── Passives/        (PassiveDefinition, Passive, StackCounter, CharacterEvents, CapabilityController)
 │   │   ├── Run/             (RunDirector, WaveDefinition, EnemySpawner, Intermission)
 │   │   └── UI/
-│   ├── Data/                (Characters, Enemies, Elements, Spells, SpellBooks, Passives, Items, Augments, Waves, XPCurve)
+│   ├── Data/                (Characters, Enemies, Spells, Passives, Items, Augments, Waves, XPCurve)
 │   ├── Prefabs/
 │   ├── Art/
 │   └── Scenes/
@@ -1013,13 +832,14 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **3** ✅ | `CharacterDefinition`, `Character.Init`, `BasicAttackDefinition`, `CharacterLevel` (XP, points de compétence, croissance), vitesse lue depuis `MoveSpeed`. Sprite et taille du corps depuis la définition. | Un perso configurable par données |
 | **4** ✅ | `Health`, `DamageInfo`, formules, régénération des PV, barres de PV, chiffres de dégâts ; boucliers, CC et ténacité (avec la 9b) | Dégâts corrects |
 | **5** 🟡 | Clic droit sur ennemi, `BasicAttacker`, projectiles poolés, Q + clic gauche (attack-move) ✅, dummies d'entraînement (XP au kill). *Reste : `CommandController`.* | Attaque de base façon LoL |
-| **5b** ✅ | `ManaPool`, `ElementSelection` (A/Z/E, T reset), `SpellBook` + `SpellResolver`, coût en mana + UI, déblocage d'éléments par points (niv. 1/3/5, Ctrl + A/Z/E) | Éléments activables, coût affiché |
-| **5c** ✅ | R + visée + indicateurs, sorts Magic/Physical/Buff, niveaux d'éléments, cooldown par lancement, compétence propre F (Flash) | Sorts lancés à la souris |
+| **5b** ✅ (remplacée par la 10) | `ManaPool`, `ElementSelection` (A/Z/E, T reset), `SpellBook` + `SpellResolver`, coût en mana + UI, déblocage d'éléments par points (niv. 1/3/5, Ctrl + A/Z/E) | Éléments activables, coût affiché |
+| **5c** ✅ (remplacée par la 10) | R + visée + indicateurs, sorts Magic/Physical/Buff, niveaux d'éléments, cooldown par lancement, compétence propre F (Flash) | Sorts lancés à la souris |
 | **6** ✅ | `EnemyDefinition`, `EnemyAI` (flow field + NavMesh pour élites), mana TFT + sort spécial, spawner, XP/gold au kill | Un combat complet avec des hordes |
 | **7** ✅ | `RunDirector` (timer + quota, fin de vague = timer ET quota, vies), `Wallet`, `WaveRewardSchedule`, victoire / défaite (7a) ; `Inventory` (6 slots), boutiques, enclumes, élixirs, items (7b) | Boucle de run + économie |
 | **8** ✅ | `CharacterEvents`, passifs (briques génériques : stats, triggers, stacks, ennemis proches), capacités (`SpellCrit`), augments (4 → 6 slots, relances, relance dorée, slots pleins), passifs d'items, loot (enclume à stats, sorts d'invocateur) | Builds variés |
 | **9** 🟡 | Boss à patterns et items ✅ (9a). Statuts (stun, root, silence, ralentissement, saignement, brûlure, ténacité), soins et boucliers, statuts sur les sorts, +14 items, +7 augments ✅ (9b). 4 nouveaux ennemis (loup, mage squelette, chaman gobelin, golem de pierre) ✅ (9c). *Reste : nouveaux éléments et sorts (avec un deuxième personnage), équilibrage.* | Prototype riche |
-| **10** | Méta-progression (arbres par élément et par personnage, monnaie persistante, surcharge), `RunSnapshot` (quitter/reprendre), polish, UI, audio | Prototype solide |
+| **10** 🟡 | **Refonte LoL** : sorts par champion (Q W E R à rangs, D F), Ezreal, touches par position, dézoom de la caméra ✅. *Reste : items (stats + effet propre à chacun, beaucoup plus d'items, force adaptative sur les prismatiques), UI façon LoL (stats et augments au même endroit, boutique : items seuls, détail au clic).* | Ezreal jouable |
+| **11** | Méta-progression (arbres par personnage, monnaie persistante), `RunSnapshot` (quitter/reprendre), polish, UI, audio | Prototype solide |
 
 ---
 
@@ -1036,13 +856,15 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 - **Centaines d'ennemis** : pas de `NavMeshAgent` pour les hordes (flow field), physique des ennemis à profiler tôt (repli : séparation custom).
 - **Passifs, items et augments** : tous passent par `PassiveController` ; garder un `Source` unique par effet pour retirer/rafraîchir proprement.
 - **Rogue-lite** : tout état de run doit être remis à zéro proprement entre deux runs (stacks, modificateurs, inventaire).
-- **Quitter/reprendre** : le `RunSnapshot` exige que stacks, modificateurs, items, augments et niveaux d'éléments soient sérialisables ; prévoir ce besoin dès les phases 2 et 3.
+- **Quitter/reprendre** : le `RunSnapshot` exige que stacks, modificateurs, items, augments et rangs des sorts soient sérialisables ; prévoir ce besoin dès les phases 2 et 3.
 
 ---
 
 ## 13. Questions ouvertes (à valider avant de coder)
 
 **Résolu** : plan XZ ; reset (T) ; une recette = un sort (19 par perso) ; cooldown par lancement {2, 3.5, 5.5} s ; compétence propre F (Flash 20 s) remplaçable par un sort d'invocateur ; points de compétence aux niveaux 1 à 15 pour monter le niveau des éléments (une fois par sort) ; niveaux 16 à 18 : stats seules, sauf surcharge débloquée en méta ; déblocage des éléments aux niveaux 1 / 3 / 5 ; 3 stacks max par sort ; sorts Magic / Physical / Buff ; passifs à persistance et sources de stacks variables ; XP et gold directs au kill ; fin de vague = timer ET quota ; 3 vies de stage, game over = rejouer le stage depuis la vague 1 ; ordre des fins de vague (augment, enclume prismatique gratuite à 3 choix avec 1 reroll par choix, puis boucle boutique légère / augment / boutique complète) ; vagues bonus : boutique complète après chaque vague et augment toutes les deux vagues ; un élixir max, enclumes à items comptées dans la limite d'un item ; enclumes à stats : une rareté tirée, 3 choix de même rareté ; augments toutes les 3 vagues, reroll doré ~5 % ; méta par arbres d'éléments et de personnages ; quitter/reprendre au début de la vague ; centaines d'ennemis avec creep block ; mana TFT ; boss à patterns avec 3 items ; **pas de crit sur les sorts sauf passif/augment** ; solo, un seul perso de test.
+
+**Validé (13/10/2026, refonte LoL)** : abandon des éléments ; chaque champion a ses sorts Q W E R (rangs LoL, 1 point par niveau jusqu'au 18), un passif, Flash sur F et un emplacement D pour les sorts d'invocateur ramassés ; touches par position ; personnage d'essai Ezreal. Les décisions « Résolu » ci-dessus qui parlent d'éléments, de recettes, de reset (T), de surcharge ou de compétence propre F sont **caduques**.
 
 **Validé (phase 8)** : 4 slots d'augments de base, 6 maximum avec les augmentations ; 4 relances pour toute la run (une par slot de base). **Validé** : la **mort du joueur** est un **game over immédiat** (les vies de stage ne se perdent qu'au timer).
 
@@ -1172,7 +994,7 @@ public sealed class EventBus : IEventBus {
 |---|---|---|
 | `GameStateChangedEvent` (`From` nullable, `To`) | `GameFlowController` | `MainMenuPanel`, `GameHUD`, `TimeScaleService`, `InputMapSwitcher`, audio |
 | `PlayRequestedEvent`, `QuitRequestedEvent` | `MainMenuPanel`, `QuitOverlay` | `GameFlowController` |
-| `PointerPositionEvent`, `PointerCommandEvent` (position **écran**), `ConfirmEvent`, `CancelEvent`, `AttackMoveEvent`, `ElementKeyEvent` (slot, `LevelUp` si Ctrl), `CastSpellEvent`, `SignatureEvent`, `ResetElementsEvent`, `StopEvent` | `InputReader` | `PlayerCommandInput`, `CameraController`, `QuitOverlay`, plus tard `ElementCaster` |
+| `PointerPositionEvent`, `PointerCommandEvent` (position **écran**), `ConfirmEvent`, `CancelEvent`, `AttackMoveEvent`, `AbilityKeyEvent` (slot Q W E R D F, `LevelUp` si Ctrl, `Released`), `StopEvent` | `InputReader` | `PlayerCommandInput`, `CameraController`, `QuitOverlay`, `AbilityCaster` |
 | `CameraLockEvent`, `ZoomEvent` | `InputReader` | `CameraController` |
 | `WaveStartedEvent`, `WaveEndedEvent`, `LifeLostEvent` | `RunDirector` | HUD, audio, `WaveSpawner` |
 | `StageClearedEvent`, `StageFailedEvent` | `RunDirector` | `GameFlowController`, méta-progression |
@@ -1182,13 +1004,13 @@ public sealed class EventBus : IEventBus {
 | `PlayerSpawnedEvent` (transform du joueur) | `PlayerSpawner` | `CameraController` |
 | `XpGrantedEvent` | `CharacterDebugPanel` (plus tard : kills) | `Character` joueur |
 | `XpChangedEvent`, `LevelUpEvent`, `StatChangedEvent` | `Character` joueur | `PlayerHud`, `CharacterDebugPanel` |
-| `PlayerElementsEvent`, `ElementSelectionChangedEvent` (stacks, sort résolu, coût), `ElementLevelsChangedEvent` (niveaux, « + » possibles, points, prochain déblocage) | `ElementCaster` | `PlayerHud` |
-| `ElementLevelUpRequestedEvent` | bouton « + » du HUD | `ElementCaster` |
-| `GameplayFeedbackEvent` (message) | `ElementCaster` (plus tard : sorts, boutiques…) | `PlayerHud` |
+| `AbilitiesChangedEvent` (sorts, rangs, « + » possibles, points) | `AbilityCaster` | `PlayerHud` |
+| `AbilityRankUpRequestedEvent` | bouton « + » du HUD | `AbilityCaster` |
+| `GameplayFeedbackEvent` (message) | `AbilityCaster`, boutiques… | `PlayerHud` |
 | `PlayerManaChangedEvent` | `Character` joueur | `PlayerHud` |
 | `SpellCastEvent` (sort, lancé par le joueur ?) | `SpellExecutor` | plus tard : passifs, audio |
 | `AimModeEvent` (None / AttackMove / Spell / Signature) | `PlayerCommandInput`, `SpellTargeting` | les mêmes (une seule visée à la fois) |
-| `CooldownStartedEvent` (Elemental / Signature, durée), `SignatureAssignedEvent` | `ElementCaster`, `SignatureAbility` | `PlayerHud` |
+| `CooldownStartedEvent` (slot, durée) | `AbilityCaster` | `PlayerHud` |
 | `GoldChangedEvent`, `ItemPurchasedEvent`, `AugmentChosenEvent` | `Wallet`, `Shop`, `AugmentController` | HUD, `PassiveController` |
 
 ### 14.4 Injection de dépendances (VContainer)
@@ -1228,15 +1050,15 @@ Un **`GameLifetimeScope` par stage** donne gratuitement la **remise à zéro** d
 | Domaine | SO |
 |---|---|
 | Personnages | `CharacterDefinition`, `StatBlock`, `StatGrowth`, `BasicAttackDefinition`, `PassiveDefinition` |
-| Éléments et sorts | `ElementDefinition`, `SpellDefinition`, `SpellBook`, `SpellSettings` (courbe de coût, cooldowns par stacks) |
+| Sorts | `SpellDefinition` (rangs, §7.2), `SpellSettings` (blink, prefabs d'effets) |
 | Ennemis | `EnemyDefinition`, `BossDefinition`, `PatternDefinition` |
 | Run | **`StageDefinition`** (liste de vagues, `WaveRewardSchedule`, `BonusWaveCount`, `StageLives`, difficulté), `WaveDefinition`, `WaveRewardSchedule`, `ExperienceCurve` |
 | Économie | `ItemDefinition`, `AnvilDefinition`, `StatChoiceDefinition`, `ElixirDefinition`, `AugmentDefinition`, `LootTable` |
-| Méta | `MetaNode`, `ElementMetaTree`, `CharacterMetaTree` |
+| Méta | `MetaNode`, `CharacterMetaTree` |
 | Options | **`GameOptions`** (valeurs par défaut : volumes, qualité, sensibilité, bindings par défaut) ; les choix du joueur (`UserOptions`) sont **sauvegardés en JSON** par-dessus |
 | Catalogues | `CharacterCatalog`, `ItemCatalog`, `AugmentCatalog`, `StageCatalog` |
 
-**Nommage** : `Char_<Nom>`, `Enemy_<Nom>`, `Elem_<Nom>`, `Spell_<Éléments>_x<stacks>` (ex. `Spell_Fire_x2`), `Item_<Nom>`, `Aug_<Nom>`, `Stage_<Nom>`, `Wave_<Stage>_<N>`.
+**Nommage** : `Char_<Nom>`, `Enemy_<Nom>`, `Spell_<Champion>_<Touche>` (ex. `Spell_Ezreal_Q`), `Item_<Nom>`, `Aug_<Nom>`, `Stage_<Nom>`, `Wave_<Stage>_<N>`.
 
 ### 14.6 Arborescence et assemblies
 
@@ -1262,9 +1084,8 @@ Assets/
 │   ├── Progression/         CharacterLevel, StatGrowth (SO), ExperienceCurve (SO)
 │   ├── Combat/              BasicAttacker, BasicAttackDefinition (SO), DamageInfo, DamageCalculator, Health, ManaPool, DamageType,
 │   │                        Projectile, SkillshotProjectile, ProjectileLauncher, TargetPicker, ITargetSelector
-│   ├── Spells/              ElementDefinition, SpellDefinition, SpellBook, SpellSettings (SO), ElementSelection,
-│   │                        SpellResolver, ElementLevels, ElementCaster, SpellMath, SpellCaster, SpellExecutor,
-│   │                        SpellTargeting, SpellIndicator, SignatureAbility, SpellVfx
+│   ├── Spells/              SpellDefinition, SpellSettings (SO), AbilityRanks, AbilityCaster, SpellMath,
+│   │                        SpellCaster, SpellExecutor, SpellTargeting, SpellIndicator, SpellVfx
 │   ├── Movement/            CharacterMovement
 │   ├── Enemies/             EnemyAI, EnemyDirector, FlowField, FlowFieldService, HordeSpawner, HordeSettings (SO),
 │   │                        BossDefinition, PatternDefinition (SO), PatternRunner
@@ -1276,13 +1097,13 @@ Assets/
 │   ├── Run/                 RunDirector, RunStateMachine, RewardController, StageDefinition, WaveDefinition, WaveRewardSchedule (SO)
 │   ├── Controls/            PlayerCommandInput, ClickMarker, RangeIndicator
 │   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO), TimedModifiers…
-│   └── UI/                  PlayerHud, ElementBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
+│   └── UI/                  PlayerHud, AbilityBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
 │                            Panels/ (MainMenuPanel, PauseMenu, OptionsPanel, OptionsView, RunEndPanel, ShopPanel, AnvilPanel, AugmentPanel, OfferCard),
 │                            RunHudView, InventoryView, AugmentsView, BossHudView, DebugTools/CharacterDebugPanel
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
 ├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, EnemySetup, RunSetup, EconomySetup, PassiveSetup, BossSetup, TestSceneSetup, BuildScript
 ├── Data/                    Settings/ (GameFlowSettings, CameraSettings, ControlsSettings, SpellSettings, HordeSettings, VContainerSettings),
-│                            Elements/ (Elem_Fire…), Spells/FireElectricityWind/ (19 Spell_…, SpellBook_…), Spells/Signature/Spell_Flash,
+│                            Spells/Ezreal/ (Spell_Ezreal_Q…R), Spells/Signature/Spell_Flash,
 │                            Progression/ExperienceCurve, Characters/TestHero/ (Char_TestHero…),
 │                            Characters/TrainingDummy/ (Enemy_TrainingDummy : 1000 PV, 30 armure/RM, 150 XP),
 │                            Characters/Enemies/ (Enemy_Goblin, Enemy_SkeletonArcher, Enemy_Brute + StatBlock / BasicAttack),
@@ -1293,7 +1114,7 @@ Assets/
 ├── GameAssets/ActionMaps/   Game.Input — GameActionMaps (.inputactions + C# généré)
 ├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy, Enemy, Boss),
 │                            Combat/ (Projectile_ArcaneBolt, Projectile_Skillshot, Vfx_SpellShape)
-├── GraphicAssets/           Sprites/ (Characters/…, Elements/…, Items/…, Augments/…, Spells/Spell_Flash, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
+├── GraphicAssets/           Sprites/ (Characters/…, Items/…, Augments/…, Spells/ (Flash, Ezreal_*), Status/…, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
 ├── Scenes/                  Releases/Menu, Tests/TestScene (+ Releases/Game : ancienne scène WASD, hors build)
 ├── Tests/                   EditMode/, PlayMode/
 └── UI Toolkit/   Settings/
@@ -1359,7 +1180,7 @@ Points restants (connus) :
 - *Tools > Add Test Obstacles* : (re)crée le parcours de pathfinding de `TestScene` (mur, angle en L, piège en U, piliers, couloir étroit) et rebake le NavMesh, sans toucher au reste de la scène.
 - *Tools > Build Linux (Test Scene)* / *(Game)* : builds standalone.
 - *Tools > Regenerate Input Actions Code* : régénère `GameActionMaps.cs` (§4.7).
-- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, sélection d'éléments, grimoire et coût (exemples du §7.3), déblocage des éléments, haste, niveaux d'éléments par sort, cône, dégâts de sort, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, éléments : déblocage → stacks → sort résolu → reset, boule de feu visée sur un dummy (dégâts, mana, cooldown, sélection vidée), buff sur soi qui expire, quick cast, quick cast avec indicateur (maintien → visée, relâchement → lancer, Échap pendant le maintien, mode Normal), Flash à distance fixe puis en cooldown, Flash dans un mur, gobelin qui poursuit et frappe, contournement d'un mur par le flow field, archer qui garde sa portée, brute qui lance son sort à mana plein, kill → XP + gold → retour au pool → réutilisation, mort du joueur → horde vidée → respawn, spawn continu borné à `MaxAlive`, vague : compte à rebours → combat → quota (XP coupée, gold gardé) → timer → récompense en pause → vague suivante, overtime → vies perdues → défaite → Rejouer, mort = game over immédiat, toutes les vagues + bonus → victoire, enclume prismatique gratuite après la vague 2 puis boutique légère et enclume à stats, draft d'augment après la vague 1, passif du héros (1 attaque sur 3), Frénésie (stacks puis chute), `SpellCrit`, sort d'invocateur ramassé puis utilisé, enclume ramassée ouverte en fin de vague, boss (items, sort de la phase 1, phases à 60 % et 30 %, mort), vague de boss (overtime tant qu'il vit, fin à sa mort), Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (mode de lancement par défaut, sauvegarde / rechargement JSON), le flow field (ligne droite, contournement, coins, cellule enfermée) le `Wallet`, le `WaveRewardSchedule` et la boutique (limites par boutique, enclumes à stats et à items, rerolls, inventaire plein, élixir jusqu'à la fin de la vague suivante, enchaînement des récompenses) et les augments (draft, relances, relance dorée, slots pleins : remplacement, slot puis gold, enclume) et le point visé à portée fixe en EditMode.
+- Tests : `Game.Tests.EditMode` (stats, `EventBus`, state machine, disposition clavier, `CharacterLevel`, formules de dégâts, `Health`, `ManaPool`, rangs des sorts (`AbilityRanks`), haste, cône, dégâts de sort par rang et ratios, modificateurs temporaires), `Game.Tests.PlayMode` (lancement direct de `TestScene`, Menu → Play → `TestScene`, contournement des obstacles, caméra, init du joueur et montée de niveau via le bus, spawn depuis le prefab, billboard et flip du sprite, attaque d'un dummy, kill → XP → respawn, projectiles poolés, attack-move, cercle de portée, rangs des sorts d'Ezreal (points, niveaux requis, « + »), Q visé sur un dummy (dégâts, mana, délai réduit à l'impact), W qui marque puis explose sur une attaque (mana rendu), E (blink + trait), quick cast, quick cast avec indicateur (maintien → visée, relâchement → lancer, Échap pendant le maintien, mode Normal), Flash à distance fixe puis en cooldown, Flash dans un mur, gobelin qui poursuit et frappe, contournement d'un mur par le flow field, archer qui garde sa portée, brute qui lance son sort à mana plein, kill → XP + gold → retour au pool → réutilisation, mort du joueur → horde vidée → respawn, spawn continu borné à `MaxAlive`, vague : compte à rebours → combat → quota (XP coupée, gold gardé) → timer → récompense en pause → vague suivante, overtime → vies perdues → défaite → Rejouer, mort = game over immédiat, toutes les vagues + bonus → victoire, enclume prismatique gratuite après la vague 2 puis boutique légère et enclume à stats, draft d'augment après la vague 1, passif d'Ezreal (stacks de vitesse d'attaque), Frénésie (stacks puis chute), `SpellCrit`, sort d'invocateur ramassé puis utilisé, enclume ramassée ouverte en fin de vague, boss (items, sort de la phase 1, phases à 60 % et 30 %, mort), vague de boss (overtime tant qu'il vit, fin à sa mort), Échap → visée annulée puis pause → options → reprise → menu principal, Paramètres du menu → options), plus `UserOptions` (mode de lancement par défaut, sauvegarde / rechargement JSON), le flow field (ligne droite, contournement, coins, cellule enfermée) le `Wallet`, le `WaveRewardSchedule` et la boutique (limites par boutique, enclumes à stats et à items, rerolls, inventaire plein, élixir jusqu'à la fin de la vague suivante, enchaînement des récompenses) et les augments (draft, relances, relance dorée, slots pleins : remplacement, slot puis gold, enclume) et le point visé à portée fixe en EditMode.
 
 ### 14.9 Actions d'entrée à prévoir (Input System)
 
@@ -1371,14 +1192,12 @@ Map **Gameplay** (les actions `Move`, `Look`, `Jump`… du template ne sont plus
 | `PointerCommand` | Button | clic droit (déplacement ou attaque) |
 | `Confirm` | Button | clic gauche (valide une visée) |
 | `Cancel` | Button | Échap (annule la visée, sinon ouvre la pause) |
-| `AttackMove` | Button | Q (maintenu ; `AttackMoveEvent.Pressed` vrai à l'appui, faux au relâchement) |
-| `Element1`, `Element2`, `Element3` | Button | A, Z, E |
-| `CastSpell` | Button | R (appui et relâchement) |
-| `Signature` | Button | F (appui et relâchement) |
-| `ResetElements` | Button | T |
+| `AttackMove` | Button | position A (Q en AZERTY ; maintenu ; `AttackMoveEvent.Pressed` vrai à l'appui, faux au relâchement) |
+| `Ability1` … `Ability4` | Button | positions Q W E R (A Z E R en AZERTY ; appui et relâchement) |
+| `SummonerD`, `SummonerF` | Button | D, F (appui et relâchement) |
 | `Stop` | Button | S |
-| `LevelUpModifier` | Button | Ctrl gauche / droit (maintenu avec A/Z/E : dépense un point) |
+| `LevelUpModifier` | Button | Ctrl gauche / droit (maintenu avec un sort : dépense un point) |
 | `CameraLock` | Button | Espace, clic molette |
 | `Zoom` | Value (Vector2) | molette |
 
-Les lettres sont remappées selon `ControlsSettings.KeyboardLayout` (§4.7). Prévoir le **rebind** (`UserOptions`).
+Les bindings du groupe `Positional` (sorts, invocateurs, attack-move, stop) restent à leur position ; les autres lettres sont remappées selon `ControlsSettings.KeyboardLayout` (§4.7). Prévoir le **rebind** (`UserOptions`).
