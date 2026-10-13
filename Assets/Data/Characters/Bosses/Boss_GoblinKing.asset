@@ -19,13 +19,9 @@ MonoBehaviour:
   baseStats: {fileID: 11400000, guid: ff4d8277b2712607b9252ea07ea18155, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: 465b557e9ed6cfee1a6686ac1c42099b, type: 2}
-  elements:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  elementUnlockLevels: 010000000300000005000000
-  spellBook: {fileID: 0}
-  signatureAbility: {fileID: 0}
+  abilities: []
+  summonerD: {fileID: 0}
+  summonerF: {fileID: 0}
   passive: {fileID: 0}
   xpReward: 600
   goldReward: 150
@@ -38,5 +34,5 @@ MonoBehaviour:
   title: Roi des gobelins
   pattern: {fileID: 11400000, guid: 50369d3ca288fea649f80662f3187f63, type: 2}
   items:
-  - {fileID: 11400000, guid: 5d566104818939f1c80f17edb5334afb, type: 2}
-  - {fileID: 11400000, guid: 434f82b2aac8a24c0930dcc30f437441, type: 2}
+  - {fileID: 11400000, guid: c7ad6a1102b930f769f0c1f8123f0133, type: 2}
+  - {fileID: 11400000, guid: 21b333efa21f42eaeba1df1107a3ad40, type: 2}

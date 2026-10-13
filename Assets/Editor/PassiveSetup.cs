@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace EditorTools {
     /// <summary>
-    /// Phase 8 content (design doc §8.1, §9.4, §9.5), called by <see cref="ProjectSetup"/>: 12 augments (4 Silver, 5 Gold, 3 Prismatic), two item passives, the summoner
+    /// Phase 8 content (design doc §8.1, §9.4, §9.5), called by <see cref="ProjectSetup"/>: 12 augments (4 Silver, 5 Gold, 3 Prismatic), the summoner
     /// spells and the loot settings, with their icons. Everything is a PassiveDefinition built from
     /// the generic bricks: no code per augment. Created once, never overwritten; values are
     /// placeholders, names are original.
@@ -35,6 +35,8 @@ namespace EditorTools {
             public PassiveTrigger[] Triggers = System.Array.Empty<PassiveTrigger>();
             public StackSettings Stacks;
             public NearbyEnemiesBonus Nearby;
+            public AuraSettings Aura;
+            public StatConversion[] Conversions = System.Array.Empty<StatConversion>();
         }
 
         private static readonly (RarityTier rarity, P passive)[] Augments = {
@@ -68,26 +70,8 @@ namespace EditorTools {
                 Triggers = new[] { new PassiveTrigger { On = PassiveEvent.Kill, EveryN = 1, Chance = 0.08f, Effect = PassiveEffectKind.DropLoot, Loot = LootKind.SummonerSpell } } }),
         };
 
-        // (item asset id, passive): item passives on top of their stats
-        private static readonly (string item, P passive)[] ItemPassives = {
-            ("SwiftBow", new P { Id = "Item_SwiftBow", Name = "Salve", Description = "Une attaque de base sur quatre inflige 15 (+30 % attaque physique) dégâts physiques en plus.",
-                Triggers = new[] { new PassiveTrigger { On = PassiveEvent.BasicAttackHit, EveryN = 4, Chance = 1f, Effect = PassiveEffectKind.BonusDamage,
-                                                        Damage = 15f, ScalingStat = StatType.PhysicalAttack, DamageRatio = 0.3f, DamageType = DamageType.Physical } } }),
-            ("MageCrown", new P { Id = "Item_MageCrown", Name = "Inspiration", Description = "Après un sort : +20 puissance magique pendant 3 s.",
-                Triggers = new[] { new PassiveTrigger { On = PassiveEvent.SpellCast, EveryN = 1, Chance = 1f, Effect = PassiveEffectKind.TimedStats,
-                                                        Duration = 3f, Stats = new[] { B(StatType.MagicAttack, 20) } } } }),
-        };
-
         public static (AugmentCatalog augments, LootSettings loot) Run() {
             foreach (string png in Directory.GetFiles(IconsDir, "*.png")) EconomySetup.ConfigureIcon(png.Replace('\\', '/'));
-
-            foreach ((string itemId, P passive) in ItemPassives) {
-                var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"{EconomySetup.Dir}/Items/Item_{itemId}.asset");
-                if (item == null || item.Passive != null) continue;
-                var so = new SerializedObject(item);
-                so.FindProperty("passive").objectReferenceValue = Passive(passive, null, item.Icon);
-                so.ApplyModifiedPropertiesWithoutUndo();
-            }
 
             var catalog = AssetDatabase.LoadAssetAtPath<AugmentCatalog>(AugmentCatalogPath);
             if (catalog == null) {
@@ -140,6 +124,8 @@ namespace EditorTools {
             SetField(passive, "triggers", p.Triggers);
             SetField(passive, "stacks", p.Stacks);
             SetField(passive, "nearbyEnemies", p.Nearby);
+            SetField(passive, "aura", p.Aura);
+            SetField(passive, "conversions", p.Conversions);
             EditorUtility.SetDirty(passive);
             return passive;
         }

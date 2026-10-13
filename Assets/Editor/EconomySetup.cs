@@ -8,9 +8,8 @@ using UnityEngine;
 
 namespace EditorTools {
     /// <summary>
-    /// Phase 7b content (design doc §9.3), called by <see cref="ProjectSetup"/>: 8 legendary and 4
-    /// prismatic items, 3 elixirs, the stat choices of the stat anvils, the anvils and the shop
-    /// catalog, with their pixel-art icons. Original names (no LoL item names). Created once and
+    /// Phase 7b content (design doc §9.3), called by <see cref="ProjectSetup"/>: 3 elixirs, the stat choices of the stat anvils, the anvils and the shop
+    /// catalog, with their pixel-art icons (the items themselves: LolItemsSetup). Created once and
     /// never overwritten: prices and stats are placeholders tuned in the assets.
     /// </summary>
     public static class EconomySetup {
@@ -19,21 +18,6 @@ namespace EditorTools {
         private const string IconsDir = "Assets/GraphicAssets/Sprites/Items";
 
         private static StatBonus B(StatType s, float v, ModifierType t = ModifierType.Flat) => new(s, t, v);
-
-        private static readonly (string id, string name, ItemTier tier, int cost, StatBonus[] stats)[] Items = {
-            ("SharpBlade", "Lame tranchante", ItemTier.Legendary, 260, new[] { B(StatType.PhysicalAttack, 40), B(StatType.CritChance, 0.2f) }),
-            ("MageCrown", "Couronne du mage", ItemTier.Legendary, 280, new[] { B(StatType.MagicAttack, 70), B(StatType.AbilityHaste, 10) }),
-            ("SwiftBow", "Arc rapide", ItemTier.Legendary, 260, new[] { B(StatType.AttackSpeed, 0.35f, ModifierType.PercentAdd), B(StatType.CritChance, 0.15f) }),
-            ("FrostHeart", "Cœur de givre", ItemTier.Legendary, 250, new[] { B(StatType.Armor, 45), B(StatType.MaxMana, 300), B(StatType.AbilityHaste, 15) }),
-            ("VoidStaff", "Bâton du néant", ItemTier.Legendary, 270, new[] { B(StatType.MagicAttack, 50), B(StatType.MagicPenPercent, 0.3f) }),
-            ("ManaStone", "Pierre de mana", ItemTier.Legendary, 240, new[] { B(StatType.MaxMana, 400), B(StatType.ManaRegen, 4), B(StatType.MagicAttack, 35) }),
-            ("ColossusArmor", "Armure du colosse", ItemTier.Legendary, 250, new[] { B(StatType.MaxHealth, 450), B(StatType.HealthRegen, 3), B(StatType.PhysicalAttack, 15) }),
-            ("VampireFang", "Croc vampirique", ItemTier.Legendary, 260, new[] { B(StatType.PhysicalAttack, 25), B(StatType.AttackSpeed, 0.2f, ModifierType.PercentAdd), B(StatType.Lifesteal, 0.12f) }),
-            ("Starshard", "Éclat d'étoile", ItemTier.Prismatic, 0, new[] { B(StatType.MagicAttack, 90), B(StatType.AbilityHaste, 20), B(StatType.MaxHealth, 300) }),
-            ("DawnBlade", "Lame de l'aube", ItemTier.Prismatic, 0, new[] { B(StatType.PhysicalAttack, 60), B(StatType.AttackSpeed, 0.3f, ModifierType.PercentAdd), B(StatType.CritChance, 0.25f) }),
-            ("PrismAegis", "Égide prismatique", ItemTier.Prismatic, 0, new[] { B(StatType.Armor, 60), B(StatType.MagicResist, 60), B(StatType.MaxHealth, 600) }),
-            ("VoidHeart", "Cœur du néant", ItemTier.Prismatic, 0, new[] { B(StatType.MagicAttack, 70), B(StatType.ManaRegen, 6), B(StatType.ManaCostReduction, 0.2f) }),
-        };
 
         private static readonly (string id, string name, int cost, StatBonus[] stats)[] Elixirs = {
             ("Strength", "Élixir de force", 40, new[] { B(StatType.PhysicalAttack, 25), B(StatType.AttackSpeed, 0.15f, ModifierType.PercentAdd) }),
@@ -69,19 +53,6 @@ namespace EditorTools {
             var catalog = AssetDatabase.LoadAssetAtPath<ShopCatalog>(CatalogPath);
             if (catalog != null) return catalog;
 
-            var items = new List<Object>();
-            foreach (var i in Items) {
-                var item = CreateAsset<ItemDefinition>($"{Dir}/Items/Item_{i.id}.asset");
-                var so = new SerializedObject(item);
-                so.FindProperty("displayName").stringValue = i.name;
-                so.FindProperty("icon").objectReferenceValue = Icon($"Item_{i.id}");
-                so.FindProperty("cost").intValue = i.cost;
-                so.FindProperty("tier").enumValueIndex = (int)i.tier;
-                WriteStats(so.FindProperty("stats"), i.stats);
-                so.ApplyModifiedPropertiesWithoutUndo();
-                items.Add(item);
-            }
-
             var elixirs = new List<Object>();
             foreach (var e in Elixirs) {
                 var elixir = CreateAsset<ElixirDefinition>($"{Dir}/Elixirs/Elixir_{e.id}.asset");
@@ -114,7 +85,7 @@ namespace EditorTools {
             Fill(cso.FindProperty("elixirs"), elixirs);
             Fill(cso.FindProperty("statAnvils"), new List<Object> { statAnvil });
             Fill(cso.FindProperty("itemAnvils"), new List<Object> { legendaryAnvil, prismaticAnvil });
-            Fill(cso.FindProperty("items"), items);
+            // items: LolItemsSetup
             Fill(cso.FindProperty("statChoices"), choices);
             cso.FindProperty("freeAnvil").objectReferenceValue = prismaticAnvil;
             cso.ApplyModifiedPropertiesWithoutUndo();

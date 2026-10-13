@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
+  m_Name: Item_WitsEnd
+  m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
+  displayName: Fin de l'esprit
+  icon: {fileID: 21300000, guid: 55de861fcace7eb839a7b23907dde698, type: 3}
+  cost: 280
+  tier: 0
+  stats:
+  - Stat: 6
+    Type: 1
+    Value: 0.5
+  - Stat: 15
+    Type: 0
+    Value: 45
+  - Stat: 16
+    Type: 0
+    Value: 0.2
+  unique: 1
+  uniqueGroup: 
+  passive: {fileID: 11400000, guid: 7e04b35cf175d08fd841fdcaa59bc577, type: 2}

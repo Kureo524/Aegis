@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 730d23eea89f8f0f3a1b883fea5a79c2, type: 3}
   m_Name: Elixir_Strength
   m_EditorClassIdentifier: Game.Features::Features.Economy.ElixirDefinition
-  displayName: "\xC9lixir de force"
+  displayName: "\xC9lixir de col\xE8re"
   icon: {fileID: 21300000, guid: 238eb7d057eae58a7b25c85aabf0b778, type: 3}
   cost: 40
   stats:
   - Stat: 4
     Type: 0
-    Value: 25
-  - Stat: 6
-    Type: 1
-    Value: 0.15
+    Value: 30
+  - Stat: 20
+    Type: 0
+    Value: 0.1
