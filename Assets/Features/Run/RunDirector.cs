@@ -48,7 +48,10 @@ namespace Features.Run {
         /// <summary>The wave may end: quota reached and no boss left.</summary>
         public bool WaveCleared => QuotaReached && !_bossAlive;
 
-        public RunDirector(StageDefinition stage, RunStateMachine machine, HordeSpawner spawner, IEventBus eventBus) {
+        private readonly Meta.RunModifiers _modifiers;
+
+        public RunDirector(StageDefinition stage, RunStateMachine machine, HordeSpawner spawner, IEventBus eventBus, Meta.RunModifiers modifiers) {
+            _modifiers = modifiers;
             _stage = stage;
             _machine = machine;
             _spawner = spawner;
@@ -56,7 +59,7 @@ namespace Features.Run {
         }
 
         public void Start() {
-            _lives = _stage.Lives;
+            _lives = _stage.Lives + (_modifiers?.ExtraLives ?? 0);   // + meta progression (§9.7)
             _machine.Changed += OnStateChanged;
             _subscriptions.Add(_eventBus.Subscribe<WaveEnemyKilledEvent>(_ => OnWaveKill()));
             _subscriptions.Add(_eventBus.Subscribe<EnemyKilledEvent>(e => {
