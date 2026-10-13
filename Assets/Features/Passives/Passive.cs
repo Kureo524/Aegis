@@ -20,6 +20,10 @@ namespace Features.Passives {
         private readonly List<(Stat stat, StatModifier modifier)> _modifiers = new();
         private readonly List<(Stat stat, StatModifier modifier)> _stackModifiers = new();
         private readonly List<(Stat stat, StatModifier modifier)> _nearbyModifiers = new();
+        private readonly List<(Stat stat, StatModifier modifier)> _conversionModifiers = new();
+        private readonly List<Character> _around = new();
+        private float _chargedUntil = -1f;
+        private float _nextAura;
         private readonly int[] _counters;
         private readonly float[] _readyAt;
         private readonly Collider[] _hits = new Collider[64];
@@ -31,6 +35,8 @@ namespace Features.Passives {
         public PassiveDefinition Definition { get; }
         public object Source { get; }
         public int Stacks { get; private set; }
+        /// <summary>Charged by a Charge effect and not used yet (Spellblade ready: UI).</summary>
+        public bool IsCharged => Time.time < _chargedUntil;
 
         /// <summary>A trigger dropped a loot (kind, where).</summary>
         public event Action<LootKind, Vector3> LootDropped;
@@ -54,12 +60,14 @@ namespace Features.Passives {
             events.Kill += OnKill;
             events.DamageTaken += OnDamageTaken;
             events.SpellHit += OnSpellHit;
+            _nextAura = Time.time + Mathf.Max(0.1f, Definition.Aura.Interval);
         }
 
         public void Detach() {
             RemoveAll(_modifiers);
             RemoveAll(_stackModifiers);
             RemoveAll(_nearbyModifiers);
+            RemoveAll(_conversionModifiers);
             foreach (Capability capability in Definition.Capabilities) _owner.Capabilities.Revoke(capability, this);
             CharacterEvents events = _owner.Events;
             events.BasicAttackHit -= OnBasicAttackHit;
@@ -74,10 +82,71 @@ namespace Features.Passives {
             if (Stacks > 0 && s.Reset == ResetPolicy.AfterDuration && Time.time - _lastStackTime >= s.Duration) ResetStacks();
 
             NearbyEnemiesBonus nearby = Definition.NearbyEnemies;
-            if (nearby.Radius > 0f && Time.time >= _nextNearby) {
-                _nextNearby = Time.time + NearbyInterval;
-                UpdateNearby(nearby);
+            bool slowTick = Time.time >= _nextNearby;
+            if (slowTick) _nextNearby = Time.time + NearbyInterval;
+            if (nearby.Radius > 0f && slowTick) UpdateNearby(nearby);
+            if (slowTick && Definition.Conversions.Length > 0) UpdateConversions();
+
+            AuraSettings aura = Definition.Aura;
+            if (aura.Radius > 0f && Time.time >= _nextAura) {
+                _nextAura = Time.time + Mathf.Max(0.1f, aura.Interval);
+                PulseAura(aura);
             }
+        }
+
+        // Sunfire-like aura: damage around the owner, optional heal per enemy hit
+        private void PulseAura(in AuraSettings aura) {
+            float raw = aura.Damage + aura.Ratio * _owner.Stats.Value(aura.ScalingStat);
+            int hit = 0;
+            foreach (Character enemy in EnemiesAround(_owner.transform.position, aura.Radius, null)) {
+                if (raw > 0f) enemy.TakeDamage(Hit(raw, aura.DamageType));
+                hit++;
+            }
+            if (hit > 0 && aura.HealPerEnemy > 0f) _owner.ReceiveHeal(aura.HealPerEnemy * hit, _owner);
+        }
+
+        private void UpdateConversions() {
+            RemoveAll(_conversionModifiers);
+            foreach (StatConversion c in Definition.Conversions) {
+                if (c.From == c.To) continue;
+                float from = c.BonusOnly ? _owner.BonusStat(c.From) : _owner.Stats.Value(c.From);
+                float value = Mathf.Max(0f, from) * c.Ratio;
+                Stat to = _owner.Stats.Get(c.To);
+                if (to == null || value == 0f) continue;
+                var modifier = new StatModifier(value, ModifierType.Flat, Source);
+                to.AddModifier(modifier);
+                _conversionModifiers.Add((to, modifier));
+            }
+        }
+
+        private DamageInfo Hit(float raw, DamageType type) {
+            StatController s = _owner.Stats;
+            return new DamageInfo(raw, type, false, false, _owner,
+                s.Value(StatType.ArmorPenFlat), s.Value(StatType.ArmorPenPercent),
+                s.Value(StatType.MagicPenFlat), s.Value(StatType.MagicPenPercent));
+        }
+
+        // Base + stat ratio + shares of the target's HP (BotRK, Liandry…)
+        private float RawDamage(in PassiveTrigger t, Character target) {
+            float raw = t.Damage + t.DamageRatio * _owner.Stats.Value(t.ScalingStat);
+            if (target != null && target.Health != null)
+                raw += t.TargetMaxHealthRatio * target.Health.Max + t.TargetCurrentHealthRatio * target.Health.Current;
+            return raw;
+        }
+
+        // Living enemies of the owner within radius of center, nearest first, except one
+        private List<Character> EnemiesAround(Vector3 center, float radius, Character except) {
+            _around.Clear();
+            int count = Physics.OverlapSphereNonAlloc(center, radius + 1f, _hits);
+            for (int i = 0; i < count; i++) {
+                Character c = _hits[i].GetComponentInParent<Character>();
+                if (c == null || c == except || !c.IsAlive || !_owner.IsHostileTo(c) || _around.Contains(c)) continue;
+                Vector3 d = c.transform.position - center;
+                d.y = 0f;
+                if (d.magnitude - c.BodyRadius <= radius) _around.Add(c);
+            }
+            _around.Sort((a, b) => (a.transform.position - center).sqrMagnitude.CompareTo((b.transform.position - center).sqrMagnitude));
+            return _around;
         }
 
         /// <summary>End of a wave: EndOfWave stacks fall off.</summary>
@@ -100,7 +169,7 @@ namespace Features.Passives {
             Fire(PassiveEvent.Kill, victim);
         }
 
-        private void OnDamageTaken(float damage) => Fire(PassiveEvent.DamageTaken, null);
+        private void OnDamageTaken(float damage, Character attacker) => Fire(PassiveEvent.DamageTaken, attacker);
 
         private void OnSpellHit(Character target, float damage) {
             if (Definition.Stacks.Source == StackSource.PerSpellHit) AddStack();
@@ -114,10 +183,12 @@ namespace Features.Passives {
                 if (t.On != happened) continue;
                 if (t.HealthBelow > 0f && (_owner.Health == null || _owner.Health.Ratio > t.HealthBelow)) continue;
                 if (Time.time < _readyAt[i]) continue;
+                if (t.ConsumesCharge && Time.time >= _chargedUntil) continue;
                 if (++_counters[i] < Mathf.Max(1, t.EveryN)) continue;
                 _counters[i] = 0;
                 if (UnityEngine.Random.value > t.Chance) continue;
                 if (t.Cooldown > 0f) _readyAt[i] = Time.time + t.Cooldown;
+                if (t.ConsumesCharge) _chargedUntil = -1f;
                 Apply(t, target);
             }
         }
@@ -133,11 +204,27 @@ namespace Features.Passives {
                     break;
                 case PassiveEffectKind.BonusDamage:
                     if (target == null || !target.IsAlive) break;
-                    float raw = t.Damage + t.DamageRatio * _owner.Stats.Value(t.ScalingStat);
-                    StatController s = _owner.Stats;
-                    target.TakeDamage(new DamageInfo(raw, t.DamageType, false, false, _owner,
-                        s.Value(StatType.ArmorPenFlat), s.Value(StatType.ArmorPenPercent),
-                        s.Value(StatType.MagicPenFlat), s.Value(StatType.MagicPenPercent)));
+                    target.TakeDamage(Hit(RawDamage(t, target), t.DamageType));
+                    break;
+                case PassiveEffectKind.Bolts: {
+                    Vector3 center = target != null ? target.transform.position : _owner.transform.position;
+                    int fired = 0;
+                    foreach (Character enemy in EnemiesAround(center, t.Radius, target).ToArray()) {
+                        if (fired++ >= Mathf.Max(1, t.Count)) break;
+                        _owner.FireBolt(enemy, Hit(RawDamage(t, enemy), t.DamageType), t.BoltColor.a > 0f ? t.BoltColor : Color.white);
+                    }
+                    break;
+                }
+                case PassiveEffectKind.Splash:
+                    if (target == null) break;
+                    foreach (Character enemy in EnemiesAround(target.transform.position, t.Radius, target).ToArray())
+                        enemy.TakeDamage(Hit(RawDamage(t, enemy), t.DamageType));
+                    break;
+                case PassiveEffectKind.ReduceCooldowns:
+                    _owner.Events.RaiseCooldownRefund(t.Amount);
+                    break;
+                case PassiveEffectKind.Charge:
+                    _chargedUntil = Time.time + t.Duration;
                     break;
                 case PassiveEffectKind.DropLoot:
                     LootDropped?.Invoke(t.Loot, target != null ? target.transform.position : _owner.transform.position);
