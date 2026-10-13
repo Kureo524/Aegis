@@ -25,6 +25,7 @@ namespace Containers {
         [SerializeField] private ExperienceCurve experienceCurve;
         [SerializeField] private ControlsSettings controlsSettings;
         [SerializeField] private SpellSettings spellSettings;
+        [SerializeField] private Features.UI.UiTheme uiTheme;
 
         protected override void Configure(IContainerBuilder builder) {
             // Infrastructure
@@ -38,6 +39,7 @@ namespace Containers {
             builder.RegisterInstance(experienceCurve);
             builder.RegisterInstance(controlsSettings);
             builder.RegisterInstance(spellSettings);
+            builder.RegisterInstance(uiTheme);
             builder.Register<UserOptions>(Lifetime.Singleton);   // player's choices (JSON) over the defaults
 
             // Game flow

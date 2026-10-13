@@ -46,7 +46,7 @@ namespace EditorTools {
         public const string FlashPath = "Assets/Data/Spells/Signature/Spell_Flash.asset";
         private const string FlashIconPath = "Assets/GraphicAssets/Sprites/Spells/Spell_Flash.png";
         private const string VContainerSettingsPath = SettingsDir + "/VContainerSettings.asset";
-        private const string RootPrefabPath = "Assets/Prefabs/RootLifetimeScope.prefab";
+        internal const string RootPrefabPath = "Assets/Prefabs/RootLifetimeScope.prefab";
         internal const string ExperienceCurvePath = "Assets/Data/Progression/ExperienceCurve.asset";
         private const string TestHeroDir = "Assets/Data/Characters/TestHero";
         public const string TestHeroPath = TestHeroDir + "/Char_TestHero.asset";
@@ -96,6 +96,7 @@ namespace EditorTools {
             EnemyContentSetup.Run(enemyPrefab);   // phase 9c: wolf, skeleton mage, goblin shaman, stone golem
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
+            UiSetup.Run();               // LoL-style UI: theme on the PanelSettings, stat icons
             SetBuildScenes();
             MigrateMenuScene();
             MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings, stage, shopCatalog, augmentCatalog, lootSettings);
