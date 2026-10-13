@@ -793,6 +793,14 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 - **`RunSnapshot`** : état complet de la run (niveau, XP, rangs des sorts, stacks de passifs, items, augments, gold, vies, vague en cours) sérialisé en JSON, pris **au début de chaque vague**. Quitter une vague puis reprendre recharge ce snapshot. Tout état de jeu doit donc être sérialisable.
 - **Solo uniquement**, un seul personnage modulable au prototype.
 
+**Implémentation (phase 11)** :
+- `MetaSettings` (SO, scope racine) : nom de la monnaie (**éclats**), gain = `perWaveOnWin × vagues + winBonus` sur un full clear (6 × vagues + 40), `perWaveOnDefeat` = 0 (une défaite ne paie rien, conforme à la règle ci-dessus), liste des arbres.
+- `MetaTreeDefinition` (champion + nœuds) et `MetaNodeDefinition` (nom, icône, coût par niveau — sa longueur = niveau max —, prérequis au niveau 1, effets × niveau, position colonne/ligne dans l'écran). `MetaEffect` : `Stat` (stat, type, valeur), `StartingGold`, `AugmentRerolls`, `ExtraLives`, `StartingAugment` (niveau 1 Argent, 2 Or, 3 Prismatique).
+- `MetaProgress` (service racine) : monnaie et niveaux, `TryBuy` / `RefusalReason`, sauvegarde JSON (`meta.json` dans `persistentDataPath`, `meta.editor.json` dans l'éditeur ; les tests PlayMode la mettent de côté), gain sur `RunEndedEvent` → `MetaRewardEvent` (affiché sur l'écran de fin).
+- `RunModifiers` (scope de jeu) lit l'arbre du champion au début de la run : vies en plus (`RunDirector`), puis `MetaApplier` au `PlayerSpawnedEvent` : modificateurs de stats (Source = le nœud), or de départ, relances d'augment, augment de départ.
+- Écran **Progression** du menu (`MetaPanel`) : nœuds par colonnes reliés à leurs prérequis (doré si acquis), niveau, bouton « Améliorer · coût », infobulle (effet actuel / suivant / raison du refus).
+- Arbre d'Ezreal (`MetaSetup`, valeurs provisoires) : Entraînement (+3 AD/niv.), Endurance (+40 PV), Bourse (+60 or) → Précision (+3 % crit), Concentration (+4 haste), Cuirasse (+4 armure/RM), Second regard (+1 relance) → Flux de mana, Vigueur, Faveur (augment de départ) → Maîtrise (+4 % AD), Pas léger (+3 % vitesse), Héritage (+1 vie).
+
 ### 9.8 Technique & perf
 - **Object Pooling** : `UnityEngine.Pool.ObjectPool<T>` (intégré), via `PrefabPool` (`Systems.Pooling`, service du `GameLifetimeScope` : un pool par prefab, instances créées par le conteneur). Utilisé par les projectiles et les VFX de sorts.
 - **Caméra** : `CameraController` maison, verrouillée / libre façon LoL (§4.8). Cinemachine reste une option si le besoin grossit.
@@ -856,7 +864,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **8** ✅ | `CharacterEvents`, passifs (briques génériques : stats, triggers, stacks, ennemis proches), capacités (`SpellCrit`), augments (4 → 6 slots, relances, relance dorée, slots pleins), passifs d'items, loot (enclume à stats, sorts d'invocateur) | Builds variés |
 | **9** 🟡 | Boss à patterns et items ✅ (9a). Statuts (stun, root, silence, ralentissement, saignement, brûlure, ténacité), soins et boucliers, statuts sur les sorts, +14 items, +7 augments ✅ (9b). 4 nouveaux ennemis (loup, mage squelette, chaman gobelin, golem de pierre) ✅ (9c). *Reste : nouveaux éléments et sorts (avec un deuxième personnage), équilibrage.* | Prototype riche |
 | **10** 🟡 | **Refonte LoL** : sorts par champion (Q W E R à rangs, D F), Ezreal, touches par position, dézoom de la caméra ✅. Objets de LoL (65, passif propre, force adaptative sur les prismatiques, groupes uniques) ✅. Rééquilibrage (bot `BalanceSimulation`) ✅. UI façon LoL ✅ (§7.9). *Reste : boutique complète plus tôt dans le calendrier des récompenses (à valider), boss encore dur.* | Ezreal jouable |
-| **11** | Méta-progression (arbres par personnage, monnaie persistante), `RunSnapshot` (quitter/reprendre), polish, UI, audio | Prototype solide |
+| **11** 🟡 | Méta-progression : monnaie persistante, arbre d'Ezreal, écran Progression, bonus appliqués en début de run ✅ (§9.7). *Reste : `RunSnapshot` (quitter/reprendre), polish, audio.* | Prototype solide |
 
 ---
 
