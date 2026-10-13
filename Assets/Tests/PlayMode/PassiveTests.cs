@@ -58,21 +58,20 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator HeroPassive_EveryThirdBasicAttack_AddsMagicDamage() {
+        public IEnumerator EzrealPassive_SpellHitsStackAttackSpeed() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Assert.IsNotNull(Player.Definition.Passive, "the test hero has a passive");
+            Assert.IsNotNull(Player.Definition.Passive, "Ezreal has his passive");
+            Passive passive = null;
+            foreach (Passive p in Player.Passives.All) if (p.Definition == Player.Definition.Passive) passive = p;
+            Assert.IsNotNull(passive);
+            float speed = Player.Stats.Value(StatType.AttackSpeed);
             Character dummy = Dummy();
-            int magic = 0;
-            System.Action<Character, float, DamageInfo> onDamage = (t, d, info) => { if (!info.IsBasicAttack && info.Type == DamageType.Magic) magic++; };
-            Player.Events.DamageDealt += onDamage;
-            var attacker = Player.GetComponent<BasicAttacker>();
-            Time.timeScale = 4f;
-            attacker.Attack(dummy);
-            yield return Hits(attacker, 2);
-            Assert.AreEqual(0, magic, "not on the first two");
-            yield return Hits(attacker, 1);
-            Assert.AreEqual(1, magic, "on the third");
-            Player.Events.DamageDealt -= onDamage;
+            SpellDefinition q = Player.Definition.Abilities[0];
+            Game.Resolve<SpellExecutor>().Execute(Player, q, Ctx(dummy), 1);
+            float end = Time.time + 2f;
+            while (passive.Stacks == 0 && Time.time < end) yield return null;
+            Assert.AreEqual(1, passive.Stacks, "one stack per spell hit");
+            Assert.Greater(Player.Stats.Value(StatType.AttackSpeed), speed * 1.05f, "+10 % attack speed");
         }
 
         [UnityTest]
@@ -97,19 +96,19 @@ namespace Game.Tests.PlayMode {
             yield return GameFlowSmokeTests.LoadGameScene();
             Player.Stats.Get(StatType.CritChance).AddModifier(new StatModifier(1f, ModifierType.Flat, "test"));
             var executor = Game.Resolve<SpellExecutor>();
-            SpellDefinition fireball = Player.GetComponent<ElementCaster>().Resolver.Resolve(new ElementSelectionKeyHelper().FireOnce);
+            SpellDefinition fireball = Player.Definition.Abilities[0];   // Ezreal Q
             Character dummy = Dummy();
 
             bool crit = false;
             using (Bus.Subscribe<DamageDealtEvent>(e => crit |= e.IsCrit && !e.TargetIsPlayer)) {
-                executor.Execute(Player, fireball, Ctx(dummy), 0);
+                executor.Execute(Player, fireball, Ctx(dummy), 1);
                 yield return new WaitForSeconds(1f);
             }
             Assert.IsFalse(crit, "no crit without the capability, even at 100 % crit chance");
 
             Player.Passives.Add(Augment("Augment_JeweledGauntlet"), "test");
             using (Bus.Subscribe<DamageDealtEvent>(e => crit |= e.IsCrit && !e.TargetIsPlayer)) {
-                executor.Execute(Player, fireball, Ctx(dummy), 0);
+                executor.Execute(Player, fireball, Ctx(dummy), 1);
                 yield return new WaitForSeconds(1f);
             }
             Assert.IsTrue(crit, "SpellCrit: the spell crits");
@@ -122,15 +121,15 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator SummonerSpellLoot_PickedOnContact_OnlyOneAtATime() {
+        public IEnumerator SummonerSpellLoot_PickedOnContact_FillsD_OnlyOneAtATime() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            var signature = Player.GetComponent<SignatureAbility>();
-            SpellDefinition flash = signature.Spell;
+            var abilities = Player.GetComponent<AbilityCaster>();
+            Assert.IsNull(abilities.Spell(AbilitySlots.SummonerD), "D starts empty");
             Bus.Publish(new LootDropRequestedEvent(LootKind.SummonerSpell, Player.transform.position));
             yield return null;
             yield return null;
-            Assert.IsTrue(signature.HoldsConsumable, "picked up on contact");
-            Assert.AreNotSame(flash, signature.Spell);
+            Assert.IsTrue(abilities.HoldsConsumable, "picked up on contact");
+            Assert.IsNotNull(abilities.Spell(AbilitySlots.SummonerD));
 
             Bus.Publish(new LootDropRequestedEvent(LootKind.SummonerSpell, Player.transform.position));
             yield return null;
@@ -139,21 +138,20 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator SummonerSpell_UsedOnce_ThenFIsTheSignatureAgain() {
+        public IEnumerator SummonerSpell_UsedOnce_ThenDIsEmptyAgain_FlashUntouched() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            var signature = Player.GetComponent<SignatureAbility>();
-            SpellDefinition flash = signature.Spell;
+            var abilities = Player.GetComponent<AbilityCaster>();
             SpellDefinition ghost = System.Array.Find(Game.Resolve<Features.Loot.LootSettings>().SummonerSpells, s => s.Targeting == TargetingType.Self);
             Assert.IsNotNull(ghost, "a Self summoner spell (Ghost) in the loot settings");
             float speed = Player.Stats.Value(StatType.MoveSpeed);
 
-            Assert.IsTrue(signature.PickUp(ghost));
-            Assert.IsTrue(signature.TryUse());   // Self: cast at once
+            Assert.IsTrue(abilities.PickUp(ghost));
+            Assert.IsTrue(abilities.TryCast(AbilitySlots.SummonerD));   // Self: cast at once
             yield return null;
             Assert.Greater(Player.Stats.Value(StatType.MoveSpeed), speed, "Ghost: faster");
-            Assert.IsFalse(signature.HoldsConsumable, "used up");
-            Assert.AreSame(flash, signature.Spell, "F is Flash again");
-            Assert.AreEqual(0f, signature.CooldownRemaining, "Flash's own cooldown untouched");
+            Assert.IsFalse(abilities.HoldsConsumable, "used up");
+            Assert.IsNull(abilities.Spell(AbilitySlots.SummonerD), "D is empty again");
+            Assert.AreEqual(0f, abilities.CooldownRemaining(AbilitySlots.SummonerF), "Flash untouched");
         }
 
         [UnityTest]
@@ -176,17 +174,6 @@ namespace Game.Tests.PlayMode {
             Assert.IsInstanceOf<StatChoiceDefinition>(shop.AnvilChoices[0]);
             shop.Choose(0);
             Assert.AreEqual(AugmentDraftPhase.Choose, Game.Resolve<AugmentController>().Phase, "then the scheduled augment");
-        }
-    }
-
-    /// <summary>Fireball's selection key (Fire × 1) without depending on the resolver's internals.</summary>
-    internal sealed class ElementSelectionKeyHelper {
-        public int FireOnce {
-            get {
-                var selection = new ElementSelection(3, 3);
-                selection.Add(0);
-                return selection.Key;
-            }
         }
     }
 }

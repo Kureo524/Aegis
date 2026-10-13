@@ -38,9 +38,12 @@ namespace Game.Tests.PlayMode {
 
         private static float Dist(Character c) => (c.transform.position - Player.transform.position).sqrMagnitude;
 
-        private static SpellDefinition Spell(string displayName) {
-            SpellDefinition spell = Player.Definition.SpellBook.Spells.FirstOrDefault(s => s.DisplayName == displayName);
-            Assert.IsNotNull(spell, displayName);
+        // A spell built for the test (private serialized fields set by reflection)
+        private static SpellDefinition TestSpell(params (string field, object value)[] fields) {
+            var spell = ScriptableObject.CreateInstance<SpellDefinition>();
+            foreach ((string field, object value) in fields)
+                typeof(SpellDefinition).GetField(field, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+                                       .SetValue(spell, value);
             return spell;
         }
 
@@ -74,7 +77,7 @@ namespace Game.Tests.PlayMode {
             yield return new WaitForSeconds(0.8f);
             Assert.AreEqual(0, hits, "no attack while stunned");
             Assert.Less(Flat(start, Player.transform.position), 0.05f, "no move while stunned");
-            Assert.IsFalse(Player.GetComponent<SpellCaster>().Cast(Spell("Boule de feu"), Ctx(Dummy()), 0), "no spell while stunned");
+            Assert.IsFalse(Player.GetComponent<SpellCaster>().Cast(Player.Definition.Abilities[0], Ctx(Dummy()), 1), "no spell while stunned");
 
             float end = Time.time + 5f;
             while (hits == 0 && Time.time < end) yield return null;
@@ -98,12 +101,14 @@ namespace Game.Tests.PlayMode {
         public IEnumerator Spell_AppliesItsStatuses_ToWhatItHits() {
             yield return GameFlowSmokeTests.LoadGameScene();
             Character dummy = Dummy();
-            SpellDefinition thunder = Spell("Foudre");   // unit target, stuns
+            SpellDefinition thunder = TestSpell(("targeting", TargetingType.UnitTarget), ("range", 20f), ("projectileSpeed", 40f),
+                                                ("baseDamage", new[] { 50f }),
+                                                ("statuses", new[] { new StatusApplication { Kind = StatusKind.Stun, Duration = 0.8f } }));
             Assert.IsTrue(thunder.Statuses.Any(s => s.Kind == StatusKind.Stun));
             Game.Resolve<SpellExecutor>().Execute(Player, thunder, Ctx(dummy), 0);
             float end = Time.time + 2f;
             while (!dummy.Status.IsStunned && Time.time < end) yield return null;
-            Assert.IsTrue(dummy.Status.IsStunned, "Foudre stuns its target");
+            Assert.IsTrue(dummy.Status.IsStunned, "the spell stuns its target");
         }
 
         [UnityTest]
@@ -124,7 +129,8 @@ namespace Game.Tests.PlayMode {
         [UnityTest]
         public IEnumerator BuffSpell_GivesASelfShield_ShownWithTheHp() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            SpellDefinition overcharge = Spell("Surcharge");
+            SpellDefinition overcharge = TestSpell(("targeting", TargetingType.Self), ("kind", SpellKind.Buff),
+                                                   ("selfSustain", new SelfSustain { Shield = 80f, PowerRatio = 0.3f, ShieldDuration = 4f }));
             Assert.Greater(overcharge.SelfSustain.Shield, 0f);
             Game.Resolve<SpellExecutor>().Execute(Player, overcharge, Ctx(Dummy()), 0);
             Assert.Greater(Player.Health.Shield, overcharge.SelfSustain.Shield - 1f, "shield + power ratio");
