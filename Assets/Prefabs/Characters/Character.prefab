@@ -299,6 +299,8 @@ MonoBehaviour:
   burnTint: {r: 1, g: 0.6, b: 0.35, a: 1}
   bleedTint: {r: 1, g: 0.5, b: 0.5, a: 1}
   stunShake: 4
+  hitTint: {r: 1, g: 0.45, b: 0.45, a: 1}
+  hitDuration: 0.12
 --- !u!1 &6333415215501701613
 GameObject:
   m_ObjectHideFlags: 0
