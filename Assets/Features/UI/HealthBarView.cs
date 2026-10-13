@@ -8,7 +8,8 @@ namespace Features.UI {
     /// World-space HP bar above a character: two sprites (background + fill) facing the camera.
     /// Sprites rather than UI so hundreds of them stay cheap. Same-prefab component: listens to its
     /// character's C# events directly. A shield shows as a white part after the HP (LoL style);
-    /// the strongest status (§5.7, StatusKind order) shows as an icon left of the bar.
+    /// the strongest status (§5.7, StatusKind order) shows as an icon left of the bar, else the icon
+    /// of the spell whose mark the character carries (Ezreal W).
     /// </summary>
     public class HealthBarView : MonoBehaviour {
         [SerializeField] private SpriteRenderer background;
@@ -27,6 +28,7 @@ namespace Features.UI {
         private Transform _camera;
         private Character _character;
         private SpriteRenderer _shield;
+        private const float StatusIconSize = 0.28f;
 
         [Inject]
         public void Construct(Camera mainCamera) {
@@ -74,8 +76,12 @@ namespace Features.UI {
                 };
                 if (active) icon = statusSprites[i];
             }
+            float size = StatusIconSize;
+            if (icon == null && status.MarkSpell != null) icon = status.MarkSpell.Icon;
             statusIcon.sprite = icon;
             statusIcon.enabled = icon != null;
+            // Every icon at the same size on screen, whatever its resolution
+            if (icon != null) statusIcon.transform.localScale = Vector3.one * (size / Mathf.Max(0.01f, icon.bounds.size.x));
         }
 
         private void OnHealthChanged(float current, float max) => Refresh();
