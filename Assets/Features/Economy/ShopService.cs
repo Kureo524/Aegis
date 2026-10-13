@@ -94,6 +94,7 @@ namespace Features.Economy {
                     if (ItemBought) return "Un item par boutique";
                     if (_inventory.IsFull) return "Inventaire plein";
                     if (item.Unique && _inventory.Contains(item)) return "Déjà possédé";
+                    if (_inventory.GroupOwner(item) != null) return $"Un seul objet « {item.UniqueGroup} »";
                     return Afford(item.Cost);
                 case AnvilDefinition anvil when anvil.Kind == AnvilKind.Item:
                     if (!IsFull) return "Indisponible";

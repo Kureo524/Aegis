@@ -28,7 +28,15 @@ namespace Features.Economy {
 
         public bool Contains(ItemDefinition item) => _items.Contains(item);
 
-        public bool CanAdd(ItemDefinition item) => item != null && !IsFull && !(item.Unique && Contains(item));
+        public bool CanAdd(ItemDefinition item) => item != null && !IsFull && !(item.Unique && Contains(item)) && GroupOwner(item) == null;
+
+        /// <summary>The owned item that shares <paramref name="item"/>'s unique group (null: none).</summary>
+        public ItemDefinition GroupOwner(ItemDefinition item) {
+            if (item == null || string.IsNullOrEmpty(item.UniqueGroup)) return null;
+            foreach (ItemDefinition owned in _items)
+                if (owned.UniqueGroup == item.UniqueGroup) return owned;
+            return null;
+        }
 
         public bool TryAdd(ItemDefinition item) {
             if (!CanAdd(item)) return false;
