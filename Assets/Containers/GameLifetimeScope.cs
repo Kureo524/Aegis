@@ -83,6 +83,9 @@ namespace Containers {
             if (runEndPanel != null) builder.RegisterComponent(runEndPanel);
             builder.RegisterInstance(stage);
             builder.RegisterComponent(runStateMachine);
+            // Meta progression of the run's champion (§9.7)
+            builder.Register(r => new Features.Meta.RunModifiers(r.Resolve<Features.Meta.MetaProgress>(), playerDefinition), Lifetime.Singleton);
+            builder.RegisterEntryPoint<Features.Meta.MetaApplier>();
             builder.RegisterEntryPoint<RunDirector>().AsSelf();
             builder.RegisterEntryPoint<RewardController>().AsSelf();
             builder.RegisterInstance(shopCatalog);

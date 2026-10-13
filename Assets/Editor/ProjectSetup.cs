@@ -100,6 +100,7 @@ namespace EditorTools {
             UiSetup.Run();               // LoL-style UI: theme on the PanelSettings, stat icons
             SetBuildScenes();
             MigrateMenuScene();
+            MetaSetup.Run(RootPrefabPath, MenuScenePath);   // meta progression: settings, Ezreal's tree, Progression screen
             MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings, stage, shopCatalog, augmentCatalog, lootSettings);
 
             AssetDatabase.SaveAssets();

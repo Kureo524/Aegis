@@ -89,6 +89,21 @@ namespace Features.Augments {
             PublishDraft();
         }
 
+        /// <summary>More rerolls for the run (meta progression, §9.7).</summary>
+        public void AddRerolls(int count) {
+            RerollsLeft += count;
+            PublishDraft();
+        }
+
+        /// <summary>A random augment of <paramref name="rarity"/>, outside any draft (meta starting augment, §9.7).</summary>
+        public AugmentDefinition GrantRandom(RarityTier rarity) {
+            AugmentDefinition pick = PickAugment(rarity);
+            if (pick == null || _owned.Count >= Slots) return null;
+            Add(pick);
+            _eventBus.Publish(new GameplayFeedbackEvent($"Augment de départ : {pick.DisplayName}"));
+            return pick;
+        }
+
         public void Pick(int index) {
             if (_phase != AugmentDraftPhase.Choose || index < 0 || index >= _choices.Count) return;
             AugmentDefinition chosen = _choices[index];

@@ -20,7 +20,7 @@ namespace Features.UI.Panels {
         private IPanelManager _panelManager;
         private IDisposable _stateSubscription;
 
-        private Button _play, _settings, _quit;
+        private Button _play, _settings, _quit, _progression;
         private VisualElement _visualElement;
 
         [Inject]
@@ -36,6 +36,8 @@ namespace Features.UI.Panels {
 
             _play     = _visualElement.Q<Button>("PlayButton");
             _settings = _visualElement.Q<Button>("SettingsButton");
+            _progression = _visualElement.Q<Button>("ProgressionButton");
+            if (_progression != null) _progression.clicked += OnProgression;
             _quit     = _visualElement.Q<Button>("QuitButton");
 
             _play.clicked     += OnPlay;
@@ -47,6 +49,7 @@ namespace Features.UI.Panels {
             if (_play == null) return;
             _play.clicked     -= OnPlay;
             _settings.clicked -= OnSettings;
+            if (_progression != null) _progression.clicked -= OnProgression;
             _quit.clicked     -= OnQuit;
         }
 
@@ -86,6 +89,7 @@ namespace Features.UI.Panels {
         }
 
         private void OnSettings() => _eventBus.Publish(new OptionsRequestedEvent());
+        private void OnProgression() => _eventBus.Publish(new MetaTreeRequestedEvent());
 
         private void OnQuit() => _eventBus.Publish(new QuitRequestedEvent());
 
