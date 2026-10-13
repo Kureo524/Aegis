@@ -494,6 +494,7 @@ Stats : 600 PV (+102), 375 mana (+70), 62 AD (+2,5), 0,625 AS (+2,5 %), portée 
 - **Infobulles partout** (`UiTooltip`) : sorts (rang, coût et délai du rang, description), passif, stats, augments, objets (stats + passif), buffs.
 - **Boutique** (`ShopPanel`) : filtres par stat à gauche (Attaque, Critique, Vitesse d'attaque, Puissance magique, Mana, Santé, Armure, Résistance magique, Accélération, Bottes, Élixirs et enclumes), **grille d'icônes avec juste le prix** (grisée si refusé, prix rouge si trop cher), **fiche de l'objet sélectionné** à droite (stats, passif, groupe unique, raison du refus, Acheter), inventaire et Continuer en bas. Clic = sélection, **double-clic ou clic droit = achat** (comme LoL).
 - Enclumes et augments : cartes du thème, bordure à la couleur de la rareté, survol qui soulève la carte. HUD du haut et barre de boss au thème.
+- **Polish (13/10/2026)** : recharge des sorts en **balayage circulaire** façon LoL (`CooldownSweep`, Painter2D) et **flash** de la case quand le sort redevient prêt ; **flash rouge et écrasement** du sprite à chaque coup subi (`CharacterVisual.PlayHit`) ; **anneau doré** à la montée de niveau ; **bannières de vague** en fondu zoomé (serif dorée) ; **écran d'augments façon Arena** (pas de fenêtre, trois grandes cartes 290 × 400 sur fond de la rareté, survol qui les soulève) ; **menu principal** en français au thème (titre AEGIS / La Horde, fond nocturne pixel-art avec les yeux de la horde à l'horizon).
 
 ## 8. CharacterDefinition (le "preset" de perso)
 
