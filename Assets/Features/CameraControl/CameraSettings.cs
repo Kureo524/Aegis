@@ -18,7 +18,7 @@ namespace Features.CameraControl {
 
         [Header("Zoom")]
         [SerializeField] private float minZoom = 5f;
-        [SerializeField] private float maxZoom = 20f;
+        [SerializeField] private float maxZoom = 32f;
         [SerializeField] private float zoomSpeed = 10f;
 
         public Vector3 Offset => offset;
