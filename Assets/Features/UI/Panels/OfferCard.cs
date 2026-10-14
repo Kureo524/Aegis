@@ -4,45 +4,70 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Features.UI.Panels {
-    /// <summary>A card of the shop / anvil screens: icon, name, stat lines, action button and a short note.</summary>
+    /// <summary>
+    /// A card of the anvil / augment screens: icon, name, stat lines and a short note. The whole
+    /// card is the button that picks it; actions on the card (rerolls) go right below it, in the
+    /// column made by <see cref="Column"/>.
+    /// </summary>
     public static class OfferCard {
         public const float Width = 190f;
 
         public static VisualElement Build(Sprite icon, string title, Color titleColor, string body,
-                                          string button, Action onClick, bool enabled, string note = null) {
+                                          Action onClick, bool enabled, string note = null) {
             var card = new VisualElement();
             card.AddToClassList("ae-card");
+            card.EnableInClassList("ae-card--clickable", enabled && onClick != null);
+            card.EnableInClassList("ae-card--disabled", !enabled);
             card.style.borderTopColor = card.style.borderLeftColor = titleColor;   // rarity / tier color
+            if (enabled && onClick != null)
+                card.RegisterCallback<ClickEvent>(e => {
+                    if (e.button == 0) onClick();
+                });
 
-            var image = new VisualElement();
+            var image = new VisualElement { pickingMode = PickingMode.Ignore };
             image.AddToClassList("ae-card__icon");
             if (icon != null) image.style.backgroundImage = new StyleBackground(icon);
             else image.style.display = DisplayStyle.None;
             card.Add(image);
 
-            var name = new Label(title);
+            var name = new Label(title) { pickingMode = PickingMode.Ignore };
             name.AddToClassList("ae-card__name");
             name.style.color = titleColor;
             card.Add(name);
 
-            var lines = new Label(body);
+            var lines = new Label(body) { pickingMode = PickingMode.Ignore };
             lines.AddToClassList("ae-card__body");
             card.Add(lines);
 
-            Button action = MenuStyles.Button(button, onClick);
-            action.AddToClassList("ae-button--primary");
-            action.style.height = 32;
-            action.style.fontSize = 13;
-            action.style.alignSelf = Align.Stretch;
-            action.SetEnabled(enabled);
-            card.Add(action);
-
             if (!string.IsNullOrEmpty(note)) {
-                var n = new Label(note);
+                var n = new Label(note) { pickingMode = PickingMode.Ignore };
                 n.AddToClassList("ae-card__note");
                 card.Add(n);
             }
             return card;
+        }
+
+        /// <summary>The card and, under it, its own buttons (rerolls).</summary>
+        public static VisualElement Column(VisualElement card, params Button[] below) {
+            var column = new VisualElement();
+            column.AddToClassList("ae-card-column");
+            column.Add(card);
+            foreach (Button button in below) {
+                if (button == null) continue;
+                button.AddToClassList("ae-card-column__button");
+                button.style.marginLeft = button.style.marginRight = 0;
+                column.Add(button);
+            }
+            return column;
+        }
+
+        /// <summary>A small button for the column under a card.</summary>
+        public static Button SmallButton(string text, Action onClick, bool enabled = true) {
+            Button button = MenuStyles.Button(text, onClick);
+            button.style.height = 30;
+            button.style.fontSize = 13;
+            button.SetEnabled(enabled);
+            return button;
         }
 
         /// <summary>Name, color, icon and stat lines of any offer or anvil choice.</summary>

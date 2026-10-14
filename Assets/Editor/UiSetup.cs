@@ -43,6 +43,7 @@ namespace EditorTools {
                 }
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
+            ShopIcons(theme);
 
             GameObject root = PrefabUtility.LoadPrefabContents(ProjectSetup.RootPrefabPath);
             var scopeSo = new SerializedObject(root.GetComponent<RootLifetimeScope>());
@@ -59,6 +60,37 @@ namespace EditorTools {
                 panel.themeStyleSheet = tss;
                 EditorUtility.SetDirty(panel);
             }
+        }
+
+        private const string RolesDir = "Assets/GraphicAssets/Sprites/UI/Roles";
+        private static readonly StatType[] OtherStats = { StatType.MaxHealth, StatType.MaxMana };
+        private static readonly (Features.Economy.ItemRole role, string file)[] Roles = {
+            (Features.Economy.ItemRole.None, "All"), (Features.Economy.ItemRole.Marksman, "Marksman"), (Features.Economy.ItemRole.Mage, "Mage"),
+            (Features.Economy.ItemRole.Fighter, "Fighter"), (Features.Economy.ItemRole.Assassin, "Assassin"), (Features.Economy.ItemRole.Tank, "Tank"),
+        };
+
+        // Shop category and filter icons (rewritten on every run)
+        private static void ShopIcons(UiTheme theme) {
+            foreach (string png in Directory.GetFiles(RolesDir, "*.png")) EconomySetup.ConfigureIcon(png.Replace('\\', '/'));
+            EconomySetup.ConfigureIcon($"{IconsDir}/Stat_None.png");
+            var so = new SerializedObject(theme);
+            SerializedProperty other = so.FindProperty("otherStats");
+            other.arraySize = OtherStats.Length;
+            for (int i = 0; i < OtherStats.Length; i++) {
+                SerializedProperty e = other.GetArrayElementAtIndex(i);
+                e.FindPropertyRelative("Stat").enumValueIndex = (int)OtherStats[i];
+                e.FindPropertyRelative("Icon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>($"{IconsDir}/Stat_{OtherStats[i]}.png");
+            }
+            SerializedProperty roles = so.FindProperty("roles");
+            roles.arraySize = Roles.Length;
+            for (int i = 0; i < Roles.Length; i++) {
+                SerializedProperty e = roles.GetArrayElementAtIndex(i);
+                e.FindPropertyRelative("Role").intValue = (int)Roles[i].role;
+                e.FindPropertyRelative("Icon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>($"{RolesDir}/Role_{Roles[i].file}.png");
+            }
+            so.FindProperty("recommendedIcon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>($"{RolesDir}/Role_Recommended.png");
+            so.FindProperty("noFilterIcon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>($"{IconsDir}/Stat_None.png");
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
     }
 }

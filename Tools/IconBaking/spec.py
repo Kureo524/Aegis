@@ -93,6 +93,12 @@ ST = {
  'MaxHealth': ((120, 230, 140), 'heart-plus', 'heart'), 'MaxMana': ((120, 170, 255), 'crystal-ball', 'water-drop'),
 }
 for k, (col, *c) in ST.items(): B(f'UI/Stats/Stat_{k}', col, *c)
+B('UI/Stats/Stat_None', (200, 190, 170), 'cancel')
+# ---- shop categories (glyph only); the legendary anvils by role are Items/Anvil_Legendary with the
+# role glyph in a medallion (bottom right), composited by role_anvils.py
+RO = {'All': 'stars-stack', 'Recommended': 'star-medal', 'Marksman': 'high-shot', 'Mage': 'pointy-hat',
+      'Fighter': 'crossed-swords', 'Assassin': 'hooded-assassin', 'Tank': 'shield'}
+for k, c in RO.items(): B(f'UI/Roles/Role_{k}', (240, 226, 190), c)
 # ---- statuses
 SS = {'Stun': ((255, 230, 100), 'knocked-out-stars', 'star-swirl'), 'Root': ((140, 230, 120), 'root-tip', 'vine-whip'), 'Silence': ((200, 150, 255), 'silenced', 'mute'),
       'Slow': ((140, 200, 255), 'snail', 'turtle'), 'Burn': ((255, 140, 60), 'flame', 'fire'), 'Bleed': ((255, 90, 90), 'bleeding-wound', 'drop'), 'Shred': ((220, 200, 170), 'cracked-shield', 'broken-shield')}

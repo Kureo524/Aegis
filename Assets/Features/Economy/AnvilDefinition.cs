@@ -20,6 +20,8 @@ namespace Features.Economy {
         [SerializeField, Min(0)] private int cost = 60;
         [SerializeField, Min(1)] private int choiceCount = 3;
         [SerializeField, Min(0)] private int rerollsPerChoice;
+        [Tooltip("Item anvil: only items of this role (None: any).")]
+        [SerializeField] private ItemRole role;
 
         public string DisplayName => displayName;
         public Sprite Icon => icon;
@@ -29,5 +31,6 @@ namespace Features.Economy {
         public int Cost => cost;
         public int ChoiceCount => choiceCount;
         public int RerollsPerChoice => rerollsPerChoice;
+        public ItemRole Role => role;
     }
 }

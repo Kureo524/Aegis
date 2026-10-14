@@ -102,12 +102,17 @@ namespace Game.Tests.PlayMode {
             var attacker = Player.GetComponent<Features.Combat.BasicAttacker>();
             attacker.Cancel();
             attacker.enabled = false;
+            // The random items of the skipped waves must not kill it in 10 min of game time (thorns scale
+            // with the test's huge max health)
+            var inventory = Game.Resolve<Inventory>();
+            while (inventory.Items.Count > 0) inventory.RemoveAt(0);
+            boss.Stats.Get(StatType.MaxHealth).AddModifier(new StatModifier(1e6f, ModifierType.Flat, "test"));
 
             // Quota reached, timer over: the boss still stands → overtime
             HordeSpawnEntry entry = bossWave.SpawnTable[0];
             for (int i = 0; i < bossWave.KillQuota; i++) {
                 Character e = spawner.Spawn(entry.Prefab, entry.Definition, Player.transform.position + new Vector3(-12f, 0f, 0f));
-                Hit(e, 1e7f);
+                Hit(e, e.Health.Max);   // no overkill: a splash / chain of the random rewards would carry it to the boss
             }
             Assert.IsTrue(run.QuotaReached);
             Time.timeScale = 60f;

@@ -77,14 +77,13 @@ namespace EditorTools {
             }
 
             var statAnvil = Anvil("Anvil_Stats", "Enclume à stats", AnvilKind.Stat, ItemTier.Legendary, 60, 0);
-            var legendaryAnvil = Anvil("Anvil_Legendary", "Enclume légendaire", AnvilKind.Item, ItemTier.Legendary, 220, 1);
             var prismaticAnvil = Anvil("Anvil_Prismatic", "Enclume prismatique", AnvilKind.Item, ItemTier.Prismatic, 480, 1);
 
             catalog = CreateAsset<ShopCatalog>(CatalogPath);
             var cso = new SerializedObject(catalog);
             Fill(cso.FindProperty("elixirs"), elixirs);
             Fill(cso.FindProperty("statAnvils"), new List<Object> { statAnvil });
-            Fill(cso.FindProperty("itemAnvils"), new List<Object> { legendaryAnvil, prismaticAnvil });
+            Fill(cso.FindProperty("itemAnvils"), new List<Object> { prismaticAnvil });   // + the legendary anvils by role (ItemsSetup)
             // items: ItemsSetup
             Fill(cso.FindProperty("statChoices"), choices);
             cso.FindProperty("freeAnvil").objectReferenceValue = prismaticAnvil;

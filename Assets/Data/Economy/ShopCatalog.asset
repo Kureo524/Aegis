@@ -19,8 +19,12 @@ MonoBehaviour:
   statAnvils:
   - {fileID: 11400000, guid: 98f0f4f4a74b97499bda846780430f31, type: 2}
   itemAnvils:
-  - {fileID: 11400000, guid: cbaa1506d326b40b7a352c85ea377b73, type: 2}
   - {fileID: 11400000, guid: 4f5a4a743300450be9a28571f0732d4d, type: 2}
+  - {fileID: 11400000, guid: 43c719e290b57804c88d1bdf0c5efa1f, type: 2}
+  - {fileID: 11400000, guid: 69123fcedc113334ea8876fd6998726d, type: 2}
+  - {fileID: 11400000, guid: 3584b20babd884444968b3804a73fc0b, type: 2}
+  - {fileID: 11400000, guid: 725b6da72c03b15fdb7945d821f2447c, type: 2}
+  - {fileID: 11400000, guid: 1c0d8685532c25dbc964d536b30956ed, type: 2}
   items:
   - {fileID: 11400000, guid: c84e0a9bdb03b6af39b04b264bcb892f, type: 2}
   - {fileID: 11400000, guid: f5b0890fe3ddded4aa61ecbb0dc6e1fb, type: 2}
