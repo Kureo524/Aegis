@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa1d26b6a60a3d3c68b2d37a15dde8d6, type: 3}
-  m_Name: Meta_Ezreal_Favor
+  m_Name: Meta_Vesna_Favor
   m_EditorClassIdentifier: Game.Features::Features.Meta.MetaNodeDefinition
   displayName: Faveur
   description: "Un augment au d\xE9but de chaque partie : Argent, puis Or, puis Prismatique."

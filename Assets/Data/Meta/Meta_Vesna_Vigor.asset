@@ -10,21 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa1d26b6a60a3d3c68b2d37a15dde8d6, type: 3}
-  m_Name: Meta_Ezreal_Plating
+  m_Name: Meta_Vesna_Vigor
   m_EditorClassIdentifier: Game.Features::Features.Meta.MetaNodeDefinition
-  displayName: Cuirasse
-  description: "Armure et r\xE9sistance magique."
-  icon: {fileID: 21300000, guid: b26aa365fe78aca939645cf07bba27a3, type: 3}
-  costs: 1e000000320000004b000000
+  displayName: Vigueur
+  description: "R\xE9g\xE9n\xE9ration de PV."
+  icon: {fileID: 21300000, guid: 565f2d3ac8b630bd9abd1045e3c0edb4, type: 3}
+  costs: 28000000410000005f000000
   prerequisites:
-  - {fileID: 11400000, guid: d9ccdd60c38fd678c81bbc16c8f32ea8, type: 2}
+  - {fileID: 11400000, guid: 4d7897c30e02bc10aa0fb6a907f4dd9d, type: 2}
   effects:
   - Kind: 0
-    Stat: 14
+    Stat: 1
     Type: 0
-    Value: 4
-  - Kind: 0
-    Stat: 15
-    Type: 0
-    Value: 4
-  position: {x: 1, y: 2}
+    Value: 0.4
+  position: {x: 2, y: 2}

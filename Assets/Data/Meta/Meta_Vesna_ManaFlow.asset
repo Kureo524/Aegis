@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa1d26b6a60a3d3c68b2d37a15dde8d6, type: 3}
-  m_Name: Meta_Ezreal_Mastery
+  m_Name: Meta_Vesna_ManaFlow
   m_EditorClassIdentifier: Game.Features::Features.Meta.MetaNodeDefinition
-  displayName: "Ma\xEEtrise"
-  description: Un pourcentage de toute l'attaque physique.
-  icon: {fileID: 21300000, guid: 51fc89affa0624d9096787fa53ee2646, type: 3}
-  costs: 500000008c000000dc000000
+  displayName: Flux de mana
+  description: "R\xE9g\xE9n\xE9ration de mana."
+  icon: {fileID: 21300000, guid: 81f50c742d585c97b8ddac1942dd8813, type: 3}
+  costs: 28000000410000005f000000
   prerequisites:
-  - {fileID: 11400000, guid: 7373dc4855c8bd8bdbacff4d3ec533f5, type: 2}
+  - {fileID: 11400000, guid: 1336f8144f151c2758f69fa65f69c631, type: 2}
   effects:
   - Kind: 0
-    Stat: 4
-    Type: 1
-    Value: 0.04
-  position: {x: 3, y: 0}
+    Stat: 3
+    Type: 0
+    Value: 0.3
+  position: {x: 2, y: 1}

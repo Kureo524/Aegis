@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45f014c6ae418d65281ee01e40135079, type: 3}
   m_Name: Char_TestHero
   m_EditorClassIdentifier: Game.Features::Features.Characters.CharacterDefinition
-  displayName: Ezreal
+  displayName: Vesna
   faction: 0
-  sprite: {fileID: -541787417, guid: bcf5b001d69db8d12bc872bba3640a75, type: 3}
-  animations: {fileID: 11400000, guid: c37ecd6b284926aba9d1778bc46bc103, type: 2}
-  portrait: {fileID: -2571425248213282646, guid: 4fec3a7248465e643a59eaced76e9a07, type: 3}
-  bodySize: {x: 0.8, y: 1.55}
+  sprite: {fileID: 934678258, guid: 966cf3fd8191862848bfc6b52f2624b4, type: 3}
+  animations: {fileID: 11400000, guid: f642ca77f3fd9a95e9217a2de32d27a2, type: 2}
+  portrait: {fileID: -6577837168843260694, guid: 9ff9e06c57cefbcd398c1922cdca37f2, type: 3}
+  bodySize: {x: 0.8, y: 1.56}
   baseStats: {fileID: 11400000, guid: 678c37d837112de6d9c82309cb4b4bb1, type: 2}
   growthPerLevel: {fileID: 11400000, guid: f56a6bbecec94666a9f39d0ac4101af0, type: 2}
   basicAttack: {fileID: 11400000, guid: 65fc0cafb31edf45cbf2771e1b8b28fc, type: 2}

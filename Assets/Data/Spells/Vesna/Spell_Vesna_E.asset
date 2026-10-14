@@ -10,36 +10,39 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
-  m_Name: Spell_Ezreal_W
+  m_Name: Spell_Vesna_E
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
-  displayName: Flux d'essence
-  description: "Tire un orbe qui s'accroche au premier ennemi touch\xE9 pendant 4
-    s. Une attaque ou un autre sort d'Ezreal sur la cible le fait exploser : 80/135/190/245/300
-    (+60 % AD bonus) (+70 % AP) d\xE9g\xE2ts magiques, et rend 60/70/80/90/100 mana."
-  icon: {fileID: 21300000, guid: c38dfd68b1d8f0d25a01253719ac8ed4, type: 3}
-  color: {r: 1, g: 0.8, b: 0.35, a: 1}
+  displayName: Roulade
+  description: Roule vers le curseur, puis gagne +40/50/60/70/80 % de vitesse d'attaque
+    pendant 3 s.
+  icon: {fileID: 21300000, guid: 55687396492b51b18bee8c0da3127092, type: 3}
+  color: {r: 1, g: 0.8, b: 0.4, a: 1}
   rankUnlockLevels: 0100000003000000050000000700000009000000
   baseDamage:
-  - 80
-  - 135
-  - 190
-  - 245
-  - 300
+  - 0
   cooldowns:
-  - 8
+  - 16
+  - 14.5
+  - 13
+  - 11.5
+  - 10
   manaCosts:
-  - 50
-  targeting: 1
-  range: 12
-  radius: 0.8
+  - 40
+  targeting: 2
+  range: 4
+  radius: 0.5
   coneAngle: 60
-  castTime: 0.25
+  castTime: 0.1
   canMoveWhileCasting: 0
-  kind: 0
+  kind: 2
   adRatio: 0
-  bonusAdRatio: 0.6
-  apRatio: 0.7
-  buffs: []
+  bonusAdRatio: 0
+  apRatio: 0
+  buffs:
+  - Stat: 6
+    Type: 1
+    Value: 0.4
+    Duration: 3
   statuses: []
   selfSustain:
     Heal: 0
@@ -47,19 +50,14 @@ MonoBehaviour:
     PowerRatio: 0
     ShieldDuration: 0
   affectsAllies: 0
-  projectileSpeed: 17
+  projectileSpeed: 20
   pierce: 0
-  blink: 0
+  blink: 1
   fixedRange: 0
   appliesOnHit: 0
   cooldownRefundOnHit: 0
   mark:
-    Enabled: 1
-    Duration: 4
-    ManaRefund:
-    - 60
-    - 70
-    - 80
-    - 90
-    - 100
+    Enabled: 0
+    Duration: 0
+    ManaRefund: []
   blinkBoltRadius: 0

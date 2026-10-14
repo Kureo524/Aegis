@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f17b536d74c1d4f508cc28f6a44cdbea, type: 3}
-  m_Name: MetaTree_Ezreal
+  m_Name: MetaTree_Vesna
   m_EditorClassIdentifier: Game.Features::Features.Meta.MetaTreeDefinition
-  displayName: Ezreal
+  displayName: Vesna
   character: {fileID: 11400000, guid: 982e78e197d784f50af3cc6d28e6a8c9, type: 2}
   nodes:
   - {fileID: 11400000, guid: 600f14bc83c9749b3a823ceda3ab12a1, type: 2}

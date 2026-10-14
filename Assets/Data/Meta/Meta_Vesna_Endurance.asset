@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa1d26b6a60a3d3c68b2d37a15dde8d6, type: 3}
-  m_Name: Meta_Ezreal_Swiftness
+  m_Name: Meta_Vesna_Endurance
   m_EditorClassIdentifier: Game.Features::Features.Meta.MetaNodeDefinition
-  displayName: "Pas l\xE9ger"
-  description: "Vitesse de d\xE9placement."
-  icon: {fileID: 21300000, guid: 29c75f47bcc8b412ca928a6e0a9aeb19, type: 3}
-  costs: 3c00000064000000
-  prerequisites:
-  - {fileID: 11400000, guid: 05f4352188615ec4bbecd2d421ea06a8, type: 2}
+  displayName: Endurance
+  description: Plus de PV.
+  icon: {fileID: 21300000, guid: 0b2df478bd135b791983321f620c3eeb, type: 3}
+  costs: 0f00000019000000230000003200000046000000
+  prerequisites: []
   effects:
   - Kind: 0
-    Stat: 18
-    Type: 1
-    Value: 0.03
-  position: {x: 3, y: 1}
+    Stat: 0
+    Type: 0
+    Value: 40
+  position: {x: 0, y: 1}

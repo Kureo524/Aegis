@@ -82,26 +82,26 @@ namespace EditorTools {
             Character playerPrefab = CharacterPrefabSetup.CreatePlayerPrefab();
             AssignMissingHeroSprite();
             AssignMissingHeroProjectile();
-            EzrealSetup.Run(CreateFlash());   // the test champion's abilities, passive and summoner spells
+            HeroSetup.Run(CreateFlash());   // the champion (Vesna): abilities, passive, stats, summoner spells
             CreateTrainingDummy();
             Character dummyPrefab = CharacterPrefabSetup.CreateDummyPrefab();
             Character enemyPrefab = CharacterPrefabSetup.CreateEnemyPrefab();
             HordeSettings hordeSettings = EnemySetup.Run(enemyPrefab);
             StageDefinition stage = RunSetup.Run(enemyPrefab);
             ShopCatalog shopCatalog = EconomySetup.Run();
-            LolItemsSetup.Run();         // the items, copied from LoL (before the boss: he carries some)
+            ItemsSetup.Run();            // the items (before the boss: he carries some)
             (Features.Augments.AugmentCatalog augmentCatalog, Features.Loot.LootSettings lootSettings) = PassiveSetup.Run();
             BossSetup.Run(enemyPrefab);   // after the items: the boss carries some
             ContentSetup.Run();           // phase 9b: statuses on spells, more items and augments
             EnemyContentSetup.Run(enemyPrefab);   // phase 9c: wolf, skeleton mage, goblin shaman, stone golem
-            ArenaAugmentsSetup.Run();    // augments after LoL Arena (catalog = exactly that list)
+            AugmentsSetup.Run();         // the augments (catalog = exactly that list)
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
-            UiSetup.Run();               // LoL-style UI: theme on the PanelSettings, stat icons
+            UiSetup.Run();               // MOBA-style UI: theme on the PanelSettings, stat icons
             SetBuildScenes();
             MigrateMenuScene();
-            MetaSetup.Run(RootPrefabPath, MenuScenePath);   // meta progression: settings, Ezreal's tree, Progression screen
-            CharacterSpritesSetup.Run();   // animated LoL sprites, creature names, ground shadows
+            MetaSetup.Run(RootPrefabPath, MenuScenePath);   // meta progression: settings, Vesna's tree, Progression screen
+            CharacterSpritesSetup.Run();   // animated sprites, creature names, ground shadows
             ArenaSetup.Run();   // forest clearing: rocks, trees, ruins, painted ground, light, fog, post-processing
             MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings, stage, shopCatalog, augmentCatalog, lootSettings);
 
@@ -119,12 +119,12 @@ namespace EditorTools {
             SerializedProperty xp = so.FindProperty("xpToNextLevel");
             xp.arraySize = 17;   // max level 18
             for (int i = 0; i < xp.arraySize; i++) xp.GetArrayElementAtIndex(i).intValue = 280 + 100 * i;
-            so.FindProperty("lastSkillPointLevel").intValue = 18;   // a skill point on every level (LoL)
+            so.FindProperty("lastSkillPointLevel").intValue = 18;   // a skill point on every level (MOBA)
             so.ApplyModifiedPropertiesWithoutUndo();
             return curve;
         }
 
-        // Test character of design doc §7.8: placeholder assets, turned into Ezreal by EzrealSetup.
+        // Test character of design doc §7.8: placeholder assets, turned into Vesna by HeroSetup.
         private static void CreateTestHero() {
             if (AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath) != null) return;
 
@@ -144,7 +144,7 @@ namespace EditorTools {
 
             var growth = CreateAsset<StatGrowth>(TestHeroDir + "/StatGrowth_TestHero.asset");
             var growthSo = new SerializedObject(growth);
-            growthSo.FindProperty("mode").enumValueIndex = (int)GrowthMode.LoL;
+            growthSo.FindProperty("mode").enumValueIndex = (int)GrowthMode.Curved;
             growthSo.ApplyModifiedPropertiesWithoutUndo();
             SetList(growth, "entries", new (StatType, float, ModifierType)[] {
                 (StatType.MaxHealth, 100f, ModifierType.Flat), (StatType.HealthRegen, 0.1f, ModifierType.Flat),
@@ -159,7 +159,7 @@ namespace EditorTools {
 
             var attack = CreateAsset<BasicAttackDefinition>(TestHeroDir + "/BasicAttack_TestHero.asset");
             var attackSo = new SerializedObject(attack);
-            attackSo.FindProperty("windupPercent").floatValue = 0.18f;   // LoL marksman-like
+            attackSo.FindProperty("windupPercent").floatValue = 0.18f;   // MOBA marksman-like
             attackSo.ApplyModifiedPropertiesWithoutUndo();
 
             var hero = CreateAsset<CharacterDefinition>(TestHeroPath);
@@ -214,7 +214,7 @@ namespace EditorTools {
             if (flash != null) return flash;
             flash = CreateAsset<SpellDefinition>(FlashPath);
             var so = new SerializedObject(flash);
-            so.FindProperty("displayName").stringValue = "Flash";
+            so.FindProperty("displayName").stringValue = "Bond éclair";
             so.FindProperty("icon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(FlashIconPath);
             so.FindProperty("color").colorValue = new Color(1f, 0.9f, 0.4f);
             so.FindProperty("targeting").enumValueIndex = (int)TargetingType.GroundPoint;

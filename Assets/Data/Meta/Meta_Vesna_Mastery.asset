@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa1d26b6a60a3d3c68b2d37a15dde8d6, type: 3}
-  m_Name: Meta_Ezreal_Legacy
+  m_Name: Meta_Vesna_Mastery
   m_EditorClassIdentifier: Game.Features::Features.Meta.MetaNodeDefinition
-  displayName: "H\xE9ritage"
-  description: Une vie de stage en plus.
-  icon: {fileID: 21300000, guid: a5e808ca9adf1e0b8b0ec81b0fd6af52, type: 3}
-  costs: 96000000
+  displayName: "Ma\xEEtrise"
+  description: Un pourcentage de toute l'attaque physique.
+  icon: {fileID: 21300000, guid: 51fc89affa0624d9096787fa53ee2646, type: 3}
+  costs: 500000008c000000dc000000
   prerequisites:
-  - {fileID: 11400000, guid: 6323df74c561396a9986f566bbea6228, type: 2}
+  - {fileID: 11400000, guid: 7373dc4855c8bd8bdbacff4d3ec533f5, type: 2}
   effects:
-  - Kind: 3
-    Stat: 0
-    Type: 0
-    Value: 1
-  position: {x: 3, y: 2}
+  - Kind: 0
+    Stat: 4
+    Type: 1
+    Value: 0.04
+  position: {x: 3, y: 0}

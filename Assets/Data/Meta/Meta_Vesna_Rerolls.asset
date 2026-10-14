@@ -10,16 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa1d26b6a60a3d3c68b2d37a15dde8d6, type: 3}
-  m_Name: Meta_Ezreal_Endurance
+  m_Name: Meta_Vesna_Rerolls
   m_EditorClassIdentifier: Game.Features::Features.Meta.MetaNodeDefinition
-  displayName: Endurance
-  description: Plus de PV.
-  icon: {fileID: 21300000, guid: 0b2df478bd135b791983321f620c3eeb, type: 3}
-  costs: 0f00000019000000230000003200000046000000
-  prerequisites: []
+  displayName: Second regard
+  description: Une relance de plus sur chaque carte d'augment.
+  icon: {fileID: 21300000, guid: fc3bccb560c49bc45a6abd3802e08386, type: 3}
+  costs: 2800000050000000
+  prerequisites:
+  - {fileID: 11400000, guid: def6e4584ce4184739a015c5efaeb761, type: 2}
   effects:
-  - Kind: 0
+  - Kind: 2
     Stat: 0
     Type: 0
-    Value: 40
-  position: {x: 0, y: 1}
+    Value: 1
+  position: {x: 1, y: 3}

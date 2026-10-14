@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_Vesna_W
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: Bombe de cendres
+  description: "Lance une bombe qui explose au point vis\xE9 : 70/110/150/190/230
+    (+40 % AD bonus) (+60 % AP) d\xE9g\xE2ts magiques dans la zone, puis les ennemis
+    br\xFBlent pendant 3 s (12 (+8 % AP) d\xE9g\xE2ts par seconde)."
+  icon: {fileID: 21300000, guid: c38dfd68b1d8f0d25a01253719ac8ed4, type: 3}
+  color: {r: 1, g: 0.35, b: 0.15, a: 1}
+  rankUnlockLevels: 0100000003000000050000000700000009000000
+  baseDamage:
+  - 70
+  - 110
+  - 150
+  - 190
+  - 230
+  cooldowns:
+  - 10
+  - 9.5
+  - 9
+  - 8.5
+  - 8
+  manaCosts:
+  - 60
+  targeting: 2
+  range: 9
+  radius: 2.6
+  coneAngle: 60
+  castTime: 0.25
+  canMoveWhileCasting: 0
+  kind: 0
+  adRatio: 0
+  bonusAdRatio: 0.4
+  apRatio: 0.6
+  buffs: []
+  statuses:
+  - Kind: 5
+    Duration: 3
+    Power: 12
+    ScalingStat: 5
+    Ratio: 0.08
+    TargetMaxHealthRatio: 0
+    MaxStacks: 1
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
+  affectsAllies: 0
+  projectileSpeed: 17
+  pierce: 0
+  blink: 0
+  fixedRange: 0
+  appliesOnHit: 0
+  cooldownRefundOnHit: 0
+  mark:
+    Enabled: 0
+    Duration: 4
+    ManaRefund:
+    - 60
+    - 70
+    - 80
+    - 90
+    - 100
+  blinkBoltRadius: 0
