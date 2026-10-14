@@ -17,9 +17,10 @@ namespace Features.Augments {
         [SerializeField, Min(1)] private int choiceCount = 3;
         [Tooltip("Rarity of a draft (all 3 choices): Silver / Gold / Prismatic weights.")]
         [SerializeField] private float[] rarityWeights = { 55f, 33f, 12f };
-        [Tooltip("Rerolls for the whole run: one per base slot (each replaces one choice).")]
-        [SerializeField, Min(0)] private int rerolls = 4;
-        [Tooltip("Chance that a draft carries a golden reroll: its first reroll gives rarity +1.")]
+        [Tooltip("Rerolls of each card, per draft (not kept from one draft to the next).")]
+        [UnityEngine.Serialization.FormerlySerializedAs("rerolls")]
+        [SerializeField, Min(0)] private int rerollsPerCard = 1;
+        [Tooltip("Chance that a draft offers a golden reroll: a separate, single reroll that gives one card rarity +1.")]
         [SerializeField, Range(0f, 1f)] private float goldRerollChance = 0.05f;
 
         [Header("All slots full")]
@@ -33,7 +34,7 @@ namespace Features.Augments {
         public int MaxSlots => Mathf.Max(baseSlots, maxSlots);
         public int ChoiceCount => choiceCount;
         public float[] RarityWeights => rarityWeights;
-        public int Rerolls => rerolls;
+        public int RerollsPerCard => rerollsPerCard;
         public float GoldRerollChance => goldRerollChance;
         public AnvilDefinition FullSlotsAnvil => fullSlotsAnvil;
         public int GoldFor(RarityTier rarity) => (int)rarity < goldPerRarity.Length ? goldPerRarity[(int)rarity] : 0;

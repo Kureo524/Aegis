@@ -10,7 +10,7 @@ namespace Features.Meta {
         Stat,
         /// <summary>+Value × level gold at the start of the run.</summary>
         StartingGold,
-        /// <summary>+Value × level augment rerolls for the run.</summary>
+        /// <summary>+Value × level rerolls on every card of every augment draft.</summary>
         AugmentRerolls,
         /// <summary>+Value × level stage lives.</summary>
         ExtraLives,
@@ -62,7 +62,7 @@ namespace Features.Meta {
                 parts.Add(e.Kind switch {
                     MetaEffectKind.Stat => StatLabels.Format(new StatBonus(e.Stat, e.Type, v)),
                     MetaEffectKind.StartingGold => $"+{v:0} or au départ",
-                    MetaEffectKind.AugmentRerolls => $"+{v:0} relance(s) d'augment",
+                    MetaEffectKind.AugmentRerolls => $"+{v:0} relance(s) par carte d'augment",
                     MetaEffectKind.ExtraLives => $"+{v:0} vie(s) de stage",
                     _ => $"Augment {StatLabels.Name((RarityTier)Mathf.Clamp(level - 1, 0, 2))} au départ",
                 });

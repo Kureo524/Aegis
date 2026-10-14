@@ -95,6 +95,8 @@
     border-color: var(--teal);
 }
 .ae-button--primary:hover { background-color: #26697a; border-color: #5df5e8; }
+.ae-button--golden { background-color: #5a4310; border-color: #ffd65c; color: #fff2c4; }
+.ae-button--golden:hover { background-color: #7a5c18; border-color: #fff0a0; }
 
 /* ---- slots (abilities, items) ---- */
 .ae-slot {

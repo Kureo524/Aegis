@@ -33,7 +33,7 @@ namespace Features.Meta {
             _applied = true;
             _modifiers.ApplyStats(player.Stats);
             if (_modifiers.StartingGold > 0) _wallet.Add(_modifiers.StartingGold);
-            if (_modifiers.AugmentRerolls > 0) _augments.AddRerolls(_modifiers.AugmentRerolls);
+            if (_modifiers.AugmentRerolls > 0) _augments.AddRerollsPerCard(_modifiers.AugmentRerolls);
             if (_modifiers.StartingAugment is { } rarity) _augments.GrantRandom(rarity);
         }
 

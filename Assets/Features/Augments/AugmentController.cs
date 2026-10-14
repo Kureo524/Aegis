@@ -13,8 +13,10 @@ namespace Features.Augments {
     /// <summary>
     /// Augments of the run (design doc §9.4), Arena style:
     /// - Draft (RewardKind.Augment): a rarity is drawn, 3 augments of that rarity not owned yet.
-    /// - Rerolls: a pool for the whole run (one per base slot); each replaces one choice. A draft
-    ///   may carry a golden reroll (~5 %): its first reroll gives an augment of rarity +1.
+    /// - Rerolls: each card of a draft has its own reroll (RerollsPerCard, + meta bonus), reset on
+    ///   every draft; a reroll keeps the card's rarity. A draft may also offer a golden reroll
+    ///   (~5 %): a separate, single reroll that gives one card an augment of rarity +1. Only the
+    ///   golden reroll changes a rarity.
     /// - The chosen augment's passive is added to the player (Source = the augment).
     /// - All slots full: the player takes one benefit instead: a stat anvil of the drafted rarity,
     ///   a replacement (Silver → an owned higher one, Gold → same, Prismatic → lower), or +1 slot
@@ -35,9 +37,14 @@ namespace Features.Augments {
         private RarityTier _rarity;
         private bool _golden;
         private AugmentDefinition _pending;
+        private readonly List<int> _cardRerolls = new();
+        private int _bonusRerolls;
 
         public int Slots { get; private set; }
-        public int RerollsLeft { get; private set; }
+        /// <summary>Rerolls each card gets in a draft.</summary>
+        public int RerollsPerCard => _catalog.RerollsPerCard + _bonusRerolls;
+        /// <summary>Rerolls left on card <paramref name="index"/> of the current draft.</summary>
+        public int RerollsLeft(int index) => index >= 0 && index < _cardRerolls.Count ? _cardRerolls[index] : 0;
         public AugmentDraftPhase Phase => _phase;
         public RarityTier Rarity => _rarity;
         public bool GoldenReroll => _golden;
@@ -57,13 +64,12 @@ namespace Features.Augments {
             _wallet = wallet;
             _eventBus = eventBus;
             Slots = catalog.BaseSlots;
-            RerollsLeft = catalog.Rerolls;
         }
 
         public void Start() {
             _subscriptions.Add(_eventBus.Subscribe<RewardStepEvent>(e => { if (e.Kind == RewardKind.Augment) OpenDraft(); }));
             _subscriptions.Add(_eventBus.Subscribe<AugmentPickRequestedEvent>(e => Pick(e.Index)));
-            _subscriptions.Add(_eventBus.Subscribe<AugmentRerollRequestedEvent>(e => Reroll(e.Index)));
+            _subscriptions.Add(_eventBus.Subscribe<AugmentRerollRequestedEvent>(e => Reroll(e.Index, e.Golden)));
             _subscriptions.Add(_eventBus.Subscribe<AugmentFullSlotsRequestedEvent>(e => ChooseFullSlotsOption(e.Option, e.Index)));
             PublishOwned();
         }
@@ -76,10 +82,12 @@ namespace Features.Augments {
             _golden = golden;
             _pending = null;
             _choices.Clear();
+            _cardRerolls.Clear();
             for (int i = 0; i < _catalog.ChoiceCount; i++) {
                 AugmentDefinition pick = PickAugment(rarity);
                 if (pick == null) break;
                 _choices.Add(pick);
+                _cardRerolls.Add(RerollsPerCard);
             }
             if (_choices.Count == 0) {   // nothing left to offer
                 Close();
@@ -89,10 +97,11 @@ namespace Features.Augments {
             PublishDraft();
         }
 
-        /// <summary>More rerolls for the run (meta progression, §9.7).</summary>
-        public void AddRerolls(int count) {
-            RerollsLeft += count;
-            PublishDraft();
+        /// <summary>More rerolls on every card of every draft of the run (meta progression, §9.7).</summary>
+        public void AddRerollsPerCard(int count) {
+            _bonusRerolls += Mathf.Max(0, count);
+            for (int i = 0; i < _cardRerolls.Count; i++) _cardRerolls[i] += Mathf.Max(0, count);
+            if (_phase != AugmentDraftPhase.Closed) PublishDraft();
         }
 
         /// <summary>A random augment of <paramref name="rarity"/>, outside any draft (meta starting augment, §9.7).</summary>
@@ -117,18 +126,20 @@ namespace Features.Augments {
             PublishDraft();
         }
 
-        public void Reroll(int index) {
-            if (_phase != AugmentDraftPhase.Choose || index < 0 || index >= _choices.Count || RerollsLeft <= 0) return;
+        /// <summary>Rerolls card <paramref name="index"/>: with its own reroll (same rarity), or with the golden one (rarity + 1).</summary>
+        public void Reroll(int index, bool golden = false) {
+            if (_phase != AugmentDraftPhase.Choose || index < 0 || index >= _choices.Count) return;
+            if (golden ? !_golden : _cardRerolls[index] <= 0) return;
             RarityTier rarity = _choices[index].Rarity;
-            if (_golden) rarity = (RarityTier)Mathf.Min((int)rarity + 1, (int)RarityTier.Prismatic);
+            if (golden) rarity = (RarityTier)Mathf.Min((int)rarity + 1, (int)RarityTier.Prismatic);
             AugmentDefinition pick = PickAugment(rarity);
             if (pick == null) {
                 _eventBus.Publish(new GameplayFeedbackEvent("Plus rien à proposer"));
                 return;
             }
             _choices[index] = pick;
-            _golden = false;   // only the first reroll is golden
-            RerollsLeft--;
+            if (golden) _golden = false;
+            else _cardRerolls[index]--;
             PublishDraft();
         }
 
@@ -219,7 +230,7 @@ namespace Features.Augments {
             var replaceable = new List<AugmentDefinition>();
             if (_phase == AugmentDraftPhase.SlotsFull && _pending != null)
                 foreach (int i in ReplaceableIndices(_pending.Rarity)) replaceable.Add(_owned[i].augment);
-            _eventBus.Publish(new AugmentDraftEvent(_phase, _rarity, _choices.ToArray(), RerollsLeft, _golden, _pending,
+            _eventBus.Publish(new AugmentDraftEvent(_phase, _rarity, _choices.ToArray(), _cardRerolls.ToArray(), _golden, _pending,
                                                     replaceable, Slots < _catalog.MaxSlots,
                                                     _pending != null ? _catalog.GoldFor(_pending.Rarity) : 0));
         }

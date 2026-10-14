@@ -62,7 +62,7 @@ MonoBehaviour:
   - 55
   - 33
   - 12
-  rerolls: 4
+  rerollsPerCard: 1
   goldRerollChance: 0.05
   fullSlotsAnvil: {fileID: 11400000, guid: 98f0f4f4a74b97499bda846780430f31, type: 2}
   goldPerRarity: 960000002c010000f4010000
