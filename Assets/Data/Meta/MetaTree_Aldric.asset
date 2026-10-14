@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f17b536d74c1d4f508cc28f6a44cdbea, type: 3}
+  m_Name: MetaTree_Aldric
+  m_EditorClassIdentifier: Game.Features::Features.Meta.MetaTreeDefinition
+  displayName: Aldric
+  character: {fileID: 11400000, guid: 80bfb1140450182f3892fb882f6e9ff4, type: 2}
+  nodes:
+  - {fileID: 11400000, guid: 509bcae47d5f919d1adaaaf31d48ae70, type: 2}
+  - {fileID: 11400000, guid: d4006732133d4329e8ad64a9fd7ef6b5, type: 2}
+  - {fileID: 11400000, guid: d6a6cc16145453a6897d0e566f34aaa2, type: 2}
+  - {fileID: 11400000, guid: 24d3dd57a88421d57be7dfc83927f566, type: 2}
+  - {fileID: 11400000, guid: d3bdc99b8e2cb1bb8b0e991f78c79b02, type: 2}
+  - {fileID: 11400000, guid: 8a3e98f1efc6d70b7af16f9e9c75962d, type: 2}
+  - {fileID: 11400000, guid: 71753a9433cbf1e62941fb0a870ffabc, type: 2}
+  - {fileID: 11400000, guid: 127e4c9addc0b5dc492dd6dca6a8433a, type: 2}
+  - {fileID: 11400000, guid: 8e82632d1b5b713e1a1b9df1b5b54ba3, type: 2}
+  - {fileID: 11400000, guid: f7cf2add8456c698baa744a9fca5ca3a, type: 2}
+  - {fileID: 11400000, guid: e0d9ac22e923cd498920790731359e4c, type: 2}
+  - {fileID: 11400000, guid: 72357679afded2c2cac0c9a58356a36d, type: 2}
+  - {fileID: 11400000, guid: a09ea2b4f7fd79fb6a3d474c44ea3c57, type: 2}

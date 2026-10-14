@@ -1,7 +1,8 @@
 # Renders every clip of every character of chars.json into frames, from the game camera pitch,
 # 3/4 view facing screen right. Output: sprites/<Char>/<clip>_<i>.png + meta.json.
 # Models: CC0 glTF (Quaternius) or "@dummy" (built here). Optional: recolor {material: rgb},
-# "stone" (every material turned to rock), "ember": a glowing ember in the right hand.
+# "stone" (every material turned to rock), "ember": a glowing ember in the right hand,
+# "blade": {"color": rgb, "length": share of the height} a glowing blade held in the right hand.
 import bpy, sys, os, json, math, mathutils
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -59,6 +60,24 @@ def build_dummy():
     action('Death', [(1, (0, 0, 0)), (6, (d(-12), 0, 0)), (20, (d(84), 0, -0.05)), (24, (d(80), 0, -0.05))])
     return root, [o for o in bpy.data.objects if o.type == 'MESH']
 
+def build_blade(color, length, width):
+    """A tapered double-edged blade along +Y (hilt at the origin) with a crossguard, unit-free."""
+    import bmesh
+    me = bpy.data.meshes.new('Blade'); bm = bmesh.new()
+    base, tip = 0.12 * length, length
+    ring = lambda y, w, t: [bm.verts.new((x, y, z)) for x, z in ((w, 0), (0, t), (-w, 0), (0, -t))]
+    a = ring(base, width, width * 0.28); b = ring(tip * 0.86, width * 0.8, width * 0.22); c = bm.verts.new((0, tip, 0))
+    for i in range(4):
+        j = (i + 1) % 4
+        bm.faces.new((a[i], a[j], b[j], b[i])); bm.faces.new((b[i], b[j], c))
+    bm.faces.new(a[::-1])
+    bm.to_mesh(me); bm.free()
+    blade = bpy.data.objects.new('Blade', me); bpy.context.scene.collection.objects.link(blade)
+    blade.data.materials.append(emissive('BladeMat', color, 1.0))
+    bpy.ops.mesh.primitive_cube_add(size=1); guard = bpy.context.active_object; guard.name = 'Guard'
+    guard.data.materials.append(flat('GuardMat', (0.18, 0.14, 0.42), 0.4))
+    return blade, guard
+
 def play(arm, obj, name):
     act = find_action(name)
     target = arm if arm is not None else obj
@@ -95,6 +114,22 @@ for name, c in cfg.items():
             ember.name = 'Ember'
             ember.data.materials.append(emissive('EmberMat', (1.0, 0.32, 0.04), 2.6))
             print('EMBER on', ember_bone)
+    blade = guard = None
+    if c.get('blade') and arm is not None:
+        hand = next((b.name for b in arm.data.bones if any(k in b.name.lower() for k in ('fist', 'hand', 'wrist')) and b.name.lower().rstrip('.0123456789').endswith(('r', 'right'))), None)
+        if hand:
+            blade, guard = build_blade(tuple(c['blade'].get('color', (0.55, 0.9, 1.0))), 1.0, 1.0)
+            print('BLADE on', hand)
+    def place_blade():
+        # along the wrist bone (+Y), from its tail; fixed world size
+        if blade is None: return
+        pb = arm.pose.bones[hand]
+        _, rot, _ = (arm.matrix_world @ pb.matrix).decompose()
+        tail = arm.matrix_world @ pb.tail
+        at = mathutils.Matrix.Translation(tail) @ rot.to_matrix().to_4x4()
+        L = h * c['blade'].get('length', 0.5)
+        blade.matrix_world = at @ mathutils.Matrix.Diagonal((h * 0.028, L, h * 0.028, 1))
+        guard.matrix_world = at @ mathutils.Matrix.Translation((0, L * 0.12, 0)) @ mathutils.Matrix.Diagonal((h * 0.11, h * 0.02, h * 0.03, 1))
     def place_ember():
         # world position of the wrist, a bit past it (the palm); fixed world size
         if ember is None: return
@@ -104,7 +139,7 @@ for name, c in cfg.items():
         ember.scale = (ember_size,) * 3
     idle = c['clips']['idle']
     act = play(arm, obj, idle[0]); bpy.context.scene.frame_set(int(act.frame_range[0]))
-    lo, hi = common.bounds([m for m in meshes if m.name != 'Ember'])
+    lo, hi = common.bounds([m for m in meshes if m.name not in ('Ember', 'Blade', 'Guard')])
     h = hi.z - lo.z
     ember_size = h * 0.045
     scale = c['height'] / h
@@ -134,6 +169,7 @@ for name, c in cfg.items():
             t = f0 + (f1 - f0) * (i / n if loop else i / max(1, n - 1))
             scn.frame_set(int(t), subframe=t - int(t))
             place_ember()
+            place_blade()
             scn.render.filepath = f'{out}/{clip}_{i:02d}.png'
             bpy.ops.render.render(write_still=True)
             frames.append(os.path.basename(scn.render.filepath))

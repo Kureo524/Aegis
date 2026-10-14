@@ -62,50 +62,89 @@ namespace EditorTools {
                     Costs = new[] { 90, 180, 320 }, Effects = new[] { Of(MetaEffectKind.StartingAugment, 1) }, Requires = new[] { "Rerolls" }, At = new(2, 3) },
         };
 
+        // Aldric: toughness first, then frost and sustain (values are placeholders)
+        private static readonly N[] Aldric = {
+            new() { Id = "Bulwark", Name = "Rempart", Description = "Plus d'armure.", Icon = $"{StatIcons}/Stat_Armor.png",
+                    Costs = new[] { 15, 25, 35, 50, 70 }, Effects = new[] { Stat(StatType.Armor, 3) }, At = new(0, 0) },
+            new() { Id = "Vigor", Name = "Carrure", Description = "Plus de PV.", Icon = $"{StatIcons}/Stat_MaxHealth.png",
+                    Costs = new[] { 15, 25, 35, 50, 70 }, Effects = new[] { Stat(StatType.MaxHealth, 50) }, At = new(0, 1) },
+            new() { Id = "Purse", Name = "Bourse", Description = "De l'or dès le début de la partie.", Icon = "Assets/GraphicAssets/Sprites/Items/Anvil_Stats.png",
+                    Costs = new[] { 20, 35, 55 }, Effects = new[] { Of(MetaEffectKind.StartingGold, 60) }, At = new(0, 2) },
+            new() { Id = "Edge", Name = "Fil de givre", Description = "Aldric frappe plus fort.", Icon = $"{StatIcons}/Stat_PhysicalAttack.png",
+                    Costs = new[] { 25, 40, 60, 80, 110 }, Effects = new[] { Stat(StatType.PhysicalAttack, 3) }, Requires = new[] { "Bulwark" }, At = new(1, 0) },
+            new() { Id = "Wards", Name = "Runes de garde", Description = "Résistance magique.", Icon = $"{StatIcons}/Stat_MagicResist.png",
+                    Costs = new[] { 25, 40, 60 }, Effects = new[] { Stat(StatType.MagicResist, 4) }, Requires = new[] { "Bulwark" }, At = new(1, 1) },
+            new() { Id = "Steadfast", Name = "Inébranlable", Description = "Ténacité : les contrôles durent moins longtemps.", Icon = $"{StatIcons}/Stat_Tenacity.png",
+                    Costs = new[] { 30, 50, 75 }, Effects = new[] { Stat(StatType.Tenacity, 0.06f) }, Requires = new[] { "Vigor" }, At = new(1, 2) },
+            new() { Id = "Rerolls", Name = "Second regard", Description = "Une relance de plus sur chaque carte d'augment.", Icon = "Assets/GraphicAssets/Sprites/Augments/Augment_SecondWind.png",
+                    Costs = new[] { 40, 80 }, Effects = new[] { Of(MetaEffectKind.AugmentRerolls, 1) }, Requires = new[] { "Purse" }, At = new(1, 3) },
+            new() { Id = "Rhythm", Name = "Cadence", Description = "Vitesse d'attaque.", Icon = $"{StatIcons}/Stat_AttackSpeed.png",
+                    Costs = new[] { 40, 65, 95 }, Effects = new[] { Stat(StatType.AttackSpeed, 0.04f, ModifierType.PercentAdd) }, Requires = new[] { "Edge" }, At = new(2, 0) },
+            new() { Id = "Winter", Name = "Long hiver", Description = "Les sorts reviennent plus vite.", Icon = $"{StatIcons}/Stat_AbilityHaste.png",
+                    Costs = new[] { 40, 65, 95 }, Effects = new[] { Stat(StatType.AbilityHaste, 5) }, Requires = new[] { "Wards" }, At = new(2, 1) },
+            new() { Id = "Regrowth", Name = "Sève froide", Description = "Régénération de PV.", Icon = $"{StatIcons}/Stat_Lifesteal.png",
+                    Costs = new[] { 40, 65, 95 }, Effects = new[] { Stat(StatType.HealthRegen, 0.5f) }, Requires = new[] { "Steadfast" }, At = new(2, 2) },
+            new() { Id = "Legacy", Name = "Héritage", Description = "Une vie de stage en plus.", Icon = "Assets/GraphicAssets/Sprites/Augments/Augment_Phoenix.png",
+                    Costs = new[] { 150 }, Effects = new[] { Of(MetaEffectKind.ExtraLives, 1) }, Requires = new[] { "Regrowth" }, At = new(3, 2) },
+            new() { Id = "Colossus", Name = "Colosse", Description = "Un pourcentage de tous les PV.", Icon = "Assets/GraphicAssets/Sprites/Items/Item_TitanHeart.png",
+                    Costs = new[] { 80, 140, 220 }, Effects = new[] { Stat(StatType.MaxHealth, 0.04f, ModifierType.PercentAdd) }, Requires = new[] { "Rhythm" }, At = new(3, 0) },
+            new() { Id = "Favor", Name = "Faveur", Description = "Un augment au début de chaque partie : Argent, puis Or, puis Prismatique.", Icon = "Assets/GraphicAssets/Sprites/Augments/Augment_RunawaySorcery.png",
+                    Costs = new[] { 90, 180, 320 }, Effects = new[] { Of(MetaEffectKind.StartingAugment, 1) }, Requires = new[] { "Rerolls" }, At = new(2, 3) },
+        };
+
+        // A champion's tree, created once (nodes Meta_<champion>_<id>, tree MetaTree_<champion>)
+        private static MetaTreeDefinition Tree(string champion, N[] data, string characterPath) {
+            string treePath = $"{Dir}/MetaTree_{champion}.asset";
+            var existing = AssetDatabase.LoadAssetAtPath<MetaTreeDefinition>(treePath);
+            if (existing != null) return existing;
+            Directory.CreateDirectory(Dir);
+            var nodes = new Dictionary<string, MetaNodeDefinition>();
+            foreach (N n in data) {
+                var node = ScriptableObject.CreateInstance<MetaNodeDefinition>();
+                AssetDatabase.CreateAsset(node, $"{Dir}/Meta_{champion}_{n.Id}.asset");
+                nodes[n.Id] = node;
+            }
+            foreach (N n in data) {
+                var so = new SerializedObject(nodes[n.Id]);
+                so.FindProperty("displayName").stringValue = n.Name;
+                so.FindProperty("description").stringValue = n.Description;
+                so.FindProperty("icon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(n.Icon);
+                SpellAssets.SetInts(so.FindProperty("costs"), n.Costs);
+                SerializedProperty pre = so.FindProperty("prerequisites");
+                pre.arraySize = n.Requires.Length;
+                for (int i = 0; i < n.Requires.Length; i++) pre.GetArrayElementAtIndex(i).objectReferenceValue = nodes[n.Requires[i]];
+                so.FindProperty("position").vector2IntValue = n.At;
+                so.ApplyModifiedPropertiesWithoutUndo();
+                typeof(MetaNodeDefinition).GetField("effects", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+                                          .SetValue(nodes[n.Id], n.Effects);
+                EditorUtility.SetDirty(nodes[n.Id]);
+            }
+
+            var tree = ScriptableObject.CreateInstance<MetaTreeDefinition>();
+            AssetDatabase.CreateAsset(tree, treePath);
+            var tso = new SerializedObject(tree);
+            tso.FindProperty("displayName").stringValue = champion;
+            tso.FindProperty("character").objectReferenceValue = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(characterPath);
+            SerializedProperty list = tso.FindProperty("nodes");
+            list.arraySize = data.Length;
+            for (int i = 0; i < data.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = nodes[data[i].Id];
+            tso.ApplyModifiedPropertiesWithoutUndo();
+            return tree;
+        }
+
         public static MetaSettings Run(string rootPrefabPath, string menuScenePath) {
             var settings = AssetDatabase.LoadAssetAtPath<MetaSettings>(SettingsPath);
             if (settings == null) {
-                Directory.CreateDirectory(Dir);
-                var nodes = new Dictionary<string, MetaNodeDefinition>();
-                foreach (N n in Vesna) {
-                    var node = ScriptableObject.CreateInstance<MetaNodeDefinition>();
-                    AssetDatabase.CreateAsset(node, $"{Dir}/Meta_Vesna_{n.Id}.asset");
-                    nodes[n.Id] = node;
-                }
-                foreach (N n in Vesna) {
-                    var so = new SerializedObject(nodes[n.Id]);
-                    so.FindProperty("displayName").stringValue = n.Name;
-                    so.FindProperty("description").stringValue = n.Description;
-                    so.FindProperty("icon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(n.Icon);
-                    SpellAssets.SetInts(so.FindProperty("costs"), n.Costs);
-                    SerializedProperty pre = so.FindProperty("prerequisites");
-                    pre.arraySize = n.Requires.Length;
-                    for (int i = 0; i < n.Requires.Length; i++) pre.GetArrayElementAtIndex(i).objectReferenceValue = nodes[n.Requires[i]];
-                    so.FindProperty("position").vector2IntValue = n.At;
-                    so.ApplyModifiedPropertiesWithoutUndo();
-                    typeof(MetaNodeDefinition).GetField("effects", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
-                                              .SetValue(nodes[n.Id], n.Effects);
-                    EditorUtility.SetDirty(nodes[n.Id]);
-                }
-
-                var tree = ScriptableObject.CreateInstance<MetaTreeDefinition>();
-                AssetDatabase.CreateAsset(tree, $"{Dir}/MetaTree_Vesna.asset");
-                var tso = new SerializedObject(tree);
-                tso.FindProperty("displayName").stringValue = "Vesna";
-                tso.FindProperty("character").objectReferenceValue = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(ProjectSetup.TestHeroPath);
-                SerializedProperty list = tso.FindProperty("nodes");
-                list.arraySize = Vesna.Length;
-                for (int i = 0; i < Vesna.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = nodes[Vesna[i].Id];
-                tso.ApplyModifiedPropertiesWithoutUndo();
-
                 settings = ScriptableObject.CreateInstance<MetaSettings>();
                 AssetDatabase.CreateAsset(settings, SettingsPath);
-                var sso = new SerializedObject(settings);
-                SerializedProperty trees = sso.FindProperty("trees");
-                trees.arraySize = 1;
-                trees.GetArrayElementAtIndex(0).objectReferenceValue = tree;
-                sso.ApplyModifiedPropertiesWithoutUndo();
             }
+            // One tree per champion, in the roster's order
+            MetaTreeDefinition[] wanted = { Tree("Vesna", Vesna, ProjectSetup.TestHeroPath), Tree("Aldric", Aldric, AldricSetup.DefinitionPath) };
+            var sso = new SerializedObject(settings);
+            SerializedProperty trees = sso.FindProperty("trees");
+            trees.arraySize = wanted.Length;
+            for (int i = 0; i < wanted.Length; i++) trees.GetArrayElementAtIndex(i).objectReferenceValue = wanted[i];
+            sso.ApplyModifiedPropertiesWithoutUndo();
 
             GameObject root = PrefabUtility.LoadPrefabContents(rootPrefabPath);
             var scopeSo = new SerializedObject(root.GetComponent<RootLifetimeScope>());

@@ -82,7 +82,8 @@ namespace EditorTools {
             Character playerPrefab = CharacterPrefabSetup.CreatePlayerPrefab();
             AssignMissingHeroSprite();
             AssignMissingHeroProjectile();
-            HeroSetup.Run(CreateFlash());   // the champion (Vesna): abilities, passive, stats, summoner spells
+            SpellDefinition flash = CreateFlash();
+            HeroSetup.Run(flash);   // the first champion (Vesna): abilities, passive, stats, summoner spells
             CreateTrainingDummy();
             Character dummyPrefab = CharacterPrefabSetup.CreateDummyPrefab();
             Character enemyPrefab = CharacterPrefabSetup.CreateEnemyPrefab();
@@ -90,6 +91,7 @@ namespace EditorTools {
             StageDefinition stage = RunSetup.Run(enemyPrefab);
             ShopCatalog shopCatalog = EconomySetup.Run();
             ItemsSetup.Run();            // the items (before the boss: he carries some)
+            CharacterDefinition aldric = AldricSetup.Run(flash);   // the second champion (after the items: his recommended ones)
             (Features.Augments.AugmentCatalog augmentCatalog, Features.Loot.LootSettings lootSettings) = PassiveSetup.Run();
             BossSetup.Run(enemyPrefab);   // after the items: the boss carries some
             ContentSetup.Run();           // phase 9b: statuses on spells, more items and augments
@@ -100,7 +102,9 @@ namespace EditorTools {
             UiSetup.Run();               // MOBA-style UI: theme on the PanelSettings, stat icons
             SetBuildScenes();
             MigrateMenuScene();
-            MetaSetup.Run(RootPrefabPath, MenuScenePath);   // meta progression: settings, Vesna's tree, Progression screen
+            MetaSetup.Run(RootPrefabPath, MenuScenePath);   // meta progression: settings, a tree per champion, Progression screen
+            ChampionsSetup.Run(RootPrefabPath, MenuScenePath,
+                               AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath), aldric);   // roster + champion select screen
             CharacterSpritesSetup.Run();   // animated sprites, creature names, ground shadows
             ArenaSetup.Run();   // forest clearing: rocks, trees, ruins, painted ground, light, fog, post-processing
             MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings, stage, shopCatalog, augmentCatalog, lootSettings);

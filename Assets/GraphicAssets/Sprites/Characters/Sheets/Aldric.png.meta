@@ -1,0 +1,2492 @@
+fileFormatVersion: 2
+guid: f81d7306df423b9a3bdaaed3fd6ea9dc
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1340230554088353517
+    second: Aldric_0
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 83.47
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Aldric_000
+      rect:
+        serializedVersion: 2
+        x: 849
+        y: 272
+        width: 57
+        height: 145
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.1948}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c12493647404b14ab9931b168150a601
+      internalID: 1801324476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_001
+      rect:
+        serializedVersion: 2
+        x: 908
+        y: 272
+        width: 57
+        height: 145
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.1948}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7877fba9ec3108f792452c83d058f129
+      internalID: 1888418261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_002
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 271
+        width: 57
+        height: 146
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.1935}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: db1e66dab5f0e01e3de1a095ccaede4d
+      internalID: -1381807175
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_003
+      rect:
+        serializedVersion: 2
+        x: 506
+        y: 420
+        width: 57
+        height: 147
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e95d66527f9c894ce358515b21d53838
+      internalID: 1714010421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_004
+      rect:
+        serializedVersion: 2
+        x: 565
+        y: 420
+        width: 57
+        height: 147
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 908138f5582c49aac6a4a6ab5de4b992
+      internalID: -2078481927
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_005
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 572
+        width: 57
+        height: 148
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.2044}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6685423b30a9990f9f9356450af49305
+      internalID: -2144760368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_006
+      rect:
+        serializedVersion: 2
+        x: 835
+        y: 572
+        width: 57
+        height: 148
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.2044}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f8516eb8494ed14228dea0597b2da62
+      internalID: 1524077060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_007
+      rect:
+        serializedVersion: 2
+        x: 345
+        y: 571
+        width: 57
+        height: 149
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.2097}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: efee1f7651c80785cf634615135561d7
+      internalID: 150442654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_008
+      rect:
+        serializedVersion: 2
+        x: 894
+        y: 572
+        width: 57
+        height: 148
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.2044}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1bed8ab3fe93274211c152cb58fd719
+      internalID: 2053309965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_009
+      rect:
+        serializedVersion: 2
+        x: 953
+        y: 572
+        width: 57
+        height: 148
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.2044}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4beff2efb692d418a541d1fa4a907719
+      internalID: -338592991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_010
+      rect:
+        serializedVersion: 2
+        x: 1012
+        y: 572
+        width: 57
+        height: 148
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.2044}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 770eb523210544dd85667b75b3e51cc4
+      internalID: 1178361282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_011
+      rect:
+        serializedVersion: 2
+        x: 624
+        y: 420
+        width: 57
+        height: 147
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8eb48cfbaa37e17f4c527302ed6bb2fd
+      internalID: 736055288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_012
+      rect:
+        serializedVersion: 2
+        x: 507
+        y: 271
+        width: 57
+        height: 146
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.1935}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2b0ce3748fe72e79ec38109ac5bbd0cf
+      internalID: 433333736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_013
+      rect:
+        serializedVersion: 2
+        x: 566
+        y: 271
+        width: 57
+        height: 146
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.1935}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 47b8f26aa8cc2838bfd1e807d7efdc3c
+      internalID: 675413108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_014
+      rect:
+        serializedVersion: 2
+        x: 625
+        y: 271
+        width: 57
+        height: 146
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.1935}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3ec9692bedd570d94d3d75d6df03123a
+      internalID: 1274598240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_015
+      rect:
+        serializedVersion: 2
+        x: 967
+        y: 272
+        width: 57
+        height: 145
+      alignment: 9
+      pivot: {x: 0.3289, y: 0.1948}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: da27e1596b3c9feb1728c51fd54306de
+      internalID: 428424519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_016
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 570
+        width: 102
+        height: 150
+      alignment: 9
+      pivot: {x: 0.4779, y: 0.255}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7022446c75c7a3bc2e55fac9d954bfb5
+      internalID: 1340921979
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_017
+      rect:
+        serializedVersion: 2
+        x: 636
+        y: 728
+        width: 84
+        height: 152
+      alignment: 9
+      pivot: {x: 0.4137, y: 0.2648}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94860c5c9591a2cde22c01a154d194e4
+      internalID: -1766171281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_018
+      rect:
+        serializedVersion: 2
+        x: 683
+        y: 420
+        width: 79
+        height: 147
+      alignment: 9
+      pivot: {x: 0.3639, y: 0.2398}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e98352aeaa8de56cfcf68868437a3802
+      internalID: -300568221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_019
+      rect:
+        serializedVersion: 2
+        x: 801
+        y: 133
+        width: 122
+        height: 135
+      alignment: 9
+      pivot: {x: 0.3668, y: 0.1277}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8af03c00cf5df04b0a672164920d8b0f
+      internalID: 638290013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_020
+      rect:
+        serializedVersion: 2
+        x: 521
+        y: 130
+        width: 151
+        height: 138
+      alignment: 9
+      pivot: {x: 0.3692, y: 0.125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76665bb169a2f53b997447262315cfbc
+      internalID: -1116518878
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_021
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 129
+        width: 153
+        height: 139
+      alignment: 9
+      pivot: {x: 0.3775, y: 0.1384}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 665cc4c08b866802ee40f644c7f45640
+      internalID: 306870220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_022
+      rect:
+        serializedVersion: 2
+        x: 925
+        y: 133
+        width: 131
+        height: 135
+      alignment: 9
+      pivot: {x: 0.4714, y: 0.1425}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0169109b5bde1b9f2143087bf13388f
+      internalID: 83933520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_023
+      rect:
+        serializedVersion: 2
+        x: 1026
+        y: 272
+        width: 89
+        height: 145
+      alignment: 9
+      pivot: {x: 0.5253, y: 0.2155}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 212d97f0a6e0fe043a7986ace1c0c964
+      internalID: -467968935
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_024
+      rect:
+        serializedVersion: 2
+        x: 1071
+        y: 572
+        width: 73
+        height: 148
+      alignment: 9
+      pivot: {x: 0.3253, y: 0.2449}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7fb92b4a3d9d62d182f73d01bc5eb2c
+      internalID: -1767638812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_025
+      rect:
+        serializedVersion: 2
+        x: 684
+        y: 271
+        width: 84
+        height: 146
+      alignment: 9
+      pivot: {x: 0.3899, y: 0.2209}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 607299a055fa5ddfc9245ae34b250228
+      internalID: 1662413651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_026
+      rect:
+        serializedVersion: 2
+        x: 1146
+        y: 572
+        width: 93
+        height: 148
+      alignment: 9
+      pivot: {x: 0.4597, y: 0.2111}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85d931d230610f11350e83759dbc6596
+      internalID: -293459675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_027
+      rect:
+        serializedVersion: 2
+        x: 1241
+        y: 572
+        width: 103
+        height: 148
+      alignment: 9
+      pivot: {x: 0.4733, y: 0.2179}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c7bcb93dcfb04f240065c6550f374a8d
+      internalID: 1216523712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_028
+      rect:
+        serializedVersion: 2
+        x: 764
+        y: 420
+        width: 58
+        height: 147
+      alignment: 9
+      pivot: {x: 0.3578, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d868910e9662d620d50e10d6c254f846
+      internalID: 2088919893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_029
+      rect:
+        serializedVersion: 2
+        x: 1065
+        y: 729
+        width: 113
+        height: 151
+      alignment: 9
+      pivot: {x: 0.1217, y: 0.1738}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72ca7f4d24ca53b510f53fc0e27912c5
+      internalID: 644715834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_030
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 884
+        width: 123
+        height: 161
+      alignment: 9
+      pivot: {x: 0.1037, y: 0.1692}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a1d18bfadfa3290a8a1d7892edc592b
+      internalID: -1381713810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_031
+      rect:
+        serializedVersion: 2
+        x: 1117
+        y: 273
+        width: 135
+        height: 144
+      alignment: 9
+      pivot: {x: 0.087, y: 0.2239}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a653e041f3bf90927e01e6537eba4ca
+      internalID: 54732112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_032
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1047
+        width: 106
+        height: 168
+      alignment: 9
+      pivot: {x: 0.4127, y: 0.3705}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e94a1ae3e7a98d0596eef17dec54d238
+      internalID: -637958157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_033
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 128
+        width: 127
+        height: 140
+      alignment: 9
+      pivot: {x: 0.5886, y: 0.2375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ea55605187c014a1e5b1ebe14ffb64cd
+      internalID: 1467232540
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_034
+      rect:
+        serializedVersion: 2
+        x: 1254
+        y: 275
+        width: 102
+        height: 142
+      alignment: 9
+      pivot: {x: 0.5172, y: 0.2341}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e82abe090e4f5cec3ea935106905cc5f
+      internalID: -1408376561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_035
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 570
+        width: 71
+        height: 150
+      alignment: 9
+      pivot: {x: 0.3063, y: 0.2483}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6eb08322ac9f36cb179c756bdc9d4d74
+      internalID: -516277908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_036
+      rect:
+        serializedVersion: 2
+        x: 1346
+        y: 572
+        width: 63
+        height: 148
+      alignment: 9
+      pivot: {x: 0.2817, y: 0.2179}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1babdc0bbd44e13d81def4402190afd9
+      internalID: -1018430484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_037
+      rect:
+        serializedVersion: 2
+        x: 824
+        y: 420
+        width: 58
+        height: 147
+      alignment: 9
+      pivot: {x: 0.3578, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c1cea4d2cf51708f02cce2de8698a85
+      internalID: -1073063784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_038
+      rect:
+        serializedVersion: 2
+        x: 884
+        y: 420
+        width: 60
+        height: 147
+      alignment: 9
+      pivot: {x: 0.3458, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6dbba0fcb2af07da0921832da1942fcd
+      internalID: 136934007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_039
+      rect:
+        serializedVersion: 2
+        x: 722
+        y: 728
+        width: 59
+        height: 152
+      alignment: 9
+      pivot: {x: 0.3008, y: 0.2253}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1c26d297f09c03fb6516986d87b664d
+      internalID: 1111413033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_040
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 419
+        width: 93
+        height: 148
+      alignment: 9
+      pivot: {x: 0.1909, y: 0.2044}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e05429cea401cdb00151c1ad529702f
+      internalID: 562430266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_041
+      rect:
+        serializedVersion: 2
+        x: 946
+        y: 420
+        width: 122
+        height: 147
+      alignment: 9
+      pivot: {x: 0.2193, y: 0.2193}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9ed7119bf60d353995cf8315f91efa5
+      internalID: 976810066
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_042
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 419
+        width: 131
+        height: 148
+      alignment: 9
+      pivot: {x: 0.3034, y: 0.2246}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bbcff8f97ebb6981b487eab82b498c06
+      internalID: 1565550053
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_043
+      rect:
+        serializedVersion: 2
+        x: 1211
+        y: 887
+        width: 120
+        height: 158
+      alignment: 9
+      pivot: {x: 0.5396, y: 0.2167}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85ba4e05b3806ca0a0da9ea70aa66dac
+      internalID: -251998167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_044
+      rect:
+        serializedVersion: 2
+        x: 1052
+        y: 1052
+        width: 128
+        height: 163
+      alignment: 9
+      pivot: {x: 0.6855, y: 0.2101}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f10e6d4a8875ec408253ab9d3ca30d39
+      internalID: 1326015560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_045
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 571
+        width: 164
+        height: 149
+      alignment: 9
+      pivot: {x: 0.7424, y: 0.1963}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f756b6627396bf26bb2d9e00c14d3d95
+      internalID: 794946463
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_046
+      rect:
+        serializedVersion: 2
+        x: 645
+        y: 885
+        width: 181
+        height: 160
+      alignment: 9
+      pivot: {x: 0.7721, y: 0.3203}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f09ef75f3432957b230397e30875fba2
+      internalID: 265335562
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_047
+      rect:
+        serializedVersion: 2
+        x: 1180
+        y: 729
+        width: 213
+        height: 151
+      alignment: 9
+      pivot: {x: 0.8392, y: 0.2665}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f9df47b7ac13dae95d61b252abce9bc0
+      internalID: -1772872662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_048
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 885
+        width: 211
+        height: 160
+      alignment: 9
+      pivot: {x: 0.8614, y: 0.3453}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 45c15b4a1bdef76126d93a794e73eec1
+      internalID: -1940840173
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_049
+      rect:
+        serializedVersion: 2
+        x: 1182
+        y: 1052
+        width: 209
+        height: 163
+      alignment: 9
+      pivot: {x: 0.8505, y: 0.388}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa7b97f4f8219d0f0a6765b824f58617
+      internalID: -491926802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_050
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 1051
+        width: 211
+        height: 164
+      alignment: 9
+      pivot: {x: 0.8424, y: 0.3917}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6db072b8cc6c91a1f316c7efb5a22bf2
+      internalID: 1184059914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_051
+      rect:
+        serializedVersion: 2
+        x: 839
+        y: 1051
+        width: 211
+        height: 164
+      alignment: 9
+      pivot: {x: 0.8424, y: 0.3917}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a0cc0826851eaa2ea5344161675c20c
+      internalID: -928086955
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_052
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 419
+        width: 61
+        height: 148
+      alignment: 9
+      pivot: {x: 0.1926, y: 0.1706}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2041053b98aedb263fa76c6fa50ab485
+      internalID: 1371898990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_053
+      rect:
+        serializedVersion: 2
+        x: 1070
+        y: 420
+        width: 58
+        height: 147
+      alignment: 9
+      pivot: {x: 0.3233, y: 0.1717}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c8013961178eeac064fffa76803cf34f
+      internalID: -2062078837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_054
+      rect:
+        serializedVersion: 2
+        x: 770
+        y: 271
+        width: 77
+        height: 146
+      alignment: 9
+      pivot: {x: 0.2435, y: 0.1729}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1452ceb996250515cbb67ed217cfb4a
+      internalID: -1316837005
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_055
+      rect:
+        serializedVersion: 2
+        x: 1130
+        y: 420
+        width: 98
+        height: 147
+      alignment: 9
+      pivot: {x: 0.1709, y: 0.1717}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9430f497e3970ec28e82c0de9a63b638
+      internalID: -1805913454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_056
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 419
+        width: 91
+        height: 148
+      alignment: 9
+      pivot: {x: 0.1511, y: 0.1706}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 17776d628d57c6285bd265afc0c5f3e4
+      internalID: -1542920056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_057
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 419
+        width: 64
+        height: 148
+      alignment: 9
+      pivot: {x: 0.1836, y: 0.1706}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d47e6e1d18d7966bdf54cdd960003cdc
+      internalID: -1004063433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_058
+      rect:
+        serializedVersion: 2
+        x: 1230
+        y: 420
+        width: 51
+        height: 147
+      alignment: 9
+      pivot: {x: 0.4069, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d22cccf5b2da89fe6186041713df6488
+      internalID: -926131635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_059
+      rect:
+        serializedVersion: 2
+        x: 1283
+        y: 420
+        width: 113
+        height: 147
+      alignment: 9
+      pivot: {x: 0.1217, y: 0.1513}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fced796abc51c1ebd6ec555c4b540db2
+      internalID: -1846459211
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_060
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 723
+        width: 123
+        height: 157
+      alignment: 9
+      pivot: {x: 0.1037, y: 0.1481}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a68ba1c8f158dd5781cdcc792f921e3f
+      internalID: 1950528703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_061
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 128
+        width: 135
+        height: 140
+      alignment: 9
+      pivot: {x: 0.087, y: 0.2017}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d101fcc95bf152364fbbc26a4ce9ee0f
+      internalID: 892880844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_062
+      rect:
+        serializedVersion: 2
+        x: 108
+        y: 1047
+        width: 104
+        height: 168
+      alignment: 9
+      pivot: {x: 0.4207, y: 0.3705}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6372a126c7d0095a37c672c37ae4767a
+      internalID: -2037303374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_063
+      rect:
+        serializedVersion: 2
+        x: 1058
+        y: 133
+        width: 126
+        height: 135
+      alignment: 9
+      pivot: {x: 0.5933, y: 0.2092}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f05291892f5ecf5c8b9846cea4589e0a
+      internalID: 1200606923
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_064
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 126
+        width: 98
+        height: 142
+      alignment: 9
+      pivot: {x: 0.5383, y: 0.2341}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89ec1e557f30e8fb9229810936f93f8b
+      internalID: -1871500607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_065
+      rect:
+        serializedVersion: 2
+        x: 281
+        y: 570
+        width: 62
+        height: 150
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.2483}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7fbb22b5f6f7dfb222f5471470e6c784
+      internalID: -1511345991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_066
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 419
+        width: 54
+        height: 148
+      alignment: 9
+      pivot: {x: 0.3287, y: 0.2179}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b68cec6aa14b1125b1b099871d195f83
+      internalID: -684554189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_067
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 270
+        width: 51
+        height: 147
+      alignment: 9
+      pivot: {x: 0.4069, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e62ebe6c702ff69b8e1b6496056a124a
+      internalID: -445959327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_068
+      rect:
+        serializedVersion: 2
+        x: 783
+        y: 728
+        width: 139
+        height: 152
+      alignment: 9
+      pivot: {x: 0.1277, y: 0.1792}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0c59e6b8a8e24d43300c7d20a8f39b9
+      internalID: -218232698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_069
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 722
+        width: 137
+        height: 158
+      alignment: 9
+      pivot: {x: 0.1296, y: 0.1724}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1bdc23441091a46036f26089b02208b4
+      internalID: 840170472
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_070
+      rect:
+        serializedVersion: 2
+        x: 205
+        y: 883
+        width: 148
+        height: 162
+      alignment: 9
+      pivot: {x: 0.174, y: 0.1682}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a2bb6f12dcea2e3dc0d3ae70fbc7d66
+      internalID: -793591672
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_071
+      rect:
+        serializedVersion: 2
+        x: 355
+        y: 883
+        width: 163
+        height: 162
+      alignment: 9
+      pivot: {x: 0.1702, y: 0.1682}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0576452df82e6d7b575f323fe91cf851
+      internalID: 1360834352
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_072
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 1047
+        width: 129
+        height: 168
+      alignment: 9
+      pivot: {x: 0.1376, y: 0.1622}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 25dd47774243942be6e9c4bd27a8d2ba
+      internalID: -1481131126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_073
+      rect:
+        serializedVersion: 2
+        x: 1186
+        y: 135
+        width: 114
+        height: 133
+      alignment: 9
+      pivot: {x: 0.1645, y: 0.2048}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a01efa68ac6a535d6f5a7155cd0d918f
+      internalID: 643446042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_074
+      rect:
+        serializedVersion: 2
+        x: 1302
+        y: 138
+        width: 119
+        height: 130
+      alignment: 9
+      pivot: {x: 0.166, y: 0.2096}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c462b3c5fae6ff38c873f15cca2c703
+      internalID: -1816899599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_075
+      rect:
+        serializedVersion: 2
+        x: 674
+        y: 131
+        width: 125
+        height: 137
+      alignment: 9
+      pivot: {x: 0.15, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 37c82ba11957a46d339f5bd6e1e6040e
+      internalID: 1302610823
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_076
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 270
+        width: 135
+        height: 147
+      alignment: 9
+      pivot: {x: 0.1315, y: 0.1853}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c26d22069a70b3804b0cd20cb738cfc3
+      internalID: 1648714906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_077
+      rect:
+        serializedVersion: 2
+        x: 924
+        y: 728
+        width: 139
+        height: 152
+      alignment: 9
+      pivot: {x: 0.1277, y: 0.1792}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3d998dc7589e6482dd3ce88cd65266d
+      internalID: 1021012351
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_078
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 569
+        width: 102
+        height: 151
+      alignment: 9
+      pivot: {x: 0.4779, y: 0.2533}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42c87f78b8fa95b86e29916f7e892dc8
+      internalID: -571041450
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_079
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 5
+        width: 171
+        height: 119
+      alignment: 9
+      pivot: {x: 0.2208, y: 0.3214}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 71342b4e0263c3968495107469b7d4e1
+      internalID: -1828266739
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_080
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 26
+        width: 222
+        height: 98
+      alignment: 9
+      pivot: {x: 0.2736, y: 0.3596}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 45b0c7073aaa83e22cd3b67048af2007
+      internalID: -85163871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_081
+      rect:
+        serializedVersion: 2
+        x: 257
+        y: 18
+        width: 143
+        height: 106
+      alignment: 9
+      pivot: {x: 0.5087, y: 0.2948}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5ce2c35ff0f18bf999bd2534e239a8e7
+      internalID: 912720205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_082
+      rect:
+        serializedVersion: 2
+        x: 530
+        y: 24
+        width: 112
+        height: 100
+      alignment: 9
+      pivot: {x: 0.5067, y: 0.1424}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba71c6997b70f36f9a257e6f73d03d62
+      internalID: -1947490454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_083
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 82
+        height: 124
+      alignment: 9
+      pivot: {x: 0.5213, y: 0.0342}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: caf178e75e3dccd81065429f5b14a725
+      internalID: -1281153663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_084
+      rect:
+        serializedVersion: 2
+        x: 570
+        y: 571
+        width: 99
+        height: 149
+      alignment: 9
+      pivot: {x: 0.5934, y: 0.0218}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8872c069c9bfb712d6dc63c3c38c52a
+      internalID: 1321500730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_085
+      rect:
+        serializedVersion: 2
+        x: 868
+        y: 26
+        width: 123
+        height: 98
+      alignment: 9
+      pivot: {x: 0.5996, y: 0.0739}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8891270b8fbe0e681ca0beabdf5573bf
+      internalID: -299899488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_086
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 18
+        width: 126
+        height: 106
+      alignment: 9
+      pivot: {x: 0.4901, y: 0.191}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c218d5f2b6f444820146a9375f40b51d
+      internalID: -853554742
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_087
+      rect:
+        serializedVersion: 2
+        x: 139
+        y: 722
+        width: 99
+        height: 158
+      alignment: 9
+      pivot: {x: 0.3409, y: 0.4826}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2bed6b29b9767d09b620080f2f0fa04a
+      internalID: -1059575348
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_088
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 726
+        width: 75
+        height: 154
+      alignment: 9
+      pivot: {x: 0.3433, y: 0.3912}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b8b6095b935d60d39382391915fcb129
+      internalID: 30154890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_089
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 571
+        width: 103
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4733, y: 0.25}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d6138ec0a4b12a1ddeb778c0c8f16c0
+      internalID: 655667252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_090
+      rect:
+        serializedVersion: 2
+        x: 190
+        y: 270
+        width: 84
+        height: 147
+      alignment: 9
+      pivot: {x: 0.5804, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: afd2939ae8b2570f759cf6056ea6f597
+      internalID: 1062846713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_091
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 270
+        width: 84
+        height: 147
+      alignment: 9
+      pivot: {x: 0.5804, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2ac97effa96cefdaa10965c4263e35f7
+      internalID: 451013008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_092
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 882
+        width: 112
+        height: 163
+      alignment: 9
+      pivot: {x: 0.4353, y: 0.1794}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c8382119f66d602f7fa96076859251c
+      internalID: 309808856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_093
+      rect:
+        serializedVersion: 2
+        x: 114
+        y: 882
+        width: 89
+        height: 163
+      alignment: 9
+      pivot: {x: 0.5478, y: 0.1733}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5cd3727ad07261df3e6aa5d8cd467656
+      internalID: 1453857711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_094
+      rect:
+        serializedVersion: 2
+        x: 1041
+        y: 886
+        width: 83
+        height: 159
+      alignment: 9
+      pivot: {x: 0.5873, y: 0.1839}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09313c984f958a66e8b989ff043115b8
+      internalID: -1431734446
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_095
+      rect:
+        serializedVersion: 2
+        x: 1126
+        y: 886
+        width: 83
+        height: 159
+      alignment: 9
+      pivot: {x: 0.5873, y: 0.1839}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2f2b6671028d7c5f05f084ae87d8116
+      internalID: -1898807797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_096
+      rect:
+        serializedVersion: 2
+        x: 345
+        y: 1047
+        width: 87
+        height: 168
+      alignment: 9
+      pivot: {x: 0.5603, y: 0.1681}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 51e84dd98ca13b44d72a02bfbbb2206c
+      internalID: -920943197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_097
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 724
+        width: 83
+        height: 156
+      alignment: 9
+      pivot: {x: 0.5873, y: 0.1811}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c518680cfe5b216ad2295a7046e82931
+      internalID: 679645734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_098
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 1050
+        width: 86
+        height: 165
+      alignment: 9
+      pivot: {x: 0.5669, y: 0.1651}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4884a2ef99a6f525b95fe22dadbe7767
+      internalID: 1202867952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_099
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 1047
+        width: 102
+        height: 168
+      alignment: 9
+      pivot: {x: 0.4779, y: 0.1562}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bcccef685a41ef54f6dec351afca6a59
+      internalID: -1831016493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_100
+      rect:
+        serializedVersion: 2
+        x: 527
+        y: 727
+        width: 107
+        height: 153
+      alignment: 9
+      pivot: {x: 0.4556, y: 0.1846}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c3b9a78961d0859236e720609a6481c1
+      internalID: 83471444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aldric_101
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 270
+        width: 84
+        height: 147
+      alignment: 9
+      pivot: {x: 0.5804, y: 0.1989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa746f8555b5100def54fbf0610b4f22
+      internalID: -351184665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 998420d97d73d0d4c8ce8a70d7aa3f74
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Aldric_000: 1801324476
+      Aldric_001: 1888418261
+      Aldric_002: -1381807175
+      Aldric_003: 1714010421
+      Aldric_004: -2078481927
+      Aldric_005: -2144760368
+      Aldric_006: 1524077060
+      Aldric_007: 150442654
+      Aldric_008: 2053309965
+      Aldric_009: -338592991
+      Aldric_010: 1178361282
+      Aldric_011: 736055288
+      Aldric_012: 433333736
+      Aldric_013: 675413108
+      Aldric_014: 1274598240
+      Aldric_015: 428424519
+      Aldric_016: 1340921979
+      Aldric_017: -1766171281
+      Aldric_018: -300568221
+      Aldric_019: 638290013
+      Aldric_020: -1116518878
+      Aldric_021: 306870220
+      Aldric_022: 83933520
+      Aldric_023: -467968935
+      Aldric_024: -1767638812
+      Aldric_025: 1662413651
+      Aldric_026: -293459675
+      Aldric_027: 1216523712
+      Aldric_028: 2088919893
+      Aldric_029: 644715834
+      Aldric_030: -1381713810
+      Aldric_031: 54732112
+      Aldric_032: -637958157
+      Aldric_033: 1467232540
+      Aldric_034: -1408376561
+      Aldric_035: -516277908
+      Aldric_036: -1018430484
+      Aldric_037: -1073063784
+      Aldric_038: 136934007
+      Aldric_039: 1111413033
+      Aldric_040: 562430266
+      Aldric_041: 976810066
+      Aldric_042: 1565550053
+      Aldric_043: -251998167
+      Aldric_044: 1326015560
+      Aldric_045: 794946463
+      Aldric_046: 265335562
+      Aldric_047: -1772872662
+      Aldric_048: -1940840173
+      Aldric_049: -491926802
+      Aldric_050: 1184059914
+      Aldric_051: -928086955
+      Aldric_052: 1371898990
+      Aldric_053: -2062078837
+      Aldric_054: -1316837005
+      Aldric_055: -1805913454
+      Aldric_056: -1542920056
+      Aldric_057: -1004063433
+      Aldric_058: -926131635
+      Aldric_059: -1846459211
+      Aldric_060: 1950528703
+      Aldric_061: 892880844
+      Aldric_062: -2037303374
+      Aldric_063: 1200606923
+      Aldric_064: -1871500607
+      Aldric_065: -1511345991
+      Aldric_066: -684554189
+      Aldric_067: -445959327
+      Aldric_068: -218232698
+      Aldric_069: 840170472
+      Aldric_070: -793591672
+      Aldric_071: 1360834352
+      Aldric_072: -1481131126
+      Aldric_073: 643446042
+      Aldric_074: -1816899599
+      Aldric_075: 1302610823
+      Aldric_076: 1648714906
+      Aldric_077: 1021012351
+      Aldric_078: -571041450
+      Aldric_079: -1828266739
+      Aldric_080: -85163871
+      Aldric_081: 912720205
+      Aldric_082: -1947490454
+      Aldric_083: -1281153663
+      Aldric_084: 1321500730
+      Aldric_085: -299899488
+      Aldric_086: -853554742
+      Aldric_087: -1059575348
+      Aldric_088: 30154890
+      Aldric_089: 655667252
+      Aldric_090: 1062846713
+      Aldric_091: 451013008
+      Aldric_092: 309808856
+      Aldric_093: 1453857711
+      Aldric_094: -1431734446
+      Aldric_095: -1898807797
+      Aldric_096: -920943197
+      Aldric_097: 679645734
+      Aldric_098: 1202867952
+      Aldric_099: -1831016493
+      Aldric_100: 83471444
+      Aldric_101: -351184665
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
