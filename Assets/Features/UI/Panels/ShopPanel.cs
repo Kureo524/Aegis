@@ -378,9 +378,10 @@ namespace Features.UI.Panels {
             Fill(_drawerBodies[(int)Drawer.Consumables],
                  _state.Offers.Where(o => o is ElixirDefinition || o is AnvilDefinition { Kind: AnvilKind.Stat }).Where(MatchesSearch), shown);
             List<ItemDefinition> items = _state.Offers.OfType<ItemDefinition>().Where(MatchesSearch).OrderBy(i => i.Cost).ThenBy(i => i.DisplayName).ToList();
-            Fill(_drawerBodies[(int)Drawer.Boots], items.Where(IsBoots).Where(MatchesStat), shown);
+            // The categories and stat filters only sort the main panel; the drawers only follow the search
+            Fill(_drawerBodies[(int)Drawer.Boots], items.Where(IsBoots), shown);
             for (int d = 0; d < 2; d++)
-                if (_drawerBodies[d].childCount == 0) _drawerBodies[d].Add(MenuStyles.Hint("Rien avec ce filtre."));
+                if (_drawerBodies[d].childCount == 0) _drawerBodies[d].Add(MenuStyles.Hint("Aucun résultat."));
 
             // Main: the item anvils of the category, then its legendary items
             Fill(_anvils, _state.Offers.OfType<AnvilDefinition>().Where(a => a.Kind == AnvilKind.Item && MatchesCategory(a) && MatchesSearch(a)), shown);

@@ -78,6 +78,12 @@ namespace Game.Tests.PlayMode {
             int mages = shop.Items.Count(i => i.Tier == ItemTier.Legendary && i.UniqueGroup != "Bottes" && (i.Roles & ItemRole.Mage) != 0);
             Assert.AreEqual(mages, root.Q(className: "ae-shop__main").Query(className: "ae-offer").ToList().Count - 2, "the mage items in the grid");
             Assert.Greater(root.Query(className: "ae-iconbutton").ToList().Count, 15, "categories and stat filters as icons");
+            // Categories and stat filters only sort the main panel: the drawers keep everything
+            panel.SetStatFilter(3);
+            int boots = shop.Items.Count(i => i.UniqueGroup == "Bottes");
+            VisualElement[] drawers2 = root.Query(className: "ae-drawer").ToList().ToArray();
+            Assert.AreEqual(boots, drawers2[1].Query(className: "ae-offer").ToList().Count, "every boot, whatever the filter");
+            Assert.AreEqual(shop.Elixirs.Count + shop.StatAnvils.Count, drawers2[0].Query(className: "ae-offer").ToList().Count);
             panel.ShowAllItems();
 
             ItemDefinition edge = Item("SunsteelBlade");
