@@ -27,6 +27,7 @@ namespace Containers {
         [SerializeField] private SpellSettings spellSettings;
         [SerializeField] private Features.UI.UiTheme uiTheme;
         [SerializeField] private Features.Meta.MetaSettings metaSettings;
+        [SerializeField] private Features.Characters.ChampionRoster championRoster;
 
         protected override void Configure(IContainerBuilder builder) {
             // Infrastructure
@@ -44,6 +45,9 @@ namespace Containers {
             builder.RegisterInstance(metaSettings);
             builder.Register<Features.Meta.MetaProgress>(Lifetime.Singleton);   // persistent currency and trees (JSON)
             builder.Register<UserOptions>(Lifetime.Singleton);   // player's choices (JSON) over the defaults
+            if (championRoster != null) builder.RegisterInstance(championRoster);
+            else builder.RegisterInstance(ScriptableObject.CreateInstance<Features.Characters.ChampionRoster>());
+            builder.RegisterEntryPoint<Features.Characters.ChampionSelection>().AsSelf();   // champion of the next runs
 
             // Game flow
             builder.RegisterComponent(stateMachine);

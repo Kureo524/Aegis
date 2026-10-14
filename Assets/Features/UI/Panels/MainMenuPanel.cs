@@ -83,10 +83,8 @@ namespace Features.UI.Panels {
             _visualElement.style.display = DisplayStyle.None;   // no more clicks, no more rendering
         }
 
-        private void OnPlay() {
-            _play.SetEnabled(false);   // avoid double clicks
-            _eventBus.Publish(new PlayRequestedEvent());
-        }
+        // The champion select screen starts the run (ChampionSelectPanel)
+        private void OnPlay() => _eventBus.Publish(new ChampionSelectRequestedEvent());
 
         private void OnSettings() => _eventBus.Publish(new OptionsRequestedEvent());
         private void OnProgression() => _eventBus.Publish(new MetaTreeRequestedEvent());

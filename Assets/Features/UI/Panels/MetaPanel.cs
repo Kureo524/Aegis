@@ -21,15 +21,18 @@ namespace Features.UI.Panels {
         private MetaProgress _progress;
         private readonly DisposableBag _subscriptions = new();
         private UiTooltip _tooltip;
-        private VisualElement _overlay, _tree;
+        private VisualElement _overlay, _tree, _tabs;
+        private Features.Characters.ChampionSelection _selection;
+        private int _treeIndex = -1;
         private Label _currency, _title;
         private bool _open;
 
         public bool IsOpen => _open;
 
         [Inject]
-        public void Construct(IEventBus eventBus, MetaProgress progress) {
+        public void Construct(IEventBus eventBus, MetaProgress progress, Features.Characters.ChampionSelection selection) {
             _progress = progress;
+            _selection = selection;
             _subscriptions.Add(eventBus.Subscribe<MetaTreeRequestedEvent>(_ => Show(true)));
             _subscriptions.Add(eventBus.Subscribe<UiCancelEvent>(_ => Show(false)));
             _subscriptions.Add(eventBus.Subscribe<MetaChangedEvent>(_ => Refresh()));
@@ -51,6 +54,9 @@ namespace Features.UI.Panels {
             header.Add(_title);
             header.Add(_currency);
             box.Add(header);
+            _tabs = new VisualElement();
+            _tabs.AddToClassList("ae-meta__tabs");
+            box.Add(_tabs);
             box.Add(MenuStyles.Hint("Gagne des éclats en terminant le stage (vagues bonus comprises) et améliore ton champion pour toutes les parties."));
 
             _tree = new VisualElement();
@@ -74,13 +80,32 @@ namespace Features.UI.Panels {
             _open = open;
             if (_overlay == null) return;
             _overlay.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
-            if (open) Refresh();
+            if (open) {
+                _treeIndex = -1;   // the selected champion's tree first
+                Refresh();
+            }
             else _tooltip.Hide();
         }
 
         private void Refresh() {
             if (_tree == null || _progress?.Settings == null) return;
-            MetaTreeDefinition tree = _progress.Settings.Trees.Length > 0 ? _progress.Settings.Trees[0] : null;
+            MetaTreeDefinition[] trees = _progress.Settings.Trees;
+            if (_treeIndex < 0 || _treeIndex >= trees.Length) {
+                _treeIndex = 0;
+                for (int i = 0; i < trees.Length; i++)
+                    if (trees[i] != null && _selection != null && trees[i].Character == _selection.Current) _treeIndex = i;
+            }
+            MetaTreeDefinition tree = trees.Length > 0 ? trees[_treeIndex] : null;
+            _tabs.Clear();
+            for (int i = 0; i < trees.Length; i++) {
+                if (trees[i] == null) continue;
+                int index = i;
+                var tab = new Button(() => ShowTree(index)) { text = trees[i].DisplayName };
+                tab.AddToClassList("ae-tab");
+                tab.EnableInClassList("ae-tab--active", i == _treeIndex);
+                _tabs.Add(tab);
+            }
+            _tabs.style.display = trees.Length > 1 ? DisplayStyle.Flex : DisplayStyle.None;
             _currency.text = $"{_progress.Currency} {_progress.Settings.CurrencyName}";
             _tree.Clear();
             if (tree == null) return;
@@ -104,6 +129,16 @@ namespace Features.UI.Panels {
             foreach (MetaNodeDefinition node in tree.Nodes)
                 if (node != null) _tree.Add(NodeCard(node, centers[node]));
         }
+
+        /// <summary>Shows the tree of another champion (tab).</summary>
+        public void ShowTree(int index) {
+            _treeIndex = index;
+            Refresh();
+        }
+
+        /// <summary>The champion whose tree is shown (tests).</summary>
+        public Features.Characters.CharacterDefinition ShownChampion =>
+            _progress?.Settings != null && _treeIndex >= 0 && _treeIndex < _progress.Settings.Trees.Length ? _progress.Settings.Trees[_treeIndex].Character : null;
 
         private VisualElement NodeCard(MetaNodeDefinition node, Rect rect) {
             int level = _progress.Level(node);

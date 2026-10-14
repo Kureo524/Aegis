@@ -62,6 +62,11 @@ namespace Containers {
         public List<CharacterSpawn> enemySpawns = new();
 
         protected override void Configure(IContainerBuilder builder) {
+            // The champion picked in the menu (root scope); this scene's own one otherwise
+            CharacterDefinition champion = playerDefinition;
+            if (Parent != null && Parent.Container.TryResolve(out Features.Characters.ChampionSelection selection) && selection.Current != null)
+                champion = selection.Current;
+
             builder.RegisterComponent(mainCamera);
             builder.Register<PrefabPool>(Lifetime.Scoped);
             builder.Register<ProjectileLauncher>(Lifetime.Scoped);
@@ -85,7 +90,7 @@ namespace Containers {
             builder.RegisterInstance(stage);
             builder.RegisterComponent(runStateMachine);
             // Meta progression of the run's champion (§9.7)
-            builder.Register(r => new Features.Meta.RunModifiers(r.Resolve<Features.Meta.MetaProgress>(), playerDefinition), Lifetime.Singleton);
+            builder.Register(r => new Features.Meta.RunModifiers(r.Resolve<Features.Meta.MetaProgress>(), champion), Lifetime.Singleton);
             builder.RegisterEntryPoint<Features.Meta.MetaApplier>();
             builder.RegisterEntryPoint<RunDirector>().AsSelf();
             builder.RegisterEntryPoint<RewardController>().AsSelf();
@@ -103,7 +108,7 @@ namespace Containers {
 
             builder.RegisterEntryPoint<PlayerSpawner>()
                 .WithParameter(playerPrefab)
-                .WithParameter(playerDefinition)
+                .WithParameter(champion)
                 .WithParameter(playerSpawn);
             builder.RegisterEntryPoint<EnemySpawner>()
                 .WithParameter<IReadOnlyList<CharacterSpawn>>(enemySpawns);

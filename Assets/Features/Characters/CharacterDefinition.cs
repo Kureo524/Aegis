@@ -17,6 +17,10 @@ namespace Features.Characters {
     public class CharacterDefinition : ScriptableObject {
         [SerializeField] private string displayName;
         [SerializeField] private Faction faction = Faction.Enemy;
+        [Tooltip("Champions: the epithet shown with the name (\"la Lanceuse de braises\").")]
+        [SerializeField] private string epithet;
+        [Tooltip("Champions: how they play, for the champion select screen.")]
+        [SerializeField, TextArea] private string summary;
 
         [Header("Body")]
         [Tooltip("Facing right, pivot at the feet.")]
@@ -53,6 +57,8 @@ namespace Features.Characters {
 
         public string DisplayName => displayName;
         public Faction Faction => faction;
+        public string Epithet => epithet;
+        public string Summary => summary;
         public Sprite Sprite => sprite;
         public SpriteAnimationSet Animations => animations;
         public Sprite Portrait => portrait != null ? portrait : sprite;
