@@ -68,4 +68,7 @@ namespace Systems.Inputs.Events {
             Delta = delta;
         }
     }
+
+    /// <summary>The shop key (P) was pressed.</summary>
+    public readonly struct ShopKeyEvent : IEvent { }
 }

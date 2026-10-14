@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Coutelas du revenant
   icon: {fileID: 21300000, guid: d4b8adf36928ceb8a9e8bd34cce51acb, type: 3}
-  cost: 280
+  cost: 375
   tier: 0
   stats:
   - Stat: 4
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: e0de411523d02ad07ae5cbadf141009c, type: 2}
+  roles: 16

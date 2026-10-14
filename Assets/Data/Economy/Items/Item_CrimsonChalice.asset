@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_CrimsonChalice
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: Calice écarlate
+  displayName: "Calice \xE9carlate"
   icon: {fileID: 21300000, guid: 0a99ff769ae6d585ab0f5069ed59d900, type: 3}
-  cost: 340
+  cost: 385
   tier: 0
   stats:
   - Stat: 4
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: Dernier rempart
   passive: {fileID: 11400000, guid: 016cfde1c324ec577bc7fb63f7d3b187, type: 2}
+  roles: 4

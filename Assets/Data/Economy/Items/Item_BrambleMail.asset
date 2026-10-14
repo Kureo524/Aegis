@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Cotte de ronces
   icon: {fileID: 21300000, guid: 5bc3a3ef80bbf7f448699111fc3509d0, type: 3}
-  cost: 245
+  cost: 260
   tier: 0
   stats:
   - Stat: 0
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: edc8a552a98ba078b96c371a599f5f16, type: 2}
+  roles: 8

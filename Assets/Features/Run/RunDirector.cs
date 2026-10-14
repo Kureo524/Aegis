@@ -9,7 +9,7 @@ using VContainer.Unity;
 namespace Features.Run {
     /// <summary>
     /// Plays a stage (design doc §9.1) through the <see cref="RunStateMachine"/>:
-    /// PreWave (countdown, nothing spawns) → Combat (timer + kill quota, the horde spawns) →
+    /// PreWave (the break: countdown, nothing spawns, the shop is open; NextWaveRequestedEvent ends it) → Combat (timer + kill quota, the horde spawns) →
     /// Reward (timer over AND quota reached: the horde vanishes, the end-of-wave screen opens, game
     /// paused) → PreWave… If the timer ends before the quota: Overtime, one stage life lost at once
     /// and one more every LifeLossInterval until the quota is reached. Dying is an instant defeat
@@ -72,6 +72,9 @@ namespace Features.Run {
             }));
             _subscriptions.Add(_eventBus.Subscribe<RewardClosedEvent>(_ => OnRewardClosed()));
             _subscriptions.Add(_eventBus.Subscribe<SkipWaveRequestedEvent>(_ => SkipWave()));
+            _subscriptions.Add(_eventBus.Subscribe<NextWaveRequestedEvent>(_ => {
+                if (!_halted && !_ended && State == RunState.PreWave) _timer = 0f;
+            }));
             _subscriptions.Add(_eventBus.Subscribe<BossDefeatedEvent>(_ => OnBossDefeated()));
 
             _spawner.SetSpawning(false);
@@ -175,7 +178,7 @@ namespace Features.Run {
         private void OnRewardClosed() {
             if (_ended || State != RunState.Reward) return;
             _waveIndex++;
-            _timer = _stage.PreWaveCountdown;
+            _timer = _stage.Intermission;   // the break: shop open, the HUD can start the wave sooner
             _machine.TryChange(RunState.PreWave);
         }
 

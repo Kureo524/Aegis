@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Lentille abyssale
   icon: {fileID: 21300000, guid: d21ee939928eda82a8b6413e72345a2b, type: 3}
-  cost: 310
+  cost: 370
   tier: 0
   stats:
   - Stat: 5
@@ -32,3 +32,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 4551729d5478f6895926fe6d319d6827, type: 2}
+  roles: 2

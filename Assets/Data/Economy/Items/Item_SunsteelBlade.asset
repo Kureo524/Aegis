@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_SunsteelBlade
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: 'Lame d''aciersoleil'
+  displayName: Lame d'aciersoleil
   icon: {fileID: 21300000, guid: 51fc89affa0624d9096787fa53ee2646, type: 3}
-  cost: 345
+  cost: 410
   tier: 0
   stats:
   - Stat: 4
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: e78fcc8561b942c74acf8e6bacb5bcd9, type: 2}
+  roles: 1

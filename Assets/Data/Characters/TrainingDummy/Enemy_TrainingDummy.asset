@@ -24,6 +24,7 @@ MonoBehaviour:
   abilities: []
   summonerD: {fileID: 0}
   summonerF: {fileID: 0}
+  recommendedItems: []
   passive: {fileID: 0}
   xpReward: 150
   goldReward: 25

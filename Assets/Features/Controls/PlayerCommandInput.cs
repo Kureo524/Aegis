@@ -7,7 +7,6 @@ using Features.Stats;
 using Systems.EventBusses;
 using Systems.Inputs.Events;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using VContainer;
 using VContainer.Unity;
 
@@ -86,6 +85,7 @@ namespace Features.Controls {
 
         private void OnConfirm(ConfirmEvent evt) {
             if (!_aimingAttackMove || OrdersBlocked) return;
+            if (UI.UiPicking.IsPointerOverUi(evt.ScreenPosition)) return;
             if (!TryGetGroundPoint(evt.ScreenPosition, out Ray _, out Vector3 point)) return;
 
             Character preferred = ClosestEnemy(point, attackMoveSelectRadius);
@@ -101,7 +101,7 @@ namespace Features.Controls {
         }
 
         private void OnPointerCommand(PointerCommandEvent evt) {
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (UI.UiPicking.IsPointerOverUi(evt.ScreenPosition)) return;   // a click on the UI is not an order
 
             // Right click while aiming only cancels the aim (§4.6); during an R / F aim it belongs to it
             if (_aimingAttackMove) {

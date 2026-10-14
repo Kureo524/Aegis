@@ -150,10 +150,19 @@ namespace Game.Tests.PlayMode {
             return null;
         }
 
+        // The nearest one (the dummies are at 4.2, 4.5 and 7 m: the far one is out of a cone's reach)
         private static Features.Characters.Character FindDummy(Features.Characters.Character player) {
-            foreach (var c in Object.FindObjectsByType<Features.Characters.Character>(FindObjectsSortMode.None))
-                if (c != player && c.IsAlive) return c;
-            return null;
+            Features.Characters.Character best = null;
+            float bestDistance = float.MaxValue;
+            foreach (var c in Object.FindObjectsByType<Features.Characters.Character>(FindObjectsSortMode.None)) {
+                if (c == player || !c.IsAlive) continue;
+                float d = (c.transform.position - player.transform.position).sqrMagnitude;
+                if (d < bestDistance) {
+                    best = c;
+                    bestDistance = d;
+                }
+            }
+            return best;
         }
 
         [UnityTest]

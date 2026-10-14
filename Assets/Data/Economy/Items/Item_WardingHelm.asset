@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Heaume protecteur
   icon: {fileID: 21300000, guid: 5bec5d4a722024769bc7ebd1d2371cc4, type: 3}
-  cost: 310
+  cost: 370
   tier: 0
   stats:
   - Stat: 4
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: Dernier rempart
   passive: {fileID: 11400000, guid: 7a8f66899c21de846a3b9ad2c93b7131, type: 2}
+  roles: 4

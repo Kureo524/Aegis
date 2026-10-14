@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Tambour de guerre
   icon: {fileID: 21300000, guid: c689e474ca4c082508ade56428e082fe, type: 3}
-  cost: 330
+  cost: 400
   tier: 0
   stats:
   - Stat: 4
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 43d067f8349d14a698cbec37ec247282, type: 2}
+  roles: 4

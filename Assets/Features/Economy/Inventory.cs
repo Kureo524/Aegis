@@ -6,8 +6,9 @@ using VContainer.Unity;
 
 namespace Features.Economy {
     /// <summary>
-    /// The run's items (design doc §9.3): 6 slots like in MOBAs, no components, no selling yet. An item's
-    /// stats are applied through PlayerUpgrades with the item slot as Source. Game scope.
+    /// The run's items (design doc §9.3): 6 slots, no components. An item's stats and passive are
+    /// applied through PlayerUpgrades with the item slot as Source, and taken back when it is sold.
+    /// Game scope.
     /// </summary>
     public sealed class Inventory : IStartable {
         public const int Capacity = 6;
@@ -15,6 +16,7 @@ namespace Features.Economy {
         private readonly PlayerUpgrades _upgrades;
         private readonly IEventBus _eventBus;
         private readonly List<ItemDefinition> _items = new();
+        private readonly List<(Slot slot, Passives.Passive passive)> _slots = new();
 
         public IReadOnlyList<ItemDefinition> Items => _items;
         public bool IsFull => _items.Count >= Capacity;
@@ -43,9 +45,22 @@ namespace Features.Economy {
             _items.Add(item);
             var slot = new Slot(_items.Count - 1, item);
             _upgrades.ApplyPermanent(item.Stats, slot);
-            _upgrades.AddPassive(item.Passive, slot);
+            _slots.Add((slot, _upgrades.AddPassive(item.Passive, slot)));
             Publish();
             return true;
+        }
+
+        /// <summary>Takes the item of slot <paramref name="index"/> away, with its stats and passive (selling).</summary>
+        public ItemDefinition RemoveAt(int index) {
+            if (index < 0 || index >= _items.Count) return null;
+            ItemDefinition item = _items[index];
+            (Slot slot, Passives.Passive passive) = _slots[index];
+            _upgrades.RemovePermanent(slot);
+            if (passive != null) _upgrades.RemovePassive(passive);
+            _items.RemoveAt(index);
+            _slots.RemoveAt(index);
+            Publish();
+            return item;
         }
 
         private void Publish() => _eventBus.Publish(new InventoryChangedEvent(_items.ToArray(), Capacity));

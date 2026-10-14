@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_BarkCloak
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: 'Cape d''écorce'
+  displayName: "Cape d'\xE9corce"
   icon: {fileID: 21300000, guid: 64f56cadfc07b4c658091c05beef6fb7, type: 3}
-  cost: 280
+  cost: 275
   tier: 0
   stats:
   - Stat: 0
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 1f82c71ac17623983a8301bf46a31659, type: 2}
+  roles: 8

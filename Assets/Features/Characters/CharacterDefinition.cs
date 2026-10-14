@@ -44,6 +44,8 @@ namespace Features.Characters {
         [Tooltip("Summoner spell on F (the blink, Bond éclair).")]
         [FormerlySerializedAs("signatureAbility")]
         [SerializeField] private SpellDefinition summonerF;
+        [Tooltip("Shop: the items suggested for this champion (Recommended tab).")]
+        [SerializeField] private Economy.ItemDefinition[] recommendedItems = System.Array.Empty<Economy.ItemDefinition>();
 
         [Header("Passive (design doc §8.1)")]
         [Tooltip("Optional: the character's own passive.")]
@@ -61,6 +63,7 @@ namespace Features.Characters {
         public System.Collections.Generic.IReadOnlyList<SpellDefinition> Abilities => abilities;
         public SpellDefinition SummonerD => summonerD;
         public SpellDefinition SummonerF => summonerF;
+        public Economy.ItemDefinition[] RecommendedItems => recommendedItems;
         public Passives.PassiveDefinition Passive => passive;
         public bool HasAbilities => abilities.Length == AbilitySlots.AbilityCount && System.Array.TrueForAll(abilities, a => a != null);
 

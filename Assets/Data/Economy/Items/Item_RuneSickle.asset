@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Faucille runique
   icon: {fileID: 21300000, guid: 572de878717def073b595dd749fa9eee, type: 3}
-  cost: 290
+  cost: 400
   tier: 0
   stats:
   - Stat: 4
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: Arme runique
   passive: {fileID: 11400000, guid: ee99db93c262eab59b0120c77cdf19c9, type: 2}
+  roles: 1

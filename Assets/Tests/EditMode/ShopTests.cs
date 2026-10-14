@@ -78,15 +78,21 @@ namespace Game.Tests.EditMode {
             _assets.Clear();
         }
 
+        private void Break() => _bus.Publish(new RunStateChangedEvent(RunState.Reward, RunState.PreWave));
+        private void Wave() => _bus.Publish(new RunStateChangedEvent(RunState.PreWave, RunState.Combat));
+
         [Test]
-        public void LightShop_OneElixir_NoItems_StatAnvilsAtWill() {
-            _shop.Open(full: false);
+        public void BetweenWaves_NoLimitButGold_ElixirsItemsAndAnvils() {
+            Break();
+            Assert.IsTrue(_shop.CanBuy);
             Assert.IsTrue(_shop.TryBuy(_elixir));
             Assert.AreEqual(960, _wallet.Gold);
             Assert.AreEqual(20f, _stats.Value(StatType.Armor), "elixir active at once");
-            Assert.IsFalse(_shop.TryBuy(_elixir), "one elixir per shop");
-            Assert.IsFalse(_shop.TryBuy(_legendaries[0]), "no items in the light shop");
-            Assert.IsFalse(_shop.TryBuy(_legendaryAnvil), "no item anvils in the light shop");
+            Assert.IsTrue(_shop.TryBuy(_legendaries[0]));
+            Assert.IsTrue(_shop.TryBuy(_legendaries[1]), "no limit of one item per visit");
+            Assert.IsTrue(_shop.TryBuy(_legendaries[2]));
+            Assert.AreEqual(10f + 11f + 12f, _stats.Value(StatType.PhysicalAttack));
+            Assert.IsFalse(_shop.TryBuy(_legendaries[0]), "unique: already owned");
 
             for (int i = 0; i < 2; i++) {
                 Assert.IsTrue(_shop.TryBuy(_statAnvil));
@@ -95,30 +101,52 @@ namespace Game.Tests.EditMode {
                 Assert.AreEqual(3, _shop.AnvilChoices.Count);
                 CollectionAssert.AllItemsAreUnique(_shop.AnvilChoices);
                 foreach (ScriptableObject c in _shop.AnvilChoices) Assert.AreEqual(RarityTier.Gold, ((StatChoiceDefinition)c).Rarity);
+                Assert.IsFalse(_shop.TryBuy(_elixir), "nothing else while an anvil is open");
                 _shop.Choose(0);
                 Assert.IsFalse(_shop.AnvilOpen);
             }
             Assert.AreEqual(200f, _stats.Value(StatType.MaxHealth), "two permanent stat bonuses");
+
+            Assert.IsTrue(_shop.TryBuy(_legendaryAnvil));
+            CollectionAssert.DoesNotContain(_shop.AnvilChoices, _legendaries[0], "owned items are not offered");
+
+            _wallet.TrySpend(_wallet.Gold);
+            _shop.Choose(0);
+            Assert.AreEqual("Pas assez d'or", _shop.RefusalReason(_legendaries[5]), "gold is the only limit");
         }
 
         [Test]
-        public void FullShop_OneItem_ItemAnvilsCountAsTheItem() {
-            _shop.Open(full: true);
-            Assert.IsTrue(_shop.TryBuy(_legendaries[0]));
-            Assert.AreEqual(10f, _stats.Value(StatType.PhysicalAttack));
-            Assert.IsFalse(_shop.TryBuy(_legendaries[1]), "one item per shop");
-            Assert.IsFalse(_shop.TryBuy(_legendaryAnvil), "item anvils count as the item");
+        public void DuringAWave_ShopBrowsable_NothingBoughtOrSold() {
+            Wave();
+            Assert.IsFalse(_shop.CanBuy);
+            Assert.AreEqual(ShopService.BetweenWavesOnly, _shop.RefusalReason(_legendaries[0]));
+            Assert.IsFalse(_shop.TryBuy(_elixir));
+            Assert.AreEqual(1000, _wallet.Gold);
+            _inventory.TryAdd(_legendaries[0]);
+            Assert.IsFalse(_shop.TrySell(0), "no selling during a wave");
+            int published = 0;
+            _bus.Subscribe<ShopStateEvent>(e => { if (e.CanBuy) published++; });
+            Break();
+            Assert.AreEqual(1, published, "the break opens the purchases");
+        }
 
-            _shop.Open(full: true);   // next full shop
-            Assert.IsFalse(_shop.TryBuy(_legendaries[0]), "unique: already owned");
-            Assert.IsTrue(_shop.TryBuy(_legendaryAnvil));
-            CollectionAssert.DoesNotContain(_shop.AnvilChoices, _legendaries[0], "owned items are not offered");
-            Assert.IsFalse(_shop.TryBuy(_legendaries[1]), "anvil bought: no other item");
+        [Test]
+        public void Sell_GivesBackSeventyPercent_AndTakesTheStatsBack() {
+            Break();
+            _shop.TryBuy(_legendaries[3]);
+            Assert.AreEqual(13f, _stats.Value(StatType.PhysicalAttack));
+            int gold = _wallet.Gold;
+            Assert.AreEqual(70, _legendaries[3].SellValue);
+            Assert.IsTrue(_shop.TrySell(0));
+            Assert.AreEqual(gold + 70, _wallet.Gold);
+            Assert.AreEqual(0, _inventory.Items.Count);
+            Assert.AreEqual(0f, _stats.Value(StatType.PhysicalAttack), "the item's stats are gone");
+            Assert.IsTrue(_shop.TryBuy(_legendaries[3]), "and it can be bought again");
         }
 
         [Test]
         public void ItemAnvil_RerollsOncePerChoice() {
-            _shop.Open(full: true);
+            Break();
             _shop.TryBuy(_legendaryAnvil);
             ScriptableObject before = _shop.AnvilChoices[1];
             _shop.Reroll(1);
@@ -134,16 +162,15 @@ namespace Game.Tests.EditMode {
         [Test]
         public void InventoryFull_RefusesItems() {
             for (int i = 0; i < Inventory.Capacity; i++) Assert.IsTrue(_inventory.TryAdd(_legendaries[i]));
-            _shop.Open(full: true);
+            Break();
             Assert.IsFalse(_shop.TryBuy(_legendaries[7]));
             Assert.AreEqual("Inventaire plein", _shop.RefusalReason(_legendaryAnvil));
         }
 
         [Test]
         public void Elixir_LastsUntilTheEndOfTheNextWave() {
-            _shop.Open(full: false);
+            Break();
             _shop.TryBuy(_elixir);
-            _bus.Publish(new RunStateChangedEvent(RunState.Reward, RunState.PreWave));
             _bus.Publish(new RunStateChangedEvent(RunState.PreWave, RunState.Combat));
             Assert.AreEqual(20f, _stats.Value(StatType.Armor), "still active during the next wave");
             _bus.Publish(new RunStateChangedEvent(RunState.Combat, RunState.Reward));
@@ -158,15 +185,14 @@ namespace Game.Tests.EditMode {
             int closed = 0;
             _bus.Subscribe<RewardClosedEvent>(_ => closed++);
 
-            _bus.Publish(new WaveRewardEvent(2, false, new[] { RewardKind.FreePrismaticAnvil, RewardKind.LightShop }));
+            _bus.Publish(new WaveRewardEvent(2, false, new[] { RewardKind.FreePrismaticAnvil, RewardKind.FreeStatAnvil }));
             Assert.IsTrue(_shop.AnvilOpen, "free prismatic anvil first");
             Assert.AreEqual(1000, _wallet.Gold, "free");
             _shop.Choose(0);
             Assert.AreEqual(ItemTier.Prismatic, _inventory.Items[0].Tier);
-            Assert.IsTrue(_shop.IsOpen, "then the light shop");
-            Assert.IsFalse(_shop.IsFull);
+            Assert.IsTrue(_shop.AnvilOpen, "then the free stat anvil");
             Assert.AreEqual(0, closed);
-            _shop.Close();
+            _shop.Choose(0);
             Assert.AreEqual(1, closed, "all rewards done");
             controller.Dispose();
         }

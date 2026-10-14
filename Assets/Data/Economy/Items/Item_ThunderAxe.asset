@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Hache-tonnerre
   icon: {fileID: 21300000, guid: c59106223e145709f98450d4b946482c, type: 3}
-  cost: 330
+  cost: 350
   tier: 0
   stats:
   - Stat: 4
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: Fendoir
   passive: {fileID: 11400000, guid: f966d25b185f81740ba8f5416ca105a9, type: 2}
+  roles: 4

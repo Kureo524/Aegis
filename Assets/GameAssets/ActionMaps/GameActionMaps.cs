@@ -333,6 +333,16 @@ namespace GameAssets.ActionMaps
                     ""interactions"": """",
                     ""initialStateCheck"": true,
                     ""priority"": 0
+                },
+                {
+                    ""name"": ""Shop"",
+                    ""type"": ""Button"",
+                    ""id"": ""758327d7-48f0-4e5e-898c-62c8e4d787c0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
                 }
             ],
             ""bindings"": [
@@ -905,6 +915,17 @@ namespace GameAssets.ActionMaps
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""LevelUpModifier"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0205849d-d1d2-4edb-869d-8cdb069c109e"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Shop"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1526,6 +1547,7 @@ namespace GameAssets.ActionMaps
             m_Gameplay_CameraLock = m_Gameplay.FindAction("CameraLock", throwIfNotFound: true);
             m_Gameplay_Zoom = m_Gameplay.FindAction("Zoom", throwIfNotFound: true);
             m_Gameplay_LevelUpModifier = m_Gameplay.FindAction("LevelUpModifier", throwIfNotFound: true);
+            m_Gameplay_Shop = m_Gameplay.FindAction("Shop", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1643,6 +1665,7 @@ namespace GameAssets.ActionMaps
         private readonly InputAction m_Gameplay_CameraLock;
         private readonly InputAction m_Gameplay_Zoom;
         private readonly InputAction m_Gameplay_LevelUpModifier;
+        private readonly InputAction m_Gameplay_Shop;
         /// <summary>
         /// Provides access to input actions defined in input action map "Gameplay".
         /// </summary>
@@ -1751,6 +1774,10 @@ namespace GameAssets.ActionMaps
             /// </summary>
             public InputAction @LevelUpModifier => m_Wrapper.m_Gameplay_LevelUpModifier;
             /// <summary>
+            /// Provides access to the underlying input action "Gameplay/Shop".
+            /// </summary>
+            public InputAction @Shop => m_Wrapper.m_Gameplay_Shop;
+            /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
             public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
@@ -1848,6 +1875,9 @@ namespace GameAssets.ActionMaps
                 @LevelUpModifier.started += instance.OnLevelUpModifier;
                 @LevelUpModifier.performed += instance.OnLevelUpModifier;
                 @LevelUpModifier.canceled += instance.OnLevelUpModifier;
+                @Shop.started += instance.OnShop;
+                @Shop.performed += instance.OnShop;
+                @Shop.canceled += instance.OnShop;
             }
 
             /// <summary>
@@ -1931,6 +1961,9 @@ namespace GameAssets.ActionMaps
                 @LevelUpModifier.started -= instance.OnLevelUpModifier;
                 @LevelUpModifier.performed -= instance.OnLevelUpModifier;
                 @LevelUpModifier.canceled -= instance.OnLevelUpModifier;
+                @Shop.started -= instance.OnShop;
+                @Shop.performed -= instance.OnShop;
+                @Shop.canceled -= instance.OnShop;
             }
 
             /// <summary>
@@ -2399,6 +2432,13 @@ namespace GameAssets.ActionMaps
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnLevelUpModifier(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Shop" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnShop(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

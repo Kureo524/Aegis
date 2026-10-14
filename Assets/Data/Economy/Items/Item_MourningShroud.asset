@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Linceul du deuil
   icon: {fileID: 21300000, guid: e30112da0e30c57b4aeab39f3ae0538a, type: 3}
-  cost: 280
+  cost: 295
   tier: 0
   stats:
   - Stat: 0
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 8c0c99809e4b79fd9a4df9841b9a415c, type: 2}
+  roles: 8

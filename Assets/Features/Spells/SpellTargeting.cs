@@ -164,6 +164,7 @@ namespace Features.Spells {
 
         private void OnConfirm(ConfirmEvent e) {
             if (!IsAiming) return;
+            if (UI.UiPicking.IsPointerOverUi(e.ScreenPosition)) return;   // clicking the HUD does not cast
             _pointer = e.ScreenPosition;
             if (!TryBuildContext(_spell, out CastContext ctx)) return;   // keep aiming
 

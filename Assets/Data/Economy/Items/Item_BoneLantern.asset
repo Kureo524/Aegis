@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_BoneLantern
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: 'Lanterne d''os'
+  displayName: Lanterne d'os
   icon: {fileID: 21300000, guid: 9a1533a58b2279142a1f202bf79d8f4c, type: 3}
-  cost: 290
+  cost: 315
   tier: 0
   stats:
   - Stat: 5
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: Arme runique
   passive: {fileID: 11400000, guid: d706662a9f583312594cafc9e64987c3, type: 2}
+  roles: 18

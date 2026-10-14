@@ -1,99 +1,135 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using Features.Economy;
 using Features.Events;
+using Features.Run;
 using Features.Stats;
 using Systems.EventBusses;
+using Systems.Inputs.Events;
 using UnityEngine;
 using UnityEngine.UIElements;
 using VContainer;
 
 namespace Features.UI.Panels {
     /// <summary>
-    /// Shop screen, MOBA style (design doc §9.3), drawn from the ShopService snapshots only
-    /// (ShopStateEvent): filters by stat on the left, a grid of icons with their price (greyed when
-    /// refused, red price when too expensive), the details of the selected offer on the right
-    /// (stats, passive, why it cannot be bought, Buy), the inventory and Continue at the bottom.
-    /// Click selects; double click or right click buys. Buying and leaving are bus requests.
+    /// The shop screen (design doc §9.3), open at any time (shop key, HUD button; it also opens by
+    /// itself at the start of every break), drawn from the ShopService snapshots only:
+    /// - top: Recommended / All items tabs, a search field, the gold, close;
+    /// - left: filters by role (marksman, mage…) and by stat;
+    /// - center: the offers by section (Consumables, Anvils, Boots, Legendary items), icon + price,
+    ///   greyed when refused, price in red when too expensive;
+    /// - right: the selected offer (stats, passive, unique group, why it cannot be bought, Buy), or
+    ///   the selected inventory item with its sell value (Sell);
+    /// - bottom: the inventory, the break timer / "between waves only" during a wave, Start the wave.
+    /// Click selects; double click or right click buys. Buying, selling and leaving are bus requests.
     /// Own UIDocument; anvils open above it (AnvilPanel).
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class ShopPanel : MonoBehaviour {
-        private enum Filter { All, Attack, Critical, AttackSpeed, Magic, Mana, Health, Armor, MagicResist, Haste, Boots, Consumables }
+        private enum Tab { Recommended, All }
 
-        private static readonly (Filter filter, string label)[] Filters = {
-            (Filter.All, "Tous"), (Filter.Attack, "Attaque"), (Filter.Critical, "Critique"), (Filter.AttackSpeed, "Vitesse d'attaque"),
-            (Filter.Magic, "Puissance magique"), (Filter.Mana, "Mana"), (Filter.Health, "Santé"), (Filter.Armor, "Armure"),
-            (Filter.MagicResist, "Résistance magique"), (Filter.Haste, "Accélération"), (Filter.Boots, "Bottes"), (Filter.Consumables, "Élixirs et enclumes"),
+        private enum Filter {
+            All, Marksman, Mage, Fighter, Assassin, Tank,
+            Attack, Critical, AttackSpeed, Magic, Penetration, Mana, Health, Armor, MagicResist, Haste, MoveSpeed, Lifesteal,
+        }
+
+        private static readonly (Filter filter, string label, ItemRole role)[] Roles = {
+            (Filter.All, "Tous", ItemRole.None), (Filter.Marksman, "Tireur", ItemRole.Marksman), (Filter.Mage, "Mage", ItemRole.Mage),
+            (Filter.Fighter, "Combattant", ItemRole.Fighter), (Filter.Assassin, "Assassin", ItemRole.Assassin), (Filter.Tank, "Tank", ItemRole.Tank),
+        };
+
+        private static readonly (Filter filter, string label, StatType icon, StatType[] stats)[] StatFilters = {
+            (Filter.Attack, "Attaque", StatType.PhysicalAttack, new[] { StatType.PhysicalAttack }),
+            (Filter.Critical, "Critique", StatType.CritChance, new[] { StatType.CritChance, StatType.CritDamage }),
+            (Filter.AttackSpeed, "Vitesse d'attaque", StatType.AttackSpeed, new[] { StatType.AttackSpeed }),
+            (Filter.Magic, "Puissance magique", StatType.MagicAttack, new[] { StatType.MagicAttack }),
+            (Filter.Penetration, "Pénétration", StatType.ArmorPenPercent, new[] { StatType.ArmorPenFlat, StatType.ArmorPenPercent, StatType.MagicPenFlat, StatType.MagicPenPercent }),
+            (Filter.Mana, "Mana", StatType.MaxMana, new[] { StatType.MaxMana, StatType.ManaRegen }),
+            (Filter.Health, "Santé", StatType.MaxHealth, new[] { StatType.MaxHealth, StatType.HealthRegen }),
+            (Filter.Armor, "Armure", StatType.Armor, new[] { StatType.Armor }),
+            (Filter.MagicResist, "Résistance magique", StatType.MagicResist, new[] { StatType.MagicResist }),
+            (Filter.Haste, "Accélération", StatType.AbilityHaste, new[] { StatType.AbilityHaste }),
+            (Filter.MoveSpeed, "Vitesse de déplacement", StatType.MoveSpeed, new[] { StatType.MoveSpeed }),
+            (Filter.Lifesteal, "Vol de vie", StatType.Lifesteal, new[] { StatType.Lifesteal, StatType.Omnivamp }),
         };
 
         private IEventBus _eventBus;
+        private UiTheme _theme;
         private readonly DisposableBag _subscriptions = new();
         private UiTooltip _tooltip;
         private VisualElement _overlay, _grid, _inventory, _detail, _filters;
-        private Label _title, _gold, _limits;
+        private Button _recommendedTab, _allTab, _startWave;
+        private TextField _search;
+        private Label _gold, _status;
+
+        private bool _open;
         private ShopStateEvent _state;
         private IReadOnlyList<ItemDefinition> _items = new List<ItemDefinition>();
+        private IReadOnlyList<ItemDefinition> _recommended = Array.Empty<ItemDefinition>();
+        private string _champion = "";
         private int _goldValue;
+        private RunStatusEvent _run;
+        private bool _hasRun;
+        private Tab _tab = Tab.All;
         private Filter _filter = Filter.All;
+        private string _query = "";
         private ScriptableObject _selected;
+        private int _selectedSlot = -1;
 
-        public bool IsOpen => _state.Open;
+        public bool IsOpen => _open;
         /// <summary>The offer shown in the details panel (tests).</summary>
         public ScriptableObject Selected => _selected;
+        /// <summary>The inventory slot shown in the details panel (-1: an offer is shown).</summary>
+        public int SelectedSlot => _selectedSlot;
 
         [Inject]
-        public void Construct(IEventBus eventBus) {
+        public void Construct(IEventBus eventBus, UiTheme theme) {
             _eventBus = eventBus;
-            _subscriptions.Add(eventBus.Subscribe<ShopStateEvent>(e => {
-                if (!_state.Open && e.Open) _selected = null;   // a new shop starts without selection
-                _state = e;
-                Refresh();
-            }));
-            _subscriptions.Add(eventBus.Subscribe<GoldChangedEvent>(e => {
-                _goldValue = e.Gold;
-                Refresh();
-            }));
+            _theme = theme;
+            _subscriptions.Add(eventBus.Subscribe<ShopStateEvent>(e => { _state = e; Refresh(); }));
+            _subscriptions.Add(eventBus.Subscribe<GoldChangedEvent>(e => { _goldValue = e.Gold; Refresh(); }));
             _subscriptions.Add(eventBus.Subscribe<InventoryChangedEvent>(e => {
                 _items = e.Items;
+                if (_selectedSlot >= _items.Count) _selectedSlot = -1;
                 Refresh();
             }));
+            _subscriptions.Add(eventBus.Subscribe<PlayerChampionEvent>(e => {
+                _recommended = e.RecommendedItems;
+                _champion = e.Name;
+                if (_recommended.Count > 0 && _selected == null) _tab = Tab.Recommended;
+                Refresh();
+            }));
+            _subscriptions.Add(eventBus.Subscribe<RunStatusEvent>(e => {
+                _run = e;
+                _hasRun = true;
+                RefreshStatus();
+            }));
+            _subscriptions.Add(eventBus.Subscribe<RunStateChangedEvent>(e => {
+                // Every break after a wave opens the shop by itself
+                if (e.To == RunState.PreWave && e.From == RunState.Reward) Show(true);
+            }));
+            _subscriptions.Add(eventBus.Subscribe<ShopKeyEvent>(_ => Show(!_open)));
+            _subscriptions.Add(eventBus.Subscribe<ShopToggleRequestedEvent>(_ => Show(!_open)));
+            _subscriptions.Add(eventBus.Subscribe<ShopCloseRequestedEvent>(_ => Show(false)));
         }
 
         private void Start() {
             _tooltip = new UiTooltip();
             _overlay = MenuStyles.Overlay(out VisualElement box);
+            _overlay.AddToClassList("ae-shop-overlay");
             box.AddToClassList("ae-shop");
             box.style.width = StyleKeyword.Null;
 
-            var header = new VisualElement();
-            header.AddToClassList("ae-shop__header");
-            var titles = new VisualElement();
-            _title = MenuStyles.Title("Boutique");
-            _title.style.marginBottom = 0;
-            _title.style.unityTextAlign = TextAnchor.MiddleLeft;
-            _limits = MenuStyles.Hint("");
-            titles.Add(_title);
-            titles.Add(_limits);
-            _gold = new Label();
-            _gold.AddToClassList("ae-gold");
-            _gold.style.fontSize = 22;
-            header.Add(titles);
-            header.Add(_gold);
-            box.Add(header);
+            box.Add(BuildHeader());
 
             var body = new VisualElement();
             body.AddToClassList("ae-shop__body");
             _filters = new VisualElement();
             _filters.AddToClassList("ae-shop__filters");
-            foreach ((Filter filter, string label) in Filters) {
-                Filter f = filter;
-                var button = new Button(() => { _filter = f; Refresh(); }) { text = label };
-                button.AddToClassList("ae-filter");
-                button.userData = f;
-                _filters.Add(button);
-            }
+            BuildFilters();
             body.Add(_filters);
 
             var scroll = new ScrollView(ScrollViewMode.Vertical);
@@ -107,16 +143,7 @@ namespace Features.UI.Panels {
             body.Add(_detail);
             box.Add(body);
 
-            var footer = new VisualElement();
-            footer.AddToClassList("ae-shop__footer");
-            _inventory = new VisualElement();
-            _inventory.AddToClassList("ae-shop__inventory");
-            footer.Add(_inventory);
-            Button leave = MenuStyles.Button("Continuer", () => _eventBus.Publish(new ShopCloseRequestedEvent()));
-            leave.AddToClassList("ae-button--primary");
-            leave.style.width = 180;
-            footer.Add(leave);
-            box.Add(footer);
+            box.Add(BuildFooter());
 
             VisualElement root = GetComponent<UIDocument>().rootVisualElement;
             root.Add(_overlay);
@@ -124,11 +151,145 @@ namespace Features.UI.Panels {
             Refresh();
         }
 
+        private VisualElement BuildHeader() {
+            var header = new VisualElement();
+            header.AddToClassList("ae-shop__header");
+            Label title = MenuStyles.Title("Boutique");
+            title.AddToClassList("ae-shop__title");
+            header.Add(title);
+
+            var tabs = new VisualElement();
+            tabs.AddToClassList("ae-shop__tabs");
+            _recommendedTab = new Button(() => SetTab(Tab.Recommended)) { text = "Recommandés" };
+            _allTab = new Button(() => SetTab(Tab.All)) { text = "Tous les objets" };
+            _recommendedTab.AddToClassList("ae-tab");
+            _allTab.AddToClassList("ae-tab");
+            tabs.Add(_recommendedTab);
+            tabs.Add(_allTab);
+            header.Add(tabs);
+
+            _search = new TextField { value = "" };
+            _search.AddToClassList("ae-shop__search");
+            _search.textEdition.placeholder = "Rechercher un objet…";
+            _search.RegisterValueChangedCallback(e => {
+                _query = e.newValue ?? "";
+                if (_query.Length > 0) _tab = Tab.All;
+                Refresh();
+            });
+            header.Add(_search);
+
+            var spacer = new VisualElement();
+            spacer.style.flexGrow = 1;
+            header.Add(spacer);
+
+            var goldRow = new VisualElement();
+            goldRow.AddToClassList("ae-goldrow");
+            var coin = new VisualElement();
+            coin.AddToClassList("ae-coin");
+            goldRow.Add(coin);
+            _gold = new Label();
+            _gold.AddToClassList("ae-gold");
+            _gold.style.fontSize = 22;
+            goldRow.Add(_gold);
+            header.Add(goldRow);
+
+            Button close = MenuStyles.Button("✕", () => Show(false));
+            close.AddToClassList("ae-shop__close");
+            header.Add(close);
+            return header;
+        }
+
+        private void BuildFilters() {
+            _filters.Add(Section("Rôles"));
+            foreach ((Filter filter, string label, ItemRole _) in Roles) _filters.Add(FilterButton(filter, label, null));
+            _filters.Add(Section("Statistiques"));
+            foreach ((Filter filter, string label, StatType icon, StatType[] _) in StatFilters)
+                _filters.Add(FilterButton(filter, label, _theme != null ? _theme.Icon(icon) : null));
+        }
+
+        private static Label Section(string text) {
+            var label = new Label(text);
+            label.AddToClassList("ae-shop__filter-title");
+            return label;
+        }
+
+        private Button FilterButton(Filter filter, string label, Sprite icon) {
+            var button = new Button(() => { _filter = filter; _tab = Tab.All; Refresh(); });
+            button.AddToClassList("ae-filter");
+            button.userData = filter;
+            if (icon != null) {
+                var image = new VisualElement { pickingMode = PickingMode.Ignore };
+                image.AddToClassList("ae-filter__icon");
+                image.style.backgroundImage = new StyleBackground(icon);
+                button.Add(image);
+            }
+            button.Add(new Label(label) { pickingMode = PickingMode.Ignore });
+            return button;
+        }
+
+        private VisualElement BuildFooter() {
+            var footer = new VisualElement();
+            footer.AddToClassList("ae-shop__footer");
+            var inventoryBox = new VisualElement();
+            inventoryBox.AddToClassList("ae-shop__inventory-box");
+            inventoryBox.Add(Section("Inventaire"));
+            _inventory = new VisualElement();
+            _inventory.AddToClassList("ae-shop__inventory");
+            inventoryBox.Add(_inventory);
+            footer.Add(inventoryBox);
+
+            _status = new Label();
+            _status.AddToClassList("ae-shop__status");
+            footer.Add(_status);
+
+            _startWave = MenuStyles.Button("Lancer la vague ▶", () => _eventBus.Publish(new NextWaveRequestedEvent()));
+            _startWave.AddToClassList("ae-button--primary");
+            _startWave.AddToClassList("ae-shop__start");
+            footer.Add(_startWave);
+            return footer;
+        }
+
         private void OnDestroy() => _subscriptions.Dispose();
+
+        public void Show(bool open) {
+            if (_open == open) return;
+            _open = open;
+            if (!open) _tooltip?.Hide();
+            _eventBus?.Publish(new ShopVisibilityChangedEvent(open));
+            Refresh();
+        }
+
+        private void SetTab(Tab tab) {
+            _tab = tab;
+            if (tab == Tab.Recommended) {
+                _filter = Filter.All;
+                _query = "";
+                _search?.SetValueWithoutNotify("");
+            }
+            Refresh();
+        }
+
+        /// <summary>The "All items" tab with no filter nor search (tests, shortcuts).</summary>
+        public void ShowAllItems() {
+            _filter = Filter.All;
+            _query = "";
+            _search?.SetValueWithoutNotify("");
+            SetTab(Tab.All);
+        }
+
+        /// <summary>True when the "Recommended" tab is shown.</summary>
+        public bool ShowsRecommended => _tab == Tab.Recommended;
 
         /// <summary>Selects an offer (click), shown in the details panel.</summary>
         public void Select(ScriptableObject offer) {
             _selected = offer;
+            _selectedSlot = -1;
+            Refresh();
+        }
+
+        /// <summary>Selects an owned item (inventory click): details and its sell value.</summary>
+        public void SelectSlot(int slot) {
+            _selectedSlot = slot >= 0 && slot < _items.Count ? slot : -1;
             Refresh();
         }
 
@@ -136,22 +297,18 @@ namespace Features.UI.Panels {
 
         private void Refresh() {
             if (_overlay == null) return;
-            _overlay.style.display = _state.Open ? DisplayStyle.Flex : DisplayStyle.None;
-            if (!_state.Open) {
-                _tooltip.Hide();
-                return;
-            }
+            _overlay.style.display = _open ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!_open) return;
 
-            _title.text = _state.Full ? "Boutique" : "Boutique légère";
-            _gold.text = $"{_goldValue} or";
-            _limits.text = $"Élixir : {(_state.ElixirBought ? "acheté" : "1 max")}"
-                           + (_state.Full ? $"   ·   Objet : {(_state.ItemBought ? "acheté" : "1 max (enclumes à objets comprises)")}" : "   ·   Objets : boutique complète")
-                           + "   ·   Enclumes à stats : sans limite";
+            _gold.text = _goldValue.ToString();
+            _recommendedTab.EnableInClassList("ae-tab--active", _tab == Tab.Recommended);
+            _allTab.EnableInClassList("ae-tab--active", _tab == Tab.All);
+            _recommendedTab.style.display = _recommended.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             foreach (VisualElement child in _filters.Children())
-                child.EnableInClassList("ae-filter--active", (Filter)child.userData == _filter);
+                if (child.userData is Filter f) child.EnableInClassList("ae-filter--active", _tab == Tab.All && f == _filter);
 
-            _inventory.Clear();
-            for (int i = 0; i < Inventory.Capacity; i++) _inventory.Add(PlayerHud.ItemSlot(i < _items.Count ? _items[i] : null, _tooltip));
+            RefreshInventory();
+            RefreshStatus();
 
             _grid.Clear();
             if (_state.Offers == null) return;
@@ -159,41 +316,78 @@ namespace Features.UI.Panels {
             for (int i = 0; i < _state.Offers.Count; i++) refusals[_state.Offers[i]] = _state.Refusals[i];
             if (_selected != null && !refusals.ContainsKey(_selected)) _selected = null;
 
-            List<ScriptableObject> consumables = _state.Offers.Where(o => o is not ItemDefinition && Matches(o)).ToList();
-            List<ItemDefinition> items = _state.Offers.OfType<ItemDefinition>().Where(Matches).OrderBy(i => i.Cost).ToList();
-            AddSection("Élixirs et enclumes", consumables, refusals);
-            AddSection(_state.Full ? "Objets légendaires" : "", items.Cast<ScriptableObject>().ToList(), refusals);
-            if (consumables.Count == 0 && items.Count == 0) _grid.Add(MenuStyles.Hint("Rien dans cette catégorie."));
+            var shown = new List<ScriptableObject>();
+            if (_tab == Tab.Recommended) {
+                List<ScriptableObject> picks = _recommended.Where(i => i != null && refusals.ContainsKey(i)).Cast<ScriptableObject>().ToList();
+                AddSection(string.IsNullOrEmpty(_champion) ? "Recommandés" : $"Recommandés pour {_champion}", picks, refusals, shown);
+                AddSection("Consommables", _state.Offers.OfType<ElixirDefinition>().Cast<ScriptableObject>().ToList(), refusals, shown);
+            }
+            else {
+                AddSection("Consommables", _state.Offers.OfType<ElixirDefinition>().Where(Matches).Cast<ScriptableObject>().ToList(), refusals, shown);
+                AddSection("Enclumes", _state.Offers.OfType<AnvilDefinition>().Where(Matches).Cast<ScriptableObject>().ToList(), refusals, shown);
+                List<ItemDefinition> items = _state.Offers.OfType<ItemDefinition>().Where(Matches).OrderBy(i => i.Cost).ThenBy(i => i.DisplayName).ToList();
+                AddSection("Bottes", items.Where(IsBoots).Cast<ScriptableObject>().ToList(), refusals, shown);
+                AddSection("Objets légendaires", items.Where(i => !IsBoots(i)).Cast<ScriptableObject>().ToList(), refusals, shown);
+            }
+            if (shown.Count == 0) _grid.Add(MenuStyles.Hint(_query.Length > 0 ? $"Aucun objet ne correspond à « {_query} »." : "Rien dans cette catégorie."));
 
-            _selected ??= consumables.Concat(items).FirstOrDefault();
-            RefreshDetail(_selected, _selected != null && refusals.TryGetValue(_selected, out string r) ? r : null);
+            if (_selectedSlot >= 0) RefreshOwned(_items[_selectedSlot], _selectedSlot);
+            else {
+                _selected ??= shown.FirstOrDefault();
+                RefreshDetail(_selected, _selected != null && refusals.TryGetValue(_selected, out string r) ? r : null);
+            }
         }
 
-        private void AddSection(string title, List<ScriptableObject> offers, Dictionary<ScriptableObject, string> refusals) {
-            if (offers.Count == 0) return;
-            if (!string.IsNullOrEmpty(title)) {
-                var label = new Label(title);
-                label.AddToClassList("ae-shop__section");
-                _grid.Add(label);
+        private static bool IsBoots(ItemDefinition item) => item.UniqueGroup == "Bottes";
+
+        private void RefreshInventory() {
+            _inventory.Clear();
+            for (int i = 0; i < Inventory.Capacity; i++) {
+                int slot = i;
+                VisualElement cell = PlayerHud.ItemSlot(i < _items.Count ? _items[i] : null, _tooltip);
+                cell.EnableInClassList("ae-slot--selected", slot == _selectedSlot);
+                if (i < _items.Count) cell.RegisterCallback<ClickEvent>(_ => SelectSlot(slot));
+                _inventory.Add(cell);
             }
+        }
+
+        private void RefreshStatus() {
+            if (_status == null) return;
+            bool breakTime = _state.CanBuy && _hasRun && _run.State == RunState.PreWave;
+            if (!_state.CanBuy) _status.text = ShopService.BetweenWavesOnly + " : prépare ton build en attendant.";
+            else _status.text = breakTime ? $"Achats ouverts · prochaine vague dans {Mathf.CeilToInt(_run.TimeLeft)} s" : "Achats ouverts";
+            _status.EnableInClassList("ae-shop__status--closed", !_state.CanBuy);
+            _startWave.style.display = breakTime ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        private void AddSection(string title, List<ScriptableObject> offers, Dictionary<ScriptableObject, string> refusals, List<ScriptableObject> shown) {
+            if (offers.Count == 0) return;
+            var label = new Label(title);
+            label.AddToClassList("ae-shop__section");
+            _grid.Add(label);
             var row = new VisualElement();
             row.AddToClassList("ae-shop__row");
-            foreach (ScriptableObject offer in offers) row.Add(OfferIcon(offer, refusals[offer]));
+            foreach (ScriptableObject offer in offers) {
+                row.Add(OfferIcon(offer, refusals[offer]));
+                shown.Add(offer);
+            }
             _grid.Add(row);
         }
 
         private VisualElement OfferIcon(ScriptableObject offer, string refusal) {
-            (string name, Color color, Sprite icon, string _) = OfferCard.Describe(offer);
+            (string name, Color _, Sprite icon, string _) = OfferCard.Describe(offer);
             int cost = OfferCard.Cost(offer);
+            bool poor = refusal == "Pas assez d'or";
             var cell = new VisualElement();
             cell.AddToClassList("ae-offer");
-            cell.EnableInClassList("ae-offer--refused", refusal != null && refusal != "Pas assez d'or");
-            cell.EnableInClassList("ae-offer--poor", refusal == "Pas assez d'or");
+            cell.EnableInClassList("ae-offer--refused", refusal != null && !poor && refusal != ShopService.BetweenWavesOnly);
+            cell.EnableInClassList("ae-offer--poor", poor);
+            cell.EnableInClassList("ae-offer--owned", offer is ItemDefinition owned && _items.Contains(owned));
 
             var frame = new VisualElement();
             frame.AddToClassList("ae-slot");
             frame.AddToClassList("ae-offer__icon");
-            frame.EnableInClassList("ae-slot--selected", offer == _selected);
+            frame.EnableInClassList("ae-slot--selected", offer == _selected && _selectedSlot < 0);
             if (icon != null) frame.style.backgroundImage = new StyleBackground(icon);
             cell.Add(frame);
             var price = new Label(cost > 0 ? cost.ToString() : "—");
@@ -205,10 +399,56 @@ namespace Features.UI.Panels {
                 else Select(offer);
             });
             cell.RegisterCallback<PointerDownEvent>(e => {
-                if (e.button == 1) Buy(offer);   // right click buys, like in MOBAs
+                if (e.button == 1) Buy(offer);   // right click buys
             });
             _tooltip.Attach(cell, () => (name, cost > 0 ? $"{cost} or" : "", refusal));
             return cell;
+        }
+
+        private VisualElement DetailHead(string name, Color color, Sprite icon, string price, bool prismatic) {
+            var head = new VisualElement();
+            head.AddToClassList("ae-detail__head");
+            var image = new VisualElement();
+            image.AddToClassList("ae-slot");
+            image.AddToClassList("ae-detail__icon");
+            if (prismatic) image.AddToClassList("ae-slot--prismatic");
+            if (icon != null) image.style.backgroundImage = new StyleBackground(icon);
+            head.Add(image);
+            var titles = new VisualElement();
+            titles.style.flexShrink = 1;
+            var title = new Label(name);
+            title.AddToClassList("ae-detail__name");
+            title.style.color = color;
+            titles.Add(title);
+            var cost = new Label(price);
+            cost.AddToClassList("ae-gold");
+            titles.Add(cost);
+            head.Add(titles);
+            return head;
+        }
+
+        private void AddItemBody(ItemDefinition item) {
+            string roles = RoleNames(item.Roles);
+            if (roles.Length > 0) {
+                var tags = new Label(roles);
+                tags.AddToClassList("ae-detail__tags");
+                _detail.Add(tags);
+            }
+            var stats = new Label(StatLabels.Format(item.Stats));
+            stats.AddToClassList("ae-detail__stats");
+            _detail.Add(stats);
+            if (item.Passive != null) {
+                var passive = new Label($"<b>{item.Passive.DisplayName}</b> : {item.Passive.Description}");
+                passive.AddToClassList("ae-detail__text");
+                _detail.Add(passive);
+            }
+            if (!string.IsNullOrEmpty(item.UniqueGroup)) {
+                var group = new Label($"Un seul objet « {item.UniqueGroup} »");
+                group.AddToClassList("ae-dim");
+                group.style.fontSize = 11;
+                group.style.marginTop = 6;
+                _detail.Add(group);
+            }
         }
 
         private void RefreshDetail(ScriptableObject offer, string refusal) {
@@ -218,43 +458,21 @@ namespace Features.UI.Panels {
                 return;
             }
             (string name, Color color, Sprite icon, string body) = OfferCard.Describe(offer);
-            var head = new VisualElement();
-            head.AddToClassList("ae-detail__head");
-            var image = new VisualElement();
-            image.AddToClassList("ae-slot");
-            image.AddToClassList("ae-detail__icon");
-            if (icon != null) image.style.backgroundImage = new StyleBackground(icon);
-            head.Add(image);
-            var titles = new VisualElement();
-            titles.style.flexShrink = 1;
-            var title = new Label(name);
-            title.AddToClassList("ae-detail__name");
-            title.style.color = color;
-            titles.Add(title);
             int cost = OfferCard.Cost(offer);
-            var price = new Label(cost > 0 ? $"{cost} or" : "Gratuit");
-            price.AddToClassList("ae-gold");
-            titles.Add(price);
-            head.Add(titles);
-            _detail.Add(head);
-
-            var stats = new Label(offer is ItemDefinition shown ? StatLabels.Format(shown.Stats) : body);
-            stats.AddToClassList("ae-detail__stats");
-            _detail.Add(stats);
+            _detail.Add(DetailHead(name, color, icon, cost > 0 ? $"{cost} or" : "Gratuit", offer is ItemDefinition { Tier: ItemTier.Prismatic }));
 
             if (offer is ItemDefinition item) {
-                if (item.Passive != null) {
-                    var passive = new Label($"<b>{item.Passive.DisplayName}</b> : {item.Passive.Description}");
-                    passive.AddToClassList("ae-detail__text");
-                    _detail.Add(passive);
-                }
-                if (!string.IsNullOrEmpty(item.UniqueGroup)) {
-                    var group = new Label($"Un seul objet « {item.UniqueGroup} »");
-                    group.AddToClassList("ae-dim");
-                    group.style.fontSize = 11;
-                    group.style.marginTop = 6;
-                    _detail.Add(group);
-                }
+                AddItemBody(item);
+                var resale = new Label($"Revente : {item.SellValue} or");
+                resale.AddToClassList("ae-dim");
+                resale.style.fontSize = 11;
+                resale.style.marginTop = 4;
+                _detail.Add(resale);
+            }
+            else {
+                var text = new Label(body);
+                text.AddToClassList("ae-detail__stats");
+                _detail.Add(text);
             }
 
             var spacer = new VisualElement();
@@ -271,23 +489,54 @@ namespace Features.UI.Panels {
             _detail.Add(buy);
         }
 
+        private void RefreshOwned(ItemDefinition item, int slot) {
+            _detail.Clear();
+            (string name, Color color, Sprite icon, string _) = OfferCard.Describe(item);
+            _detail.Add(DetailHead(name, color, icon, "Dans ton inventaire", item.Tier == ItemTier.Prismatic));
+            AddItemBody(item);
+            var spacer = new VisualElement();
+            spacer.style.flexGrow = 1;
+            _detail.Add(spacer);
+            if (!_state.CanBuy) {
+                var why = new Label(ShopService.BetweenWavesOnly);
+                why.AddToClassList("ae-detail__refusal");
+                _detail.Add(why);
+            }
+            Button sell = MenuStyles.Button($"Vendre · {item.SellValue} or", () => _eventBus.Publish(new ShopSellRequestedEvent(slot)));
+            sell.AddToClassList("ae-button--sell");
+            sell.SetEnabled(_state.CanBuy);
+            _detail.Add(sell);
+            Button back = MenuStyles.Button("Retour à la boutique", () => SelectSlot(-1));
+            back.style.marginTop = 4;
+            _detail.Add(back);
+        }
+
+        private static string RoleNames(ItemRole roles) {
+            var names = new List<string>();
+            foreach ((Filter _, string label, ItemRole role) in Roles)
+                if (role != ItemRole.None && (roles & role) != 0) names.Add(label);
+            return string.Join(" · ", names);
+        }
+
         private bool Matches(ScriptableObject offer) {
+            (string name, Color _, Sprite _, string _) = OfferCard.Describe(offer);
+            if (_query.Length > 0 && Fold(name).IndexOf(Fold(_query), StringComparison.Ordinal) < 0) return false;
             if (_filter == Filter.All) return true;
-            if (offer is not ItemDefinition item) return _filter == Filter.Consumables;
-            bool Has(params StatType[] stats) => item.Stats.Any(s => stats.Contains(s.Stat));
-            return _filter switch {
-                Filter.Attack => Has(StatType.PhysicalAttack, StatType.ArmorPenFlat, StatType.ArmorPenPercent),
-                Filter.Critical => Has(StatType.CritChance),
-                Filter.AttackSpeed => Has(StatType.AttackSpeed),
-                Filter.Magic => Has(StatType.MagicAttack, StatType.MagicPenFlat, StatType.MagicPenPercent),
-                Filter.Mana => Has(StatType.MaxMana, StatType.ManaRegen),
-                Filter.Health => Has(StatType.MaxHealth, StatType.HealthRegen),
-                Filter.Armor => Has(StatType.Armor),
-                Filter.MagicResist => Has(StatType.MagicResist),
-                Filter.Haste => Has(StatType.AbilityHaste),
-                Filter.Boots => item.UniqueGroup == "Bottes",
-                _ => false,
-            };
+            if (offer is not ItemDefinition item) return false;
+            foreach ((Filter f, string _, ItemRole role) in Roles)
+                if (f == _filter) return (item.Roles & role) != 0;
+            foreach ((Filter f, string _, StatType _, StatType[] stats) in StatFilters)
+                if (f == _filter) return item.Stats.Any(s => stats.Contains(s.Stat));
+            return false;
+        }
+
+        // Search ignores case and accents ("epee" finds "Épée")
+        private static string Fold(string text) {
+            string decomposed = (text ?? "").ToLowerInvariant().Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder(decomposed.Length);
+            foreach (char c in decomposed)
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark) sb.Append(c);
+            return sb.ToString();
         }
     }
 }

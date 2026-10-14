@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Sandales du sage
   icon: {fileID: 21300000, guid: bc56eb85b613776d38711daba2551b9c, type: 3}
-  cost: 90
+  cost: 145
   tier: 0
   stats:
   - Stat: 22
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: Bottes
   passive: {fileID: 11400000, guid: 252d4bf4a27ab60e283729b103d2c3d3, type: 2}
+  roles: 31

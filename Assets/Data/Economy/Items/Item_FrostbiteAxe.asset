@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Hache mord-givre
   icon: {fileID: 21300000, guid: 94db74d31609eb6d985143a22bb25f7f, type: 3}
-  cost: 320
+  cost: 375
   tier: 0
   stats:
   - Stat: 4
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: a30c5c5735814a211a51e51f7bfe71fa, type: 2}
+  roles: 17

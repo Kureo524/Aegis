@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: WaveRewardSchedule
   m_EditorClassIdentifier: Game.Features::Features.Run.WaveRewardSchedule
   prelude: 0000000001000000
-  loop: 020000000000000003000000
+  loop: 050000000000000005000000
   bonusAugmentEvery: 2

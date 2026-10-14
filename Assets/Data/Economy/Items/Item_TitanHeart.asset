@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_TitanHeart
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: Cœur de titan
+  displayName: "C\u0153ur de titan"
   icon: {fileID: 21300000, guid: 574156de5c04118c8ac4188d02034817, type: 3}
-  cost: 300
+  cost: 310
   tier: 0
   stats:
   - Stat: 0
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 77f92e66869df03fc9661c27377c0473, type: 2}
+  roles: 12

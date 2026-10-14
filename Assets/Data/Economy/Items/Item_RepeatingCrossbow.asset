@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_RepeatingCrossbow
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: Arbalète à répétition
+  displayName: "Arbal\xE8te \xE0 r\xE9p\xE9tition"
   icon: {fileID: 21300000, guid: 1be9a188b77924413a3d6b565d788e43, type: 3}
-  cost: 265
+  cost: 260
   tier: 0
   stats:
   - Stat: 6
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 61b00b7a815eb635e9759b04041365e5, type: 2}
+  roles: 1

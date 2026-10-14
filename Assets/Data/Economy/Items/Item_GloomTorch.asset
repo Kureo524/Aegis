@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Torche lugubre
   icon: {fileID: 21300000, guid: 0fd6857f2e6d745de99055f5d7113a10, type: 3}
-  cost: 320
+  cost: 340
   tier: 0
   stats:
   - Stat: 5
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 9e07868a1aa3dd131ad9b5d8328cd604, type: 2}
+  roles: 18

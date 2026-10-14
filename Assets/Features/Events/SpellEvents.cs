@@ -21,16 +21,19 @@ namespace Features.Events {
         }
     }
 
-    /// <summary>The player's champion (HUD portrait): published when the player is bound to the bus.</summary>
+    /// <summary>The player's champion (HUD portrait, shop recommendations): published when the player is bound to the bus.</summary>
     public readonly struct PlayerChampionEvent : IEvent {
         public readonly string Name;
         public readonly UnityEngine.Sprite Portrait;
         public readonly Passives.PassiveDefinition Passive;
+        public readonly System.Collections.Generic.IReadOnlyList<Economy.ItemDefinition> RecommendedItems;
 
-        public PlayerChampionEvent(string name, UnityEngine.Sprite portrait, Passives.PassiveDefinition passive) {
+        public PlayerChampionEvent(string name, UnityEngine.Sprite portrait, Passives.PassiveDefinition passive,
+                                   System.Collections.Generic.IReadOnlyList<Economy.ItemDefinition> recommendedItems = null) {
             Name = name;
             Portrait = portrait;
             Passive = passive;
+            RecommendedItems = recommendedItems ?? System.Array.Empty<Economy.ItemDefinition>();
         }
     }
 

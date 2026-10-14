@@ -24,9 +24,10 @@ MonoBehaviour:
   abilities: []
   summonerD: {fileID: 0}
   summonerF: {fileID: 0}
+  recommendedItems: []
   passive: {fileID: 0}
   xpReward: 99
-  goldReward: 10
+  goldReward: 8
   navigation: 0
   specialSpell: {fileID: 0}
   startMana: 0
