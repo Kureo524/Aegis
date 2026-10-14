@@ -65,10 +65,15 @@ namespace Game.Tests.PlayMode {
 
             panel.ShowAllItems();
             Assert.Greater(root.Query(className: "ae-offer").ToList().Count, 50, "every offer: drawers, anvils and items");
-            string[] drawers = root.Query<Button>(className: "ae-shop__drawer-title").ToList().Select(l => l.text).ToArray();
+            string[] drawers = root.Query<Label>(className: "ae-shop__drawer-title").ToList().Select(l => l.text).ToArray();
             CollectionAssert.AreEqual(new[] { "Élixirs & enclumes à stats", "Bottes", "Mes objets" }, drawers, "the three drawers on the left");
             Assert.AreEqual(6, root.Query(className: "ae-shop__anvils").Children<VisualElement>().ToList().Count,
                             "every item anvil: prismatic + one legendary per role");
+            VisualElement[] bodies = root.Query(className: "ae-drawer__body").ToList().ToArray();
+            Assert.IsTrue(bodies.All(b => b.resolvedStyle.display == DisplayStyle.None || b.style.display == DisplayStyle.None), "the drawers are folded");
+            panel.OpenDrawer(1);
+            Assert.AreEqual(DisplayStyle.Flex, bodies[1].style.display.value, "the pointer over a drawer unfolds it");
+            panel.OpenDrawer(1, false);
 
             // A category: its own legendary anvil and only its items
             panel.SetCategory(ItemRole.Mage);
@@ -142,6 +147,12 @@ namespace Game.Tests.PlayMode {
             Assert.IsFalse(Game.Resolve<Inventory>().Contains(item));
             Press(Cell());
             Assert.IsTrue(Game.Resolve<Inventory>().Contains(item), "the second click buys");
+
+            // ✕ during a wave
+            bus.Publish(new Features.Events.SkipWaveRequestedEvent());
+            yield return null;
+            Press(root.Query<Button>(className: "ae-shop__close").First());
+            Assert.IsFalse(panel.IsOpen, "the cross closes the shop");
         }
 
         [UnityTest]

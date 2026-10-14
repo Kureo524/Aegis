@@ -177,7 +177,7 @@ namespace Features.UI.Panels {
                     foreach (MetaNodeDefinition pre in node.Prerequisites) {
                         if (pre == null || !_rects.TryGetValue(pre, out Rect from)) continue;
                         bool lit = _progress.Level(pre) > 0;
-                        p.strokeColor = lit ? new Color(0.78f, 0.66f, 0.43f, 0.95f) : new Color(0.35f, 0.33f, 0.3f, 0.7f);
+                        p.strokeColor = lit ? new Color(0.56f, 0.5f, 1f, 0.95f) : new Color(0.24f, 0.25f, 0.42f, 0.7f);
                         var a = new Vector2(from.xMax, from.center.y);
                         var b = new Vector2(to.xMin, to.center.y);
                         float mid = (a.x + b.x) / 2f;

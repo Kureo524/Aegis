@@ -52,7 +52,7 @@ namespace Features.UI {
             row.AddToClassList("ae-panel");
             row.AddToClassList("ae-runhud");
 
-            _wave = Cell(row, 18, new Color(0.95f, 0.8f, 0.4f));
+            _wave = Cell(row, 18, new Color(0.72f, 0.88f, 1f));
             _timer = Cell(row, 22, Color.white);
             _timer.style.minWidth = 70;
             _timer.style.unityTextAlign = TextAnchor.MiddleCenter;

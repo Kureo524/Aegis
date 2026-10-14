@@ -21,6 +21,7 @@ namespace Game.Tests.EditMode {
         private ElixirDefinition _elixir;
         private AnvilDefinition _statAnvil, _legendaryAnvil, _prismaticAnvil;
         private readonly List<ItemDefinition> _legendaries = new();
+        private ItemDefinition _boots;
 
         private T Make<T>(string name, params (string field, object value)[] fields) where T : ScriptableObject {
             var asset = ScriptableObject.CreateInstance<T>();
@@ -40,6 +41,8 @@ namespace Game.Tests.EditMode {
                 _legendaries.Add(Make<ItemDefinition>($"Legendary{i}", ("cost", 100), ("tier", ItemTier.Legendary),
                                                       ("stats", Bonus(StatType.PhysicalAttack, 10 + i)),
                                                       ("roles", i < 4 ? ItemRole.Mage : ItemRole.Tank)));
+            _boots = Make<ItemDefinition>("Boots", ("cost", 100), ("tier", ItemTier.Legendary), ("uniqueGroup", ItemDefinition.BootsGroup),
+                                          ("stats", Bonus(StatType.MoveSpeed, 1)), ("roles", ItemRole.Mage | ItemRole.Tank));
             var prismatics = new List<ItemDefinition>();
             for (int i = 0; i < 4; i++)
                 prismatics.Add(Make<ItemDefinition>($"Prismatic{i}", ("tier", ItemTier.Prismatic), ("stats", Bonus(StatType.MagicAttack, 50))));
@@ -52,7 +55,7 @@ namespace Game.Tests.EditMode {
             _statAnvil = Make<AnvilDefinition>("StatAnvil", ("kind", AnvilKind.Stat), ("cost", 60), ("rarityWeights", new[] { 0f, 1f, 0f }));
             _legendaryAnvil = Make<AnvilDefinition>("LegendaryAnvil", ("kind", AnvilKind.Item), ("itemTier", ItemTier.Legendary), ("cost", 80), ("rerollsPerChoice", 1));
             _prismaticAnvil = Make<AnvilDefinition>("PrismaticAnvil", ("kind", AnvilKind.Item), ("itemTier", ItemTier.Prismatic), ("cost", 300), ("rerollsPerChoice", 1));
-            var allItems = new List<ItemDefinition>(_legendaries);
+            var allItems = new List<ItemDefinition>(_legendaries) { _boots };
             allItems.AddRange(prismatics);
             _catalog = Make<ShopCatalog>("Catalog", ("elixirs", new[] { _elixir }), ("statAnvils", new[] { _statAnvil }),
                                          ("itemAnvils", new[] { _legendaryAnvil, _prismaticAnvil }), ("items", allItems.ToArray()),
@@ -168,7 +171,7 @@ namespace Game.Tests.EditMode {
             for (int n = 0; n < 5; n++) {
                 Assert.IsTrue(_shop.TryBuy(mageAnvil));
                 Assert.AreEqual(3, _shop.AnvilChoices.Count);
-                foreach (ScriptableObject c in _shop.AnvilChoices) Assert.AreEqual(ItemRole.Mage, ((ItemDefinition)c).Roles, "mage items only");
+                foreach (ScriptableObject c in _shop.AnvilChoices) Assert.AreEqual(ItemRole.Mage, ((ItemDefinition)c).Roles, "mage items only, never boots");
                 _shop.Reroll(0);
                 Assert.AreEqual(ItemRole.Mage, ((ItemDefinition)_shop.AnvilChoices[0]).Roles, "rerolls too");
                 _shop.Choose(0);

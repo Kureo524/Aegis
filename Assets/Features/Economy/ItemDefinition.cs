@@ -18,6 +18,8 @@ namespace Features.Economy {
         public const float SellRatio = 0.7f;
         /// <summary>Sell value of an item that was not bought (prismatic items from anvils).</summary>
         public const int UnboughtSellValue = 150;
+        /// <summary>Unique group of the boots: sold in the shop only, never offered by an anvil.</summary>
+        public const string BootsGroup = "Bottes";
 
         [SerializeField] private string displayName;
         [SerializeField] private Sprite icon;
@@ -42,6 +44,7 @@ namespace Features.Economy {
         public string UniqueGroup => uniqueGroup;
         public Passives.PassiveDefinition Passive => passive;
         public ItemRole Roles => roles;
+        public bool IsBoots => uniqueGroup == BootsGroup;
         /// <summary>Gold given back when the item is sold (70 % of its price).</summary>
         public int SellValue => cost > 0 ? Mathf.RoundToInt(cost * SellRatio) : UnboughtSellValue;
     }

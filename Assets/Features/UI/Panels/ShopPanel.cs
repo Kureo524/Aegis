@@ -18,8 +18,8 @@ namespace Features.UI.Panels {
     /// The shop screen (design doc §9.3), open at any time (shop key, HUD button; it also opens by
     /// itself at the start of every break), drawn from the ShopService snapshots only:
     /// - top: title, search, gold, close;
-    /// - left, three drawers that fold: Elixirs and stat anvils, Boots, My items (the inventory:
-    ///   click an item for its details and its sell value);
+    /// - left, three drawers, folded, that unfold under the pointer: Elixirs and stat anvils, Boots,
+    ///   My items (the inventory: click an item for its details and its sell value);
     /// - the main panel: the categories as icons on top (all, recommended, marksman, mage…), the
     ///   stat filters as icons on its right side, the item anvils (prismatic, legendary of the
     ///   category's role) above the legendary items of the category;
@@ -62,8 +62,8 @@ namespace Features.UI.Panels {
         private UiTooltip _tooltip;
         private VisualElement _overlay, _anvils, _grid, _detail, _categories, _statFilters;
         private readonly VisualElement[] _drawerBodies = new VisualElement[3];
-        private readonly Button[] _drawerHeads = new Button[3];
-        private readonly bool[] _folded = new bool[3];
+        private readonly VisualElement[] _drawers = new VisualElement[3];
+        private readonly bool[] _drawerOpen = new bool[3];
         private Button _startWave;
         private TextField _search;
         private Label _gold, _status, _gridTitle;
@@ -186,36 +186,53 @@ namespace Features.UI.Panels {
             goldRow.Add(_gold);
             header.Add(goldRow);
 
-            Button close = MenuStyles.Button("✕", () => Show(false));
+            // Closes on press (not on release): nothing in between can swallow it, at any time of the run
+            Button close = MenuStyles.Button("✕", null);
             close.AddToClassList("ae-shop__close");
+            close.RegisterCallback<PointerDownEvent>(e => {
+                if (e.button != 0) return;
+                e.StopPropagation();
+                Show(false);
+            }, TrickleDown.TrickleDown);
             header.Add(close);
             return header;
         }
 
-        // ---- left column: three drawers that fold ----
+        // ---- left column: three drawers, folded, that unfold while the pointer is over them ----
         private VisualElement BuildDrawers() {
-            var column = new ScrollView(ScrollViewMode.Vertical);
+            var column = new VisualElement();
             column.AddToClassList("ae-shop__drawers");
             string[] titles = { "Élixirs & enclumes à stats", "Bottes", "Mes objets" };
             for (int i = 0; i < 3; i++) {
                 int index = i;
                 var drawer = new VisualElement();
                 drawer.AddToClassList("ae-drawer");
-                Button head = new Button(() => {
-                    _folded[index] = !_folded[index];
-                    Refresh();
-                }) { text = titles[i] };
+                var head = new Label(titles[i]);
                 head.AddToClassList("ae-drawer__head");
                 head.AddToClassList("ae-shop__drawer-title");
                 drawer.Add(head);
                 var content = new VisualElement();
                 content.AddToClassList("ae-drawer__body");
                 drawer.Add(content);
-                _drawerHeads[i] = head;
+                drawer.RegisterCallback<PointerEnterEvent>(_ => SetDrawer(index, true));
+                drawer.RegisterCallback<PointerLeaveEvent>(_ => SetDrawer(index, false));
+                _drawers[i] = drawer;
                 _drawerBodies[i] = content;
                 column.Add(drawer);
+                SetDrawer(i, false);
             }
             return column;
+        }
+
+        private void SetDrawer(int index, bool open) {
+            _drawerOpen[index] = open;
+            _drawers[index].EnableInClassList("ae-drawer--open", open);
+            _drawerBodies[index].style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        /// <summary>Unfolds a drawer of the left column as the pointer would (tests).</summary>
+        public void OpenDrawer(int index, bool open = true) {
+            if (index >= 0 && index < 3 && _drawers[index] != null) SetDrawer(index, open);
         }
 
         // ---- the main panel: categories on top, stat filters on the right, anvils then items ----
@@ -250,8 +267,6 @@ namespace Features.UI.Panels {
             _grid = new VisualElement();
             _grid.AddToClassList("ae-shop__row");
             scroll.Add(_grid);
-            row.Add(scroll);
-
             _statFilters = new VisualElement();
             _statFilters.AddToClassList("ae-shop__stats");
             _statFilters.Add(IconButton(_theme != null ? _theme.NoFilterIcon : null, "Aucun filtre", () => SetStatFilter(-1), -1));
@@ -260,6 +275,7 @@ namespace Features.UI.Panels {
                 _statFilters.Add(IconButton(_theme != null ? _theme.Icon(StatFilters[i].icon) : null, StatFilters[i].label, () => SetStatFilter(index), index));
             }
             row.Add(_statFilters);
+            row.Add(scroll);
             main.Add(row);
             return main;
         }
@@ -356,10 +372,6 @@ namespace Features.UI.Panels {
             }
             foreach (VisualElement child in _statFilters.Children())
                 child.EnableInClassList("ae-iconbutton--active", child.userData is int f && f == _statFilter);
-            for (int i = 0; i < 3; i++) {
-                _drawerHeads[i].EnableInClassList("ae-drawer__head--folded", _folded[i]);
-                _drawerBodies[i].style.display = _folded[i] ? DisplayStyle.None : DisplayStyle.Flex;
-            }
             RefreshStatus();
 
             _cells.Clear();
@@ -418,7 +430,7 @@ namespace Features.UI.Panels {
             }
         }
 
-        private static bool IsBoots(ItemDefinition item) => item.UniqueGroup == "Bottes";
+        private static bool IsBoots(ItemDefinition item) => item.IsBoots;
 
         // The legendary anvils follow the category (all of them under "every item"); prismatic ones always show
         private bool MatchesCategory(AnvilDefinition anvil) =>
