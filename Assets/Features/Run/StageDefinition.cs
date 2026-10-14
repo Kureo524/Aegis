@@ -29,7 +29,7 @@ namespace Features.Run {
         [SerializeField, Min(0f)] private float firstWaveCountdown = 5f;
         [Tooltip("Break after the end-of-wave rewards: the time to shop (seconds, not paused). The HUD can start the wave sooner.")]
         [UnityEngine.Serialization.FormerlySerializedAs("preWaveCountdown")]
-        [SerializeField, Min(0f)] private float intermission = 30f;
+        [SerializeField, Min(0f)] private float intermission = 60f;
 
         public string DisplayName => displayName;
         public WaveDefinition[] Waves => waves;
