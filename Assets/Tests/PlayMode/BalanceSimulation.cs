@@ -58,7 +58,7 @@ namespace Game.Tests.PlayMode {
         private readonly List<Character> _enemies = new();
         private readonly List<string> _log = new();
         private float _nextScan, _waveStart, _quotaAt, _minHp = 1f;
-        private int _wave = -1;
+        private int _wave = -1, _elites;
 
         [UnityTearDown]
         public IEnumerator TearDown() {
@@ -92,6 +92,10 @@ namespace Game.Tests.PlayMode {
             var run = _game.Resolve<RunDirector>();
             var machine = _root.Resolve<GameFlowStateMachine>();
             _bus.Subscribe<WaveRewardEvent>(_ => { _waveEnded = true; Track(run); });
+            _bus.Subscribe<EliteSpawnedEvent>(_ => _elites++);
+            _bus.Subscribe<RunStateChangedEvent>(e => {
+                if (e.To == RunState.Overtime) _log.Add($"OVERTIME wave={run.WaveNumber} alive={_enemies.Count(c => c.IsAlive)} {BossHealth()}");
+            });
             _bus.Subscribe<PlayerDiedEvent>(_ => _log.Add($"DIED wave={run.WaveNumber} t={Time.time - _waveStart:0}s alive={_enemies.Count(c => c.IsAlive)} " +
                                                        $"lvl={_player.Level.Level} ranks={_abilities.Rank(0)}{_abilities.Rank(1)}{_abilities.Rank(2)}{_abilities.Rank(3)} {BossHealth()}"));
 
@@ -104,7 +108,7 @@ namespace Game.Tests.PlayMode {
                 else if (_player.IsAlive) Play();
                 yield return null;
             }
-            _log.Add($"END state={machine.CurrentState} wave={run.WaveNumber} lives={run.Lives} level={_player.Level.Level}");
+            _log.Add($"END state={machine.CurrentState} wave={run.WaveNumber} lives={run.Lives} level={_player.Level.Level} elites={_elites} {BossHealth()}");
             string path = System.Environment.GetEnvironmentVariable("AEGIS_BALANCE_LOG");
             if (string.IsNullOrEmpty(path)) path = Path.Combine(Application.dataPath, "../Temp/balance.log");
             File.WriteAllLines(path, _log);
@@ -171,7 +175,10 @@ namespace Game.Tests.PlayMode {
             Character nearest = Nearest();
             if (nearest == null) return;
             Character boss = _enemies.FirstOrDefault(c => c.IsAlive && c.Definition is BossDefinition);
-            Character focus = boss != null && Flat(nearest.transform.position - _player.transform.position).magnitude > 2.5f ? boss : nearest;
+            // Like a player: the quota first (ordinary enemies around), elites when nothing else is close
+            Character ordinary = _enemies.Where(c => c.IsAlive && !c.IsElite && Flat(c.transform.position - _player.transform.position).magnitude < 8f)
+                                         .OrderBy(c => (c.transform.position - _player.transform.position).sqrMagnitude).FirstOrDefault();
+            Character focus = boss != null && Flat(nearest.transform.position - _player.transform.position).magnitude > 2.5f ? boss : ordinary ?? nearest;
             float distance = Flat(nearest.transform.position - _player.transform.position).magnitude;
             Vector3 away = Flat(_player.transform.position - Centroid(6f)).normalized;
 

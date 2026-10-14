@@ -33,7 +33,9 @@ namespace Features.UI {
         private readonly System.Collections.Generic.List<SpriteRenderer> _ticks = new();
         private float _width, _height;
         private bool _withTicks;
-        private const float StatusIconSize = 0.28f, Border = 0.035f;
+        private const float StatusIconSize = 0.28f, Border = 0.035f, ItemIconSize = 0.26f;
+        private readonly System.Collections.Generic.List<SpriteRenderer> _itemIcons = new();
+        private static readonly Color EliteFrame = new(0.62f, 0.5f, 1f, 1f);
 
         [Inject]
         public void Construct(Camera mainCamera) {
@@ -80,9 +82,36 @@ namespace Features.UI {
             _well.transform.localPosition = new Vector3(0f, 0f, -0.0005f);
             if (statusIcon != null) statusIcon.transform.localPosition = new Vector3(-_width / 2f - 0.2f, 0f, -0.002f);
             transform.localPosition = new Vector3(0f, character.Definition.BodySize.y + heightOffset, 0f);
+            foreach (SpriteRenderer icon in _itemIcons) icon.enabled = false;   // a reused enemy carries nothing yet
             gameObject.SetActive(true);
             Refresh();
             OnStatusChanged();
+        }
+
+        /// <summary>
+        /// The items the character carries (elites, bosses), as small icons in a row above the bar;
+        /// elites get a violet frame.
+        /// </summary>
+        public void ShowItems(System.Collections.Generic.IReadOnlyList<Economy.ItemDefinition> items, bool elite) {
+            if (elite) background.color = EliteFrame;
+            if (statusIcon == null) return;
+            int shown = 0;
+            foreach (Economy.ItemDefinition item in items) {
+                if (item == null || item.Icon == null) continue;
+                if (_itemIcons.Count <= shown) {
+                    SpriteRenderer copy = Instantiate(statusIcon, transform);
+                    copy.name = "Item";
+                    _itemIcons.Add(copy);
+                }
+                SpriteRenderer icon = _itemIcons[shown++];
+                icon.sprite = item.Icon;
+                icon.enabled = true;
+                icon.transform.localScale = Vector3.one * (ItemIconSize / Mathf.Max(0.01f, item.Icon.bounds.size.x));
+            }
+            for (int i = shown; i < _itemIcons.Count; i++) _itemIcons[i].enabled = false;
+            float step = ItemIconSize + 0.04f, left = -(shown - 1) * step / 2f;
+            for (int i = 0; i < shown; i++)
+                _itemIcons[i].transform.localPosition = new Vector3(left + i * step, _height / 2f + Border + ItemIconSize / 2f + 0.04f, -0.002f);
         }
 
         private void OnStatusChanged() {

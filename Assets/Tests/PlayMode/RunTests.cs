@@ -141,7 +141,7 @@ namespace Game.Tests.PlayMode {
             Assert.AreEqual(RunState.PreWave, run.State, "back to the countdown");
 
             // The break: 30 s, the shop opens by itself, anything can be bought, the HUD starts the wave
-            Assert.AreEqual(Game.Resolve<StageDefinition>().Intermission, run.TimeLeft, 0.5f, "a 30 s break after the rewards");
+            Assert.AreEqual(Game.Resolve<StageDefinition>().Intermission, run.TimeLeft, 0.5f, "a 60 s break after the rewards");
             yield return null;
             var panel = Object.FindFirstObjectByType<ShopPanel>();
             Assert.IsTrue(panel.IsOpen, "the shop opens at the start of the break");

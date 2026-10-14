@@ -517,7 +517,7 @@ Stats : 640 PV (+105), 300 mana (+45), 64 AD (+3,2), 0,70 AS (+2,2 %), portée 1
 
 **UI façon LoL (13/10/2026)**, UI Toolkit :
 - **Thème** : `Assets/UI/AegisTheme.uss` (palette LoL : panneaux bleu nuit, cadres or, texte crème, accents turquoise ; classes `ae-panel`, `ae-button`, `ae-slot`, `ae-tooltip`, `ae-tab`, `ae-bar`… avec survols animés), branché sur **tous** les documents par `AegisTheme.tss` (thème Unity par défaut + le nôtre) sur le `PanelSettings` partagé (`UiSetup`). Polices Noto Sans / Noto Serif (OFL, `Assets/UI/Fonts`). `MenuStyles` et les cartes (`OfferCard`) n'ont plus de couleurs en dur.
-- **HUD bas** (`PlayerHud`) : à gauche, **un panneau à deux onglets**, *Statistiques* (12 stats avec icônes : AD, AP, armure, RM, vitesse d'attaque, accélération, critique, vitesse, vol de vie, pénétrations, ténacité ; liste et icônes dans le SO `UiTheme` du root) et *Augments* (slots, rareté en bordure) ; au centre, barre de **buffs** (stacks des passifs, lame enchantée prête : `PlayerBuffsEvent`), ligne de feedback, **portrait** du champion avec son niveau (`PlayerChampionEvent`), barre de sorts (`AbilityBarView` : passif, Q W E R avec touche, pastilles de rang, « + », voile tant que non appris, délais ; D F), barres PV (bouclier blanc) / mana / XP ; à droite, les **6 objets**, l'élixir actif et l'or.
+- **HUD bas** (`PlayerHud`) : à gauche, **un panneau à deux onglets**, *Statistiques* (12 stats avec icônes : AD, AP, armure, RM, vitesse d'attaque, accélération, critique, vitesse, vol de vie, pénétrations, ténacité ; liste et icônes dans le SO `UiTheme` du root) et *Augments* (slots, rareté en bordure) ; au centre, ligne de feedback puis, **juste au-dessus du panneau** (et de sa barre de vie), la barre de **buffs** (stacks des passifs, lame enchantée prête : `PlayerBuffsEvent`), **portrait** du champion avec son niveau (`PlayerChampionEvent`), barre de sorts (`AbilityBarView` : passif, Q W E R avec touche, pastilles de rang, « + », voile tant que non appris, délais ; D F), barres PV (bouclier blanc) / mana / XP ; à droite, les **6 objets**, l'élixir actif et l'or, qui est aussi **le bouton de la boutique** (clic, infobulle « Boutique · P » ; plus de bouton « Boutique »).
 - **Infobulles partout** (`UiTooltip`) : sorts (rang, coût et délai du rang, description), passif, stats, augments, objets (stats + passif), buffs.
 - **Boutique** (`ShopPanel`) : filtres par stat à gauche (Attaque, Critique, Vitesse d'attaque, Puissance magique, Mana, Santé, Armure, Résistance magique, Accélération, Bottes, Élixirs et enclumes), **grille d'icônes avec juste le prix** (grisée si refusé, prix rouge si trop cher), **fiche de l'objet sélectionné** à droite (stats, passif, groupe unique, raison du refus, Acheter), inventaire et Continuer en bas. Clic = sélection, **double-clic ou clic droit = achat** (comme LoL).
 - Enclumes et augments : cartes du thème, bordure à la couleur de la rareté, survol qui soulève la carte. HUD du haut et barre de boss au thème.
@@ -606,7 +606,7 @@ Une **run** est une partie sur un **stage**, **équivalent d'un niveau de BTD6**
    ▼
  Fin de vague = timer écoulé ET quota atteint
    ▼
- Événement de fin de vague selon le WaveRewardSchedule (§9.3) : augment, enclume prismatique gratuite ou rien, puis une pause de 30 s, boutique ouverte
+ Événement de fin de vague selon le WaveRewardSchedule (§9.3) : augment, enclume prismatique gratuite ou rien, puis une pause de 60 s, boutique ouverte
    ▼  (jeu en pause)
  fermeture ──► compte à rebours 10 s ──► vague suivante
 ```
@@ -686,7 +686,7 @@ public class ElixirDefinition : ScriptableObject {   // consommable acheté en b
 
 **Boutique toujours accessible (14/10/2026)** : la boutique s'ouvre **à tout moment** (touche **P**, bouton du HUD, et d'elle-même au début de chaque pause) ; on peut toujours la parcourir, mais **acheter et vendre ne se fait qu'entre les vagues** (`RunState.PreWave`). **Aucune limite par visite** : seul l'or limite. Un seul élixir actif à la fois (un nouveau remplace l'ancien). **Revente à 70 %** du prix (`ItemDefinition.SellValue`, 150 or pour un prismatique obtenu en enclume).
 
-**Pause entre les vagues** : après les récompenses de fin de vague, **30 s** (`StageDefinition.Intermission`) avant la vague suivante, boutique ouverte ; le bouton **« Lancer la vague »** (HUD du haut et pied de la boutique, `NextWaveRequestedEvent`) la démarre tout de suite. Avant la première vague : 10 s.
+**Pause entre les vagues** : après les récompenses de fin de vague, **60 s** (`StageDefinition.Intermission`, 30 s jusqu'au 15/10/2026) avant la vague suivante, boutique ouverte ; le bouton **« Lancer la vague »** (HUD du haut et pied de la boutique, `NextWaveRequestedEvent`) la démarre tout de suite. Avant la première vague : 10 s.
 
 **Récompenses de fin de vague** (`WaveRewardSchedule`, SO piloté par les données : un prélude, puis une boucle ; `None` = juste la pause) :
 
@@ -814,6 +814,10 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 >   - **Golem de pierre** (élite NavMesh, 900 PV, 60 armure, 50 % ténacité) : sort spécial **Séisme**, zone de 3,5 près de lui qui immobilise 1,2 s.
 >   - `SpellExecutor.Telegraph` : les skillshots ennemis sont télégraphiés par une ligne ; rouge pour ce qui fait mal, vert pour un soutien.
 > - *Reste : `WaveScaling` et vagues (phase 7), IA à fréquence réduite pour les ennemis lointains, boss (`PatternRunner`).*
+
+**Élites (15/10/2026)** : un ennemi de la horde peut apparaître en **élite** (`WaveDefinition.EliteChance`, 0 % aux vagues 1 et 2 → 6 / 7 % puis 4 % à la vague du boss, 12 / 15 % en vagues bonus) avec **1 à 3 objets** (`WaveDefinition.EliteItems` : 1 jusqu'à la vague du boss, puis 2 et 3 en vagues bonus) tirés de `HordeSettings.EliteItems` (objets dont le passif sert à un ennemi : épines, dégâts à l'impact, ralentissements, régénération, bouclier, auras…). Il en reçoit les stats et les passifs comme un boss (`Character.Carry`), a **×1,7 PV**, rapporte **×4 or et XP**, est **plus grand** (×1,2), teinté d'un violet froid, avec un **cadre violet** et **les icônes de ses objets au-dessus de sa barre de vie** (aussi pour le boss). `HordeSpawner.MakeElite`, `EliteSpawnedEvent` ; réglages dans `EliteSetup` (réécrits à chaque setup).
+
+**Objets qui grandissent (15/10/2026)** : effet de passif `AddStack` (un stack de plus du compteur du passif, permanent avec `ResetPolicy.Never`) et filtre `EliteOnly` (la cible ou la victime doit être une élite ou un boss). **Cœur de forge** (tank / combattant, 450 PV) : toutes les 6 s, une attaque inflige 50 + 6 % PV max et donne **+10 PV max** pour la partie, sans limite. **Trophée du conquérant** (50 AD) : **+4 AD par élite ou boss tué** (15 max). **Grimoire des âmes** (75 AP) : **+7 AP par élite ou boss tué** (15 max). Leurs stacks s'affichent dans la barre de buffs ; prix : stats + passif + 110 or (« croissance »).
 
 ### 9.7 Méta-progression (rogue-lite)
 

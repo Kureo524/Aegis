@@ -175,5 +175,70 @@ namespace Game.Tests.PlayMode {
             Assert.IsFalse(inventory.CanAdd(Item("MageSlippers")), "one pair of boots");
             Assert.IsTrue(inventory.CanAdd(Item("SunsteelBlade")));
         }
+
+        [UnityTest]
+        public IEnumerator GrowingItems_ForgeHeartGrowsOnHits_TrophyOnEliteKillsOnly() {
+            yield return GameFlowSmokeTests.LoadGameScene();
+            Equip("ForgeHeart");
+            Equip("ConquerorTrophy");
+            Passive forge = Player.Passives.All.First(p => p.Definition.name.Contains("ForgeHeart"));
+            Passive trophy = Player.Passives.All.First(p => p.Definition.name.Contains("ConquerorTrophy"));
+            Character goblin = Spawn("Enemy_Goblin", new Vector3(3f, 0f, 0f));
+            float hp = Player.Stats.Value(StatType.MaxHealth);
+            Hit(goblin);
+            Assert.AreEqual(1, forge.Stacks, "a charged hit grows the heart");
+            Assert.AreEqual(hp + 10f, Player.Stats.Value(StatType.MaxHealth), 0.01f, "+10 max HP for the run");
+            Hit(goblin);
+            Assert.AreEqual(1, forge.Stacks, "once every 6 s");
+
+            float ad = Player.Stats.Value(StatType.PhysicalAttack);
+            Hit(goblin, 1e6f);
+            Assert.IsFalse(goblin.IsAlive);
+            Assert.AreEqual(0, trophy.Stacks, "a normal kill gives nothing");
+            Character elite = Spawn("Enemy_Goblin", new Vector3(-3f, 0f, 0f));
+            Game.Resolve<HordeSpawner>().MakeElite(elite, 1);
+            Hit(elite, 1e7f);
+            Assert.AreEqual(1, trophy.Stacks, "an elite kill grows the trophy");
+            Assert.GreaterOrEqual(Player.Stats.Value(StatType.PhysicalAttack), ad + 4f - 0.01f, "+4 attack (then the % bonuses)");
+            Game.Resolve<Systems.EventBusses.IEventBus>().Publish(new Features.Events.RunStateChangedEvent(RunState.Combat, RunState.Reward));
+            Assert.AreEqual(1, trophy.Stacks, "kept for the rest of the run");
+        }
+
+        [UnityTest]
+        public IEnumerator Elite_CarriesItems_TougherBiggerMarked_WorthMore() {
+            yield return GameFlowSmokeTests.LoadGameScene();
+            Character normal = Spawn("Enemy_Goblin", new Vector3(3f, 0f, 0f));
+            Character elite = Spawn("Enemy_Goblin", new Vector3(-3f, 0f, 0f));
+            float baseHp = normal.Health.Max;
+            Game.Resolve<HordeSpawner>().MakeElite(elite, 2);
+            Assert.IsTrue(elite.IsElite);
+            Assert.AreEqual(2, elite.CarriedItems.Count, "two different items");
+            Assert.AreNotSame(elite.CarriedItems[0], elite.CarriedItems[1]);
+            Assert.Greater(elite.Health.Max, baseHp * 2f - 1f, "twice the health, plus its items");
+            Assert.AreEqual(elite.Health.Max, elite.Health.Current, 0.5f, "spawned at full health");
+            CollectionAssert.IsSubsetOf(elite.CarriedItems, Game.Resolve<HordeSettings>().EliteItems);
+            foreach (ItemDefinition item in elite.CarriedItems)
+                if (item.Passive != null) Assert.IsTrue(elite.Passives.All.Any(p => p.Source == (object)item), "its items' passives");
+            var icons = elite.GetComponentsInChildren<SpriteRenderer>().Where(r => r.name == "Item" && r.enabled).ToArray();
+            Assert.AreEqual(2, icons.Length, "item icons over the health bar");
+
+            int gold = 0;
+            using (Game.Resolve<Systems.EventBusses.IEventBus>().Subscribe<Features.Events.EnemyKilledEvent>(e => gold = e.Gold)) {
+                Hit(normal, 1e6f);
+                int normalGold = gold;
+                Hit(elite, 1e7f);
+                Assert.AreEqual(normalGold * 4, gold, 1, "an elite is worth 4 times the gold");
+            }
+
+            // Reused from the pool: an ordinary goblin again
+            yield return new WaitForSeconds(1f);
+            Character again = Spawn("Enemy_Goblin", new Vector3(0f, 0f, 3f));
+            Character reused = elite == again ? again : null;
+            if (reused != null) {
+                Assert.IsFalse(reused.IsElite);
+                Assert.AreEqual(0, reused.CarriedItems.Count);
+            }
+            Assert.IsFalse(again.IsElite);
+        }
     }
 }

@@ -65,6 +65,8 @@ I = {
  'StormSpire': ('prism', 'lightning-tower', 'lightning-spanner', 'lightning-bolt'), 'BloomBlade': ('prism', 'flower-twirl', 'lotus-flower', 'rose'), 'MirrorMask': ('prism', 'domino-mask', 'mask'),
  'BindingChain': ('prism', 'chained-arrow-heads', 'wavy-chains', 'chain'), 'MagmaShield': ('prism', 'lava', 'shield'),
 }
+I.update({'ForgeHeart': ('crimson', 'heart-tower', 'heart-organ', 'hearts'), 'ConquerorTrophy': ('gold', 'trophy-cup', 'podium-winner', 'trophy'),
+          'SoulGrimoire': ('purple', 'book-aura', 'evil-book', 'book-cover')})
 for k, (pal, *c) in I.items(): T(f'Items/Item_{k}', pal, *c)
 T('Items/Elixir_Iron', 'green', 'potion-ball', 'round-bottom-flask')
 T('Items/Elixir_Sorcery', 'blue', 'magic-potion', 'potion-ball')
