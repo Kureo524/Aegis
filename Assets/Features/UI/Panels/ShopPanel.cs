@@ -18,8 +18,9 @@ namespace Features.UI.Panels {
     /// The shop screen (design doc §9.3), open at any time (shop key, HUD button; it also opens by
     /// itself at the start of every break), drawn from the ShopService snapshots only:
     /// - top: title, search, gold, close;
-    /// - left, three drawers, folded, that unfold under the pointer: Elixirs and stat anvils, Boots,
-    ///   My items (the inventory: click an item for its details and its sell value);
+    /// - on the left edge, three vertical tabs whose panels slide out to the left of the window under
+    ///   the pointer: Elixirs and stat anvils, Boots, My items (the inventory: click an item for its
+    ///   details and its sell value);
     /// - the main panel: the categories as icons on top (all, recommended, marksman, mage…), the
     ///   stat filters as icons on its right side, the item anvils (prismatic, legendary of the
     ///   category's role) above the legendary items of the category;
@@ -64,6 +65,8 @@ namespace Features.UI.Panels {
         private readonly VisualElement[] _drawerBodies = new VisualElement[3];
         private readonly VisualElement[] _drawers = new VisualElement[3];
         private readonly bool[] _drawerOpen = new bool[3];
+        private readonly bool[] _overTab = new bool[3], _overPanel = new bool[3];
+        private readonly VisualElement[] _tabs = new VisualElement[3];
         private Button _startWave;
         private TextField _search;
         private Label _gold, _status, _gridTitle;
@@ -140,7 +143,6 @@ namespace Features.UI.Panels {
 
             var body = new VisualElement();
             body.AddToClassList("ae-shop__body");
-            body.Add(BuildDrawers());
             body.Add(BuildMain());
             _detail = new VisualElement();
             _detail.AddToClassList("ae-shop__detail");
@@ -148,6 +150,14 @@ namespace Features.UI.Panels {
             box.Add(body);
 
             box.Add(BuildFooter());
+
+            // The box sits in a frame that also holds the side tabs and their panels, outside its left edge
+            var frame = new VisualElement();
+            frame.AddToClassList("ae-shop-frame");
+            _overlay.Remove(box);
+            frame.Add(box);
+            frame.Add(BuildSideTabs());
+            _overlay.Add(frame);
 
             VisualElement root = GetComponent<UIDocument>().rootVisualElement;
             root.Add(_overlay);
@@ -198,15 +208,36 @@ namespace Features.UI.Panels {
             return header;
         }
 
-        // ---- left column: three drawers, folded, that unfold while the pointer is over them ----
-        private VisualElement BuildDrawers() {
-            var column = new VisualElement();
-            column.AddToClassList("ae-shop__drawers");
+        // ---- left edge: three vertical tabs; each slides its panel out to the left of the window ----
+        private const long SideCloseDelayMs = 160;
+
+        private VisualElement BuildSideTabs() {
+            var side = new VisualElement { pickingMode = PickingMode.Ignore };
+            side.AddToClassList("ae-shop__side");
+            var tabs = new VisualElement { pickingMode = PickingMode.Ignore };
+            tabs.AddToClassList("ae-shop__tabs");
+            var panels = new VisualElement { pickingMode = PickingMode.Ignore };
+            panels.AddToClassList("ae-shop__flyouts");
+            side.Add(tabs);
+            side.Add(panels);
             string[] titles = { "Élixirs & enclumes à stats", "Bottes", "Mes objets" };
+            string[] tabTexts = { "Élixirs & stats", "Bottes", "Mes objets" };
             for (int i = 0; i < 3; i++) {
                 int index = i;
+                var tab = new VisualElement();
+                tab.AddToClassList("ae-sidetab");
+                var tabLabel = new Label(tabTexts[i]) { pickingMode = PickingMode.Ignore };
+                tabLabel.AddToClassList("ae-sidetab__label");
+                tab.Add(tabLabel);
+                tab.RegisterCallback<PointerEnterEvent>(_ => Hover(index, tab: true, over: true));
+                tab.RegisterCallback<PointerLeaveEvent>(_ => Hover(index, tab: true, over: false));
+                tab.RegisterCallback<PointerDownEvent>(_ => SetDrawer(index, !_drawerOpen[index]));
+                tabs.Add(tab);
+                _tabs[i] = tab;
+
                 var drawer = new VisualElement();
                 drawer.AddToClassList("ae-drawer");
+                drawer.style.top = i * SideTabStep;
                 var head = new Label(titles[i]);
                 head.AddToClassList("ae-drawer__head");
                 head.AddToClassList("ae-shop__drawer-title");
@@ -214,26 +245,60 @@ namespace Features.UI.Panels {
                 var content = new VisualElement();
                 content.AddToClassList("ae-drawer__body");
                 drawer.Add(content);
-                drawer.RegisterCallback<PointerEnterEvent>(_ => SetDrawer(index, true));
-                drawer.RegisterCallback<PointerLeaveEvent>(_ => SetDrawer(index, false));
+                drawer.RegisterCallback<PointerEnterEvent>(_ => Hover(index, tab: false, over: true));
+                drawer.RegisterCallback<PointerLeaveEvent>(_ => Hover(index, tab: false, over: false));
+                panels.Add(drawer);
                 _drawers[i] = drawer;
                 _drawerBodies[i] = content;
-                column.Add(drawer);
+                drawer.style.visibility = Visibility.Hidden;
                 SetDrawer(i, false);
             }
-            return column;
+            return side;
+        }
+
+        private const float SideTabStep = 156f;   // tab height + gap (USS .ae-sidetab)
+
+        // Open while the pointer is over the tab or its panel; closes a moment after it left both
+        private void Hover(int index, bool tab, bool over) {
+            if (tab) _overTab[index] = over;
+            else _overPanel[index] = over;
+            if (over) {
+                for (int i = 0; i < 3; i++)
+                    if (i != index && !_overTab[i] && !_overPanel[i]) SetDrawer(i, false);
+                SetDrawer(index, true);
+                return;
+            }
+            _drawers[index].schedule.Execute(() => {
+                if (!_overTab[index] && !_overPanel[index]) SetDrawer(index, false);
+            }).ExecuteLater(SideCloseDelayMs);
         }
 
         private void SetDrawer(int index, bool open) {
             _drawerOpen[index] = open;
-            _drawers[index].EnableInClassList("ae-drawer--open", open);
-            _drawerBodies[index].style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
+            VisualElement drawer = _drawers[index];
+            _tabs[index].EnableInClassList("ae-sidetab--open", open);
+            if (open) {
+                drawer.style.visibility = Visibility.Visible;
+                drawer.BringToFront();
+                drawer.schedule.Execute(() => drawer.EnableInClassList("ae-drawer--open", _drawerOpen[index]));   // next frame: slides in
+            }
+            else {
+                drawer.EnableInClassList("ae-drawer--open", false);
+                drawer.schedule.Execute(() => {
+                    if (!_drawerOpen[index]) drawer.style.visibility = Visibility.Hidden;
+                }).ExecuteLater(SlideMs);
+            }
         }
 
-        /// <summary>Unfolds a drawer of the left column as the pointer would (tests).</summary>
+        private const long SlideMs = 180;
+
+        /// <summary>Slides a side panel out as the pointer would (tests).</summary>
         public void OpenDrawer(int index, bool open = true) {
             if (index >= 0 && index < 3 && _drawers[index] != null) SetDrawer(index, open);
         }
+
+        /// <summary>True while that side panel is out.</summary>
+        public bool IsDrawerOpen(int index) => index >= 0 && index < 3 && _drawerOpen[index];
 
         // ---- the main panel: categories on top, stat filters on the right, anvils then items ----
         private VisualElement BuildMain() {
@@ -312,7 +377,13 @@ namespace Features.UI.Panels {
         public void Show(bool open) {
             if (_open == open) return;
             _open = open;
-            if (!open) _tooltip?.Hide();
+            if (!open) {
+                _tooltip?.Hide();
+                for (int i = 0; i < 3; i++) {
+                    _overTab[i] = _overPanel[i] = false;
+                    if (_drawers[i] != null) SetDrawer(i, false);
+                }
+            }
             _eventBus?.Publish(new ShopVisibilityChangedEvent(open));
             Refresh();
         }
