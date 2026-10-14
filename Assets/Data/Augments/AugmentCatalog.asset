@@ -13,17 +13,47 @@ MonoBehaviour:
   m_Name: AugmentCatalog
   m_EditorClassIdentifier: Game.Features::Features.Augments.AugmentCatalog
   augments:
-  - {fileID: 11400000, guid: 3e63ab81d6c4b9d65bd651ffc0ccc399, type: 2}
-  - {fileID: 11400000, guid: 24ee7b474721daf258317c33592978b0, type: 2}
-  - {fileID: 11400000, guid: b8ab1303eb1408d609be543a7a44f3a6, type: 2}
-  - {fileID: 11400000, guid: 6138b47c36cb5e0f398ce01ba21e1e97, type: 2}
-  - {fileID: 11400000, guid: b5213b0fc90e1caf9a7f1a422d859e10, type: 2}
-  - {fileID: 11400000, guid: 510c62a6007bc100daae7205258d1924, type: 2}
-  - {fileID: 11400000, guid: 73ae68089205927afbb37e71dacaa3f8, type: 2}
+  - {fileID: 11400000, guid: 451da7f2d04cdf151b9fd8f85a38a120, type: 2}
+  - {fileID: 11400000, guid: 1212a19540d7289a1b91d5f07fc6fc0f, type: 2}
+  - {fileID: 11400000, guid: 785f22361b24198ea864ca71df341a1d, type: 2}
+  - {fileID: 11400000, guid: 991519c426c0e922a9dcbdc0644efff2, type: 2}
+  - {fileID: 11400000, guid: 470f62161a22f2bf18dbcf7d6ffb96e7, type: 2}
+  - {fileID: 11400000, guid: 8a8944f3fa23af4688063e24ddb90269, type: 2}
+  - {fileID: 11400000, guid: 2f20932a3372152b283f6990116b2f7c, type: 2}
+  - {fileID: 11400000, guid: 5d597525ac188ae348e5565d3bc5afb1, type: 2}
+  - {fileID: 11400000, guid: 5ac9e4223b081436487ab29ea3a09497, type: 2}
+  - {fileID: 11400000, guid: fb96ea3bdd1ff210d8fe3fcf1a5eacf0, type: 2}
   - {fileID: 11400000, guid: 69c16783b50174f85b24d62f7d12e953, type: 2}
   - {fileID: 11400000, guid: befa62a90d5265256b005dcc96a5bb2a, type: 2}
-  - {fileID: 11400000, guid: 883e090b9fa877922a0f3007d2216d26, type: 2}
-  - {fileID: 11400000, guid: ddaafc5d3dcd63ed08d272d59906879e, type: 2}
+  - {fileID: 11400000, guid: a0613bf7701c69e0283a7a2f262547ee, type: 2}
+  - {fileID: 11400000, guid: 1a02127461adcbc68b9d537f8a70328d, type: 2}
+  - {fileID: 11400000, guid: 8fc3790fc040e5f618160981200ca383, type: 2}
+  - {fileID: 11400000, guid: 3f8b3bc8c4d6d7f3a95b992e7f2c4846, type: 2}
+  - {fileID: 11400000, guid: 2e43fcbf9feb945e58d2541ee5a429a1, type: 2}
+  - {fileID: 11400000, guid: a0c30ce1de59e5c86b583808d3bb7fbc, type: 2}
+  - {fileID: 11400000, guid: 3675e5ce75ba0f3849e5873bbfe71ab2, type: 2}
+  - {fileID: 11400000, guid: a2262df81e9a2151a8d927d90162a08c, type: 2}
+  - {fileID: 11400000, guid: 2ad9fa7938c56555eb308490cd1c6ede, type: 2}
+  - {fileID: 11400000, guid: 2de17d796c71f05ccbaf231e72119a60, type: 2}
+  - {fileID: 11400000, guid: a6545faa17f2627c18e2cf3839245075, type: 2}
+  - {fileID: 11400000, guid: a05d98e0f9bb71e518ed45b5d7257318, type: 2}
+  - {fileID: 11400000, guid: 73ae68089205927afbb37e71dacaa3f8, type: 2}
+  - {fileID: 11400000, guid: f2baa8943086e259faaecb5d6b462536, type: 2}
+  - {fileID: 11400000, guid: fc9f6cdce60f394e2890424ade0bbf17, type: 2}
+  - {fileID: 11400000, guid: bb5da8c042d27fe5cbae0204c9d277a0, type: 2}
+  - {fileID: 11400000, guid: c2667a57c0058248c872cacf4363d347, type: 2}
+  - {fileID: 11400000, guid: 60598059cb43aa82f83962cd5e2813c9, type: 2}
+  - {fileID: 11400000, guid: b49f0562acb1f79c4b68d1de202159fa, type: 2}
+  - {fileID: 11400000, guid: 050cb099205d075f38da4630d4977bd5, type: 2}
+  - {fileID: 11400000, guid: c14a697a8c4eb784e8c2b87155d28e7f, type: 2}
+  - {fileID: 11400000, guid: 30710b824a79f654ba7437054c6694f7, type: 2}
+  - {fileID: 11400000, guid: 90fd01f2a09e99458af62c2c918f06a3, type: 2}
+  - {fileID: 11400000, guid: 11f8125bcabc51cd69bc0f3966462b8f, type: 2}
+  - {fileID: 11400000, guid: 25dea8cee2474ea298e48cf794de18d3, type: 2}
+  - {fileID: 11400000, guid: ec43cefbe09d6c7308af33c5a7d7dc51, type: 2}
+  - {fileID: 11400000, guid: f4d81549a873929dc81ce7883a2af483, type: 2}
+  - {fileID: 11400000, guid: b5213b0fc90e1caf9a7f1a422d859e10, type: 2}
+  - {fileID: 11400000, guid: 3354519c74bafaf52ab2f2e8f43d80e2, type: 2}
   - {fileID: 11400000, guid: 29dc5e6c98c147370acd5a1d312c0dc2, type: 2}
   baseSlots: 4
   maxSlots: 6
@@ -32,7 +62,7 @@ MonoBehaviour:
   - 55
   - 33
   - 12
-  rerolls: 4
+  rerollsPerCard: 1
   goldRerollChance: 0.05
   fullSlotsAnvil: {fileID: 11400000, guid: 98f0f4f4a74b97499bda846780430f31, type: 2}
   goldPerRarity: 960000002c010000f4010000

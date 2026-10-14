@@ -14,20 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
   displayName: Gobelin
   faction: 1
-  sprite: {fileID: 21300000, guid: 3b119b003b1589b679e690602793e40b, type: 3}
-  bodySize: {x: 0.7, y: 1.25}
+  sprite: {fileID: -1086599569, guid: 934844abd5ca08c5d8acc42297d9c977, type: 3}
+  animations: {fileID: 11400000, guid: 40e589132308eaeeba6a9f9cadd0a7a8, type: 2}
+  portrait: {fileID: 0}
+  bodySize: {x: 0.7, y: 1.22}
   baseStats: {fileID: 11400000, guid: 0cd866e5f0d7ba90c8f524490cb947c2, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: 465b557e9ed6cfee1a6686ac1c42099b, type: 2}
-  elements:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  elementUnlockLevels: 010000000300000005000000
-  spellBook: {fileID: 0}
-  signatureAbility: {fileID: 0}
-  xpReward: 18
-  goldReward: 3
+  abilities: []
+  summonerD: {fileID: 0}
+  summonerF: {fileID: 0}
+  recommendedItems: []
+  passive: {fileID: 0}
+  xpReward: 81
+  goldReward: 6
   navigation: 0
   specialSpell: {fileID: 0}
   startMana: 0

@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c58604379ce9cdca08ba4b1092853e8f, type: 3}
+  m_Name: Anim_StoneGolem
+  m_EditorClassIdentifier: Game.Features::Features.Characters.SpriteAnimationSet
+  idle:
+    Frames:
+    - {fileID: -360325136, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 471646869, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 475194144, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -875233234, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -879365715, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -705850294, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 2143871888, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 2027943553, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 515032307, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 132174199, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 266375189, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 2117154500, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    Duration: 1
+    Loop: 1
+  run:
+    Frames:
+    - {fileID: -165942431, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 832734664, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -993456683, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -226886276, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 1081595208, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 1745317370, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 1527140927, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -1297443578, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -862875099, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 619537969, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 1572857230, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -169856496, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    Duration: 0.542
+    Loop: 1
+  attack:
+    Frames:
+    - {fileID: -1124621564, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 674937647, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 1685778775, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 792278304, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -2011877288, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 173571232, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -812879554, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 335173329, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 1538129841, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -1488676746, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    Duration: 0.833
+    Loop: 0
+  attackImpact: 0.45
+  hit:
+    Frames:
+    - {fileID: 909747673, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 155382310, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -675366782, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -956593193, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -1088077821, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 1555535885, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    Duration: 0.583
+    Loop: 0
+  death:
+    Frames:
+    - {fileID: -661814356, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 718520975, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 236791447, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -168281867, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 726334164, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -1501759901, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 61946013, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -1706032806, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -449006822, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 450853232, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 2006479520, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -160045225, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    Duration: 0.75
+    Loop: 0
+  dash:
+    Frames: []
+    Duration: 1
+    Loop: 1
+  cast:
+    Frames:
+    - {fileID: -493361201, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -167354798, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -980050917, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -893012326, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: -1203042397, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 1925016869, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 2108551879, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 1331398916, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 198854096, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 240677051, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 1871034457, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    - {fileID: 30040086, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
+    Duration: 0.833
+    Loop: 0
+  spellClips: []
+  runReferenceSpeed: 2.2

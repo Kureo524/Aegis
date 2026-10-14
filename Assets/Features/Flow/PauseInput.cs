@@ -8,7 +8,7 @@ using VContainer.Unity;
 namespace Features.Flow {
     /// <summary>
     /// Escape in game (design doc §4.1): cancels the current aim first (Q / R / F, handled by their
-    /// owners); with nothing to cancel, requests the pause. Game scope entry point. Leaving the
+    /// owners), then closes the shop if it is open; with nothing to cancel, requests the pause. Game scope entry point. Leaving the
     /// pause (Escape on the UI map, "Resume" button) belongs to the pause menu.
     /// </summary>
     public sealed class PauseInput : IInitializable, IDisposable {
@@ -16,6 +16,7 @@ namespace Features.Flow {
         private readonly DisposableBag _subscriptions = new();
         private bool _spellAim;
         private bool _attackMoveHeld;
+        private bool _shopOpen;
         private int _aimEndedFrame = -1;
 
         public PauseInput(IEventBus eventBus) {
@@ -25,9 +26,10 @@ namespace Features.Flow {
         public void Initialize() {
             _subscriptions.Add(_eventBus.Subscribe<AimModeEvent>(e => {
                 if (_spellAim && e.Mode == AimMode.None) _aimEndedFrame = Time.frameCount;
-                _spellAim = e.Mode is AimMode.Spell or AimMode.Signature;
+                _spellAim = e.Mode == AimMode.Ability;
             }));
             _subscriptions.Add(_eventBus.Subscribe<AttackMoveEvent>(e => _attackMoveHeld = e.Pressed));
+            _subscriptions.Add(_eventBus.Subscribe<ShopVisibilityChangedEvent>(e => _shopOpen = e.Open));
             _subscriptions.Add(_eventBus.Subscribe<CancelEvent>(_ => OnCancel()));
         }
 
@@ -36,6 +38,10 @@ namespace Features.Flow {
         // Subscribers run in any order: an aim cancelled by this same Escape ended this frame.
         private void OnCancel() {
             if (_spellAim || _attackMoveHeld || _aimEndedFrame == Time.frameCount) return;
+            if (_shopOpen) {
+                _eventBus.Publish(new ShopCloseRequestedEvent());
+                return;
+            }
             _eventBus.Publish(new PauseRequestedEvent());
         }
     }

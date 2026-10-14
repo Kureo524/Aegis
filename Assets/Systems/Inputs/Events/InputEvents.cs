@@ -34,36 +34,28 @@ namespace Systems.Inputs.Events {
     /// <summary>Escape while a menu has the input (UI map): back / close.</summary>
     public readonly struct UiCancelEvent : IEvent { }
     
-    /// <summary>Attack-move key (Q) pressed or released: aiming lasts while it is held.</summary>
+    /// <summary>Attack-move key (Q, physical A in QWERTY) pressed or released: aiming lasts while it is held.</summary>
     public readonly struct AttackMoveEvent : IEvent {
         public readonly bool Pressed;
         public AttackMoveEvent(bool pressed) => Pressed = pressed;
     }
     
-    /// <summary>A / Z / E. With Ctrl held (LevelUp), spends a skill point on the element instead.</summary>
-    public readonly struct ElementKeyEvent : IEvent {
-        public readonly int Slot; // 0, 1, 2
+    /// <summary>
+    /// A spell key: Q W E R (slots 0–3, on A Z E R in AZERTY) or D F (summoner spells, slots 4–5).
+    /// Pressed, or released (casts in the "quick cast with indicator" mode). With Ctrl held
+    /// (LevelUp), Q W E R spend a skill point on the ability instead.
+    /// </summary>
+    public readonly struct AbilityKeyEvent : IEvent {
+        public readonly int Slot;
         public readonly bool LevelUp;
+        public readonly bool Released;
 
-        public ElementKeyEvent(int slot, bool levelUp = false) {
+        public AbilityKeyEvent(int slot, bool levelUp = false, bool released = false) {
             Slot = slot;
             LevelUp = levelUp;
+            Released = released;
         }
     }
-    
-    /// <summary>R pressed, or released (Released: casts in the "quick cast with indicator" mode).</summary>
-    public readonly struct CastSpellEvent : IEvent {
-        public readonly bool Released;
-        public CastSpellEvent(bool released) => Released = released;
-    }
-    
-    /// <summary>F pressed, or released (see <see cref="CastSpellEvent"/>).</summary>
-    public readonly struct SignatureEvent : IEvent {
-        public readonly bool Released;
-        public SignatureEvent(bool released) => Released = released;
-    }
-    
-    public readonly struct ResetElementsEvent : IEvent { }
     
     public readonly struct StopEvent : IEvent { }
     
@@ -76,4 +68,7 @@ namespace Systems.Inputs.Events {
             Delta = delta;
         }
     }
+
+    /// <summary>The shop key (P) was pressed.</summary>
+    public readonly struct ShopKeyEvent : IEvent { }
 }

@@ -12,22 +12,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
   m_Name: Spell_Ghost
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
-  displayName: "Fant\xF4me"
+  displayName: "Pas du vent"
   icon: {fileID: 21300000, guid: 12d989b7042e5ca29962be75f0cd13d2, type: 3}
   color: {r: 0.75, g: 0.9, b: 1, a: 1}
-  recipe: []
+  description: 
+  rankUnlockLevels: []
+  baseDamage:
+  - 50
+  cooldowns:
+  - 1
+  manaCosts:
+  - 0
   targeting: 0
   range: 8
   radius: 1
   coneAngle: 60
   castTime: 0
   canMoveWhileCasting: 1
-  cooldownOverride: 1
   kind: 2
-  powerRatio: 0.5
-  scaling:
-    Base: 50
-    PerElementLevel: 10
+  adRatio: 0
+  bonusAdRatio: 0
+  apRatio: 0.5
   buffs:
   - Stat: 18
     Type: 1

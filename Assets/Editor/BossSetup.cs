@@ -116,7 +116,7 @@ namespace EditorTools {
             so.FindProperty("goldReward").intValue = 150;
             so.FindProperty("pattern").objectReferenceValue = pattern;
             SerializedProperty items = so.FindProperty("items");
-            string[] itemIds = { "ColossusArmor", "SharpBlade" };
+            string[] itemIds = { "EmberPlate", "IronCleaver" };
             items.arraySize = itemIds.Length;
             for (int i = 0; i < itemIds.Length; i++)
                 items.GetArrayElementAtIndex(i).objectReferenceValue = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"{EconomySetup.Dir}/Items/Item_{itemIds[i]}.asset");
@@ -137,9 +137,7 @@ namespace EditorTools {
             so.FindProperty("radius").floatValue = radius;
             so.FindProperty("castTime").floatValue = castTime;
             so.FindProperty("kind").enumValueIndex = (int)SpellKind.Physical;
-            so.FindProperty("powerRatio").floatValue = ratio;
-            so.FindProperty("scaling").FindPropertyRelative("Base").floatValue = damage;
-            so.FindProperty("scaling").FindPropertyRelative("PerElementLevel").floatValue = 0f;
+            SpellAssets.SetDamage(so, damage, ratio);
             so.ApplyModifiedPropertiesWithoutUndo();
             return spell;
         }

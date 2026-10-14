@@ -10,8 +10,10 @@ namespace Features.Combat {
     public class BasicAttackDefinition : ScriptableObject {
         [Tooltip("Share of the attack interval spent before the hit lands (0..1).")]
         [SerializeField, Range(0f, 1f)] private float windupPercent = 0.25f;
-        [Tooltip("Null = instant melee hit. Otherwise a homing projectile (must carry a Projectile).")]
+        [Tooltip("Null = instant melee hit. Otherwise a projectile (must carry a Projectile).")]
         [SerializeField] private Projectile projectilePrefab;
+        [Tooltip("Ranged: true = homing, cannot miss (MOBA auto-attack). False = flies straight towards where the target was when fired: can be dodged (enemy archers).")]
+        [SerializeField] private bool homing = true;
         [Tooltip("World units per second.")]
         [SerializeField] private float projectileSpeed = 20f;
         [Tooltip("Multiplier applied to the scaling attack stat.")]
@@ -22,6 +24,7 @@ namespace Features.Combat {
         public Projectile ProjectilePrefab => projectilePrefab;
         public float ProjectileSpeed => projectileSpeed;
         public bool IsRanged => projectilePrefab != null;
+        public bool Homing => homing;
         public float DamageRatio => damageRatio;
         public DamageType DamageType => damageType;
     }

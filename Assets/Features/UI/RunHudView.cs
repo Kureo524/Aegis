@@ -9,6 +9,7 @@ namespace Features.UI {
     /// <summary>
     /// Top-center run HUD (design doc §9.8), fed by RunStatusEvent only: wave number (bonus waves
     /// flagged), timer or countdown, kill quota, stage lives. Overtime shows when the next life is lost.
+    /// During the break before a wave: "Start the wave" (NextWaveRequestedEvent) and the shop button.
     /// Shares the GameHud UIDocument.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
@@ -18,11 +19,14 @@ namespace Features.UI {
 
         private readonly DisposableBag _subscriptions = new();
         private Label _wave, _timer, _quota, _lives, _banner;
+        private VisualElement _breakRow;
+        private IEventBus _eventBus;
         private RunStatusEvent? _status;
         private float _bannerUntil;
 
         [Inject]
         public void Construct(IEventBus eventBus) {
+            _eventBus = eventBus;
             _subscriptions.Add(eventBus.Subscribe<RunStatusEvent>(e => {
                 _status = e;
                 Refresh();
@@ -45,12 +49,10 @@ namespace Features.UI {
             var row = new VisualElement { pickingMode = PickingMode.Ignore };
             row.style.flexDirection = FlexDirection.Row;
             row.style.alignItems = Align.Center;
-            row.style.paddingLeft = row.style.paddingRight = 14;
-            row.style.paddingTop = row.style.paddingBottom = 6;
-            row.style.backgroundColor = new Color(0.06f, 0.07f, 0.1f, 0.75f);
-            UiStyles.Border(row, 1, new Color(1f, 1f, 1f, 0.15f), 8);
+            row.AddToClassList("ae-panel");
+            row.AddToClassList("ae-runhud");
 
-            _wave = Cell(row, 18, new Color(0.95f, 0.8f, 0.4f));
+            _wave = Cell(row, 18, new Color(0.72f, 0.88f, 1f));
             _timer = Cell(row, 22, Color.white);
             _timer.style.minWidth = 70;
             _timer.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -58,9 +60,22 @@ namespace Features.UI {
             _lives = Cell(row, 18, new Color(1f, 0.4f, 0.45f));
 
             _banner = UiStyles.Text("", 26, Color.white);
-            _banner.style.marginTop = 10;
+            _banner.AddToClassList("ae-banner");
+            _banner.style.fontSize = StyleKeyword.Null;   // the theme's
+            _banner.style.color = StyleKeyword.Null;
+
+            _breakRow = new VisualElement();
+            _breakRow.AddToClassList("ae-runhud__break");
+            Button start = Panels.MenuStyles.Button("Lancer la vague ▶", () => _eventBus.Publish(new NextWaveRequestedEvent()));
+            start.AddToClassList("ae-button--primary");
+            start.AddToClassList("ae-runhud__start");
+            Button shop = Panels.MenuStyles.Button("Boutique (P)", () => _eventBus.Publish(new ShopToggleRequestedEvent()));
+            shop.AddToClassList("ae-runhud__shop");
+            _breakRow.Add(start);
+            _breakRow.Add(shop);
 
             column.Add(row);
+            column.Add(_breakRow);
             column.Add(_banner);
             root.Add(column);
             Refresh();
@@ -74,14 +89,17 @@ namespace Features.UI {
         }
 
         private void Update() {
-            if (_banner != null && _banner.text.Length > 0 && Time.unscaledTime >= _bannerUntil) _banner.text = "";
+            if (_banner != null && _banner.ClassListContains("ae-banner--show") && Time.unscaledTime >= _bannerUntil)
+                _banner.RemoveFromClassList("ae-banner--show");   // fades out (theme transition)
         }
 
         private void OnDestroy() => _subscriptions.Dispose();
 
         private void Banner(string text) {
             _bannerUntil = Time.unscaledTime + 2.5f;
-            if (_banner != null) _banner.text = text;
+            if (_banner == null) return;
+            _banner.text = text;
+            _banner.AddToClassList("ae-banner--show");
         }
 
         private void Refresh() {
@@ -95,7 +113,7 @@ namespace Features.UI {
             _timer.style.display = s.State == RunState.Reward ? DisplayStyle.None : DisplayStyle.Flex;
             switch (s.State) {
                 case RunState.PreWave:
-                    _timer.text = $"Départ {seconds}";
+                    _timer.text = $"Pause {seconds} s";
                     _timer.style.color = Color.white;
                     break;
                 case RunState.Overtime:
@@ -113,6 +131,7 @@ namespace Features.UI {
             _quota.text = s.QuotaReached ? $"Quota atteint ({s.Kills})" : $"Kills {s.Kills}/{s.Quota}";
             _quota.style.color = s.QuotaReached ? quotaDoneColor : Color.white;
             _lives.text = new string('♥', s.Lives);
+            _breakRow.style.display = s.State == RunState.PreWave ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
 }

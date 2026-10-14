@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
+  m_Name: Item_MourningShroud
+  m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
+  displayName: Linceul du deuil
+  icon: {fileID: 21300000, guid: e30112da0e30c57b4aeab39f3ae0538a, type: 3}
+  cost: 295
+  tier: 0
+  stats:
+  - Stat: 0
+    Type: 0
+    Value: 400
+  - Stat: 14
+    Type: 0
+    Value: 55
+  - Stat: 22
+    Type: 0
+    Value: 10
+  unique: 1
+  uniqueGroup: 
+  passive: {fileID: 11400000, guid: 8c0c99809e4b79fd9a4df9841b9a415c, type: 2}
+  roles: 8

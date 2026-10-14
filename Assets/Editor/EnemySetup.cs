@@ -31,7 +31,8 @@ namespace EditorTools {
 
             var melee = AttackOnce(EnemiesDir + "/BasicAttack_EnemyMelee.asset", windup: 0.35f, ratio: 1f, projectile: null, speed: 0f);
             var archerShot = AttackOnce(EnemiesDir + "/BasicAttack_EnemyArrow.asset", windup: 0.3f, ratio: 1f,
-                                        projectile: AssetDatabase.LoadAssetAtPath<Projectile>(CharacterPrefabSetup.ArcaneBoltPrefabPath), speed: 14f);
+                                        projectile: AssetDatabase.LoadAssetAtPath<Projectile>(CharacterPrefabSetup.ArcaneBoltPrefabPath), speed: 14f,
+                                        homing: false);   // enemy arrows can be dodged
             SpellDefinition slam = CreateBruteSlam();
 
             var goblin = EnemyOnce(GoblinPath, "Gobelin", "Enemy_Goblin", new Vector2(0.7f, 1.25f), melee, EnemyNavigation.FlowField,
@@ -54,7 +55,7 @@ namespace EditorTools {
             return CreateHordeSettings(enemyPrefab, goblin, archer, brute);
         }
 
-        private static BasicAttackDefinition AttackOnce(string path, float windup, float ratio, Projectile projectile, float speed) {
+        internal static BasicAttackDefinition AttackOnce(string path, float windup, float ratio, Projectile projectile, float speed, bool homing = true) {
             var attack = AssetDatabase.LoadAssetAtPath<BasicAttackDefinition>(path);
             if (attack != null) return attack;
             attack = CreateAsset<BasicAttackDefinition>(path);
@@ -63,6 +64,7 @@ namespace EditorTools {
             so.FindProperty("damageRatio").floatValue = ratio;
             so.FindProperty("projectilePrefab").objectReferenceValue = projectile;
             if (speed > 0f) so.FindProperty("projectileSpeed").floatValue = speed;
+            so.FindProperty("homing").boolValue = homing;
             so.ApplyModifiedPropertiesWithoutUndo();
             return attack;
         }
@@ -80,14 +82,12 @@ namespace EditorTools {
             so.FindProperty("radius").floatValue = 2.2f;
             so.FindProperty("castTime").floatValue = 0.9f;
             so.FindProperty("kind").enumValueIndex = (int)SpellKind.Physical;
-            so.FindProperty("powerRatio").floatValue = 0.6f;
-            so.FindProperty("scaling").FindPropertyRelative("Base").floatValue = 60f;
-            so.FindProperty("scaling").FindPropertyRelative("PerElementLevel").floatValue = 0f;
+            SpellAssets.SetDamage(so, 60f, 0.6f);
             so.ApplyModifiedPropertiesWithoutUndo();
             return spell;
         }
 
-        private static EnemyDefinition EnemyOnce(string path, string displayName, string sprite, Vector2 body,
+        internal static EnemyDefinition EnemyOnce(string path, string displayName, string sprite, Vector2 body,
                                                  BasicAttackDefinition attack, EnemyNavigation navigation, int xp, int gold,
                                                  SpellDefinition special, (StatType, float)[] stats) {
             var enemy = AssetDatabase.LoadAssetAtPath<EnemyDefinition>(path);

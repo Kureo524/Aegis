@@ -26,5 +26,5 @@ MonoBehaviour:
   lives: 3
   lifeLossInterval: 30
   playerDeath: 0
-  firstWaveCountdown: 5
-  preWaveCountdown: 10
+  firstWaveCountdown: 10
+  intermission: 30

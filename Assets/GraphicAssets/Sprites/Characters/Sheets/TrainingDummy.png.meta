@@ -1,0 +1,882 @@
+fileFormatVersion: 2
+guid: 641d55fd736874491905e90b3c678044
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4294694359391820836
+    second: TrainingDummy_0
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 87.31
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: TrainingDummy_000
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 525
+        width: 78
+        height: 141
+      alignment: 9
+      pivot: {x: 0.5, y: 0.1987}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc82b21f951b1c617169703c0cf9ab7b
+      internalID: -249896831
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_001
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 372
+        width: 78
+        height: 141
+      alignment: 9
+      pivot: {x: 0.5, y: 0.1987}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a0c6b65dda47b4242a2944046a96b98f
+      internalID: -844853141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_002
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 373
+        width: 77
+        height: 140
+      alignment: 9
+      pivot: {x: 0.4935, y: 0.2002}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f167faaa5b3876689f5a1541c577c23
+      internalID: 668755246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_003
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 373
+        width: 77
+        height: 140
+      alignment: 9
+      pivot: {x: 0.4805, y: 0.2002}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b93802775c70e61cbef222ae811770a
+      internalID: 379288667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_004
+      rect:
+        serializedVersion: 2
+        x: 558
+        y: 373
+        width: 76
+        height: 140
+      alignment: 9
+      pivot: {x: 0.4737, y: 0.2002}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e27c13dd05b35afaf2dd4128653aff6
+      internalID: 2096610406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_005
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 231
+        width: 76
+        height: 139
+      alignment: 9
+      pivot: {x: 0.4737, y: 0.2016}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6aa67807b0c6bd7332fbbe155e8f1d6
+      internalID: 1870854063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_006
+      rect:
+        serializedVersion: 2
+        x: 236
+        y: 231
+        width: 76
+        height: 139
+      alignment: 9
+      pivot: {x: 0.4737, y: 0.2016}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2d45b0a9bbc0e112ff04e6659fe143a
+      internalID: 700271624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_007
+      rect:
+        serializedVersion: 2
+        x: 314
+        y: 231
+        width: 76
+        height: 139
+      alignment: 9
+      pivot: {x: 0.4737, y: 0.2016}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42fc17ade006af5aeac112bfebdfffef
+      internalID: 269567538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_008
+      rect:
+        serializedVersion: 2
+        x: 636
+        y: 373
+        width: 77
+        height: 140
+      alignment: 9
+      pivot: {x: 0.4805, y: 0.2002}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3775ccc4918b12c645876affb6119e75
+      internalID: 2017638737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_009
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 230
+        width: 77
+        height: 140
+      alignment: 9
+      pivot: {x: 0.4805, y: 0.2002}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2e72fb81fe66581ebc4d6ebd43fa36ec
+      internalID: -345020634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_010
+      rect:
+        serializedVersion: 2
+        x: 79
+        y: 230
+        width: 77
+        height: 140
+      alignment: 9
+      pivot: {x: 0.4935, y: 0.2002}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0909209761b2d79dba24f37058b282fe
+      internalID: 1728878820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_011
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 372
+        width: 78
+        height: 141
+      alignment: 9
+      pivot: {x: 0.5, y: 0.1987}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 402bb490649dc80e1262ae54fe83a734
+      internalID: -14914688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_012
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 372
+        width: 78
+        height: 141
+      alignment: 9
+      pivot: {x: 0.5, y: 0.1987}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 339e223105cc4243b27d97597b63c995
+      internalID: -791969337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_013
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 515
+        width: 92
+        height: 151
+      alignment: 9
+      pivot: {x: 0.6304, y: 0.1723}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44977c3e795537b0e6a767dfa7c1a8e2
+      internalID: -1417248849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_014
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 516
+        width: 88
+        height: 150
+      alignment: 9
+      pivot: {x: 0.6136, y: 0.1801}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d2765cbccc602ec44783008374418762
+      internalID: 924988918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_015
+      rect:
+        serializedVersion: 2
+        x: 554
+        y: 237
+        width: 85
+        height: 133
+      alignment: 9
+      pivot: {x: 0.4, y: 0.2257}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 15f2715b93901170d59405027c2e80a1
+      internalID: 1115307314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_016
+      rect:
+        serializedVersion: 2
+        x: 472
+        y: 234
+        width: 80
+        height: 136
+      alignment: 9
+      pivot: {x: 0.425, y: 0.2134}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 613073f44848cc46d68832e1a13d5d99
+      internalID: -1070389207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_017
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 521
+        width: 79
+        height: 145
+      alignment: 9
+      pivot: {x: 0.5696, y: 0.1933}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f529c07bd00d9212b89e0ec1c2396287
+      internalID: -1961517755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_018
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 523
+        width: 79
+        height: 143
+      alignment: 9
+      pivot: {x: 0.5443, y: 0.196}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5ba2242d4a08a7afdc957285d4bf810
+      internalID: -238651184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_019
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 372
+        width: 78
+        height: 141
+      alignment: 9
+      pivot: {x: 0.5, y: 0.1987}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e5f38ac55375f45d237a93b255dcbb3d
+      internalID: 298108532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_020
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 372
+        width: 78
+        height: 141
+      alignment: 9
+      pivot: {x: 0.5, y: 0.1987}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 25a12d2004b57c5f74792e60f3b4682a
+      internalID: -318014114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_021
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 521
+        width: 80
+        height: 145
+      alignment: 9
+      pivot: {x: 0.575, y: 0.1864}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2741a8d5b80fed63bf246a8863a31ce0
+      internalID: -656400504
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_022
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 515
+        width: 90
+        height: 151
+      alignment: 9
+      pivot: {x: 0.6222, y: 0.179}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a6676da4b220efa04d3733f3f582d12
+      internalID: 2040706708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_023
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 516
+        width: 88
+        height: 150
+      alignment: 9
+      pivot: {x: 0.6136, y: 0.1801}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9fe4bfd7bd6b15d6e535a42315da2b4a
+      internalID: -707300343
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_024
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 231
+        width: 78
+        height: 139
+      alignment: 9
+      pivot: {x: 0.4615, y: 0.2088}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65aa1a1628552e37af7eb6a9a0474b53
+      internalID: -297035820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_025
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 109
+        width: 103
+        height: 119
+      alignment: 9
+      pivot: {x: 0.3301, y: 0.2775}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c5830ce359b4ea61b85288df90041aa
+      internalID: 1790677289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_026
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 13
+        width: 130
+        height: 94
+      alignment: 9
+      pivot: {x: 0.2308, y: 0.3832}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5acbf7bb9c4aeabb623eb90c594cf4ff
+      internalID: -443423293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_027
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 20
+        width: 153
+        height: 87
+      alignment: 9
+      pivot: {x: 0.1699, y: 0.6324}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c52cb6c961387b78744092c7d91d4f9f
+      internalID: 444346540
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_028
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 161
+        height: 107
+      alignment: 9
+      pivot: {x: 0.1429, y: 0.7105}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b14f8adec7d4cba4aca6919c06d35996
+      internalID: -812265655
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_029
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 113
+        width: 162
+        height: 115
+      alignment: 9
+      pivot: {x: 0.1358, y: 0.7393}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f0a7d0015f3410e9f4269413021fda5c
+      internalID: -603364323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_030
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 115
+        width: 162
+        height: 113
+      alignment: 9
+      pivot: {x: 0.1358, y: 0.7347}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8587fa6919652b4c34ce353033a7ad28
+      internalID: -742307027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrainingDummy_031
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 118
+        width: 162
+        height: 110
+      alignment: 9
+      pivot: {x: 0.142, y: 0.7275}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f711b8be060c4f3bd6f78a20ba10e8ce
+      internalID: 1242648697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 7701bad90177abc2e9d190b09bfed075
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      TrainingDummy_000: -249896831
+      TrainingDummy_001: -844853141
+      TrainingDummy_002: 668755246
+      TrainingDummy_003: 379288667
+      TrainingDummy_004: 2096610406
+      TrainingDummy_005: 1870854063
+      TrainingDummy_006: 700271624
+      TrainingDummy_007: 269567538
+      TrainingDummy_008: 2017638737
+      TrainingDummy_009: -345020634
+      TrainingDummy_010: 1728878820
+      TrainingDummy_011: -14914688
+      TrainingDummy_012: -791969337
+      TrainingDummy_013: -1417248849
+      TrainingDummy_014: 924988918
+      TrainingDummy_015: 1115307314
+      TrainingDummy_016: -1070389207
+      TrainingDummy_017: -1961517755
+      TrainingDummy_018: -238651184
+      TrainingDummy_019: 298108532
+      TrainingDummy_020: -318014114
+      TrainingDummy_021: -656400504
+      TrainingDummy_022: 2040706708
+      TrainingDummy_023: -707300343
+      TrainingDummy_024: -297035820
+      TrainingDummy_025: 1790677289
+      TrainingDummy_026: -443423293
+      TrainingDummy_027: 444346540
+      TrainingDummy_028: -812265655
+      TrainingDummy_029: -603364323
+      TrainingDummy_030: -742307027
+      TrainingDummy_031: 1242648697
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

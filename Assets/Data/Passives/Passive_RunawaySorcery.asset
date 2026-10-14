@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb268d7b3b865bd4fa4aca45803ef906, type: 3}
+  m_Name: Passive_RunawaySorcery
+  m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
+  displayName: Sorcellerie emballée
+  description: "Chaque sort lanc\xE9 donne +12 acc\xE9l\xE9ration, sans limite, jusqu'\xE0
+    la fin de la vague."
+  icon: {fileID: 21300000, guid: f012526de3db32ac3985af38ce3f8f96, type: 3}
+  stats: []
+  capabilities: 
+  triggers: []
+  stacks:
+    Source: 2
+    Reset: 1
+    Max: 0
+    Duration: 0
+    PerStack:
+    - Stat: 22
+      Type: 0
+      Value: 12
+  nearbyEnemies:
+    Radius: 0
+    Max: 0
+    PerEnemy: []
+  aura:
+    Radius: 0
+    Interval: 0
+    Damage: 0
+    ScalingStat: 0
+    Ratio: 0
+    DamageType: 0
+    HealPerEnemy: 0
+  conversions: []
+  damage:
+    OutgoingPercent: 0
+    TargetHealthBelow: 0
+    AppliesTo: 0
+    IncomingPercent: 0
+  abilityHaste: []

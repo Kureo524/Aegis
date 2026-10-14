@@ -43,15 +43,11 @@ namespace EditorTools {
         private const string CameraSettingsPath = SettingsDir + "/CameraSettings.asset";
         private const string ControlsSettingsPath = SettingsDir + "/ControlsSettings.asset";
         private const string SpellSettingsPath = SettingsDir + "/SpellSettings.asset";
-        private const string ElementsDir = "Assets/Data/Elements";
-        private const string SpellsDir = "Assets/Data/Spells/FireElectricityWind";
-        public const string TestSpellBookPath = SpellsDir + "/SpellBook_FireElectricityWind.asset";
-        private const string ElementIconsDir = "Assets/GraphicAssets/Sprites/Elements";
         public const string FlashPath = "Assets/Data/Spells/Signature/Spell_Flash.asset";
         private const string FlashIconPath = "Assets/GraphicAssets/Sprites/Spells/Spell_Flash.png";
         private const string VContainerSettingsPath = SettingsDir + "/VContainerSettings.asset";
-        private const string RootPrefabPath = "Assets/Prefabs/RootLifetimeScope.prefab";
-        private const string ExperienceCurvePath = "Assets/Data/Progression/ExperienceCurve.asset";
+        internal const string RootPrefabPath = "Assets/Prefabs/RootLifetimeScope.prefab";
+        internal const string ExperienceCurvePath = "Assets/Data/Progression/ExperienceCurve.asset";
         private const string TestHeroDir = "Assets/Data/Characters/TestHero";
         public const string TestHeroPath = TestHeroDir + "/Char_TestHero.asset";
         private const string DummyDir = "Assets/Data/Characters/TrainingDummy";
@@ -81,27 +77,32 @@ namespace EditorTools {
             var experienceCurve = CreateExperienceCurve();
             var controlsSettings = LoadOrCreate<ControlsSettings>(ControlsSettingsPath);
             var spellSettings = LoadOrCreate<SpellSettings>(SpellSettingsPath);
-            CreateTestElementsAndSpells();
-            ConfigureTestSpells();
             AssignSpellPrefabs(spellSettings);
             CreateTestHero();
             Character playerPrefab = CharacterPrefabSetup.CreatePlayerPrefab();
             AssignMissingHeroSprite();
             AssignMissingHeroProjectile();
-            AssignMissingHeroElements();
-            AssignMissingHeroSignature();
+            HeroSetup.Run(CreateFlash());   // the champion (Vesna): abilities, passive, stats, summoner spells
             CreateTrainingDummy();
             Character dummyPrefab = CharacterPrefabSetup.CreateDummyPrefab();
             Character enemyPrefab = CharacterPrefabSetup.CreateEnemyPrefab();
             HordeSettings hordeSettings = EnemySetup.Run(enemyPrefab);
             StageDefinition stage = RunSetup.Run(enemyPrefab);
             ShopCatalog shopCatalog = EconomySetup.Run();
+            ItemsSetup.Run();            // the items (before the boss: he carries some)
             (Features.Augments.AugmentCatalog augmentCatalog, Features.Loot.LootSettings lootSettings) = PassiveSetup.Run();
             BossSetup.Run(enemyPrefab);   // after the items: the boss carries some
+            ContentSetup.Run();           // phase 9b: statuses on spells, more items and augments
+            EnemyContentSetup.Run(enemyPrefab);   // phase 9c: wolf, skeleton mage, goblin shaman, stone golem
+            AugmentsSetup.Run();         // the augments (catalog = exactly that list)
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
+            UiSetup.Run();               // MOBA-style UI: theme on the PanelSettings, stat icons
             SetBuildScenes();
             MigrateMenuScene();
+            MetaSetup.Run(RootPrefabPath, MenuScenePath);   // meta progression: settings, Vesna's tree, Progression screen
+            CharacterSpritesSetup.Run();   // animated sprites, creature names, ground shadows
+            ArenaSetup.Run();   // forest clearing: rocks, trees, ruins, painted ground, light, fog, post-processing
             MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings, stage, shopCatalog, augmentCatalog, lootSettings);
 
             AssetDatabase.SaveAssets();
@@ -118,12 +119,12 @@ namespace EditorTools {
             SerializedProperty xp = so.FindProperty("xpToNextLevel");
             xp.arraySize = 17;   // max level 18
             for (int i = 0; i < xp.arraySize; i++) xp.GetArrayElementAtIndex(i).intValue = 280 + 100 * i;
-            so.FindProperty("lastSkillPointLevel").intValue = 15;
+            so.FindProperty("lastSkillPointLevel").intValue = 18;   // a skill point on every level (MOBA)
             so.ApplyModifiedPropertiesWithoutUndo();
             return curve;
         }
 
-        // Test character of design doc §7.8 (Fire / Electricity / Wind mage, added with the elements).
+        // Test character of design doc §7.8: placeholder assets, turned into Vesna by HeroSetup.
         private static void CreateTestHero() {
             if (AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath) != null) return;
 
@@ -143,7 +144,7 @@ namespace EditorTools {
 
             var growth = CreateAsset<StatGrowth>(TestHeroDir + "/StatGrowth_TestHero.asset");
             var growthSo = new SerializedObject(growth);
-            growthSo.FindProperty("mode").enumValueIndex = (int)GrowthMode.LoL;
+            growthSo.FindProperty("mode").enumValueIndex = (int)GrowthMode.Curved;
             growthSo.ApplyModifiedPropertiesWithoutUndo();
             SetList(growth, "entries", new (StatType, float, ModifierType)[] {
                 (StatType.MaxHealth, 100f, ModifierType.Flat), (StatType.HealthRegen, 0.1f, ModifierType.Flat),
@@ -158,7 +159,7 @@ namespace EditorTools {
 
             var attack = CreateAsset<BasicAttackDefinition>(TestHeroDir + "/BasicAttack_TestHero.asset");
             var attackSo = new SerializedObject(attack);
-            attackSo.FindProperty("windupPercent").floatValue = 0.18f;   // LoL marksman-like
+            attackSo.FindProperty("windupPercent").floatValue = 0.18f;   // MOBA marksman-like
             attackSo.ApplyModifiedPropertiesWithoutUndo();
 
             var hero = CreateAsset<CharacterDefinition>(TestHeroPath);
@@ -195,159 +196,6 @@ namespace EditorTools {
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        // Test character elements (design doc §7.8): Fire / Electricity / Wind, 19 recipes. Created once.
-        private static readonly (string id, string name, float cost, Color color)[] TestElements = {
-            ("Fire", "Feu", 10f, new Color(1f, 0.45f, 0.15f)),
-            ("Electricity", "Électricité", 12f, new Color(1f, 0.88f, 0.25f)),
-            ("Wind", "Vent", 8f, new Color(0.55f, 0.95f, 0.9f)),
-        };
-
-        // (stacks Fire, Electricity, Wind, display name, kind). Placeholder content, tuned in the assets.
-        private static readonly (int f, int e, int w, string name, SpellKind kind)[] TestSpells = {
-            (1, 0, 0, "Boule de feu", SpellKind.Magic),        (0, 1, 0, "Étincelle", SpellKind.Magic),
-            (0, 0, 1, "Rafale", SpellKind.Physical),
-            (2, 0, 0, "Grande boule de feu", SpellKind.Magic), (0, 2, 0, "Arc électrique", SpellKind.Magic),
-            (0, 0, 2, "Bourrasque", SpellKind.Buff),           (1, 1, 0, "Plasma", SpellKind.Magic),
-            (1, 0, 1, "Tornade de feu", SpellKind.Magic),      (0, 1, 1, "Orage", SpellKind.Magic),
-            (3, 0, 0, "Météore", SpellKind.Magic),             (0, 3, 0, "Foudre", SpellKind.Magic),
-            (0, 0, 3, "Cyclone", SpellKind.Physical),          (2, 1, 0, "Lance de plasma", SpellKind.Magic),
-            (2, 0, 1, "Tempête de feu", SpellKind.Magic),      (1, 2, 0, "Surcharge", SpellKind.Buff),
-            (0, 2, 1, "Tempête électrique", SpellKind.Magic),  (1, 0, 2, "Souffle ardent", SpellKind.Magic),
-            (0, 1, 2, "Ouragan statique", SpellKind.Physical), (1, 1, 1, "Cataclysme", SpellKind.Magic),
-        };
-
-        private static void CreateTestElementsAndSpells() {
-            if (AssetDatabase.LoadAssetAtPath<SpellBook>(TestSpellBookPath) != null) return;
-
-            var elements = new ElementDefinition[TestElements.Length];
-            for (int i = 0; i < TestElements.Length; i++) {
-                var (id, displayName, cost, color) = TestElements[i];
-                elements[i] = CreateAsset<ElementDefinition>($"{ElementsDir}/Elem_{id}.asset");
-                var so = new SerializedObject(elements[i]);
-                so.FindProperty("displayName").stringValue = displayName;
-                so.FindProperty("icon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>($"{ElementIconsDir}/Elem_{id}.png");
-                so.FindProperty("color").colorValue = color;
-                so.FindProperty("manaCost").floatValue = cost;
-                so.ApplyModifiedPropertiesWithoutUndo();
-            }
-
-            var spells = new List<SpellDefinition>();
-            foreach (var (f, e, w, displayName, kind) in TestSpells) {
-                int[] stacks = { f, e, w };
-                var parts = new List<string>();
-                var recipe = new List<(ElementDefinition, int)>();
-                for (int i = 0; i < stacks.Length; i++) {
-                    if (stacks[i] == 0) continue;
-                    parts.Add(stacks[i] > 1 ? $"{TestElements[i].id}_x{stacks[i]}" : TestElements[i].id);
-                    recipe.Add((elements[i], stacks[i]));
-                }
-                var spell = CreateAsset<SpellDefinition>($"{SpellsDir}/Spell_{string.Join("_", parts)}.asset");
-                var so = new SerializedObject(spell);
-                so.FindProperty("displayName").stringValue = displayName;
-                so.FindProperty("kind").enumValueIndex = (int)kind;
-                SerializedProperty list = so.FindProperty("recipe");
-                list.arraySize = recipe.Count;
-                for (int i = 0; i < recipe.Count; i++) {
-                    list.GetArrayElementAtIndex(i).FindPropertyRelative("Element").objectReferenceValue = recipe[i].Item1;
-                    list.GetArrayElementAtIndex(i).FindPropertyRelative("Count").intValue = recipe[i].Item2;
-                }
-                so.ApplyModifiedPropertiesWithoutUndo();
-                spells.Add(spell);
-            }
-
-            var book = CreateAsset<SpellBook>(TestSpellBookPath);
-            var bookSo = new SerializedObject(book);
-            SerializedProperty bookList = bookSo.FindProperty("spells");
-            bookList.arraySize = spells.Count;
-            for (int i = 0; i < spells.Count; i++) bookList.GetArrayElementAtIndex(i).objectReferenceValue = spells[i];
-            bookSo.ApplyModifiedPropertiesWithoutUndo();
-        }
-
-        // ---- Phase 5c: what each test spell does (placeholder balance, tuned in the assets) ----
-        private struct SpellSetup {
-            public TargetingType Targeting;
-            public float Range, Radius, Cone, CastTime, Ratio, Base, PerLevel, Speed;
-            public bool Pierce;
-            public (StatType stat, ModifierType type, float value, float duration)[] Buffs;
-        }
-
-        private static SpellSetup Shot(float range, float halfWidth, float speed, float ratio, float b, float perLevel, float cast, bool pierce = false) =>
-            new() { Targeting = TargetingType.Skillshot, Range = range, Radius = halfWidth, Speed = speed, Ratio = ratio, Base = b, PerLevel = perLevel, CastTime = cast, Pierce = pierce };
-        private static SpellSetup Zone(float range, float radius, float ratio, float b, float perLevel, float cast) =>
-            new() { Targeting = TargetingType.GroundPoint, Range = range, Radius = radius, Ratio = ratio, Base = b, PerLevel = perLevel, CastTime = cast };
-        private static SpellSetup Cone(float range, float angle, float ratio, float b, float perLevel, float cast) =>
-            new() { Targeting = TargetingType.Cone, Range = range, Cone = angle, Ratio = ratio, Base = b, PerLevel = perLevel, CastTime = cast };
-        private static SpellSetup Unit(float range, float speed, float ratio, float b, float perLevel, float cast) =>
-            new() { Targeting = TargetingType.UnitTarget, Range = range, Speed = speed, Ratio = ratio, Base = b, PerLevel = perLevel, CastTime = cast };
-        private static SpellSetup Buff(params (StatType, ModifierType, float, float)[] buffs) =>
-            new() { Targeting = TargetingType.Self, Radius = 1.5f, Buffs = buffs };
-
-        private static readonly Dictionary<string, SpellSetup> TestSpellSetups = new() {
-            ["Boule de feu"]        = Shot(9f, 0.6f, 18f, 0.6f, 60f, 15f, 0.15f),
-            ["Étincelle"]           = Unit(7f, 30f, 0.5f, 45f, 12f, 0.1f),
-            ["Rafale"]              = Cone(4.5f, 60f, 0.7f, 50f, 12f, 0.1f),
-            ["Grande boule de feu"] = Shot(10f, 1f, 16f, 0.8f, 110f, 20f, 0.25f),
-            ["Arc électrique"]      = Shot(12f, 0.4f, 35f, 0.7f, 90f, 18f, 0.15f, pierce: true),
-            ["Bourrasque"]          = Buff((StatType.MoveSpeed, ModifierType.PercentAdd, 0.3f, 4f), (StatType.AttackSpeed, ModifierType.PercentAdd, 0.25f, 4f)),
-            ["Plasma"]              = Zone(8f, 2f, 0.8f, 120f, 20f, 0.3f),
-            ["Tornade de feu"]      = Cone(6f, 50f, 0.7f, 100f, 18f, 0.2f),
-            ["Orage"]               = Zone(9f, 3f, 0.6f, 90f, 16f, 0.4f),
-            ["Météore"]             = Zone(10f, 3f, 1.1f, 220f, 35f, 0.6f),
-            ["Foudre"]              = Unit(9f, 45f, 1f, 200f, 30f, 0.3f),
-            ["Cyclone"]             = Zone(6f, 3.5f, 1f, 160f, 25f, 0.3f),
-            ["Lance de plasma"]     = Shot(14f, 0.8f, 30f, 0.9f, 170f, 28f, 0.35f, pierce: true),
-            ["Tempête de feu"]      = Cone(7f, 70f, 0.9f, 180f, 28f, 0.35f),
-            ["Surcharge"]           = Buff((StatType.MagicAttack, ModifierType.PercentAdd, 0.3f, 6f), (StatType.AttackSpeed, ModifierType.PercentAdd, 0.4f, 6f)),
-            ["Tempête électrique"]  = Zone(8f, 4f, 0.8f, 150f, 25f, 0.5f),
-            ["Souffle ardent"]      = Cone(6f, 90f, 0.8f, 150f, 25f, 0.25f),
-            ["Ouragan statique"]    = Buff((StatType.MoveSpeed, ModifierType.PercentAdd, 0.4f, 5f), (StatType.Armor, ModifierType.Flat, 30f, 5f)),
-            ["Cataclysme"]          = Zone(9f, 5f, 1.3f, 280f, 40f, 0.8f),
-        };
-
-        // Fills the 5c fields of the generated test spells, once: a spell still at the class defaults
-        // (scaling 50 / 10, ratio 0.5) has never been configured; anything else was tuned by hand.
-        private static void ConfigureTestSpells() {
-            var book = AssetDatabase.LoadAssetAtPath<SpellBook>(TestSpellBookPath);
-            if (book == null) return;
-            foreach (SpellDefinition spell in book.Spells) {
-                if (spell == null || !TestSpellSetups.TryGetValue(spell.DisplayName, out SpellSetup setup)) continue;
-                if (!(Mathf.Approximately(spell.Scaling.Base, 50f) && Mathf.Approximately(spell.Scaling.PerElementLevel, 10f)
-                      && Mathf.Approximately(spell.PowerRatio, 0.5f))) continue;
-
-                var so = new SerializedObject(spell);
-                so.FindProperty("targeting").enumValueIndex = (int)setup.Targeting;
-                so.FindProperty("range").floatValue = setup.Range;
-                so.FindProperty("radius").floatValue = setup.Radius;
-                if (setup.Cone > 0f) so.FindProperty("coneAngle").floatValue = setup.Cone;
-                so.FindProperty("castTime").floatValue = setup.CastTime;
-                so.FindProperty("canMoveWhileCasting").boolValue = setup.Targeting == TargetingType.Self;
-                so.FindProperty("powerRatio").floatValue = setup.Ratio;
-                so.FindProperty("scaling").FindPropertyRelative("Base").floatValue = setup.Base;
-                so.FindProperty("scaling").FindPropertyRelative("PerElementLevel").floatValue = setup.PerLevel;
-                if (setup.Speed > 0f) so.FindProperty("projectileSpeed").floatValue = setup.Speed;
-                so.FindProperty("pierce").boolValue = setup.Pierce;
-                so.FindProperty("color").colorValue = DominantColor(spell);
-                var buffs = setup.Buffs ?? System.Array.Empty<(StatType, ModifierType, float, float)>();
-                SerializedProperty list = so.FindProperty("buffs");
-                list.arraySize = buffs.Length;
-                for (int i = 0; i < buffs.Length; i++) {
-                    SerializedProperty b = list.GetArrayElementAtIndex(i);
-                    b.FindPropertyRelative("Stat").enumValueIndex = (int)buffs[i].Item1;
-                    b.FindPropertyRelative("Type").enumValueIndex = (int)buffs[i].Item2;
-                    b.FindPropertyRelative("Value").floatValue = buffs[i].Item3;
-                    b.FindPropertyRelative("Duration").floatValue = buffs[i].Item4;
-                }
-                so.ApplyModifiedPropertiesWithoutUndo();
-            }
-        }
-
-        // Color of the element with the most stacks in the recipe (VFX, projectile, indicator).
-        private static Color DominantColor(SpellDefinition spell) {
-            ElementCount best = default;
-            foreach (ElementCount e in spell.Recipe) if (e.Count > best.Count) best = e;
-            return best.Element != null ? best.Element.Color : Color.white;
-        }
-
         private static void AssignSpellPrefabs(SpellSettings settings) {
             var so = new SerializedObject(settings);
             void Fill(string field, Object value) {
@@ -361,12 +209,12 @@ namespace EditorTools {
         }
 
         // Flash (design doc §7.8): fixed-length blink towards the cursor. Created once.
-        private static SpellDefinition CreateFlash() {
+        internal static SpellDefinition CreateFlash() {
             var flash = AssetDatabase.LoadAssetAtPath<SpellDefinition>(FlashPath);
             if (flash != null) return flash;
             flash = CreateAsset<SpellDefinition>(FlashPath);
             var so = new SerializedObject(flash);
-            so.FindProperty("displayName").stringValue = "Flash";
+            so.FindProperty("displayName").stringValue = "Bond éclair";
             so.FindProperty("icon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(FlashIconPath);
             so.FindProperty("color").colorValue = new Color(1f, 0.9f, 0.4f);
             so.FindProperty("targeting").enumValueIndex = (int)TargetingType.GroundPoint;
@@ -374,34 +222,12 @@ namespace EditorTools {
             so.FindProperty("radius").floatValue = 0.5f;
             so.FindProperty("castTime").floatValue = 0f;
             so.FindProperty("canMoveWhileCasting").boolValue = true;
-            so.FindProperty("cooldownOverride").floatValue = 20f;
+            SpellAssets.SetCooldown(so, 20f);
             so.FindProperty("kind").enumValueIndex = (int)SpellKind.Buff;
             so.FindProperty("blink").boolValue = true;
             so.FindProperty("fixedRange").boolValue = true;
             so.ApplyModifiedPropertiesWithoutUndo();
             return flash;
-        }
-
-        private static void AssignMissingHeroSignature() {
-            var hero = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath);
-            if (hero == null || hero.SignatureAbility != null) return;
-            var so = new SerializedObject(hero);
-            so.FindProperty("signatureAbility").objectReferenceValue = CreateFlash();
-            so.ApplyModifiedPropertiesWithoutUndo();
-        }
-
-        // Only fills empty slots: never replaces elements or a spell book chosen by hand.
-        private static void AssignMissingHeroElements() {
-            var hero = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(TestHeroPath);
-            if (hero == null || hero.SpellBook != null) return;
-            var so = new SerializedObject(hero);
-            SerializedProperty slots = so.FindProperty("elements");
-            slots.arraySize = TestElements.Length;
-            for (int i = 0; i < TestElements.Length; i++)
-                slots.GetArrayElementAtIndex(i).objectReferenceValue =
-                    AssetDatabase.LoadAssetAtPath<ElementDefinition>($"{ElementsDir}/Elem_{TestElements[i].id}.asset");
-            so.FindProperty("spellBook").objectReferenceValue = AssetDatabase.LoadAssetAtPath<SpellBook>(TestSpellBookPath);
-            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         // Ranged hero: its basic attack fires the arcane bolt. Only fills an empty slot.

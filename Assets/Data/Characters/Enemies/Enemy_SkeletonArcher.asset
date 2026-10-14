@@ -14,20 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
   displayName: Archer squelette
   faction: 1
-  sprite: {fileID: 21300000, guid: 14292b87d214e01dd80fe3c911fca7d5, type: 3}
-  bodySize: {x: 0.7, y: 1.6}
+  sprite: {fileID: -1448117881, guid: 66cf64db918db6f7db97fcde0e8da97f, type: 3}
+  animations: {fileID: 11400000, guid: c4a899afcb76d1c18abdd06a44b4c726, type: 2}
+  portrait: {fileID: 0}
+  bodySize: {x: 0.7, y: 1.44}
   baseStats: {fileID: 11400000, guid: 72d6198966ae69db1a557dd896ab76db, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: 46a11fef046425121aad49387f562fcf, type: 2}
-  elements:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  elementUnlockLevels: 010000000300000005000000
-  spellBook: {fileID: 0}
-  signatureAbility: {fileID: 0}
-  xpReward: 22
-  goldReward: 4
+  abilities: []
+  summonerD: {fileID: 0}
+  summonerF: {fileID: 0}
+  recommendedItems: []
+  passive: {fileID: 0}
+  xpReward: 99
+  goldReward: 8
   navigation: 0
   specialSpell: {fileID: 0}
   startMana: 0

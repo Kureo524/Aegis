@@ -1,0 +1,1618 @@
+fileFormatVersion: 2
+guid: 46dafcb30366c8f97882ca90d6f16da5
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4646101929521763914
+    second: StoneGolem_0
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 102.52
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: StoneGolem_000
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1079
+        width: 197
+        height: 244
+      alignment: 9
+      pivot: {x: 0.5228, y: 0.363}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce8cfe0946f54cddafe5f818aa260b5f
+      internalID: -360325136
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_001
+      rect:
+        serializedVersion: 2
+        x: 398
+        y: 1080
+        width: 197
+        height: 243
+      alignment: 9
+      pivot: {x: 0.5228, y: 0.3603}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 729304093dc80c8b1a51a237005ffc66
+      internalID: 471646869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_002
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 1079
+        width: 197
+        height: 244
+      alignment: 9
+      pivot: {x: 0.533, y: 0.3548}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c06e45d40d636a41a12604c9e23fb66d
+      internalID: 475194144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_003
+      rect:
+        serializedVersion: 2
+        x: 597
+        y: 1080
+        width: 197
+        height: 243
+      alignment: 9
+      pivot: {x: 0.5482, y: 0.3439}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d8b536d11f22f96746a6a01a58a385e
+      internalID: -875233234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_004
+      rect:
+        serializedVersion: 2
+        x: 1465
+        y: 1082
+        width: 196
+        height: 241
+      alignment: 9
+      pivot: {x: 0.5612, y: 0.3343}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a99642dec1a26354ce3f8cf053f2853
+      internalID: -879365715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_005
+      rect:
+        serializedVersion: 2
+        x: 1663
+        y: 1082
+        width: 196
+        height: 241
+      alignment: 9
+      pivot: {x: 0.5663, y: 0.326}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87eae188d5916873ed3434e8994bab6c
+      internalID: -705850294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_006
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 836
+        width: 195
+        height: 241
+      alignment: 9
+      pivot: {x: 0.5692, y: 0.326}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f06aaab0869309c3137ec67569966527
+      internalID: 2143871888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_007
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 836
+        width: 196
+        height: 241
+      alignment: 9
+      pivot: {x: 0.5663, y: 0.326}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 585940d9654bc671200c389a4964f860
+      internalID: 2027943553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_008
+      rect:
+        serializedVersion: 2
+        x: 764
+        y: 837
+        width: 196
+        height: 240
+      alignment: 9
+      pivot: {x: 0.5663, y: 0.3315}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b2313296b80618c61c90c5f517b368f
+      internalID: 515032307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_009
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 836
+        width: 198
+        height: 241
+      alignment: 9
+      pivot: {x: 0.5556, y: 0.3384}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c0a80a4243134d5a6081e82e144641b2
+      internalID: 132174199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_010
+      rect:
+        serializedVersion: 2
+        x: 796
+        y: 1080
+        width: 198
+        height: 243
+      alignment: 9
+      pivot: {x: 0.5404, y: 0.3521}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 530f6c6fd8f4208bf5e68d5e221d4b35
+      internalID: 266375189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_011
+      rect:
+        serializedVersion: 2
+        x: 996
+        y: 1080
+        width: 198
+        height: 243
+      alignment: 9
+      pivot: {x: 0.5253, y: 0.3603}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7cd66bb0b7acd2bebb579a7bb5cf7980
+      internalID: 2117154500
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_012
+      rect:
+        serializedVersion: 2
+        x: 1647
+        y: 202
+        width: 285
+        height: 183
+      alignment: 9
+      pivot: {x: 0.5333, y: 0.1342}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d2a9924640c89e47138ebb334f54d29
+      internalID: -165942431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_013
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 298
+        height: 180
+      alignment: 9
+      pivot: {x: 0.5436, y: 0.142}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b35148e2dc40e815d55ca4c132ec5b5b
+      internalID: 832734664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_014
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 2
+        width: 290
+        height: 178
+      alignment: 9
+      pivot: {x: 0.5586, y: 0.1773}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6efe6f738b0cf2a2e162e7d15d25e2f0
+      internalID: -993456683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_015
+      rect:
+        serializedVersion: 2
+        x: 1051
+        y: 612
+        width: 209
+        height: 222
+      alignment: 9
+      pivot: {x: 0.5694, y: 0.3449}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87ee9b49df54c5039b3f11b74cbb8e09
+      internalID: -226886276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_016
+      rect:
+        serializedVersion: 2
+        x: 595
+        y: 836
+        width: 167
+        height: 241
+      alignment: 9
+      pivot: {x: 0.4371, y: 0.3633}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0be5fcc222e4b3072fccd3e903058c0e
+      internalID: 1081595208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_017
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 387
+        width: 179
+        height: 213
+      alignment: 9
+      pivot: {x: 0.4693, y: 0.2186}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d02b2fcf657f685b25547d59e2fa3c7
+      internalID: 1745317370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_018
+      rect:
+        serializedVersion: 2
+        x: 624
+        y: 192
+        width: 199
+        height: 193
+      alignment: 9
+      pivot: {x: 0.4523, y: 0.1066}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6b3d44efa246e2a2a9073619937bbbc
+      internalID: 1527140927
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_019
+      rect:
+        serializedVersion: 2
+        x: 1523
+        y: 620
+        width: 195
+        height: 214
+      alignment: 9
+      pivot: {x: 0.4923, y: 0.1615}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: da9c26dba22e66edb58c5037a28c89cd
+      internalID: -1297443578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_020
+      rect:
+        serializedVersion: 2
+        x: 273
+        y: 1331
+        width: 185
+        height: 255
+      alignment: 9
+      pivot: {x: 0.4865, y: 0.265}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60865380dbd13d6033e151381b1b04f8
+      internalID: -862875099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_021
+      rect:
+        serializedVersion: 2
+        x: 1450
+        y: 1340
+        width: 166
+        height: 246
+      alignment: 9
+      pivot: {x: 0.4458, y: 0.3356}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 658e8df84a6bb060a5aee8d99f903924
+      internalID: 619537969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_022
+      rect:
+        serializedVersion: 2
+        x: 412
+        y: 388
+        width: 213
+        height: 212
+      alignment: 9
+      pivot: {x: 0.4883, y: 0.3187}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: abe071346803501edfc84369bc4aa243
+      internalID: 1572857230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_023
+      rect:
+        serializedVersion: 2
+        x: 1370
+        y: 201
+        width: 275
+        height: 184
+      alignment: 9
+      pivot: {x: 0.5018, y: 0.1824}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e81095b35ae4907d55cc36f3a2753d10
+      internalID: -169856496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_024
+      rect:
+        serializedVersion: 2
+        x: 1618
+        y: 1341
+        width: 193
+        height: 245
+      alignment: 9
+      pivot: {x: 0.4404, y: 0.3125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6371ee46c692dd8182ea822fe9ce6827
+      internalID: -1124621564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_025
+      rect:
+        serializedVersion: 2
+        x: 825
+        y: 193
+        width: 248
+        height: 192
+      alignment: 9
+      pivot: {x: 0.5565, y: 0.1488}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d582bbf883e746933475b01695c614f5
+      internalID: 674937647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_026
+      rect:
+        serializedVersion: 2
+        x: 312
+        y: 185
+        width: 310
+        height: 200
+      alignment: 9
+      pivot: {x: 0.5581, y: 0.1078}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33466b4bf47a1a68df1becf86164679d
+      internalID: 1685778775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_027
+      rect:
+        serializedVersion: 2
+        x: 1720
+        y: 620
+        width: 326
+        height: 214
+      alignment: 9
+      pivot: {x: 0.5644, y: 0.1008}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc16c63d4c26ee69ae9ad828107de083
+      internalID: 792278304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_028
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1325
+        width: 125
+        height: 261
+      alignment: 9
+      pivot: {x: 0.632, y: 0.1401}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ea3c9aec359acf59cb7d69c8108a7f23
+      internalID: -2011877288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_029
+      rect:
+        serializedVersion: 2
+        x: 1041
+        y: 1667
+        width: 200
+        height: 270
+      alignment: 9
+      pivot: {x: 0.39, y: 0.2132}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c7c03d5944ce76824ddd31ddc2c2e22e
+      internalID: 173571232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_030
+      rect:
+        serializedVersion: 2
+        x: 1776
+        y: 1675
+        width: 163
+        height: 262
+      alignment: 9
+      pivot: {x: 0.3313, y: 0.2235}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: efbeec37c291775ddb5de04ad431afcc
+      internalID: -812879554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_031
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 1325
+        width: 144
+        height: 261
+      alignment: 9
+      pivot: {x: 0.4028, y: 0.3087}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0c5f97c1309e2ce8acd56dd18266806
+      internalID: 335173329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_032
+      rect:
+        serializedVersion: 2
+        x: 1080
+        y: 1337
+        width: 149
+        height: 249
+      alignment: 9
+      pivot: {x: 0.4295, y: 0.3517}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3242f580678e17b029e9da792943b048
+      internalID: 1538129841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_033
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 602
+        width: 188
+        height: 232
+      alignment: 9
+      pivot: {x: 0.4947, y: 0.3214}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5657fd662a538987f93c8f65ea1fb374
+      internalID: -1488676746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_034
+      rect:
+        serializedVersion: 2
+        x: 190
+        y: 603
+        width: 191
+        height: 231
+      alignment: 9
+      pivot: {x: 0.4974, y: 0.3185}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5bf27e1eac4c3552b559ce53c884809
+      internalID: -661814356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_035
+      rect:
+        serializedVersion: 2
+        x: 627
+        y: 391
+        width: 214
+        height: 209
+      alignment: 9
+      pivot: {x: 0.5234, y: 0.3089}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5becf0a341145438f0bf53e199457f34
+      internalID: 718520975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_036
+      rect:
+        serializedVersion: 2
+        x: 383
+        y: 604
+        width: 232
+        height: 230
+      alignment: 9
+      pivot: {x: 0.306, y: 0.4111}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 12baba5b79ea1930f6c3fff5e6a41b20
+      internalID: 236791447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_037
+      rect:
+        serializedVersion: 2
+        x: 1262
+        y: 615
+        width: 259
+        height: 219
+      alignment: 9
+      pivot: {x: 0.2857, y: 0.2948}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e09250173acb124e53c7506d1a061d4c
+      internalID: -168281867
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_038
+      rect:
+        serializedVersion: 2
+        x: 181
+        y: 387
+        width: 229
+        height: 213
+      alignment: 9
+      pivot: {x: 0.4017, y: 0.0731}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0dc82ea6f37a72afa229b4221e5249a9
+      internalID: 726334164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_039
+      rect:
+        serializedVersion: 2
+        x: 834
+        y: 610
+        width: 215
+        height: 224
+      alignment: 9
+      pivot: {x: 0.6372, y: 0.0248}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43e24deda95db479f3b1a2436a41e751
+      internalID: -1501759901
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_040
+      rect:
+        serializedVersion: 2
+        x: 1161
+        y: 838
+        width: 233
+        height: 239
+      alignment: 9
+      pivot: {x: 0.8197, y: -0.0102}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1de8fb0ebdfa5ecef2ea027cbff3f8d
+      internalID: 61946013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_041
+      rect:
+        serializedVersion: 2
+        x: 527
+        y: 1635
+        width: 245
+        height: 302
+      alignment: 9
+      pivot: {x: 0.849, y: 0.0946}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e659a9b23367cb7872c87a6445644428
+      internalID: -1706032806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_042
+      rect:
+        serializedVersion: 2
+        x: 1243
+        y: 1668
+        width: 262
+        height: 269
+      alignment: 9
+      pivot: {x: 0.8817, y: 0.1991}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 655f4d59125f65940c9df9c3d0a6772c
+      internalID: -449006822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_043
+      rect:
+        serializedVersion: 2
+        x: 1196
+        y: 1081
+        width: 267
+        height: 242
+      alignment: 9
+      pivot: {x: 0.8914, y: 0.1015}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7799b543880b0df49bfbd35c6f1a49f7
+      internalID: 450853232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_044
+      rect:
+        serializedVersion: 2
+        x: 1507
+        y: 1670
+        width: 267
+        height: 267
+      alignment: 9
+      pivot: {x: 0.8914, y: 0.1594}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b83f6963d8261a7f67803a46cd0e494a
+      internalID: 2006479520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_045
+      rect:
+        serializedVersion: 2
+        x: 774
+        y: 1651
+        width: 265
+        height: 286
+      alignment: 9
+      pivot: {x: 0.8906, y: 0.2188}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: debb40866db5a8728535989d85bd1fea
+      internalID: -160045225
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_046
+      rect:
+        serializedVersion: 2
+        x: 1396
+        y: 838
+        width: 191
+        height: 239
+      alignment: 9
+      pivot: {x: 0.4974, y: 0.3078}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4fef3e7b53ff23554e72d04ec73a19c6
+      internalID: 909747673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_047
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 1333
+        width: 209
+        height: 253
+      alignment: 9
+      pivot: {x: 0.4785, y: 0.275}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08e816bb84f2753ebcd4e088122f1b83
+      internalID: 155382310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_048
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 1333
+        width: 218
+        height: 253
+      alignment: 9
+      pivot: {x: 0.4954, y: 0.2947}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53ab41c9ea2f2e83d1d791824b92945e
+      internalID: -675366782
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_049
+      rect:
+        serializedVersion: 2
+        x: 1813
+        y: 1341
+        width: 209
+        height: 245
+      alignment: 9
+      pivot: {x: 0.512, y: 0.3084}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9212690afb05bc4769ada49c3f9c7fbb
+      internalID: -956593193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_050
+      rect:
+        serializedVersion: 2
+        x: 962
+        y: 837
+        width: 197
+        height: 240
+      alignment: 9
+      pivot: {x: 0.5076, y: 0.3107}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9310a1511e0fea66064ecf6e7cd6bc65
+      internalID: -1088077821
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_051
+      rect:
+        serializedVersion: 2
+        x: 1589
+        y: 838
+        width: 191
+        height: 239
+      alignment: 9
+      pivot: {x: 0.4974, y: 0.3078}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 55cd675b5b96a6eb4d449abcdca2adcc
+      internalID: 1555535885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_052
+      rect:
+        serializedVersion: 2
+        x: 891
+        y: 1333
+        width: 187
+        height: 253
+      alignment: 9
+      pivot: {x: 0.4545, y: 0.3026}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 712dc5d64b93cb35a39212e4a5fb860c
+      internalID: -493361201
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_053
+      rect:
+        serializedVersion: 2
+        x: 1231
+        y: 1338
+        width: 217
+        height: 248
+      alignment: 9
+      pivot: {x: 0.4147, y: 0.3289}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b7441e798d0452033e2f686d38c2ac7
+      internalID: -167354798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_054
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 1597
+        width: 183
+        height: 340
+      alignment: 9
+      pivot: {x: 0.5027, y: 0.2428}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c3e551a31d788f6746b50c061e915cf
+      internalID: -980050917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_055
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1588
+        width: 131
+        height: 349
+      alignment: 9
+      pivot: {x: 0.6794, y: 0.1678}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43db88057aa7fc23749d4140af326cdd
+      internalID: -893012326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_056
+      rect:
+        serializedVersion: 2
+        x: 318
+        y: 1630
+        width: 207
+        height: 307
+      alignment: 9
+      pivot: {x: 0.5072, y: 0.1484}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f9ed265595101f7231ded0906c31b65
+      internalID: -1203042397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_057
+      rect:
+        serializedVersion: 2
+        x: 843
+        y: 392
+        width: 320
+        height: 208
+      alignment: 9
+      pivot: {x: 0.5406, y: 0.0989}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 912fd8c9ee6a3e86e46b09678c79d8ee
+      internalID: 1925016869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_058
+      rect:
+        serializedVersion: 2
+        x: 1165
+        y: 396
+        width: 315
+        height: 204
+      alignment: 9
+      pivot: {x: 0.5397, y: 0.2086}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 20050cfa3e0eaded3f972757919196ea
+      internalID: 2108551879
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_059
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 182
+        width: 310
+        height: 203
+      alignment: 9
+      pivot: {x: 0.5387, y: 0.2442}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a3a3de024672e1f9ff6a66cbf33ea74
+      internalID: 1331398916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_060
+      rect:
+        serializedVersion: 2
+        x: 1075
+        y: 200
+        width: 293
+        height: 185
+      alignment: 9
+      pivot: {x: 0.5427, y: 0.1706}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88a87af2365f4af73ca439cfc0e2de9a
+      internalID: 198854096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_061
+      rect:
+        serializedVersion: 2
+        x: 1482
+        y: 396
+        width: 257
+        height: 204
+      alignment: 9
+      pivot: {x: 0.537, y: 0.2283}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2bf50903a05e082114d3ce3467f28567
+      internalID: 240677051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_062
+      rect:
+        serializedVersion: 2
+        x: 617
+        y: 606
+        width: 215
+        height: 228
+      alignment: 9
+      pivot: {x: 0.5256, y: 0.2876}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 01894664eeb43a5d578ed9d4ee3d19f4
+      internalID: 1871034457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StoneGolem_063
+      rect:
+        serializedVersion: 2
+        x: 1782
+        y: 839
+        width: 189
+        height: 238
+      alignment: 9
+      pivot: {x: 0.5132, y: 0.3049}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb48fef0fcc45186d5ea5c84bc894e89
+      internalID: 30040086
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 375cb34bfd5dd76c783100a9f9daf6e7
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      StoneGolem_000: -360325136
+      StoneGolem_001: 471646869
+      StoneGolem_002: 475194144
+      StoneGolem_003: -875233234
+      StoneGolem_004: -879365715
+      StoneGolem_005: -705850294
+      StoneGolem_006: 2143871888
+      StoneGolem_007: 2027943553
+      StoneGolem_008: 515032307
+      StoneGolem_009: 132174199
+      StoneGolem_010: 266375189
+      StoneGolem_011: 2117154500
+      StoneGolem_012: -165942431
+      StoneGolem_013: 832734664
+      StoneGolem_014: -993456683
+      StoneGolem_015: -226886276
+      StoneGolem_016: 1081595208
+      StoneGolem_017: 1745317370
+      StoneGolem_018: 1527140927
+      StoneGolem_019: -1297443578
+      StoneGolem_020: -862875099
+      StoneGolem_021: 619537969
+      StoneGolem_022: 1572857230
+      StoneGolem_023: -169856496
+      StoneGolem_024: -1124621564
+      StoneGolem_025: 674937647
+      StoneGolem_026: 1685778775
+      StoneGolem_027: 792278304
+      StoneGolem_028: -2011877288
+      StoneGolem_029: 173571232
+      StoneGolem_030: -812879554
+      StoneGolem_031: 335173329
+      StoneGolem_032: 1538129841
+      StoneGolem_033: -1488676746
+      StoneGolem_034: -661814356
+      StoneGolem_035: 718520975
+      StoneGolem_036: 236791447
+      StoneGolem_037: -168281867
+      StoneGolem_038: 726334164
+      StoneGolem_039: -1501759901
+      StoneGolem_040: 61946013
+      StoneGolem_041: -1706032806
+      StoneGolem_042: -449006822
+      StoneGolem_043: 450853232
+      StoneGolem_044: 2006479520
+      StoneGolem_045: -160045225
+      StoneGolem_046: 909747673
+      StoneGolem_047: 155382310
+      StoneGolem_048: -675366782
+      StoneGolem_049: -956593193
+      StoneGolem_050: -1088077821
+      StoneGolem_051: 1555535885
+      StoneGolem_052: -493361201
+      StoneGolem_053: -167354798
+      StoneGolem_054: -980050917
+      StoneGolem_055: -893012326
+      StoneGolem_056: -1203042397
+      StoneGolem_057: 1925016869
+      StoneGolem_058: 2108551879
+      StoneGolem_059: 1331398916
+      StoneGolem_060: 198854096
+      StoneGolem_061: 240677051
+      StoneGolem_062: 1871034457
+      StoneGolem_063: 30040086
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

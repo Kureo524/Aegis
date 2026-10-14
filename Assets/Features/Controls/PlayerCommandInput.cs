@@ -7,7 +7,6 @@ using Features.Stats;
 using Systems.EventBusses;
 using Systems.Inputs.Events;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using VContainer;
 using VContainer.Unity;
 
@@ -15,7 +14,7 @@ namespace Features.Controls {
     /// <summary>
     /// Turns the player's pointer commands into orders for the character (design doc §4).
     /// Right click on an enemy: attack it (chase, then auto-attack). Right click on the ground:
-    /// move there, which cancels the attack (a windup in progress is lost), LoL style.
+    /// move there, which cancels the attack (a windup in progress is lost), MOBA style.
     /// Hold Q and left click: attack-move (§4.6) to the clicked point, attacking first the enemy
     /// closest to the click (if any within attackMoveSelectRadius). Aiming lasts while Q is held
     /// (the attack range is shown, each click gives an order); releasing Q, right click or Escape
@@ -65,7 +64,7 @@ namespace Features.Controls {
             _subscriptions.Add(_eventBus.Subscribe<ConfirmEvent>(OnConfirm));
             _subscriptions.Add(_eventBus.Subscribe<CancelEvent>(_ => StopAiming()));
             _subscriptions.Add(_eventBus.Subscribe<AimModeEvent>(e => {
-                _otherAimActive = e.Mode is AimMode.Spell or AimMode.Signature;
+                _otherAimActive = e.Mode == AimMode.Ability;
                 if (_otherAimActive && _aimingAttackMove) StopAiming();
             }));
         }
@@ -74,7 +73,7 @@ namespace Features.Controls {
 
         private void StartAimingAttackMove() {
             if (!character.IsAlive) return;
-            _eventBus.Publish(new AimModeEvent(AimMode.AttackMove));   // cancels an R / F aim
+            _eventBus.Publish(new AimModeEvent(AimMode.AttackMove));   // cancels a spell aim
             _aimingAttackMove = true;
             if (rangeIndicator != null) rangeIndicator.Show(character.Stats.Value(StatType.AttackRange));
         }
@@ -86,6 +85,7 @@ namespace Features.Controls {
 
         private void OnConfirm(ConfirmEvent evt) {
             if (!_aimingAttackMove || OrdersBlocked) return;
+            if (UI.UiPicking.IsPointerOverUi(evt.ScreenPosition)) return;
             if (!TryGetGroundPoint(evt.ScreenPosition, out Ray _, out Vector3 point)) return;
 
             Character preferred = ClosestEnemy(point, attackMoveSelectRadius);
@@ -101,7 +101,7 @@ namespace Features.Controls {
         }
 
         private void OnPointerCommand(PointerCommandEvent evt) {
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (UI.UiPicking.IsPointerOverUi(evt.ScreenPosition)) return;   // a click on the UI is not an order
 
             // Right click while aiming only cancels the aim (§4.6); during an R / F aim it belongs to it
             if (_aimingAttackMove) {

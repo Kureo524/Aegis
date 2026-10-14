@@ -7,7 +7,10 @@
         "Game.Containers",
         "Unity.AI.Navigation",
         "VContainer",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.2D.Sprite.Editor",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
     ],
     "includePlatforms": [
         "Editor"

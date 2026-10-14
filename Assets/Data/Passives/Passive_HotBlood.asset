@@ -13,15 +13,10 @@ MonoBehaviour:
   m_Name: Passive_HotBlood
   m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
   displayName: Sang chaud
-  description: "+180 PV, +2 r\xE9g\xE9n\xE9ration de PV."
-  icon: {fileID: 21300000, guid: 9e199f9fe649ab8b5911aeb9661a3dbb, type: 3}
-  stats:
-  - Stat: 0
-    Type: 0
-    Value: 180
-  - Stat: 1
-    Type: 0
-    Value: 2
+  description: "+3 attaque physique et +5 puissance magique par ennemi \xE0 moins
+    de 5 m (8 max)."
+  icon: {fileID: 21300000, guid: 9ff55e104e4466cceb796f484996a281, type: 3}
+  stats: []
   capabilities: 
   triggers: []
   stacks:
@@ -31,6 +26,12 @@ MonoBehaviour:
     Duration: 0
     PerStack: []
   nearbyEnemies:
-    Radius: 0
-    Max: 0
-    PerEnemy: []
+    Radius: 5
+    Max: 8
+    PerEnemy:
+    - Stat: 4
+      Type: 0
+      Value: 3
+    - Stat: 5
+      Type: 0
+      Value: 5

@@ -1,0 +1,1526 @@
+fileFormatVersion: 2
+guid: b42a18126dfd676ca89b3c1896e022a8
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1591997207337964612
+    second: MaskedShaman_0
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 108.32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MaskedShaman_000
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 572
+        width: 118
+        height: 149
+      alignment: 9
+      pivot: {x: 0.447, y: 0.2212}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27ffbd41ad9384ffe55f70bb08d77be6
+      internalID: -3665226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_001
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 572
+        width: 117
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4509, y: 0.2212}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2222edbc44ae62d4a8b33248e5936a09
+      internalID: 1418087458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_002
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 724
+        width: 116
+        height: 150
+      alignment: 9
+      pivot: {x: 0.4547, y: 0.2197}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 11446edf900f13619021e7b9da1aca8c
+      internalID: 1915455684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_003
+      rect:
+        serializedVersion: 2
+        x: 236
+        y: 724
+        width: 116
+        height: 150
+      alignment: 9
+      pivot: {x: 0.4547, y: 0.2197}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3dd98f273aaf725f23b8246f520a212e
+      internalID: -1572051429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_004
+      rect:
+        serializedVersion: 2
+        x: 117
+        y: 877
+        width: 116
+        height: 151
+      alignment: 9
+      pivot: {x: 0.4547, y: 0.2249}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b217c3d8079e584b41d74f8a3c0c81ac
+      internalID: 655291992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_005
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 724
+        width: 118
+        height: 150
+      alignment: 9
+      pivot: {x: 0.447, y: 0.2264}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c550a58ac71b3b1ab3bcd41ba6038f77
+      internalID: 730996805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_006
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 572
+        width: 118
+        height: 149
+      alignment: 9
+      pivot: {x: 0.447, y: 0.2212}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 82ecdd11d94f7089b3d7b3976b86cde4
+      internalID: 1515961236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_007
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 572
+        width: 117
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4509, y: 0.2212}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c00860c3abaf2b403b0e82a29c239dbe
+      internalID: -1597327120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_008
+      rect:
+        serializedVersion: 2
+        x: 474
+        y: 724
+        width: 116
+        height: 150
+      alignment: 9
+      pivot: {x: 0.4547, y: 0.2197}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 022cb500df87326d5c487ec57ebf021a
+      internalID: -955910613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_009
+      rect:
+        serializedVersion: 2
+        x: 592
+        y: 724
+        width: 116
+        height: 150
+      alignment: 9
+      pivot: {x: 0.4547, y: 0.2197}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 865f3b8ba684f59d5f2014c646b554ca
+      internalID: -1647725081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_010
+      rect:
+        serializedVersion: 2
+        x: 235
+        y: 877
+        width: 116
+        height: 151
+      alignment: 9
+      pivot: {x: 0.4547, y: 0.2249}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 03df783329f2e79dfdb71934d1b58345
+      internalID: -203106308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_011
+      rect:
+        serializedVersion: 2
+        x: 710
+        y: 724
+        width: 118
+        height: 150
+      alignment: 9
+      pivot: {x: 0.447, y: 0.2264}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6faa1cd66f119c8391f1006074d6ab35
+      internalID: -1615147526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_012
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 421
+        width: 118
+        height: 148
+      alignment: 9
+      pivot: {x: 0.447, y: 0.2227}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 444ecad5557de35cf386279b3d322f8c
+      internalID: 266508089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_013
+      rect:
+        serializedVersion: 2
+        x: 601
+        y: 572
+        width: 117
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4509, y: 0.2212}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2ccdb1043f3ecbd6ac0ec5614a6cffa
+      internalID: 850943031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_014
+      rect:
+        serializedVersion: 2
+        x: 353
+        y: 877
+        width: 115
+        height: 151
+      alignment: 9
+      pivot: {x: 0.4587, y: 0.2182}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6415a379bbe31d2de1224ba2d71d4fc5
+      internalID: 1116908190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_015
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 876
+        width: 115
+        height: 152
+      alignment: 9
+      pivot: {x: 0.4587, y: 0.2234}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d02ecb7b8d4efccbce19b12f65b2e608
+      internalID: 1409818827
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_016
+      rect:
+        serializedVersion: 2
+        x: 830
+        y: 724
+        width: 117
+        height: 150
+      alignment: 9
+      pivot: {x: 0.4509, y: 0.2264}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3baaa8b94aece652ecc17c324c7f5cd8
+      internalID: -2028671167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_017
+      rect:
+        serializedVersion: 2
+        x: 720
+        y: 572
+        width: 118
+        height: 149
+      alignment: 9
+      pivot: {x: 0.447, y: 0.2212}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85e861d1d3c9b3270130cef906c05107
+      internalID: 1304691773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_018
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 572
+        width: 117
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4509, y: 0.2212}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 896958a57fefce044b2cdb85f4405377
+      internalID: -514591740
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_019
+      rect:
+        serializedVersion: 2
+        x: 949
+        y: 724
+        width: 115
+        height: 150
+      alignment: 9
+      pivot: {x: 0.4587, y: 0.2197}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f43484754bf1544e0a2ca20ae587b744
+      internalID: -1776785103
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_020
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 877
+        width: 116
+        height: 151
+      alignment: 9
+      pivot: {x: 0.4547, y: 0.2182}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 323c989fc5e658442853ce0ad383b5c8
+      internalID: -1111820028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_021
+      rect:
+        serializedVersion: 2
+        x: 588
+        y: 877
+        width: 118
+        height: 151
+      alignment: 9
+      pivot: {x: 0.447, y: 0.2249}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b433e45aac6cdf76d0c26a3f7214f737
+      internalID: -883485189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_022
+      rect:
+        serializedVersion: 2
+        x: 684
+        y: 421
+        width: 109
+        height: 148
+      alignment: 9
+      pivot: {x: 0.4197, y: 0.2497}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f155fcb207af27d5f05aee5f52490df2
+      internalID: 749354957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_023
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 1
+        width: 122
+        height: 122
+      alignment: 9
+      pivot: {x: 0.498, y: 0.0734}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a01c100646e252eb543a5d259afdda69
+      internalID: 1114622662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_024
+      rect:
+        serializedVersion: 2
+        x: 747
+        y: 135
+        width: 109
+        height: 133
+      alignment: 9
+      pivot: {x: 0.4106, y: 0.1651}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a040def178564937db75c9400536475b
+      internalID: 1665702172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_025
+      rect:
+        serializedVersion: 2
+        x: 968
+        y: 144
+        width: 98
+        height: 124
+      alignment: 9
+      pivot: {x: 0.3342, y: 0.1206}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62f4a6d28198c902b09043ef68c5423b
+      internalID: 948494839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_026
+      rect:
+        serializedVersion: 2
+        x: 639
+        y: 134
+        width: 106
+        height: 134
+      alignment: 9
+      pivot: {x: 0.4033, y: 0.1788}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 466b17c5b98cd420dc6fe720fbb72bb3
+      internalID: 553716233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_027
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 126
+        width: 108
+        height: 142
+      alignment: 9
+      pivot: {x: 0.4236, y: 0.218}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5ca96c33fb6bf7538d77906c62c3534
+      internalID: 1368662561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_028
+      rect:
+        serializedVersion: 2
+        x: 795
+        y: 421
+        width: 106
+        height: 148
+      alignment: 9
+      pivot: {x: 0.4316, y: 0.2429}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 45619d8d37ad98e2b65b8c61666acc2a
+      internalID: -1860166202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_029
+      rect:
+        serializedVersion: 2
+        x: 959
+        y: 572
+        width: 105
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4357, y: 0.248}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 56cfab62bcb01644fe15363c59e3e778
+      internalID: 1673867836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_030
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 420
+        width: 107
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4276, y: 0.248}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfe3122c4768bab12ac9d65766941dc1
+      internalID: 778013577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_031
+      rect:
+        serializedVersion: 2
+        x: 903
+        y: 421
+        width: 109
+        height: 148
+      alignment: 9
+      pivot: {x: 0.4197, y: 0.2497}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 937de9121d26b3936bccd7ff3126d6e5
+      internalID: 783100025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_032
+      rect:
+        serializedVersion: 2
+        x: 1014
+        y: 421
+        width: 109
+        height: 148
+      alignment: 9
+      pivot: {x: 0.4197, y: 0.2497}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0d05194c30360c65511a4300eddfbb9a
+      internalID: -164374876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_033
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 270
+        width: 126
+        height: 148
+      alignment: 9
+      pivot: {x: 0.498, y: 0.1889}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0d28a439b12105ca69787eb07816f707
+      internalID: -1950938814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_034
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 128
+        width: 142
+        height: 140
+      alignment: 9
+      pivot: {x: 0.5687, y: 0.1497}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 389296dc58eb8d419c53cc64df3ecda1
+      internalID: 1127726890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_035
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 127
+        width: 141
+        height: 141
+      alignment: 9
+      pivot: {x: 0.5727, y: 0.1699}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4f888b457db482b42e3f3bec74d5fc5
+      internalID: -1865149484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_036
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 125
+        width: 135
+        height: 143
+      alignment: 9
+      pivot: {x: 0.5685, y: 0.2095}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 86c562efae83e08975d2a57864ca0d93
+      internalID: -1551836593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_037
+      rect:
+        serializedVersion: 2
+        x: 894
+        y: 274
+        width: 121
+        height: 144
+      alignment: 9
+      pivot: {x: 0.5269, y: 0.2775}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88c9719b8677df97004e746b7b4112ed
+      internalID: 443239735
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_038
+      rect:
+        serializedVersion: 2
+        x: 247
+        y: 126
+        width: 103
+        height: 142
+      alignment: 9
+      pivot: {x: 0.3665, y: 0.38}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2c62816ce6b6c4b11ccfc5f5f98442d
+      internalID: 647125874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_039
+      rect:
+        serializedVersion: 2
+        x: 858
+        y: 136
+        width: 108
+        height: 132
+      alignment: 9
+      pivot: {x: 0.2106, y: 0.4769}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d2d1d7c45d90b3cc7144fee73d8e7a7
+      internalID: -2092521973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_040
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 116
+        height: 123
+      alignment: 9
+      pivot: {x: 0.1961, y: 0.5281}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 240a574ab018eef58b3a381fe7eb1d78
+      internalID: -1669872097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_041
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 0
+        width: 116
+        height: 123
+      alignment: 9
+      pivot: {x: 0.1875, y: 0.5281}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bd07cb336de2952c191d12d4dbf30f5f
+      internalID: 841634537
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_042
+      rect:
+        serializedVersion: 2
+        x: 236
+        y: 0
+        width: 116
+        height: 123
+      alignment: 9
+      pivot: {x: 0.1875, y: 0.5281}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2b790dedd7326df118f8e1e50d5ee83
+      internalID: -317346662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_043
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 1
+        width: 116
+        height: 122
+      alignment: 9
+      pivot: {x: 0.1875, y: 0.5324}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60ec71daf1ffb963aa7e5f4f95b5b7ad
+      internalID: 652082194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_044
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 270
+        width: 109
+        height: 148
+      alignment: 9
+      pivot: {x: 0.4197, y: 0.2497}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8400f06e94efd00a7f300ecf74483d62
+      internalID: 601988629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_045
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 420
+        width: 128
+        height: 149
+      alignment: 9
+      pivot: {x: 0.5293, y: 0.1943}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f21698ccade28b20a43fa0f55effef1f
+      internalID: 1424769798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_046
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 571
+        width: 121
+        height: 150
+      alignment: 9
+      pivot: {x: 0.5021, y: 0.2264}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 63d6caa121d4d82b129b7cf210e3e57e
+      internalID: 2104690552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_047
+      rect:
+        serializedVersion: 2
+        x: 708
+        y: 877
+        width: 107
+        height: 151
+      alignment: 9
+      pivot: {x: 0.4463, y: 0.2447}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f2d4a4ba2a3dff119ab0a7ebfaa236c6
+      internalID: 1439909563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_048
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 420
+        width: 107
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4276, y: 0.2547}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9048a0b26f0b8d78668546ce1dd7eee0
+      internalID: 106073500
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_049
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 270
+        width: 108
+        height: 148
+      alignment: 9
+      pivot: {x: 0.4236, y: 0.2497}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2231e0bf89098cc25b3a9c52ffc2a7c8
+      internalID: -1080702020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_050
+      rect:
+        serializedVersion: 2
+        x: 349
+        y: 270
+        width: 109
+        height: 148
+      alignment: 9
+      pivot: {x: 0.4197, y: 0.2497}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d7d2bc49584849cb14303e73c505cdab
+      internalID: 418634453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_051
+      rect:
+        serializedVersion: 2
+        x: 817
+        y: 877
+        width: 111
+        height: 151
+      alignment: 9
+      pivot: {x: 0.4482, y: 0.2447}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8d13545a727483fe1f74f70aa299aeb3
+      internalID: -901732464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_052
+      rect:
+        serializedVersion: 2
+        x: 930
+        y: 877
+        width: 106
+        height: 151
+      alignment: 9
+      pivot: {x: 0.441, y: 0.2447}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8ddfb1d404d5b5d6f9c4581d129d22a1
+      internalID: -1720679750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_053
+      rect:
+        serializedVersion: 2
+        x: 678
+        y: 272
+        width: 105
+        height: 146
+      alignment: 9
+      pivot: {x: 0.4262, y: 0.2531}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1aa4ef98f0a0e590811a9824ba555ec1
+      internalID: 1827597329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_054
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 723
+        width: 116
+        height: 151
+      alignment: 9
+      pivot: {x: 0.4634, y: 0.2514}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 96f04cf8754c67eafbbbccddc80c3abb
+      internalID: -1550556435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_055
+      rect:
+        serializedVersion: 2
+        x: 785
+        y: 272
+        width: 107
+        height: 146
+      alignment: 9
+      pivot: {x: 0.4182, y: 0.2531}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dedebbe13a185dfa871b8f3e611265fd
+      internalID: -1181853820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_056
+      rect:
+        serializedVersion: 2
+        x: 571
+        y: 271
+        width: 105
+        height: 147
+      alignment: 9
+      pivot: {x: 0.4262, y: 0.2514}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7252f47502f24f5b0eb3e7457706bb8
+      internalID: -640492491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_057
+      rect:
+        serializedVersion: 2
+        x: 348
+        y: 420
+        width: 105
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4357, y: 0.248}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9300da98bf01ef9630f833f5f44588a4
+      internalID: 1091282318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_058
+      rect:
+        serializedVersion: 2
+        x: 455
+        y: 420
+        width: 107
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4276, y: 0.2547}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b474e544167cf0b4e0d526d3c42eabf8
+      internalID: 1888120884
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MaskedShaman_059
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 270
+        width: 109
+        height: 148
+      alignment: 9
+      pivot: {x: 0.4197, y: 0.2497}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cde40c8b8a6525f2e90a6403e1e57b68
+      internalID: -419120068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 53ca2c3355b891a61969a8afddeca3fd
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MaskedShaman_000: -3665226
+      MaskedShaman_001: 1418087458
+      MaskedShaman_002: 1915455684
+      MaskedShaman_003: -1572051429
+      MaskedShaman_004: 655291992
+      MaskedShaman_005: 730996805
+      MaskedShaman_006: 1515961236
+      MaskedShaman_007: -1597327120
+      MaskedShaman_008: -955910613
+      MaskedShaman_009: -1647725081
+      MaskedShaman_010: -203106308
+      MaskedShaman_011: -1615147526
+      MaskedShaman_012: 266508089
+      MaskedShaman_013: 850943031
+      MaskedShaman_014: 1116908190
+      MaskedShaman_015: 1409818827
+      MaskedShaman_016: -2028671167
+      MaskedShaman_017: 1304691773
+      MaskedShaman_018: -514591740
+      MaskedShaman_019: -1776785103
+      MaskedShaman_020: -1111820028
+      MaskedShaman_021: -883485189
+      MaskedShaman_022: 749354957
+      MaskedShaman_023: 1114622662
+      MaskedShaman_024: 1665702172
+      MaskedShaman_025: 948494839
+      MaskedShaman_026: 553716233
+      MaskedShaman_027: 1368662561
+      MaskedShaman_028: -1860166202
+      MaskedShaman_029: 1673867836
+      MaskedShaman_030: 778013577
+      MaskedShaman_031: 783100025
+      MaskedShaman_032: -164374876
+      MaskedShaman_033: -1950938814
+      MaskedShaman_034: 1127726890
+      MaskedShaman_035: -1865149484
+      MaskedShaman_036: -1551836593
+      MaskedShaman_037: 443239735
+      MaskedShaman_038: 647125874
+      MaskedShaman_039: -2092521973
+      MaskedShaman_040: -1669872097
+      MaskedShaman_041: 841634537
+      MaskedShaman_042: -317346662
+      MaskedShaman_043: 652082194
+      MaskedShaman_044: 601988629
+      MaskedShaman_045: 1424769798
+      MaskedShaman_046: 2104690552
+      MaskedShaman_047: 1439909563
+      MaskedShaman_048: 106073500
+      MaskedShaman_049: -1080702020
+      MaskedShaman_050: 418634453
+      MaskedShaman_051: -901732464
+      MaskedShaman_052: -1720679750
+      MaskedShaman_053: 1827597329
+      MaskedShaman_054: -1550556435
+      MaskedShaman_055: -1181853820
+      MaskedShaman_056: -640492491
+      MaskedShaman_057: 1091282318
+      MaskedShaman_058: 1888120884
+      MaskedShaman_059: -419120068
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

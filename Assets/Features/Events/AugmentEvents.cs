@@ -11,7 +11,9 @@ namespace Features.Events {
         public readonly AugmentDraftPhase Phase;
         public readonly RarityTier Rarity;
         public readonly IReadOnlyList<AugmentDefinition> Choices;
-        public readonly int RerollsLeft;
+        /// <summary>Rerolls left on each card of this draft.</summary>
+        public readonly IReadOnlyList<int> CardRerolls;
+        /// <summary>The draft still offers its golden reroll (one card, rarity + 1).</summary>
         public readonly bool GoldenReroll;
         /// <summary>SlotsFull: the augment just chosen, and the owned augments it may replace.</summary>
         public readonly AugmentDefinition Pending;
@@ -19,13 +21,13 @@ namespace Features.Events {
         public readonly bool CanAddSlot;
         public readonly int Gold;
 
-        public AugmentDraftEvent(AugmentDraftPhase phase, RarityTier rarity, IReadOnlyList<AugmentDefinition> choices, int rerollsLeft,
+        public AugmentDraftEvent(AugmentDraftPhase phase, RarityTier rarity, IReadOnlyList<AugmentDefinition> choices, IReadOnlyList<int> cardRerolls,
                                  bool goldenReroll, AugmentDefinition pending, IReadOnlyList<AugmentDefinition> replaceable,
                                  bool canAddSlot, int gold) {
             Phase = phase;
             Rarity = rarity;
             Choices = choices;
-            RerollsLeft = rerollsLeft;
+            CardRerolls = cardRerolls;
             GoldenReroll = goldenReroll;
             Pending = pending;
             Replaceable = replaceable;
@@ -39,9 +41,14 @@ namespace Features.Events {
         public AugmentPickRequestedEvent(int index) => Index = index;
     }
 
+    /// <summary>Reroll one card: its own reroll (same rarity), or the draft's golden reroll (rarity + 1).</summary>
     public readonly struct AugmentRerollRequestedEvent : IEvent {
         public readonly int Index;
-        public AugmentRerollRequestedEvent(int index) => Index = index;
+        public readonly bool Golden;
+        public AugmentRerollRequestedEvent(int index, bool golden = false) {
+            Index = index;
+            Golden = golden;
+        }
     }
 
     public enum FullSlotsOption { Anvil, Replace, SlotOrGold }

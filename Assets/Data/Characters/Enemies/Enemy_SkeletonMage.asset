@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
+  m_Name: Enemy_SkeletonMage
+  m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
+  displayName: Spectre glacial
+  faction: 1
+  sprite: {fileID: -455579479, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+  animations: {fileID: 11400000, guid: 9fe6e24ed02fe3976a776b82625477f9, type: 2}
+  portrait: {fileID: 0}
+  bodySize: {x: 0.7, y: 1.54}
+  baseStats: {fileID: 11400000, guid: 18ba909816080e321a8d2fc92f58af2e, type: 2}
+  growthPerLevel: {fileID: 0}
+  basicAttack: {fileID: 11400000, guid: 596890bcea050194bb67fe78db41c412, type: 2}
+  abilities: []
+  summonerD: {fileID: 0}
+  summonerF: {fileID: 0}
+  recommendedItems: []
+  passive: {fileID: 0}
+  xpReward: 117
+  goldReward: 9
+  navigation: 0
+  specialSpell: {fileID: 11400000, guid: 3bc32c0fbd53a08c5a790cebffb205d8, type: 2}
+  startMana: 0
+  manaPerSecond: 8
+  manaPerAttack: 15
+  manaPerHitTaken: 1

@@ -105,7 +105,7 @@ namespace Features.Enemies {
         private void Update() {
             if (_boss == null || !owner.IsAlive) return;
             if (!Mathf.Approximately(_lastHealth, owner.Health.Current) || !Mathf.Approximately(_lastMax, owner.Health.Max)) PublishHealth();
-            if (_boss.Pattern == null) return;
+            if (_boss.Pattern == null || owner.Status.IsStunned) return;
             Character player = _director.Player;
             if (player == null || !player.IsAlive) {
                 EndStep();

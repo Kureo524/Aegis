@@ -25,6 +25,8 @@ namespace Containers {
         [SerializeField] private ExperienceCurve experienceCurve;
         [SerializeField] private ControlsSettings controlsSettings;
         [SerializeField] private SpellSettings spellSettings;
+        [SerializeField] private Features.UI.UiTheme uiTheme;
+        [SerializeField] private Features.Meta.MetaSettings metaSettings;
 
         protected override void Configure(IContainerBuilder builder) {
             // Infrastructure
@@ -38,6 +40,9 @@ namespace Containers {
             builder.RegisterInstance(experienceCurve);
             builder.RegisterInstance(controlsSettings);
             builder.RegisterInstance(spellSettings);
+            builder.RegisterInstance(uiTheme);
+            builder.RegisterInstance(metaSettings);
+            builder.Register<Features.Meta.MetaProgress>(Lifetime.Singleton);   // persistent currency and trees (JSON)
             builder.Register<UserOptions>(Lifetime.Singleton);   // player's choices (JSON) over the defaults
 
             // Game flow

@@ -44,6 +44,28 @@ namespace Features.Passives {
             for (int i = _passives.Count - 1; i >= 0; i--) Remove(_passives[i]);
         }
 
+        /// <summary>Product of the outgoing damage multipliers of every passive (DamageModifiers).</summary>
+        public float OutgoingMultiplier(Character target, in Combat.DamageInfo info) {
+            float m = 1f;
+            foreach (Passive p in _passives) m *= p.OutgoingMultiplier(target, info);
+            return m;
+        }
+
+        public float IncomingMultiplier {
+            get {
+                float m = 1f;
+                foreach (Passive p in _passives) m *= p.IncomingMultiplier;
+                return Mathf.Max(0f, m);
+            }
+        }
+
+        /// <summary>Extra ability haste on one ability (Q W E R) from every passive.</summary>
+        public float AbilityHaste(int slot) {
+            float h = 0f;
+            foreach (Passive p in _passives) h += p.Definition.AbilityHaste(slot);
+            return h;
+        }
+
         public void Tick() {
             for (int i = 0; i < _passives.Count; i++) _passives[i].Tick();
         }

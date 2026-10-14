@@ -14,7 +14,8 @@ namespace Systems.Inputs {
     /// Single owner of the generated action maps. Translates raw input into typed events on the
     /// <see cref="IEventBus"/> (design doc §14.3, §14.9). Every map starts disabled; which map is
     /// active is decided by the game state (see Features.Flow.InputMapSwitcher).
-    /// Letter bindings are remapped to the configured <see cref="KeyboardLayout"/> at startup.
+    /// Letter bindings are remapped to the configured <see cref="KeyboardLayout"/> at startup, except
+    /// the positional ones (spell keys, attack-move, stop).
     /// Registered as an entry point in the RootLifetimeScope.
     /// </summary>
     public sealed class InputReader : IInitializable, IDisposable {
@@ -40,16 +41,13 @@ namespace Systems.Inputs {
             g.Cancel.performed          += OnCancel;
             g.AttackMove.performed      += OnAttackMove;
             g.AttackMove.canceled       += OnAttackMove;
-            g.Element1.performed        += OnElement1;
-            g.Element2.performed        += OnElement2;
-            g.Element3.performed        += OnElement3;
-            g.CastSpell.performed       += OnCastSpell;
-            g.CastSpell.canceled        += OnCastSpell;
-            g.Signature.performed       += OnSignature;
-            g.Signature.canceled        += OnSignature;
-            g.ResetElements.performed   += OnResetElements;
+            foreach (InputAction action in AbilityActions(g)) {
+                action.performed += OnAbility;
+                action.canceled += OnAbility;
+            }
             g.Stop.performed            += OnStop;
             g.CameraLock.performed      += OnCameraLock;
+            g.Shop.performed            += OnShop;
             g.Zoom.performed            += OnZoom;
             g.Zoom.canceled             += OnZoom;
             _input.UI.Cancel.performed  += OnUiCancel;
@@ -82,16 +80,13 @@ namespace Systems.Inputs {
             g.Cancel.performed          -= OnCancel;
             g.AttackMove.performed      -= OnAttackMove;
             g.AttackMove.canceled       -= OnAttackMove;
-            g.Element1.performed        -= OnElement1;
-            g.Element2.performed        -= OnElement2;
-            g.Element3.performed        -= OnElement3;
-            g.CastSpell.performed       -= OnCastSpell;
-            g.CastSpell.canceled        -= OnCastSpell;
-            g.Signature.performed       -= OnSignature;
-            g.Signature.canceled        -= OnSignature;
-            g.ResetElements.performed   -= OnResetElements;
+            foreach (InputAction action in AbilityActions(g)) {
+                action.performed -= OnAbility;
+                action.canceled -= OnAbility;
+            }
             g.Stop.performed            -= OnStop;
             g.CameraLock.performed      -= OnCameraLock;
+            g.Shop.performed            -= OnShop;
             g.Zoom.performed            -= OnZoom;
             g.Zoom.canceled             -= OnZoom;
             _input.UI.Cancel.performed  -= OnUiCancel;
@@ -112,24 +107,36 @@ namespace Systems.Inputs {
         private void OnConfirm(InputAction.CallbackContext ctx)        => _eventBus.Publish(new ConfirmEvent(_pointerPosition));
         private void OnCancel(InputAction.CallbackContext ctx)         => _eventBus.Publish(new CancelEvent());
         private void OnAttackMove(InputAction.CallbackContext ctx)     => _eventBus.Publish(new AttackMoveEvent(ctx.performed));
-        private void OnElement1(InputAction.CallbackContext ctx)       => PublishElementKey(0);
-        private void OnElement2(InputAction.CallbackContext ctx)       => PublishElementKey(1);
-        private void OnElement3(InputAction.CallbackContext ctx)       => PublishElementKey(2);
-        private void PublishElementKey(int slot) =>
-            _eventBus.Publish(new ElementKeyEvent(slot, levelUp: _input.Gameplay.LevelUpModifier.IsPressed()));
-        private void OnCastSpell(InputAction.CallbackContext ctx)      => _eventBus.Publish(new CastSpellEvent(released: ctx.canceled));
-        private void OnSignature(InputAction.CallbackContext ctx)      => _eventBus.Publish(new SignatureEvent(released: ctx.canceled));
-        private void OnResetElements(InputAction.CallbackContext ctx)  => _eventBus.Publish(new ResetElementsEvent());
+        // Slot order of AbilityKeyEvent: Q W E R, then D F (design doc §7.1)
+        private static InputAction[] AbilityActions(GameActionMaps.GameplayActions g) =>
+            new[] { g.Ability1, g.Ability2, g.Ability3, g.Ability4, g.SummonerD, g.SummonerF };
+
+        private void OnAbility(InputAction.CallbackContext ctx) {
+            int slot = System.Array.IndexOf(AbilityActions(_input.Gameplay), ctx.action);
+            if (slot < 0) return;
+            bool released = ctx.canceled;
+            bool levelUp = !released && _input.Gameplay.LevelUpModifier.IsPressed();
+            _eventBus.Publish(new AbilityKeyEvent(slot, levelUp, released));
+        }
         private void OnStop(InputAction.CallbackContext ctx)           => _eventBus.Publish(new StopEvent());
         private void OnCameraLock(InputAction.CallbackContext ctx)     => _eventBus.Publish(new CameraLockEvent());
+        private void OnShop(InputAction.CallbackContext ctx)           => _eventBus.Publish(new ShopKeyEvent());
         private void OnUiCancel(InputAction.CallbackContext ctx)       => _eventBus.Publish(new UiCancelEvent());
-        /// <summary>Moves every single-letter keyboard binding to where that letter is on <paramref name="layout"/>.</summary>
+        /// <summary>Binding group of keys bound by position (Q W E R, D F, attack-move…): never remapped.</summary>
+        public const string PositionalGroup = "Positional";
+
+        /// <summary>
+        /// Moves every single-letter keyboard binding to where that letter is on <paramref name="layout"/>,
+        /// except the positional ones (MOBA keys stay where QWERTY has them: A Z E R in AZERTY).
+        /// </summary>
         public static void ApplyKeyboardLayout(InputActionAsset asset, KeyboardLayout layout) {
             const string prefix = "<Keyboard>/";
             foreach (InputActionMap map in asset.actionMaps) {
                 foreach (InputAction action in map.actions) {
                     for (int i = 0; i < action.bindings.Count; i++) {
                         string path = action.bindings[i].path;
+                        string groups = action.bindings[i].groups;
+                        if (groups != null && groups.Contains(PositionalGroup)) continue;
                         if (path == null || path.Length != prefix.Length + 1 || !path.StartsWith(prefix)) continue;
                         char letter = path[prefix.Length];
                         if (letter < 'a' || letter > 'z') continue;

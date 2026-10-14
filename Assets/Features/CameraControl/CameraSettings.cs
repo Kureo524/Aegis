@@ -1,7 +1,7 @@
 using UnityEngine;
 
 namespace Features.CameraControl {
-    /// <summary>Tuning of the LoL-style camera (design doc §14.5). Read-only at runtime.</summary>
+    /// <summary>Tuning of the MOBA-style camera (design doc §14.5). Read-only at runtime.</summary>
     [CreateAssetMenu(menuName = "Game/Settings/Camera Settings", fileName = "CameraSettings")]
     public class CameraSettings : ScriptableObject {
         [Header("Follow (locked)")]
@@ -18,7 +18,7 @@ namespace Features.CameraControl {
 
         [Header("Zoom")]
         [SerializeField] private float minZoom = 5f;
-        [SerializeField] private float maxZoom = 20f;
+        [SerializeField] private float maxZoom = 32f;
         [SerializeField] private float zoomSpeed = 10f;
 
         public Vector3 Offset => offset;

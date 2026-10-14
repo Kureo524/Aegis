@@ -6,7 +6,7 @@ using VContainer;
 
 namespace Features.CameraControl {
     /// <summary>
-    /// LoL-style camera. Locked: follows <see cref="target"/>. Unlocked: free, scrolled by moving
+    /// MOBA-style camera. Locked: follows <see cref="target"/>. Unlocked: free, scrolled by moving
     /// the cursor to the screen edges. The angle never changes: the rotation is derived once from
     /// the offset (no LookAt, which tilted the camera while it lagged behind the character). Space / middle mouse toggles the lock (CameraLockEvent),
     /// the wheel zooms (ZoomEvent). Tuning comes from <see cref="CameraSettings"/>.

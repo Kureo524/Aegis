@@ -31,6 +31,7 @@ namespace EditorTools {
         public const string EnemyPrefabPath = "Assets/Prefabs/Characters/Enemy.prefab";
         public const string PlaceholderSpritePath = "Assets/GraphicAssets/Sprites/Characters/Placeholder_Hero.png";
         public const string WhiteSpritePath = "Assets/GraphicAssets/Sprites/UI/White.png";
+        private const string StatusIconsDir = "Assets/GraphicAssets/Sprites/Status";
         public const string ArcaneBoltPrefabPath = "Assets/Prefabs/Combat/Projectile_ArcaneBolt.prefab";
         public const string SkillshotPrefabPath = "Assets/Prefabs/Combat/Projectile_Skillshot.prefab";
         public const string ShapeVfxPrefabPath = "Assets/Prefabs/Combat/Vfx_SpellShape.prefab";
@@ -64,10 +65,8 @@ namespace EditorTools {
                 input.character = root.GetComponent<Character>();
                 input.attacker = root.GetComponent<BasicAttacker>();
 
-                if (!root.TryGetComponent(out ElementCaster caster)) caster = root.AddComponent<ElementCaster>();
-                var casterSo = new SerializedObject(caster);
-                casterSo.FindProperty("owner").objectReferenceValue = root.GetComponent<Character>();
-                casterSo.ApplyModifiedPropertiesWithoutUndo();
+                // The element caster and the F-only signature ability are gone (champion abilities, §7)
+                GameObjectUtility.RemoveMonoBehavioursWithMissingScript(root);
 
                 RangeIndicator indicator = root.GetComponentInChildren<RangeIndicator>(true);
                 if (indicator == null) indicator = CreateRangeIndicator(root.transform);
@@ -82,10 +81,8 @@ namespace EditorTools {
 
                 if (!root.TryGetComponent(out SpellTargeting targeting)) targeting = root.AddComponent<SpellTargeting>();
                 SetRefs(targeting, ("owner", character), ("indicator", shape), ("rangeIndicator", indicator));
-                SetRefs(caster, ("owner", character), ("targeting", targeting), ("caster", spellCaster));
-
-                if (!root.TryGetComponent(out SignatureAbility signature)) signature = root.AddComponent<SignatureAbility>();
-                SetRefs(signature, ("owner", character), ("targeting", targeting), ("caster", spellCaster));
+                if (!root.TryGetComponent(out AbilityCaster abilities)) abilities = root.AddComponent<AbilityCaster>();
+                SetRefs(abilities, ("owner", character), ("targeting", targeting), ("caster", spellCaster));
             });
             return AssetDatabase.LoadAssetAtPath<Character>(PlayerPrefabPath);
         }
@@ -166,6 +163,7 @@ namespace EditorTools {
 
                 HealthBarView bar = root.GetComponentInChildren<HealthBarView>(true);
                 if (bar == null) bar = CreateHealthBar(root.transform);
+                AddStatusIcon(bar);
 
                 if (!root.TryGetComponent(out SpellCaster spellCaster)) spellCaster = root.AddComponent<SpellCaster>();
                 var casterSo = new SerializedObject(spellCaster);
@@ -320,6 +318,29 @@ namespace EditorTools {
             material = new Material(Shader.Find("Sprites/Default"));
             AssetDatabase.CreateAsset(material, UnlitMaterialPath);
             return material;
+        }
+
+        // Phase 9b: status icon left of the bar (added to existing prefabs too)
+        private static void AddStatusIcon(HealthBarView bar) {
+            var so = new SerializedObject(bar);
+            if (so.FindProperty("statusIcon").objectReferenceValue == null) {
+                var go = new GameObject("StatusIcon");
+                go.transform.SetParent(bar.transform, false);
+                go.transform.localPosition = new Vector3(-0.68f, 0f, -0.002f);
+                var icon = go.AddComponent<SpriteRenderer>();
+                icon.sortingOrder = 102;
+                icon.enabled = false;
+                so.FindProperty("statusIcon").objectReferenceValue = icon;
+            }
+            string[] names = System.Enum.GetNames(typeof(Features.Combat.StatusKind));
+            SerializedProperty sprites = so.FindProperty("statusSprites");
+            sprites.arraySize = names.Length;
+            for (int i = 0; i < names.Length; i++) {
+                string path = $"{StatusIconsDir}/Status_{names[i]}.png";
+                EconomySetup.ConfigureIcon(path);
+                sprites.GetArrayElementAtIndex(i).objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static HealthBarView CreateHealthBar(Transform parent) {

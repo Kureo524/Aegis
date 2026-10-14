@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
+  m_Name: Enemy_Wolf
+  m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
+  displayName: Loup
+  faction: 1
+  sprite: {fileID: -942682772, guid: 2986fb9d144899d14829e9694810d082, type: 3}
+  animations: {fileID: 11400000, guid: c232d8454ca22531683088b1acca3758, type: 2}
+  portrait: {fileID: 0}
+  bodySize: {x: 1.1, y: 1.25}
+  baseStats: {fileID: 11400000, guid: 586bd5477c8e049319e3b31a45a534c6, type: 2}
+  growthPerLevel: {fileID: 0}
+  basicAttack: {fileID: 11400000, guid: 66412ccaddfdf8e74a7eac43bd76a609, type: 2}
+  abilities: []
+  summonerD: {fileID: 0}
+  summonerF: {fileID: 0}
+  recommendedItems: []
+  passive: {fileID: 11400000, guid: 304a044ff314a659db316ce226667673, type: 2}
+  xpReward: 72
+  goldReward: 6
+  navigation: 0
+  specialSpell: {fileID: 0}
+  startMana: 0
+  manaPerSecond: 5
+  manaPerAttack: 10
+  manaPerHitTaken: 2

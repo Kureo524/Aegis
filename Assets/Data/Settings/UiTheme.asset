@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3529ec05fc0e5d0283619df984dc5c7, type: 3}
+  m_Name: UiTheme
+  m_EditorClassIdentifier: Game.Features::Features.UI.UiTheme
+  stats:
+  - Stat: 4
+    Icon: {fileID: 21300000, guid: 9e6407e4836b02339bc12649c3455f0f, type: 3}
+  - Stat: 5
+    Icon: {fileID: 21300000, guid: df1a39f788afc0fb394ac85e0ebf88e5, type: 3}
+  - Stat: 14
+    Icon: {fileID: 21300000, guid: b26aa365fe78aca939645cf07bba27a3, type: 3}
+  - Stat: 15
+    Icon: {fileID: 21300000, guid: 2a0b740fb91c6e627935a643af9b04a4, type: 3}
+  - Stat: 6
+    Icon: {fileID: 21300000, guid: 77249c691fde55becb934923927ccc54, type: 3}
+  - Stat: 22
+    Icon: {fileID: 21300000, guid: fa080b87417b489eda02d9c723ef37aa, type: 3}
+  - Stat: 8
+    Icon: {fileID: 21300000, guid: d1feac990b3a4bdd3ae387e4acd4ead6, type: 3}
+  - Stat: 18
+    Icon: {fileID: 21300000, guid: 29c75f47bcc8b412ca928a6e0a9aeb19, type: 3}
+  - Stat: 20
+    Icon: {fileID: 21300000, guid: 565f2d3ac8b630bd9abd1045e3c0edb4, type: 3}
+  - Stat: 11
+    Icon: {fileID: 21300000, guid: c295af9b30441c776b1611250d7519df, type: 3}
+  - Stat: 13
+    Icon: {fileID: 21300000, guid: 58526fcb92056f46898ced4e898709df, type: 3}
+  - Stat: 16
+    Icon: {fileID: 21300000, guid: 5c30e7c3403e9da02b1bade816044d4d, type: 3}
+  otherStats:
+  - Stat: 0
+    Icon: {fileID: 21300000, guid: 0b2df478bd135b791983321f620c3eeb, type: 3}
+  - Stat: 2
+    Icon: {fileID: 21300000, guid: 81f50c742d585c97b8ddac1942dd8813, type: 3}
+  roles:
+  - Role: 0
+    Icon: {fileID: 21300000, guid: a6804e9b4dc6ec7bb82ce3b19935e3e4, type: 3}
+  - Role: 1
+    Icon: {fileID: 21300000, guid: af7d03e8319ace4aca03f28878642ce7, type: 3}
+  - Role: 2
+    Icon: {fileID: 21300000, guid: 5ba5d1d66b92bb3f0826bf7f29cef790, type: 3}
+  - Role: 4
+    Icon: {fileID: 21300000, guid: 00faa4096e67f85e0919ec07702dae8a, type: 3}
+  - Role: 16
+    Icon: {fileID: 21300000, guid: c65a007d49bdc6318af6daefff943b24, type: 3}
+  - Role: 8
+    Icon: {fileID: 21300000, guid: 98ca7f2758a40b7c39b92ec69e4f39f7, type: 3}
+  recommendedIcon: {fileID: 21300000, guid: 2a1c546784a5027b090bd7646a037ea2, type: 3}
+  noFilterIcon: {fileID: 21300000, guid: 67c8fc0b88c1e65f5bd3a2d8504aefd6, type: 3}

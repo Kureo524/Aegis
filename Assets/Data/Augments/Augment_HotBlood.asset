@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Augment_HotBlood
   m_EditorClassIdentifier: Game.Features::Features.Augments.AugmentDefinition
   rarity: 0
-  passive: {fileID: 11400000, guid: a50f00bc621b26b1bbb82cefe1845baa, type: 2}
+  passive: {fileID: 11400000, guid: 99a7a24e5448bc1e8a862af5216df686, type: 2}

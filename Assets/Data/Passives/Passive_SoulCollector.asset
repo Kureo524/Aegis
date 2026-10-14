@@ -12,10 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb268d7b3b865bd4fa4aca45803ef906, type: 3}
   m_Name: Passive_SoulCollector
   m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
-  displayName: "Collectionneur d'\xE2mes"
-  description: Chaque kill donne +1 puissance magique et +0,5 attaque physique, pour
-    toute la partie.
-  icon: {fileID: 21300000, guid: ff7eb133c14c4adc1b3fdddf7d340f6b, type: 3}
+  displayName: 'Collectionneur d''âmes'
+  description: Chaque kill donne +0,5 AD et +1 AP pour toute la partie.
+  icon: {fileID: 21300000, guid: ec66e71576d4b76ec93f1d53ebe722b1, type: 3}
   stats: []
   capabilities: 
   triggers: []
@@ -25,13 +24,28 @@ MonoBehaviour:
     Max: 0
     Duration: 0
     PerStack:
-    - Stat: 5
-      Type: 0
-      Value: 1
     - Stat: 4
       Type: 0
       Value: 0.5
+    - Stat: 5
+      Type: 0
+      Value: 1
   nearbyEnemies:
     Radius: 0
     Max: 0
     PerEnemy: []
+  aura:
+    Radius: 0
+    Interval: 0
+    Damage: 0
+    ScalingStat: 0
+    Ratio: 0
+    DamageType: 0
+    HealPerEnemy: 0
+  conversions: []
+  damage:
+    OutgoingPercent: 0
+    TargetHealthBelow: 0
+    AppliesTo: 0
+    IncomingPercent: 0
+  abilityHaste: []

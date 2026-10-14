@@ -4,64 +4,78 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Features.UI.Panels {
-    /// <summary>A card of the shop / anvil screens: icon, name, stat lines, action button and a short note.</summary>
+    /// <summary>
+    /// A card of the anvil / augment screens: icon, name, stat lines and a short note. The whole
+    /// card is the button that picks it; actions on the card (rerolls) go right below it, in the
+    /// column made by <see cref="Column"/>.
+    /// </summary>
     public static class OfferCard {
-        public const float Width = 168f;
+        public const float Width = 190f;
 
         public static VisualElement Build(Sprite icon, string title, Color titleColor, string body,
-                                          string button, Action onClick, bool enabled, string note = null) {
+                                          Action onClick, bool enabled, string note = null) {
             var card = new VisualElement();
-            card.style.width = Width;
-            card.style.marginLeft = card.style.marginRight = 5;
-            card.style.marginTop = card.style.marginBottom = 5;
-            card.style.paddingLeft = card.style.paddingRight = 8;
-            card.style.paddingTop = card.style.paddingBottom = 8;
-            card.style.backgroundColor = new Color(0.13f, 0.15f, 0.21f, 1f);
-            card.style.alignItems = Align.Center;
-            UiStyles.Border(card, 1, new Color(titleColor.r, titleColor.g, titleColor.b, 0.6f), 8);
+            card.AddToClassList("ae-card");
+            card.EnableInClassList("ae-card--clickable", enabled && onClick != null);
+            card.EnableInClassList("ae-card--disabled", !enabled);
+            card.style.borderTopColor = card.style.borderLeftColor = titleColor;   // rarity / tier color
+            if (enabled && onClick != null)
+                card.RegisterCallback<ClickEvent>(e => {
+                    if (e.button == 0) onClick();
+                });
 
-            var image = new VisualElement();
-            image.style.width = image.style.height = 44;
-            image.style.marginBottom = 4;
+            var image = new VisualElement { pickingMode = PickingMode.Ignore };
+            image.AddToClassList("ae-card__icon");
             if (icon != null) image.style.backgroundImage = new StyleBackground(icon);
-            image.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+            else image.style.display = DisplayStyle.None;
             card.Add(image);
 
-            Label name = UiStyles.Text(title, 14, titleColor);
-            name.style.whiteSpace = WhiteSpace.Normal;
-            name.style.unityTextAlign = TextAnchor.MiddleCenter;
+            var name = new Label(title) { pickingMode = PickingMode.Ignore };
+            name.AddToClassList("ae-card__name");
+            name.style.color = titleColor;
             card.Add(name);
 
-            Label lines = UiStyles.Text(body, 12, new Color(0.85f, 0.88f, 0.95f), bold: false);
-            lines.style.unityTextOutlineWidth = 0f;
-            lines.style.whiteSpace = WhiteSpace.Normal;
-            lines.style.unityTextAlign = TextAnchor.MiddleCenter;
-            lines.style.marginTop = 4;
-            lines.style.flexGrow = 1;
+            var lines = new Label(body) { pickingMode = PickingMode.Ignore };
+            lines.AddToClassList("ae-card__body");
             card.Add(lines);
 
-            Button action = MenuStyles.Button(button, onClick);
-            action.style.height = 30;
-            action.style.fontSize = 13;
-            action.style.alignSelf = Align.Stretch;
-            action.style.marginBottom = 0;
-            action.SetEnabled(enabled);
-            card.Add(action);
-
             if (!string.IsNullOrEmpty(note)) {
-                Label n = UiStyles.Text(note, 11, new Color(1f, 0.55f, 0.45f), bold: false);
-                n.style.unityTextOutlineWidth = 0f;
-                n.style.marginTop = 3;
+                var n = new Label(note) { pickingMode = PickingMode.Ignore };
+                n.AddToClassList("ae-card__note");
                 card.Add(n);
             }
             return card;
+        }
+
+        /// <summary>The card and, under it, its own buttons (rerolls).</summary>
+        public static VisualElement Column(VisualElement card, params Button[] below) {
+            var column = new VisualElement();
+            column.AddToClassList("ae-card-column");
+            column.Add(card);
+            foreach (Button button in below) {
+                if (button == null) continue;
+                button.AddToClassList("ae-card-column__button");
+                button.style.marginLeft = button.style.marginRight = 0;
+                column.Add(button);
+            }
+            return column;
+        }
+
+        /// <summary>A small button for the column under a card.</summary>
+        public static Button SmallButton(string text, Action onClick, bool enabled = true) {
+            Button button = MenuStyles.Button(text, onClick);
+            button.style.height = 30;
+            button.style.fontSize = 13;
+            button.SetEnabled(enabled);
+            return button;
         }
 
         /// <summary>Name, color, icon and stat lines of any offer or anvil choice.</summary>
         public static (string name, Color color, Sprite icon, string body) Describe(ScriptableObject offer, RarityTier rarity = RarityTier.Silver) {
             switch (offer) {
                 case ItemDefinition item:
-                    return (item.DisplayName, StatLabels.Color(item.Tier), item.Icon, StatLabels.Format(item.Stats));
+                    string passive = item.Passive != null ? $"\n\n{item.Passive.DisplayName} : {item.Passive.Description}" : "";
+                    return (item.DisplayName, StatLabels.Color(item.Tier), item.Icon, StatLabels.Format(item.Stats) + passive);
                 case ElixirDefinition elixir:
                     return (elixir.DisplayName, new Color(0.45f, 0.9f, 0.7f), elixir.Icon,
                             StatLabels.Format(elixir.Stats) + "\njusqu'à la fin de la prochaine vague");

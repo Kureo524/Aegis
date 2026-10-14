@@ -15,20 +15,37 @@ MonoBehaviour:
   displayName: Fracas
   icon: {fileID: 0}
   color: {r: 0.95, g: 0.45, b: 0.25, a: 1}
-  recipe: []
+  description: 
+  rankUnlockLevels: []
+  baseDamage:
+  - 60
+  cooldowns:
+  - 0
+  manaCosts:
+  - 0
   targeting: 2
   range: 4
   radius: 2.2
   coneAngle: 60
   castTime: 0.9
   canMoveWhileCasting: 0
-  cooldownOverride: 0
   kind: 1
-  powerRatio: 0.6
-  scaling:
-    Base: 60
-    PerElementLevel: 0
+  adRatio: 0.6
+  bonusAdRatio: 0
+  apRatio: 0
   buffs: []
+  statuses:
+  - Kind: 3
+    Duration: 1.5
+    Power: 0.4
+    ScalingStat: 0
+    Ratio: 0
+    MaxStacks: 0
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
   projectileSpeed: 18
   pierce: 0
   blink: 0

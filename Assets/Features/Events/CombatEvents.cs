@@ -33,14 +33,16 @@ namespace Features.Events {
         }
     }
 
-    /// <summary>Player HP changed (HUD).</summary>
+    /// <summary>Player HP or shield changed (HUD).</summary>
     public readonly struct PlayerHealthChangedEvent : IEvent {
         public readonly float Current;
         public readonly float Max;
+        public readonly float Shield;
 
-        public PlayerHealthChangedEvent(float current, float max) {
+        public PlayerHealthChangedEvent(float current, float max, float shield = 0f) {
             Current = current;
             Max = max;
+            Shield = shield;
         }
     }
 
@@ -87,6 +89,26 @@ namespace Features.Events {
         public HordeStatusEvent(bool spawning, int alive) {
             Spawning = spawning;
             Alive = alive;
+        }
+    }
+}
+
+namespace Features.Events {
+    /// <summary>
+    /// A character with a death clip died (design doc §3): its body goes away at once (pool), the
+    /// clip plays on its own at the spot (DeathAnimations), then fades.
+    /// </summary>
+    public readonly struct DeathAnimationEvent : IEvent {
+        public readonly Characters.SpriteClip Clip;
+        public readonly Vector3 Position;
+        public readonly bool FlipX;
+        public readonly Vector3 Scale;
+
+        public DeathAnimationEvent(Characters.SpriteClip clip, Vector3 position, bool flipX, Vector3 scale) {
+            Clip = clip;
+            Position = position;
+            FlipX = flipX;
+            Scale = scale;
         }
     }
 }

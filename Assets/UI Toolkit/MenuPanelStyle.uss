@@ -6,7 +6,9 @@ VisualElement {
     left: 0; right: 0; top: 0; bottom: 0;
     justify-content: center;
     align-items: center;
-    background-color: rgb(20, 20, 30);   /* opaque : cache la scène Game */
+    background-color: rgb(6, 10, 26);   /* opaque : cache la scène Game */
+    background-image: url("project://database/Assets/GraphicAssets/Sprites/UI/MenuBackground.png");
+    -unity-background-scale-mode: scale-and-crop;
 
     translate: 0 0;
     transition-property: translate;
@@ -29,8 +31,25 @@ VisualElement {
     justify-content: space-between;
     align-self: center;
     align-content: center;
-    width: 320px;
-    height: 50px;
+    width: 300px;
+    height: 52px;
     aspect-ratio: auto;
-    font-size: 30px;
+    font-size: 22px;
+}
+
+.menu-title {
+    -unity-font: url("project://database/Assets/UI/Fonts/NotoSerif-Bold.ttf");
+    font-size: 96px;
+    color: #f0e6d2;
+    letter-spacing: 18px;
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: #785a28;
+    margin-bottom: 0;
+}
+.menu-subtitle {
+    -unity-font: url("project://database/Assets/UI/Fonts/NotoSerif-Bold.ttf");
+    font-size: 26px;
+    color: #c8aa6e;
+    letter-spacing: 8px;
+    margin-bottom: 40px;
 }

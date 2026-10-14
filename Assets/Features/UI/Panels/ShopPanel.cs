@@ -1,126 +1,712 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
 using Features.Economy;
 using Features.Events;
+using Features.Run;
+using Features.Stats;
 using Systems.EventBusses;
+using Systems.Inputs.Events;
 using UnityEngine;
 using UnityEngine.UIElements;
 using VContainer;
 
 namespace Features.UI.Panels {
     /// <summary>
-    /// Shop screen (design doc §9.3), drawn from the ShopService snapshots only (ShopStateEvent):
-    /// gold, inventory, offers with their price, greyed with the reason when not buyable. Buying and
-    /// leaving are bus requests. Own UIDocument; anvils open above it (AnvilPanel).
+    /// The shop screen (design doc §9.3), open at any time (shop key, HUD button; it also opens by
+    /// itself at the start of every break), drawn from the ShopService snapshots only:
+    /// - top: title, search, gold, close;
+    /// - on the left edge, three vertical tabs whose panels slide out to the left of the window under
+    ///   the pointer: Elixirs and stat anvils, Boots, My items (the inventory: click an item for its
+    ///   details and its sell value);
+    /// - the main panel: the categories as icons on top (all, recommended, marksman, mage…), the
+    ///   stat filters as icons on its right side, the item anvils (prismatic, legendary of the
+    ///   category's role) above the legendary items of the category;
+    /// - right: the selected offer (stats, passive, unique group, why it cannot be bought, Buy), or
+    ///   the selected owned item (Sell);
+    /// - bottom: the break timer / "between waves only" during a wave, Start the wave.
+    /// Click selects; double click or right click buys. Buying, selling and leaving are bus requests.
+    /// Own UIDocument; anvils open above it (AnvilPanel).
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class ShopPanel : MonoBehaviour {
+        private const float DoubleClickTime = 0.4f;
+
+        private static readonly (ItemRole role, string label)[] Roles = {
+            (ItemRole.Marksman, "Tireur"), (ItemRole.Mage, "Mage"), (ItemRole.Fighter, "Combattant"),
+            (ItemRole.Assassin, "Assassin"), (ItemRole.Tank, "Tank"),
+        };
+
+        private static readonly (string label, StatType icon, StatType[] stats)[] StatFilters = {
+            ("Attaque", StatType.PhysicalAttack, new[] { StatType.PhysicalAttack }),
+            ("Critique", StatType.CritChance, new[] { StatType.CritChance, StatType.CritDamage }),
+            ("Vitesse d'attaque", StatType.AttackSpeed, new[] { StatType.AttackSpeed }),
+            ("Puissance magique", StatType.MagicAttack, new[] { StatType.MagicAttack }),
+            ("Pénétration", StatType.ArmorPenPercent, new[] { StatType.ArmorPenFlat, StatType.ArmorPenPercent, StatType.MagicPenFlat, StatType.MagicPenPercent }),
+            ("Mana", StatType.MaxMana, new[] { StatType.MaxMana, StatType.ManaRegen }),
+            ("Santé", StatType.MaxHealth, new[] { StatType.MaxHealth, StatType.HealthRegen }),
+            ("Armure", StatType.Armor, new[] { StatType.Armor }),
+            ("Résistance magique", StatType.MagicResist, new[] { StatType.MagicResist }),
+            ("Accélération de compétence", StatType.AbilityHaste, new[] { StatType.AbilityHaste }),
+            ("Vitesse de déplacement", StatType.MoveSpeed, new[] { StatType.MoveSpeed }),
+            ("Vol de vie", StatType.Lifesteal, new[] { StatType.Lifesteal, StatType.Omnivamp }),
+        };
+
+        /// <summary>The three drawers of the left column, top to bottom.</summary>
+        private enum Drawer { Consumables, Boots, Owned }
+
         private IEventBus _eventBus;
+        private UiTheme _theme;
         private readonly DisposableBag _subscriptions = new();
-        private VisualElement _overlay, _offers, _inventory;
-        private Label _title, _gold, _limits;
+        private UiTooltip _tooltip;
+        private VisualElement _overlay, _anvils, _grid, _detail, _categories, _statFilters;
+        private readonly VisualElement[] _drawerBodies = new VisualElement[3];
+        private readonly VisualElement[] _drawers = new VisualElement[3];
+        private readonly bool[] _drawerOpen = new bool[3];
+        private readonly bool[] _overTab = new bool[3], _overPanel = new bool[3];
+        private readonly VisualElement[] _tabs = new VisualElement[3];
+        private Button _startWave;
+        private TextField _search;
+        private Label _gold, _status, _gridTitle;
+        private readonly Dictionary<ScriptableObject, VisualElement> _cells = new();
+        private readonly List<VisualElement> _slots = new();
+
+        private bool _open;
         private ShopStateEvent _state;
         private IReadOnlyList<ItemDefinition> _items = new List<ItemDefinition>();
+        private IReadOnlyList<ItemDefinition> _recommended = Array.Empty<ItemDefinition>();
+        private string _champion = "";
         private int _goldValue;
+        private RunStatusEvent _run;
+        private bool _hasRun;
+        private bool _showRecommended;
+        private ItemRole _category = ItemRole.None;
+        private int _statFilter = -1;
+        private string _query = "";
+        private ScriptableObject _selected;
+        private int _selectedSlot = -1;
+        private Dictionary<ScriptableObject, string> _refusals = new();
+        private ScriptableObject _lastClicked;
+        private float _lastClickTime;
 
-        public bool IsOpen => _state.Open;
+        public bool IsOpen => _open;
+        /// <summary>The offer shown in the details panel (tests).</summary>
+        public ScriptableObject Selected => _selected;
+        /// <summary>The inventory slot shown in the details panel (-1: an offer is shown).</summary>
+        public int SelectedSlot => _selectedSlot;
+        /// <summary>True when the "Recommended" category is shown.</summary>
+        public bool ShowsRecommended => _showRecommended;
+        /// <summary>The role of the category shown (None: every item).</summary>
+        public ItemRole Category => _category;
 
         [Inject]
-        public void Construct(IEventBus eventBus) {
+        public void Construct(IEventBus eventBus, UiTheme theme) {
             _eventBus = eventBus;
-            _subscriptions.Add(eventBus.Subscribe<ShopStateEvent>(e => {
-                _state = e;
-                Refresh();
-            }));
-            _subscriptions.Add(eventBus.Subscribe<GoldChangedEvent>(e => {
-                _goldValue = e.Gold;
-                Refresh();
-            }));
+            _theme = theme;
+            _subscriptions.Add(eventBus.Subscribe<ShopStateEvent>(e => { _state = e; Refresh(); }));
+            _subscriptions.Add(eventBus.Subscribe<GoldChangedEvent>(e => { _goldValue = e.Gold; Refresh(); }));
             _subscriptions.Add(eventBus.Subscribe<InventoryChangedEvent>(e => {
                 _items = e.Items;
+                if (_selectedSlot >= _items.Count) _selectedSlot = -1;
                 Refresh();
             }));
+            _subscriptions.Add(eventBus.Subscribe<PlayerChampionEvent>(e => {
+                _recommended = e.RecommendedItems;
+                _champion = e.Name;
+                if (_recommended.Count > 0 && _selected == null) _showRecommended = true;
+                Refresh();
+            }));
+            _subscriptions.Add(eventBus.Subscribe<RunStatusEvent>(e => {
+                _run = e;
+                _hasRun = true;
+                RefreshStatus();
+            }));
+            _subscriptions.Add(eventBus.Subscribe<RunStateChangedEvent>(e => {
+                // Every break after a wave opens the shop by itself
+                if (e.To == RunState.PreWave && e.From == RunState.Reward) Show(true);
+            }));
+            _subscriptions.Add(eventBus.Subscribe<ShopKeyEvent>(_ => Show(!_open)));
+            _subscriptions.Add(eventBus.Subscribe<ShopToggleRequestedEvent>(_ => Show(!_open)));
+            _subscriptions.Add(eventBus.Subscribe<ShopCloseRequestedEvent>(_ => Show(false)));
         }
 
         private void Start() {
+            _tooltip = new UiTooltip();
             _overlay = MenuStyles.Overlay(out VisualElement box);
-            box.style.width = 4 * (OfferCard.Width + 10) + 90;   // 4 cards per row next to the scrollbar
+            _overlay.AddToClassList("ae-shop-overlay");
+            box.AddToClassList("ae-shop");
+            box.style.width = StyleKeyword.Null;
 
-            var header = new VisualElement();
-            header.style.flexDirection = FlexDirection.Row;
-            header.style.justifyContent = Justify.SpaceBetween;
-            header.style.alignItems = Align.Center;
-            _title = MenuStyles.Title("Boutique");
-            _title.style.marginBottom = 0;
-            _gold = UiStyles.Text("", 20, new Color(1f, 0.82f, 0.3f));
-            header.Add(_title);
-            header.Add(_gold);
-            box.Add(header);
+            box.Add(BuildHeader());
 
-            _limits = MenuStyles.Hint("");
-            _limits.style.marginBottom = 6;
-            box.Add(_limits);
+            var body = new VisualElement();
+            body.AddToClassList("ae-shop__body");
+            body.Add(BuildMain());
+            _detail = new VisualElement();
+            _detail.AddToClassList("ae-shop__detail");
+            body.Add(_detail);
+            box.Add(body);
 
-            _inventory = new VisualElement();
-            _inventory.style.flexDirection = FlexDirection.Row;
-            _inventory.style.marginBottom = 8;
-            box.Add(_inventory);
+            box.Add(BuildFooter());
 
-            var scroll = new ScrollView(ScrollViewMode.Vertical);
-            scroll.style.maxHeight = 430;
-            _offers = new VisualElement();
-            _offers.style.flexDirection = FlexDirection.Row;
-            _offers.style.flexWrap = Wrap.Wrap;
-            _offers.style.justifyContent = Justify.Center;
-            scroll.Add(_offers);
-            box.Add(scroll);
+            // The box sits in a frame that also holds the side tabs and their panels, outside its left edge
+            var frame = new VisualElement();
+            frame.AddToClassList("ae-shop-frame");
+            _overlay.Remove(box);
+            frame.Add(box);
+            frame.Add(BuildSideTabs());
+            _overlay.Add(frame);
 
-            Button leave = MenuStyles.Button("Continuer", () => _eventBus.Publish(new ShopCloseRequestedEvent()));
-            leave.style.marginTop = 10;
-            box.Add(leave);
-
-            GetComponent<UIDocument>().rootVisualElement.Add(_overlay);
+            VisualElement root = GetComponent<UIDocument>().rootVisualElement;
+            root.Add(_overlay);
+            root.Add(_tooltip.Root);
             Refresh();
+        }
+
+        private VisualElement BuildHeader() {
+            var header = new VisualElement();
+            header.AddToClassList("ae-shop__header");
+            Label title = MenuStyles.Title("Boutique");
+            title.AddToClassList("ae-shop__title");
+            header.Add(title);
+
+            _search = new TextField { value = "" };
+            _search.AddToClassList("ae-shop__search");
+            _search.textEdition.placeholder = "Rechercher un objet…";
+            _search.RegisterValueChangedCallback(e => {
+                _query = e.newValue ?? "";
+                Refresh();
+            });
+            header.Add(_search);
+
+            var spacer = new VisualElement();
+            spacer.style.flexGrow = 1;
+            header.Add(spacer);
+
+            var goldRow = new VisualElement();
+            goldRow.AddToClassList("ae-goldrow");
+            var coin = new VisualElement();
+            coin.AddToClassList("ae-coin");
+            goldRow.Add(coin);
+            _gold = new Label();
+            _gold.AddToClassList("ae-gold");
+            _gold.style.fontSize = 22;
+            goldRow.Add(_gold);
+            header.Add(goldRow);
+
+            // Closes on press (not on release): nothing in between can swallow it, at any time of the run
+            Button close = MenuStyles.Button("✕", null);
+            close.AddToClassList("ae-shop__close");
+            close.RegisterCallback<PointerDownEvent>(e => {
+                if (e.button != 0) return;
+                e.StopPropagation();
+                Show(false);
+            }, TrickleDown.TrickleDown);
+            header.Add(close);
+            return header;
+        }
+
+        // ---- left edge: three vertical tabs; each slides its panel out to the left of the window ----
+        private const long SideCloseDelayMs = 160;
+
+        private VisualElement BuildSideTabs() {
+            var side = new VisualElement { pickingMode = PickingMode.Ignore };
+            side.AddToClassList("ae-shop__side");
+            var tabs = new VisualElement { pickingMode = PickingMode.Ignore };
+            tabs.AddToClassList("ae-shop__tabs");
+            var panels = new VisualElement { pickingMode = PickingMode.Ignore };
+            panels.AddToClassList("ae-shop__flyouts");
+            side.Add(tabs);
+            side.Add(panels);
+            string[] titles = { "Élixirs & enclumes à stats", "Bottes", "Mes objets" };
+            string[] tabTexts = { "Élixirs & stats", "Bottes", "Mes objets" };
+            for (int i = 0; i < 3; i++) {
+                int index = i;
+                var tab = new VisualElement();
+                tab.AddToClassList("ae-sidetab");
+                var tabLabel = new Label(tabTexts[i]) { pickingMode = PickingMode.Ignore };
+                tabLabel.AddToClassList("ae-sidetab__label");
+                tab.Add(tabLabel);
+                tab.RegisterCallback<PointerEnterEvent>(_ => Hover(index, tab: true, over: true));
+                tab.RegisterCallback<PointerLeaveEvent>(_ => Hover(index, tab: true, over: false));
+                tab.RegisterCallback<PointerDownEvent>(_ => SetDrawer(index, !_drawerOpen[index]));
+                tabs.Add(tab);
+                _tabs[i] = tab;
+
+                var drawer = new VisualElement();
+                drawer.AddToClassList("ae-drawer");
+                drawer.style.top = i * SideTabStep;
+                var head = new Label(titles[i]);
+                head.AddToClassList("ae-drawer__head");
+                head.AddToClassList("ae-shop__drawer-title");
+                drawer.Add(head);
+                var content = new VisualElement();
+                content.AddToClassList("ae-drawer__body");
+                drawer.Add(content);
+                drawer.RegisterCallback<PointerEnterEvent>(_ => Hover(index, tab: false, over: true));
+                drawer.RegisterCallback<PointerLeaveEvent>(_ => Hover(index, tab: false, over: false));
+                panels.Add(drawer);
+                _drawers[i] = drawer;
+                _drawerBodies[i] = content;
+                drawer.style.visibility = Visibility.Hidden;
+                SetDrawer(i, false);
+            }
+            return side;
+        }
+
+        private const float SideTabStep = 156f;   // tab height + gap (USS .ae-sidetab)
+
+        // Open while the pointer is over the tab or its panel; closes a moment after it left both
+        private void Hover(int index, bool tab, bool over) {
+            if (tab) _overTab[index] = over;
+            else _overPanel[index] = over;
+            if (over) {
+                for (int i = 0; i < 3; i++)
+                    if (i != index && !_overTab[i] && !_overPanel[i]) SetDrawer(i, false);
+                SetDrawer(index, true);
+                return;
+            }
+            _drawers[index].schedule.Execute(() => {
+                if (!_overTab[index] && !_overPanel[index]) SetDrawer(index, false);
+            }).ExecuteLater(SideCloseDelayMs);
+        }
+
+        private void SetDrawer(int index, bool open) {
+            _drawerOpen[index] = open;
+            VisualElement drawer = _drawers[index];
+            _tabs[index].EnableInClassList("ae-sidetab--open", open);
+            if (open) {
+                drawer.style.visibility = Visibility.Visible;
+                drawer.BringToFront();
+                drawer.schedule.Execute(() => drawer.EnableInClassList("ae-drawer--open", _drawerOpen[index]));   // next frame: slides in
+            }
+            else {
+                drawer.EnableInClassList("ae-drawer--open", false);
+                drawer.schedule.Execute(() => {
+                    if (!_drawerOpen[index]) drawer.style.visibility = Visibility.Hidden;
+                }).ExecuteLater(SlideMs);
+            }
+        }
+
+        private const long SlideMs = 180;
+
+        /// <summary>Slides a side panel out as the pointer would (tests).</summary>
+        public void OpenDrawer(int index, bool open = true) {
+            if (index >= 0 && index < 3 && _drawers[index] != null) SetDrawer(index, open);
+        }
+
+        /// <summary>True while that side panel is out.</summary>
+        public bool IsDrawerOpen(int index) => index >= 0 && index < 3 && _drawerOpen[index];
+
+        // ---- the main panel: categories on top, stat filters on the right, anvils then items ----
+        private VisualElement BuildMain() {
+            var main = new VisualElement();
+            main.AddToClassList("ae-shop__main");
+
+            _categories = new VisualElement();
+            _categories.AddToClassList("ae-shop__categories");
+            _categories.Add(IconButton(_theme != null ? _theme.Icon(ItemRole.None) : null, "Tous les objets", () => SetCategory(ItemRole.None, false),
+                                       "category-all"));
+            _categories.Add(IconButton(_theme != null ? _theme.RecommendedIcon : null, "Recommandés", () => SetCategory(ItemRole.None, true),
+                                       "category-recommended"));
+            foreach ((ItemRole role, string label) in Roles)
+                _categories.Add(IconButton(_theme != null ? _theme.Icon(role) : null, label, () => SetCategory(role, false), role));
+            main.Add(_categories);
+
+            var row = new VisualElement();
+            row.AddToClassList("ae-shop__main-row");
+            var scroll = new ScrollView(ScrollViewMode.Vertical);
+            scroll.AddToClassList("ae-shop__grid");
+            var anvilsTitle = new Label("Enclumes à objets");
+            anvilsTitle.AddToClassList("ae-shop__section");
+            scroll.Add(anvilsTitle);
+            _anvils = new VisualElement();
+            _anvils.AddToClassList("ae-shop__row");
+            _anvils.AddToClassList("ae-shop__anvils");
+            scroll.Add(_anvils);
+            _gridTitle = new Label();
+            _gridTitle.AddToClassList("ae-shop__section");
+            scroll.Add(_gridTitle);
+            _grid = new VisualElement();
+            _grid.AddToClassList("ae-shop__row");
+            scroll.Add(_grid);
+            _statFilters = new VisualElement();
+            _statFilters.AddToClassList("ae-shop__stats");
+            _statFilters.Add(IconButton(_theme != null ? _theme.NoFilterIcon : null, "Aucun filtre", () => SetStatFilter(-1), -1));
+            for (int i = 0; i < StatFilters.Length; i++) {
+                int index = i;
+                _statFilters.Add(IconButton(_theme != null ? _theme.Icon(StatFilters[i].icon) : null, StatFilters[i].label, () => SetStatFilter(index), index));
+            }
+            row.Add(_statFilters);
+            row.Add(scroll);
+            main.Add(row);
+            return main;
+        }
+
+        private Button IconButton(Sprite icon, string label, Action onClick, object key) {
+            var button = new Button(onClick) { userData = key };
+            button.AddToClassList("ae-iconbutton");
+            var image = new VisualElement { pickingMode = PickingMode.Ignore };
+            image.AddToClassList("ae-iconbutton__icon");
+            if (icon != null) image.style.backgroundImage = new StyleBackground(icon);
+            button.Add(image);
+            _tooltip.Attach(button, () => (label, "", null));
+            return button;
+        }
+
+        private VisualElement BuildFooter() {
+            var footer = new VisualElement();
+            footer.AddToClassList("ae-shop__footer");
+            _status = new Label();
+            _status.AddToClassList("ae-shop__status");
+            footer.Add(_status);
+            var hint = new Label("Double-clic ou clic droit : acheter");
+            hint.AddToClassList("ae-shop__hint");
+            footer.Add(hint);
+            _startWave = MenuStyles.Button("Lancer la vague ▶", () => _eventBus.Publish(new NextWaveRequestedEvent()));
+            _startWave.AddToClassList("ae-button--primary");
+            _startWave.AddToClassList("ae-shop__start");
+            footer.Add(_startWave);
+            return footer;
         }
 
         private void OnDestroy() => _subscriptions.Dispose();
 
+        public void Show(bool open) {
+            if (_open == open) return;
+            _open = open;
+            if (!open) {
+                _tooltip?.Hide();
+                for (int i = 0; i < 3; i++) {
+                    _overTab[i] = _overPanel[i] = false;
+                    if (_drawers[i] != null) SetDrawer(i, false);
+                }
+            }
+            _eventBus?.Publish(new ShopVisibilityChangedEvent(open));
+            Refresh();
+        }
+
+        /// <summary>A category of the top bar: a role (None: every item) or the champion's recommendations.</summary>
+        public void SetCategory(ItemRole role, bool recommended = false) {
+            _category = recommended ? ItemRole.None : role;
+            _showRecommended = recommended && _recommended.Count > 0;
+            Refresh();
+        }
+
+        /// <summary>A stat filter of the right bar (-1: none).</summary>
+        public void SetStatFilter(int index) {
+            _statFilter = index >= 0 && index < StatFilters.Length ? index : -1;
+            if (_statFilter >= 0) _showRecommended = false;
+            Refresh();
+        }
+
+        /// <summary>Every item, no filter nor search (tests, shortcuts).</summary>
+        public void ShowAllItems() {
+            _statFilter = -1;
+            _query = "";
+            _search?.SetValueWithoutNotify("");
+            SetCategory(ItemRole.None);
+        }
+
+        /// <summary>Selects an offer (click), shown in the details panel.</summary>
+        public void Select(ScriptableObject offer) {
+            _selected = offer;
+            _selectedSlot = -1;
+            RefreshSelection();
+        }
+
+        /// <summary>Selects an owned item ("My items" click): details and its sell value.</summary>
+        public void SelectSlot(int slot) {
+            _selectedSlot = slot >= 0 && slot < _items.Count ? slot : -1;
+            RefreshSelection();
+        }
+
+        private void Buy(ScriptableObject offer) => _eventBus.Publish(new ShopBuyRequestedEvent(offer));
+
         private void Refresh() {
             if (_overlay == null) return;
-            _overlay.style.display = _state.Open ? DisplayStyle.Flex : DisplayStyle.None;
-            if (!_state.Open) return;
+            _overlay.style.display = _open ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!_open) return;
 
-            _title.text = _state.Full ? "Boutique complète" : "Boutique légère";
-            _gold.text = $"{_goldValue} or";
-            _limits.text = $"Élixir : {(_state.ElixirBought ? "acheté" : "1 max")}"
-                           + (_state.Full ? $"   ·   Item : {(_state.ItemBought ? "acheté" : "1 max (enclumes à items comprises)")}" : "")
-                           + "   ·   Enclumes à stats : sans limite";
+            _gold.text = _goldValue.ToString();
+            foreach (VisualElement child in _categories.Children()) {
+                bool active = child.userData switch {
+                    "category-all" => !_showRecommended && _category == ItemRole.None,
+                    "category-recommended" => _showRecommended,
+                    ItemRole role => !_showRecommended && _category == role,
+                    _ => false,
+                };
+                child.EnableInClassList("ae-iconbutton--active", active);
+                if ("category-recommended".Equals(child.userData)) child.style.display = _recommended.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+            foreach (VisualElement child in _statFilters.Children())
+                child.EnableInClassList("ae-iconbutton--active", child.userData is int f && f == _statFilter);
+            RefreshStatus();
 
-            _inventory.Clear();
-            for (int i = 0; i < Inventory.Capacity; i++) _inventory.Add(InventorySlot(i < _items.Count ? _items[i] : null));
-
-            _offers.Clear();
+            _cells.Clear();
+            _anvils.Clear();
+            _grid.Clear();
+            _drawerBodies[(int)Drawer.Consumables].Clear();
+            _drawerBodies[(int)Drawer.Boots].Clear();
+            RefreshOwnedItems();
             if (_state.Offers == null) return;
-            for (int i = 0; i < _state.Offers.Count; i++) {
-                ScriptableObject offer = _state.Offers[i];
-                string refusal = _state.Refusals[i];
-                (string name, Color color, Sprite icon, string body) = OfferCard.Describe(offer);
-                _offers.Add(OfferCard.Build(icon, name, color, body, $"Acheter · {OfferCard.Cost(offer)} or",
-                                            () => _eventBus.Publish(new ShopBuyRequestedEvent(offer)), refusal == null, refusal));
+            _refusals = new Dictionary<ScriptableObject, string>();
+            for (int i = 0; i < _state.Offers.Count; i++) _refusals[_state.Offers[i]] = _state.Refusals[i];
+            if (_selected != null && !_refusals.ContainsKey(_selected)) _selected = null;
+
+            var shown = new List<ScriptableObject>();
+            // Left: elixirs and stat anvils, then boots
+            Fill(_drawerBodies[(int)Drawer.Consumables],
+                 _state.Offers.Where(o => o is ElixirDefinition || o is AnvilDefinition { Kind: AnvilKind.Stat }).Where(MatchesSearch), shown);
+            List<ItemDefinition> items = _state.Offers.OfType<ItemDefinition>().Where(MatchesSearch).OrderBy(i => i.Cost).ThenBy(i => i.DisplayName).ToList();
+            // The categories and stat filters only sort the main panel; the drawers only follow the search
+            Fill(_drawerBodies[(int)Drawer.Boots], items.Where(IsBoots), shown);
+            for (int d = 0; d < 2; d++)
+                if (_drawerBodies[d].childCount == 0) _drawerBodies[d].Add(MenuStyles.Hint("Aucun résultat."));
+
+            // Main: the item anvils of the category, then its legendary items
+            Fill(_anvils, _state.Offers.OfType<AnvilDefinition>().Where(a => a.Kind == AnvilKind.Item && MatchesCategory(a) && MatchesSearch(a)), shown);
+            IEnumerable<ItemDefinition> legendaries;
+            if (_showRecommended) {
+                legendaries = _recommended.Where(i => i != null && _refusals.ContainsKey(i));
+                _gridTitle.text = string.IsNullOrEmpty(_champion) ? "Recommandés" : $"Recommandés pour {_champion}";
+            }
+            else {
+                legendaries = items.Where(i => !IsBoots(i) && (_category == ItemRole.None || (i.Roles & _category) != 0)).Where(MatchesStat);
+                _gridTitle.text = CategoryTitle();
+            }
+            Fill(_grid, legendaries, shown);
+            if (_grid.childCount == 0)
+                _grid.Add(MenuStyles.Hint(_query.Length > 0 ? $"Aucun objet ne correspond à « {_query} »." : "Rien dans cette catégorie."));
+            if (_selectedSlot < 0) _selected ??= shown.FirstOrDefault();
+            RefreshSelection();
+        }
+
+        private string CategoryTitle() {
+            string title = "Objets légendaires";
+            foreach ((ItemRole role, string label) in Roles)
+                if (role == _category) title += $" · {label}";
+            if (_statFilter >= 0) title += $" · {StatFilters[_statFilter].label}";
+            return title;
+        }
+
+        private void Fill(VisualElement container, IEnumerable<ScriptableObject> offers, List<ScriptableObject> shown) {
+            foreach (ScriptableObject offer in offers) {
+                VisualElement cell = OfferIcon(offer, _refusals[offer]);
+                _cells[offer] = cell;
+                container.Add(cell);
+                shown.Add(offer);
             }
         }
 
-        public static VisualElement InventorySlot(ItemDefinition item) {
-            var slot = new VisualElement();
-            slot.style.width = slot.style.height = 38;
-            slot.style.marginRight = 4;
-            slot.style.backgroundColor = new Color(0.05f, 0.06f, 0.09f, 0.9f);
-            UiStyles.Border(slot, 1, item != null ? StatLabels.Color(item.Tier) : new Color(1f, 1f, 1f, 0.15f), 5);
-            if (item != null && item.Icon != null) {
-                slot.style.backgroundImage = new StyleBackground(item.Icon);
-                slot.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+        private static bool IsBoots(ItemDefinition item) => item.IsBoots;
+
+        // The legendary anvils follow the category (all of them under "every item"); prismatic ones always show
+        private bool MatchesCategory(AnvilDefinition anvil) =>
+            anvil.Role == ItemRole.None || _showRecommended || _category == ItemRole.None || (anvil.Role & _category) != 0;
+
+        private bool MatchesStat(ItemDefinition item) =>
+            _statFilter < 0 || item.Stats.Any(s => StatFilters[_statFilter].stats.Contains(s.Stat));
+
+        private bool MatchesSearch(ScriptableObject offer) {
+            if (_query.Length == 0) return true;
+            (string name, Color _, Sprite _, string _) = OfferCard.Describe(offer);
+            return Fold(name).IndexOf(Fold(_query), StringComparison.Ordinal) >= 0;
+        }
+
+        // "My items": the 6 slots; click shows the item and its sell value
+        private void RefreshOwnedItems() {
+            VisualElement body = _drawerBodies[(int)Drawer.Owned];
+            body.Clear();
+            _slots.Clear();
+            for (int i = 0; i < Inventory.Capacity; i++) {
+                int slot = i;
+                VisualElement cell = PlayerHud.ItemSlot(i < _items.Count ? _items[i] : null, _tooltip);
+                cell.AddToClassList("ae-shop__owned");
+                if (i < _items.Count) cell.RegisterCallback<ClickEvent>(_ => SelectSlot(slot));
+                body.Add(cell);
+                _slots.Add(cell);
             }
-            if (item != null) slot.tooltip = item.DisplayName;
-            return slot;
+        }
+
+        // Selection only touches the highlight and the details: the cells stay (double click works on them)
+        private void RefreshSelection() {
+            if (_overlay == null || !_open) return;
+            foreach ((ScriptableObject offer, VisualElement cell) in _cells)
+                cell.Q(className: "ae-offer__icon")?.EnableInClassList("ae-slot--selected", offer == _selected && _selectedSlot < 0);
+            for (int i = 0; i < _slots.Count; i++) _slots[i].EnableInClassList("ae-slot--selected", i == _selectedSlot);
+            if (_selectedSlot >= 0 && _selectedSlot < _items.Count) RefreshOwned(_items[_selectedSlot], _selectedSlot);
+            else RefreshDetail(_selected, _selected != null && _refusals.TryGetValue(_selected, out string r) ? r : null);
+        }
+
+        private void RefreshStatus() {
+            if (_status == null) return;
+            bool breakTime = _state.CanBuy && _hasRun && _run.State == RunState.PreWave;
+            if (!_state.CanBuy) _status.text = ShopService.BetweenWavesOnly + " : prépare ton build en attendant.";
+            else _status.text = breakTime ? $"Achats ouverts · prochaine vague dans {Mathf.CeilToInt(_run.TimeLeft)} s" : "Achats ouverts";
+            _status.EnableInClassList("ae-shop__status--closed", !_state.CanBuy);
+            _startWave.style.display = breakTime ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        private VisualElement OfferIcon(ScriptableObject offer, string refusal) {
+            (string name, Color _, Sprite icon, string _) = OfferCard.Describe(offer);
+            int cost = OfferCard.Cost(offer);
+            bool poor = refusal == "Pas assez d'or";
+            var cell = new VisualElement();
+            cell.AddToClassList("ae-offer");
+            cell.EnableInClassList("ae-offer--refused", refusal != null && !poor && refusal != ShopService.BetweenWavesOnly);
+            cell.EnableInClassList("ae-offer--poor", poor);
+            cell.EnableInClassList("ae-offer--owned", offer is ItemDefinition owned && _items.Contains(owned));
+
+            var frame = new VisualElement { pickingMode = PickingMode.Ignore };
+            frame.AddToClassList("ae-slot");
+            frame.AddToClassList("ae-offer__icon");
+            if (icon != null) frame.style.backgroundImage = new StyleBackground(icon);
+            cell.Add(frame);
+            var price = new Label(cost > 0 ? cost.ToString() : "—") { pickingMode = PickingMode.Ignore };
+            price.AddToClassList("ae-offer__price");
+            cell.Add(price);
+
+            // Own double click (by offer and time): a refresh between the two clicks keeps it working
+            cell.RegisterCallback<PointerDownEvent>(e => {
+                if (e.button == 1) {
+                    Buy(offer);   // right click buys
+                    return;
+                }
+                if (e.button != 0) return;
+                float now = Time.realtimeSinceStartup;
+                bool twice = _lastClicked == offer && now - _lastClickTime <= DoubleClickTime;
+                _lastClicked = twice ? null : offer;
+                _lastClickTime = now;
+                if (twice) Buy(offer);
+                else Select(offer);
+            });
+            _tooltip.Attach(cell, () => (name, cost > 0 ? $"{cost} or" : "", refusal));
+            return cell;
+        }
+
+        private VisualElement DetailHead(string name, Color color, Sprite icon, string price, bool prismatic) {
+            var head = new VisualElement();
+            head.AddToClassList("ae-detail__head");
+            var image = new VisualElement();
+            image.AddToClassList("ae-slot");
+            image.AddToClassList("ae-detail__icon");
+            if (prismatic) image.AddToClassList("ae-slot--prismatic");
+            if (icon != null) image.style.backgroundImage = new StyleBackground(icon);
+            head.Add(image);
+            var titles = new VisualElement();
+            titles.style.flexShrink = 1;
+            var title = new Label(name);
+            title.AddToClassList("ae-detail__name");
+            title.style.color = color;
+            titles.Add(title);
+            var cost = new Label(price);
+            cost.AddToClassList("ae-gold");
+            titles.Add(cost);
+            head.Add(titles);
+            return head;
+        }
+
+        private void AddItemBody(ItemDefinition item) {
+            string roles = RoleNames(item.Roles);
+            if (roles.Length > 0) {
+                var tags = new Label(roles);
+                tags.AddToClassList("ae-detail__tags");
+                _detail.Add(tags);
+            }
+            var stats = new Label(StatLabels.Format(item.Stats));
+            stats.AddToClassList("ae-detail__stats");
+            _detail.Add(stats);
+            if (item.Passive != null) {
+                var passive = new Label($"<b>{item.Passive.DisplayName}</b> : {item.Passive.Description}");
+                passive.AddToClassList("ae-detail__text");
+                _detail.Add(passive);
+            }
+            if (!string.IsNullOrEmpty(item.UniqueGroup)) {
+                var group = new Label($"Un seul objet « {item.UniqueGroup} »");
+                group.AddToClassList("ae-dim");
+                group.style.fontSize = 11;
+                group.style.marginTop = 6;
+                _detail.Add(group);
+            }
+        }
+
+        private void RefreshDetail(ScriptableObject offer, string refusal) {
+            _detail.Clear();
+            if (offer == null) {
+                _detail.Add(MenuStyles.Hint("Clique sur un objet pour voir ses détails. Double-clic ou clic droit : acheter."));
+                return;
+            }
+            (string name, Color color, Sprite icon, string body) = OfferCard.Describe(offer);
+            int cost = OfferCard.Cost(offer);
+            _detail.Add(DetailHead(name, color, icon, cost > 0 ? $"{cost} or" : "Gratuit", offer is ItemDefinition { Tier: ItemTier.Prismatic }));
+
+            if (offer is ItemDefinition item) {
+                AddItemBody(item);
+                var resale = new Label($"Revente : {item.SellValue} or");
+                resale.AddToClassList("ae-dim");
+                resale.style.fontSize = 11;
+                resale.style.marginTop = 4;
+                _detail.Add(resale);
+            }
+            else {
+                var text = new Label(body);
+                text.AddToClassList("ae-detail__stats");
+                _detail.Add(text);
+            }
+
+            var spacer = new VisualElement();
+            spacer.style.flexGrow = 1;
+            _detail.Add(spacer);
+            if (refusal != null) {
+                var why = new Label(refusal);
+                why.AddToClassList("ae-detail__refusal");
+                _detail.Add(why);
+            }
+            Button buy = MenuStyles.Button("Acheter", () => Buy(offer));
+            buy.AddToClassList("ae-button--primary");
+            buy.SetEnabled(refusal == null);
+            _detail.Add(buy);
+        }
+
+        private void RefreshOwned(ItemDefinition item, int slot) {
+            _detail.Clear();
+            (string name, Color color, Sprite icon, string _) = OfferCard.Describe(item);
+            _detail.Add(DetailHead(name, color, icon, "Dans ton inventaire", item.Tier == ItemTier.Prismatic));
+            AddItemBody(item);
+            var spacer = new VisualElement();
+            spacer.style.flexGrow = 1;
+            _detail.Add(spacer);
+            if (!_state.CanBuy) {
+                var why = new Label(ShopService.BetweenWavesOnly);
+                why.AddToClassList("ae-detail__refusal");
+                _detail.Add(why);
+            }
+            Button sell = MenuStyles.Button($"Vendre · {item.SellValue} or", () => _eventBus.Publish(new ShopSellRequestedEvent(slot)));
+            sell.AddToClassList("ae-button--sell");
+            sell.SetEnabled(_state.CanBuy);
+            _detail.Add(sell);
+            Button back = MenuStyles.Button("Retour à la boutique", () => SelectSlot(-1));
+            back.style.marginTop = 4;
+            _detail.Add(back);
+        }
+
+        private static string RoleNames(ItemRole roles) {
+            var names = new List<string>();
+            foreach ((ItemRole role, string label) in Roles)
+                if ((roles & role) != 0) names.Add(label);
+            return string.Join(" · ", names);
+        }
+
+        // Search ignores case and accents ("epee" finds "Épée")
+        private static string Fold(string text) {
+            string decomposed = (text ?? "").ToLowerInvariant().Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder(decomposed.Length);
+            foreach (char c in decomposed)
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark) sb.Append(c);
+            return sb.ToString();
         }
     }
 }

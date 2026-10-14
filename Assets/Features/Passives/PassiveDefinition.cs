@@ -5,8 +5,10 @@ using Features.Stats;
 using UnityEngine;
 
 namespace Features.Passives {
-    /// <summary>What a passive reacts to (CharacterEvents, design doc §8.1).</summary>
-    public enum PassiveEvent { BasicAttackHit, SpellCast, Kill, DamageTaken }
+    /// <summary>What a passive reacts to (CharacterEvents, design doc §8.1). DamageTaken: the target is the attacker.</summary>
+    /// <remarks>Periodic: every Cooldown seconds (auto-cast augments). Blink: after a dash / teleport.
+    /// DamageDealt: any damage the owner deals (DamageDealtRatio scales on it).</remarks>
+    public enum PassiveEvent { BasicAttackHit, SpellCast, Kill, DamageTaken, SpellHit, Periodic, Blink, DamageDealt }
 
     /// <summary>What a trigger does.</summary>
     public enum PassiveEffectKind {
@@ -16,6 +18,24 @@ namespace Features.Passives {
         BonusDamage,
         /// <summary>Drops a loot on the ground where it happened (design doc §9.5).</summary>
         DropLoot,
+        /// <summary>A status on the target of the hit (BasicAttackHit, SpellHit, §5.7).</summary>
+        ApplyStatus,
+        /// <summary>Heals the owner: Amount + AmountRatio × AmountStat.</summary>
+        Heal,
+        /// <summary>Shields the owner for Duration seconds: Amount + AmountRatio × AmountStat.</summary>
+        Shield,
+        /// <summary>Count homing bolts at the nearest other enemies within Radius of the target (Runaan, Luden…): the damage formula.</summary>
+        Bolts,
+        /// <summary>The damage formula to every other enemy within Radius of the target (Hydra cleave).</summary>
+        Splash,
+        /// <summary>Takes Amount seconds off the owner's ability cooldowns (Navori).</summary>
+        ReduceCooldowns,
+        /// <summary>Charges the passive for Duration seconds: a trigger with ConsumesCharge needs it (Spellblade: Sheen, Trinity Force…).</summary>
+        Charge,
+        /// <summary>The damage formula (and Status if set) to every enemy within Radius of the owner, with a ring (Self Destruct, Frost Wraith, Earthwake).</summary>
+        Nova,
+        /// <summary>The hit also counts as a basic attack hit: on-hit effects apply (Ethereal Weapon).</summary>
+        ProcOnHit,
     }
 
     /// <summary>Loot that a passive can drop (design doc §9.5).</summary>
@@ -34,23 +54,61 @@ namespace Features.Passives {
         [Min(1)] public int EveryN;
         [Tooltip("Chance per occurrence (0..1).")]
         [Range(0f, 1f)] public float Chance;
-        [Tooltip("SpellCast: only spells of at least this many elements (0 = any).")]
-        [Min(0)] public int MinSpellStacks;
+        [Tooltip("Only while the owner's HP share is at most this (0 = always).")]
+        [Range(0f, 1f)] public float HealthBelow;
+        [Tooltip("Seconds before the trigger can go off again (0 = none).")]
+        [Min(0f)] public float Cooldown;
+        [Tooltip("Only when the passive is charged (Charge effect), and uses the charge up.")]
+        public bool ConsumesCharge;
+        [Tooltip("SpellCast / SpellHit: only the ultimate (R).")]
+        public bool UltimateOnly;
         public PassiveEffectKind Effect;
         [Header("TimedStats")]
         public StatBonus[] Stats;
+        [Tooltip("TimedStats, Shield: seconds.")]
         [Min(0f)] public float Duration;
-        [Header("BonusDamage")]
+        [Header("BonusDamage / Bolts / Splash")]
         public float Damage;
         public StatType ScalingStat;
         public float DamageRatio;
+        [Tooltip("+ this share of the target's max HP.")]
+        public float TargetMaxHealthRatio;
+        [Tooltip("+ this share of the target's current HP.")]
+        public float TargetCurrentHealthRatio;
+        [Tooltip("DamageDealt: + this share of the damage that triggered it (Chain Lightning).")]
+        public float DamageDealtRatio;
         public DamageType DamageType;
+        [Tooltip("Bolts: how many. Splash / Bolts: Radius around the target.")]
+        [Min(0)] public int Count;
+        [Min(0f)] public float Radius;
+        public Color BoltColor;
         [Header("DropLoot")]
         public LootKind Loot;
+        [Header("ApplyStatus")]
+        public StatusApplication Status;
+        [Header("Heal / Shield")]
+        public float Amount;
+        public StatType AmountStat;
+        public float AmountRatio;
     }
 
     /// <summary>Where stacks come from (design doc §8.1).</summary>
-    public enum StackSource { None, PerBasicAttack, PerSpellCast, PerKill }
+    public enum StackSource { None, PerBasicAttack, PerSpellCast, PerKill, PerSpellHit, PerCrit }
+
+    public enum DamageScope { All, Abilities, BasicAttacks }
+
+    /// <summary>
+    /// Damage dealt and taken by the owner (Executioner, Glass Cannon…): outgoing damage × (1 +
+    /// OutgoingPercent) on targets under TargetHealthBelow (0 = any), incoming × (1 + IncomingPercent).
+    /// </summary>
+    [Serializable]
+    public struct DamageModifiers {
+        public float OutgoingPercent;
+        [Range(0f, 1f)] public float TargetHealthBelow;
+        public DamageScope AppliesTo;
+        [Tooltip("Negative = damage reduction.")]
+        public float IncomingPercent;
+    }
 
     /// <summary>When stacks go back to zero.</summary>
     public enum ResetPolicy { Never, EndOfWave, AfterDuration }
@@ -65,6 +123,30 @@ namespace Features.Passives {
         [Tooltip("AfterDuration: stacks fall off this long after the last one gained.")]
         [Min(0f)] public float Duration;
         public StatBonus[] PerStack;
+    }
+
+    /// <summary>Damage to every enemy around the owner, every Interval seconds (Sunfire Aegis).</summary>
+    [Serializable]
+    public struct AuraSettings {
+        [Tooltip("0 = no aura.")]
+        [Min(0f)] public float Radius;
+        [Min(0.1f)] public float Interval;
+        public float Damage;
+        public StatType ScalingStat;
+        public float Ratio;
+        public DamageType DamageType;
+        [Tooltip("Heals the owner this much per enemy hit (Unending Despair).")]
+        public float HealPerEnemy;
+    }
+
+    /// <summary>A share of a stat added to another one, recomputed continuously (Archangel's: bonus mana → AP).</summary>
+    [Serializable]
+    public struct StatConversion {
+        public StatType From;
+        public StatType To;
+        public float Ratio;
+        [Tooltip("Only the bonus part of From (items, buffs), not the base and level growth.")]
+        public bool BonusOnly;
     }
 
     /// <summary>Continuous bonus recomputed from the number of enemies around (design doc §8.1).</summary>
@@ -91,6 +173,11 @@ namespace Features.Passives {
         [SerializeField] private PassiveTrigger[] triggers = Array.Empty<PassiveTrigger>();
         [SerializeField] private StackSettings stacks;
         [SerializeField] private NearbyEnemiesBonus nearbyEnemies;
+        [SerializeField] private AuraSettings aura;
+        [SerializeField] private StatConversion[] conversions = Array.Empty<StatConversion>();
+        [SerializeField] private DamageModifiers damage;
+        [Tooltip("Extra ability haste per ability, Q W E R (Bread and Butter…).")]
+        [SerializeField] private float[] abilityHaste = Array.Empty<float>();
 
         public string DisplayName => displayName;
         public string Description => description;
@@ -100,5 +187,9 @@ namespace Features.Passives {
         public PassiveTrigger[] Triggers => triggers;
         public StackSettings Stacks => stacks;
         public NearbyEnemiesBonus NearbyEnemies => nearbyEnemies;
+        public AuraSettings Aura => aura;
+        public StatConversion[] Conversions => conversions;
+        public DamageModifiers Damage => damage;
+        public float AbilityHaste(int slot) => abilityHaste != null && slot >= 0 && slot < abilityHaste.Length ? abilityHaste[slot] : 0f;
     }
 }

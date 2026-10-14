@@ -15,20 +15,37 @@ MonoBehaviour:
   displayName: Coup de massue
   icon: {fileID: 0}
   color: {r: 1, g: 0.45, b: 0.2, a: 1}
-  recipe: []
+  description: 
+  rankUnlockLevels: []
+  baseDamage:
+  - 90
+  cooldowns:
+  - 0
+  manaCosts:
+  - 0
   targeting: 2
   range: 5
   radius: 2.6
   coneAngle: 60
   castTime: 1
   canMoveWhileCasting: 0
-  cooldownOverride: 0
   kind: 1
-  powerRatio: 0.8
-  scaling:
-    Base: 90
-    PerElementLevel: 0
+  adRatio: 0.8
+  bonusAdRatio: 0
+  apRatio: 0
   buffs: []
+  statuses:
+  - Kind: 0
+    Duration: 0.75
+    Power: 0
+    ScalingStat: 0
+    Ratio: 0
+    MaxStacks: 0
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
   projectileSpeed: 18
   pierce: 0
   blink: 0

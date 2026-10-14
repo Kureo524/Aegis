@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Combat.BasicAttackDefinition
   windupPercent: 0.3
   projectilePrefab: {fileID: 1090469804728839682, guid: 11cfec3c263bc2036a21d9955ee9a863, type: 3}
+  homing: 0
   projectileSpeed: 14
   damageRatio: 1
   damageType: 0

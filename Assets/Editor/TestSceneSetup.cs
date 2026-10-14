@@ -240,10 +240,8 @@ namespace EditorTools {
             var panel = Object.FindFirstObjectByType<AugmentPanel>();
             if (panel == null) panel = CreateOverlayDocument<AugmentPanel>("AugmentPanel");
             scope.augmentPanel = panel;
-            if (scope.playerHud != null) {
-                if (!scope.playerHud.TryGetComponent(out AugmentsView view)) view = scope.playerHud.gameObject.AddComponent<AugmentsView>();
-                scope.augmentsView = view;
-            }
+            // The augment slots and the items are part of the PlayerHud now (MOBA-style HUD)
+            if (scope.playerHud != null) GameObjectUtility.RemoveMonoBehavioursWithMissingScript(scope.playerHud.gameObject);
             EditorUtility.SetDirty(scope);
         }
 
@@ -256,19 +254,15 @@ namespace EditorTools {
             var anvil = Object.FindFirstObjectByType<AnvilPanel>();
             if (anvil == null) anvil = CreateOverlayDocument<AnvilPanel>("AnvilPanel", 110);   // above the shop
             scope.anvilPanel = anvil;
-            if (scope.playerHud != null) {
-                if (!scope.playerHud.TryGetComponent(out InventoryView inventory)) inventory = scope.playerHud.gameObject.AddComponent<InventoryView>();
-                scope.inventoryView = inventory;
-            }
             EditorUtility.SetDirty(scope);
         }
 
-        private const string ObstaclesRoot = "=== Obstacles ===";
+        internal const string ObstaclesRoot = "=== Obstacles ===";
         private const string NavMeshAssetPath = "Assets/Scenes/Tests/TestScene/NavMesh-Ground.asset";
 
         // Pathfinding test course around the spawn (player at the origin, ground is 100 x 100):
         // (name, position, size). Height 2 so the character cannot step onto them.
-        private static readonly (string name, Vector3 position, Vector3 size)[] Obstacles = {
+        internal static readonly (string name, Vector3 position, Vector3 size)[] Obstacles = {
             ("Wall_Front",     new Vector3(  0f, 1f,   6f), new Vector3(10f,  2f, 1f)),   // straight wall: go around
             ("L_Long",         new Vector3(  9f, 1f,  -4f), new Vector3( 1f,  2f, 9f)),   // L corner
             ("L_Short",        new Vector3( 12f, 1f,  -8f), new Vector3( 7f,  2f, 1f)),
@@ -327,7 +321,7 @@ namespace EditorTools {
 
         // Bakes and stores the NavMeshData as an asset next to the scene: data left inside the
         // scene would force Unity to save the scene in binary.
-        private static void BakeNavMesh(Unity.AI.Navigation.NavMeshSurface surface) {
+        internal static void BakeNavMesh(Unity.AI.Navigation.NavMeshSurface surface) {
             surface.BuildNavMesh();
             System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(NavMeshAssetPath)!);
             AssetDatabase.DeleteAsset(NavMeshAssetPath);
@@ -368,6 +362,10 @@ namespace EditorTools {
             var quit = Object.FindFirstObjectByType<QuitOverlay>();
             Check(quit != null, "QuitOverlay present in scene");
 
+            Check(GameObject.Find("=== Arena ===") != null, "arena dressing present (ArenaSetup)");
+            Check(UnityEngine.AI.NavMesh.SamplePosition(new Vector3(ArenaSetup.Radius - 3f, 0f, 0f), out _, 1f, UnityEngine.AI.NavMesh.AllAreas)
+                  && !UnityEngine.AI.NavMesh.SamplePosition(new Vector3(ArenaSetup.Radius + 6f, 0f, 0f), out _, 3f, UnityEngine.AI.NavMesh.AllAreas),
+                  "NavMesh limited to the clearing");
             var obstacles = GameObject.Find(ObstaclesRoot);
             Check(obstacles != null && obstacles.transform.childCount == Obstacles.Length, "pathfinding obstacles present");
             Check(surface != null && surface.navMeshData != null && AssetDatabase.Contains(surface.navMeshData),
@@ -386,14 +384,14 @@ namespace EditorTools {
                 Check(scope.runStateMachine != null, "scope.runStateMachine wired");
                 Check(scope.shopCatalog != null && scope.shopCatalog.Items.Count > 0 && scope.shopCatalog.FreeAnvil != null,
                       "scope.shopCatalog: items and free anvil");
-                Check(scope.shopPanel != null && scope.anvilPanel != null && scope.inventoryView != null, "shop, anvil and inventory UI wired");
+                Check(scope.shopPanel != null && scope.anvilPanel != null, "shop and anvil screens wired (items: PlayerHud)");
                 Check(scope.anvilPanel == null || scope.shopPanel == null
                       || scope.anvilPanel.GetComponent<UIDocument>().sortingOrder > scope.shopPanel.GetComponent<UIDocument>().sortingOrder,
                       "anvil screen drawn above the shop");
                 Check(scope.runHud != null && scope.runEndPanel != null, "run HUD and run end screen wired");
                 Check(scope.augmentCatalog != null && scope.augmentCatalog.Augments.Count >= 3 && scope.augmentCatalog.FullSlotsAnvil != null,
                       "scope.augmentCatalog: augments and full-slots anvil");
-                Check(scope.augmentPanel != null && scope.augmentsView != null, "augment screen and augment slots wired");
+                Check(scope.augmentPanel != null, "augment screen wired (augment slots: PlayerHud)");
                 Check(scope.bossHud != null, "boss bar wired");
                 if (scope.stage != null) {
                     bool bossesOk = true;
@@ -448,14 +446,13 @@ namespace EditorTools {
                     var attack = scope.playerDefinition.BasicAttack;
                     Check(attack != null && attack.ProjectilePrefab != null && attack.ProjectileSpeed > 0f,
                           "player basic attack fires a projectile");
-                    Check(scope.playerDefinition.HasElements, "player has 3 elements and a spell book");
-                    var signature = scope.playerDefinition.SignatureAbility;
-                    Check(signature != null && signature.CooldownOverride > 0f && signature.Icon != null, "player has a signature ability (F) with a cooldown");
-                    if (scope.playerDefinition.HasElements) {
-                        var resolver = new Features.Spells.SpellResolver(scope.playerDefinition.SpellBook, scope.playerDefinition.Elements);
-                        Check(resolver.Problems.Count == 0 && resolver.MissingKeys(3, 3).Count == 0 && resolver.Count == 19,
-                              "player spell book covers the 19 recipes, no duplicate");
-                    }
+                    Check(scope.playerDefinition.HasAbilities, "player has its 4 abilities (Q W E R)");
+                    if (scope.playerDefinition.HasAbilities)
+                        foreach (Features.Spells.SpellDefinition ability in scope.playerDefinition.Abilities)
+                            Check(ability.Icon != null && ability.MaxRank > 1 && ability.Cooldown(1) > 0f,
+                                  $"ability {ability.DisplayName}: icon, ranks and cooldown");
+                    var flash = scope.playerDefinition.SummonerF;
+                    Check(flash != null && flash.Cooldown(1) > 0f && flash.Icon != null, "player has a summoner spell on F with a cooldown");
                 }
                 if (scope.playerPrefab != null) {
                     Character prefab = scope.playerPrefab;
@@ -470,13 +467,9 @@ namespace EditorTools {
                         Check(input.clickMarkerPrefab != null, "Player prefab: input.clickMarkerPrefab wired");
                         Check(input.character != null && input.attacker != null, "Player prefab: input.character / attacker wired");
                         Check(input.rangeIndicator != null, "Player prefab: input.rangeIndicator wired");
-                        var caster = prefab.GetComponent<Features.Spells.ElementCaster>();
-                        Check(caster != null && new SerializedObject(caster).FindProperty("owner").objectReferenceValue != null,
-                              "Player prefab: ElementCaster wired");
                         foreach (var (component, fields) in new (Component, string[])[] {
-                                     (caster, new[] { "targeting", "caster" }),
+                                     (prefab.GetComponent<Features.Spells.AbilityCaster>(), new[] { "owner", "targeting", "caster" }),
                                      (prefab.GetComponent<Features.Spells.SpellTargeting>(), new[] { "owner", "indicator", "rangeIndicator" }),
-                                     (prefab.GetComponent<Features.Spells.SignatureAbility>(), new[] { "owner", "targeting", "caster" }),
                                      (prefab.GetComponent<Features.Spells.SpellCaster>(), new[] { "owner", "movement", "attacker", "visual" }),
                                  }) {
                             bool ok = component != null;

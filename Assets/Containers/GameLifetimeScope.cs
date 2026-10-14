@@ -32,12 +32,10 @@ namespace Containers {
         public PauseMenu pauseMenu;
         public RunHudView runHud;
         public AugmentPanel augmentPanel;
-        public AugmentsView augmentsView;
         public BossHudView bossHud;
         public RunEndPanel runEndPanel;
         public ShopPanel shopPanel;
         public AnvilPanel anvilPanel;
-        public InventoryView inventoryView;
 
         [Header("Run")]
         [Tooltip("The stage played in this scene: waves, bonus waves, lives (design doc §9.1).")]
@@ -73,6 +71,7 @@ namespace Containers {
             builder.RegisterEntryPoint<EnemyDirector>().AsSelf();
             builder.RegisterEntryPoint<HordeSpawner>().AsSelf();
             builder.RegisterEntryPoint<Wallet>().AsSelf();
+            builder.RegisterEntryPoint<Features.Characters.DeathAnimations>().AsSelf();
             builder.RegisterComponent(cameraController);
             if (quitOverlay != null) builder.RegisterComponent(quitOverlay);
             if (characterDebugPanel != null) builder.RegisterComponent(characterDebugPanel);
@@ -81,11 +80,13 @@ namespace Containers {
             if (pauseMenu != null) builder.RegisterComponent(pauseMenu);
             if (runHud != null) builder.RegisterComponent(runHud);
             if (augmentPanel != null) builder.RegisterComponent(augmentPanel);
-            if (augmentsView != null) builder.RegisterComponent(augmentsView);
             if (bossHud != null) builder.RegisterComponent(bossHud);
             if (runEndPanel != null) builder.RegisterComponent(runEndPanel);
             builder.RegisterInstance(stage);
             builder.RegisterComponent(runStateMachine);
+            // Meta progression of the run's champion (§9.7)
+            builder.Register(r => new Features.Meta.RunModifiers(r.Resolve<Features.Meta.MetaProgress>(), playerDefinition), Lifetime.Singleton);
+            builder.RegisterEntryPoint<Features.Meta.MetaApplier>();
             builder.RegisterEntryPoint<RunDirector>().AsSelf();
             builder.RegisterEntryPoint<RewardController>().AsSelf();
             builder.RegisterInstance(shopCatalog);
@@ -94,7 +95,6 @@ namespace Containers {
             builder.RegisterEntryPoint<ShopService>().AsSelf();
             if (shopPanel != null) builder.RegisterComponent(shopPanel);
             if (anvilPanel != null) builder.RegisterComponent(anvilPanel);
-            if (inventoryView != null) builder.RegisterComponent(inventoryView);
             builder.RegisterInstance(augmentCatalog);
             builder.RegisterEntryPoint<AugmentController>().AsSelf();
             builder.RegisterInstance(lootSettings);

@@ -15,20 +15,37 @@ MonoBehaviour:
   displayName: Onde royale
   icon: {fileID: 0}
   color: {r: 1, g: 0.8, b: 0.3, a: 1}
-  recipe: []
+  description: 
+  rankUnlockLevels: []
+  baseDamage:
+  - 70
+  cooldowns:
+  - 0
+  manaCosts:
+  - 0
   targeting: 2
   range: 0
   radius: 4.5
   coneAngle: 60
   castTime: 1.3
   canMoveWhileCasting: 0
-  cooldownOverride: 0
   kind: 1
-  powerRatio: 0.6
-  scaling:
-    Base: 70
-    PerElementLevel: 0
+  adRatio: 0.6
+  bonusAdRatio: 0
+  apRatio: 0
   buffs: []
+  statuses:
+  - Kind: 3
+    Duration: 2
+    Power: 0.35
+    ScalingStat: 0
+    Ratio: 0
+    MaxStacks: 0
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
   projectileSpeed: 18
   pierce: 0
   blink: 0

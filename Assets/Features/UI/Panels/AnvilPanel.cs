@@ -8,7 +8,7 @@ using VContainer;
 namespace Features.UI.Panels {
     /// <summary>
     /// Anvil screen (design doc §9.3), from AnvilOfferEvent snapshots: the 3 choices of the same
-    /// rarity, "Choose" and, for item anvils, "Reroll" with the rerolls left on each choice.
+    /// rarity (the whole card picks it) and, for item anvils, "Reroll" under each card with the rerolls left on each choice.
     /// Drawn above the shop (own UIDocument, higher sorting order).
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
@@ -33,7 +33,7 @@ namespace Features.UI.Panels {
 
         private void Start() {
             _overlay = MenuStyles.Overlay(out VisualElement box);
-            box.style.width = 3 * (OfferCard.Width + 10) + 60;
+            box.style.width = 3 * (OfferCard.Width + 16) + 60;
             _title = MenuStyles.Title("");
             _title.style.marginBottom = 2;
             box.Add(_title);
@@ -62,25 +62,21 @@ namespace Features.UI.Panels {
             bool items = _offer.Anvil.Kind == AnvilKind.Item;
             _title.text = _offer.Anvil.DisplayName;
             _title.style.color = items ? StatLabels.Color(_offer.Anvil.ItemTier) : StatLabels.Color(_offer.Rarity);
-            _subtitle.text = items ? "Choisis un item." : $"Rareté tirée : {StatLabels.Name(_offer.Rarity)}. Choisis un bonus permanent.";
+            _subtitle.text = items ? "Clique sur un item pour le prendre." : $"Rareté tirée : {StatLabels.Name(_offer.Rarity)}. Clique sur un bonus permanent pour le prendre.";
             _skip.style.display = _offer.CanSkip ? DisplayStyle.Flex : DisplayStyle.None;
 
             _choices.Clear();
             for (int i = 0; i < _offer.Choices.Count; i++) {
                 int index = i;
                 (string name, Color color, Sprite icon, string body) = OfferCard.Describe(_offer.Choices[i]);
-                VisualElement card = OfferCard.Build(icon, name, color, body, "Choisir",
+                VisualElement card = OfferCard.Build(icon, name, color, body,
                                                      () => _eventBus.Publish(new AnvilChooseRequestedEvent(index)), true);
+                Button reroll = null;
                 if (items) {
                     int left = _offer.Rerolls[i];
-                    Button reroll = MenuStyles.Button($"Relancer ({left})", () => _eventBus.Publish(new AnvilRerollRequestedEvent(index)));
-                    reroll.style.height = 26;
-                    reroll.style.fontSize = 12;
-                    reroll.style.alignSelf = Align.Stretch;
-                    reroll.SetEnabled(left > 0);
-                    card.Add(reroll);
+                    reroll = OfferCard.SmallButton($"Relancer ({left})", () => _eventBus.Publish(new AnvilRerollRequestedEvent(index)), left > 0);
                 }
-                _choices.Add(card);
+                _choices.Add(OfferCard.Column(card, reroll));
             }
         }
     }

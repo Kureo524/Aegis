@@ -16,6 +16,14 @@ namespace Features.Movement {
     ///
     /// Speed is the owner's MoveSpeed stat (<see cref="Init"/>): same code for everyone,
     /// different speed. Does not move before Init.
+    ///
+    /// <see cref="Immobilized"/> (stun, root, §5.7) holds the body in place without forgetting the
+    /// order: the walk resumes when it ends. A dash in progress is stopped.
+    ///
+    /// Steering, dashes and bodies pushing each other ignore the NavMesh: after every physics step
+    /// the body is pulled back onto it (the agent, synced with the body, is constrained to the
+    /// NavMesh), so nothing walks, charges or is pushed off the map. A body that still falls under
+    /// the ground is put back on the closest walkable point.
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(NavMeshAgent))]
@@ -24,6 +32,8 @@ namespace Features.Movement {
         [SerializeField] public float rotationSpeed = 15f;
 
         private const float SampleRadius = 10f;
+        private const float OffMeshTolerance = 0.05f;
+        private const float FallLimit = -3f;
 
         private Rigidbody _rb;
         private NavMeshAgent _agent;
@@ -41,9 +51,20 @@ namespace Features.Movement {
         private float MoveSpeed => _moveSpeed?.Value ?? 0f;
 
         public bool IsMoving => _hasDestination;
+        /// <summary>Stunned or rooted: no move, orders are kept for later.</summary>
+        public bool Immobilized { get; set; }
         public Vector3 Destination => _destination;
         /// <summary>Normalized horizontal direction of the current move, zero when idle.</summary>
         public Vector3 MoveDirection => _hasDestination ? _moveDirection : Vector3.zero;
+        /// <summary>Horizontal speed of the body (run animation pace).</summary>
+        public float CurrentSpeed {
+            get {
+                if (_rb == null) return 0f;
+                Vector3 v = _rb.linearVelocity;
+                v.y = 0f;
+                return v.magnitude;
+            }
+        }
 
         private void Awake() {
             _rb = GetComponent<Rigidbody>();
@@ -122,7 +143,7 @@ namespace Features.Movement {
             Stop();
             _rb.position = position;
             transform.position = position;
-            if (_agent.isOnNavMesh) _agent.Warp(position);
+            if (_agent.enabled) _agent.Warp(position);
         }
 
         public void Stop() {
@@ -135,8 +156,14 @@ namespace Features.Movement {
         }
 
         private void FixedUpdate() {
-            if (_agent.isOnNavMesh) _agent.nextPosition = _rb.position;
+            KeepOnNavMesh();
             if (!_hasDestination) return;
+
+            if (Immobilized) {
+                if (_dashUntil > 0f) Stop();
+                else SetHorizontalVelocity(Vector3.zero);
+                return;
+            }
 
             if (_dashUntil > 0f) {
                 if (Time.time >= _dashUntil) {
@@ -164,6 +191,33 @@ namespace Features.Movement {
             _moveDirection = toWaypoint.normalized;
             SetHorizontalVelocity(_moveDirection * MoveSpeed);
             FaceMoveDirection();
+        }
+
+        // The agent follows the body but cannot leave the NavMesh: where they part, the body went off it.
+        private void KeepOnNavMesh() {
+            if (_rb.isKinematic) return;
+            if (_rb.position.y < FallLimit) {
+                Recover();
+                return;
+            }
+            if (!_agent.enabled || !_agent.isOnNavMesh) return;
+            _agent.nextPosition = _rb.position;
+            Vector3 onMesh = _agent.nextPosition;
+            Vector3 back = onMesh - _rb.position;
+            back.y = 0f;
+            if (back.sqrMagnitude <= OffMeshTolerance * OffMeshTolerance) return;
+            _rb.position = new Vector3(onMesh.x, _rb.position.y, onMesh.z);
+            Vector3 normal = back.normalized;
+            Vector3 velocity = _rb.linearVelocity;
+            float outwards = -Vector3.Dot(velocity, normal);
+            if (outwards > 0f) _rb.linearVelocity = velocity + normal * outwards;   // no more speed off the edge
+        }
+
+        private void Recover() {
+            Vector3 probe = new Vector3(_rb.position.x, 0f, _rb.position.z);
+            if (!NavMesh.SamplePosition(probe, out NavMeshHit hit, 200f, NavMesh.AllAreas)) return;
+            _rb.linearVelocity = Vector3.zero;
+            Teleport(hit.position);
         }
 
         // Rotated through the Rigidbody, in FixedUpdate: writing transform.rotation directly
@@ -197,8 +251,9 @@ namespace Features.Movement {
             return delta.magnitude;
         }
 
-        // Keeps the vertical component so gravity keeps working.
+        // Keeps the vertical component so gravity keeps working. A dead body is kinematic: no velocity.
         private void SetHorizontalVelocity(Vector3 velocity) {
+            if (_rb.isKinematic) return;
             velocity.y = _rb.linearVelocity.y;
             _rb.linearVelocity = velocity;
         }

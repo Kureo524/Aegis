@@ -95,12 +95,24 @@ namespace Game.Tests.PlayMode {
             yield return null;
             Assert.AreEqual(RunState.Combat, run.State);
             Assert.IsTrue(run.BossAlive, "the boss spawned with the wave");
+            Character boss = null;
+            foreach (Character c in spawner.AliveEnemies) if (c.Definition is BossDefinition) boss = c;
+            Assert.IsNotNull(boss);
+            // The player fights back on her own: no basic attacks, the boss must outlast the timer at 60x
+            var attacker = Player.GetComponent<Features.Combat.BasicAttacker>();
+            attacker.Cancel();
+            attacker.enabled = false;
+            // The random items of the skipped waves must not kill it in 10 min of game time (thorns scale
+            // with the test's huge max health)
+            var inventory = Game.Resolve<Inventory>();
+            while (inventory.Items.Count > 0) inventory.RemoveAt(0);
+            boss.Stats.Get(StatType.MaxHealth).AddModifier(new StatModifier(1e6f, ModifierType.Flat, "test"));
 
             // Quota reached, timer over: the boss still stands → overtime
             HordeSpawnEntry entry = bossWave.SpawnTable[0];
             for (int i = 0; i < bossWave.KillQuota; i++) {
                 Character e = spawner.Spawn(entry.Prefab, entry.Definition, Player.transform.position + new Vector3(-12f, 0f, 0f));
-                Hit(e, 1e7f);
+                Hit(e, e.Health.Max);   // no overkill: a splash / chain of the random rewards would carry it to the boss
             }
             Assert.IsTrue(run.QuotaReached);
             Time.timeScale = 60f;
@@ -109,11 +121,12 @@ namespace Game.Tests.PlayMode {
             Time.timeScale = 1f;
             Assert.AreEqual(RunState.Overtime, run.State, "the boss is alive: the wave is not over");
 
-            Character boss = null;
-            foreach (Character c in spawner.AliveEnemies) if (c.Definition is BossDefinition) boss = c;
-            Assert.IsNotNull(boss);
-            Hit(boss, 1e7f);
-            Assert.AreEqual(RunState.Reward, run.State, "boss dead + quota: the wave ends");
+            int wave = run.WaveNumber;
+            bool ended = false;
+            using (Game.Resolve<Systems.EventBusses.IEventBus>().Subscribe<Features.Events.WaveRewardEvent>(_ => ended = true)) Hit(boss, 1e7f);
+            Assert.IsTrue(ended, "boss dead + quota: the wave ends");
+            Assert.IsTrue(run.State == RunState.Reward || (run.State == RunState.PreWave && run.WaveNumber == wave + 1),
+                          "its rewards, or straight to the break when it has none");
         }
     }
 }

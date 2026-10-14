@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c58604379ce9cdca08ba4b1092853e8f, type: 3}
+  m_Name: Anim_TrainingDummy
+  m_EditorClassIdentifier: Game.Features::Features.Characters.SpriteAnimationSet
+  idle:
+    Frames:
+    - {fileID: -249896831, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -844853141, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 668755246, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 379288667, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 2096610406, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 1870854063, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 700271624, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 269567538, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 2017638737, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -345020634, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 1728878820, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -14914688, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    Duration: 1.958
+    Loop: 1
+  run:
+    Frames: []
+    Duration: 1
+    Loop: 1
+  attack:
+    Frames: []
+    Duration: 1
+    Loop: 0
+  attackImpact: 0.45
+  hit:
+    Frames:
+    - {fileID: -791969337, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -1417248849, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 924988918, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 1115307314, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -1070389207, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -1961517755, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -238651184, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 298108532, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    Duration: 0.625
+    Loop: 0
+  death:
+    Frames:
+    - {fileID: -318014114, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -656400504, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 2040706708, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -707300343, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -297035820, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 1790677289, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -443423293, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 444346540, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -812265655, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -603364323, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: -742307027, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    - {fileID: 1242648697, guid: 641d55fd736874491905e90b3c678044, type: 3}
+    Duration: 0.958
+    Loop: 0
+  dash:
+    Frames: []
+    Duration: 1
+    Loop: 1
+  cast:
+    Frames: []
+    Duration: 1
+    Loop: 0
+  spellClips: []
+  runReferenceSpeed: 3.25

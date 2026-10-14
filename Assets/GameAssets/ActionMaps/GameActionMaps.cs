@@ -235,7 +235,7 @@ namespace GameAssets.ActionMaps
                     ""priority"": 0
                 },
                 {
-                    ""name"": ""Element1"",
+                    ""name"": ""Ability1"",
                     ""type"": ""Button"",
                     ""id"": ""f6a7b8c9-d0e1-2345-fabc-456789012345"",
                     ""expectedControlType"": ""Button"",
@@ -245,7 +245,7 @@ namespace GameAssets.ActionMaps
                     ""priority"": 0
                 },
                 {
-                    ""name"": ""Element2"",
+                    ""name"": ""Ability2"",
                     ""type"": ""Button"",
                     ""id"": ""a7b8c9d0-e1f2-3456-abcd-567890123456"",
                     ""expectedControlType"": ""Button"",
@@ -255,7 +255,7 @@ namespace GameAssets.ActionMaps
                     ""priority"": 0
                 },
                 {
-                    ""name"": ""Element3"",
+                    ""name"": ""Ability3"",
                     ""type"": ""Button"",
                     ""id"": ""b8c9d0e1-f2a3-4567-bcde-678901234567"",
                     ""expectedControlType"": ""Button"",
@@ -265,7 +265,7 @@ namespace GameAssets.ActionMaps
                     ""priority"": 0
                 },
                 {
-                    ""name"": ""CastSpell"",
+                    ""name"": ""Ability4"",
                     ""type"": ""Button"",
                     ""id"": ""c9d0e1f2-a3b4-5678-cdef-789012345678"",
                     ""expectedControlType"": ""Button"",
@@ -275,7 +275,7 @@ namespace GameAssets.ActionMaps
                     ""priority"": 0
                 },
                 {
-                    ""name"": ""Signature"",
+                    ""name"": ""SummonerF"",
                     ""type"": ""Button"",
                     ""id"": ""d0e1f2a3-b4c5-6789-defa-890123456789"",
                     ""expectedControlType"": ""Button"",
@@ -285,7 +285,7 @@ namespace GameAssets.ActionMaps
                     ""priority"": 0
                 },
                 {
-                    ""name"": ""ResetElements"",
+                    ""name"": ""SummonerD"",
                     ""type"": ""Button"",
                     ""id"": ""e1f2a3b4-c5d6-7890-efab-901234567890"",
                     ""expectedControlType"": ""Button"",
@@ -332,6 +332,16 @@ namespace GameAssets.ActionMaps
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""Shop"",
+                    ""type"": ""Button"",
+                    ""id"": ""758327d7-48f0-4e5e-898c-62c8e4d787c0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
                     ""priority"": 0
                 }
             ],
@@ -768,10 +778,10 @@ namespace GameAssets.ActionMaps
                 {
                     ""name"": """",
                     ""id"": ""55555555-5555-5555-5555-555555555555"",
-                    ""path"": ""<Keyboard>/q"",
+                    ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
+                    ""groups"": ""Positional"",
                     ""action"": ""AttackMove"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -779,22 +789,22 @@ namespace GameAssets.ActionMaps
                 {
                     ""name"": """",
                     ""id"": ""66666666-6666-6666-6666-666666666666"",
-                    ""path"": ""<Keyboard>/a"",
+                    ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Element1"",
+                    ""groups"": ""Positional"",
+                    ""action"": ""Ability1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""77777777-7777-7777-7777-777777777777"",
-                    ""path"": ""<Keyboard>/z"",
+                    ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Element2"",
+                    ""groups"": ""Positional"",
+                    ""action"": ""Ability2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -804,8 +814,8 @@ namespace GameAssets.ActionMaps
                     ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Element3"",
+                    ""groups"": ""Positional"",
+                    ""action"": ""Ability3"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -815,8 +825,8 @@ namespace GameAssets.ActionMaps
                     ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""CastSpell"",
+                    ""groups"": ""Positional"",
+                    ""action"": ""Ability4"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -826,19 +836,19 @@ namespace GameAssets.ActionMaps
                     ""path"": ""<Keyboard>/f"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Signature"",
+                    ""groups"": ""Positional"",
+                    ""action"": ""SummonerF"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"",
-                    ""path"": ""<Keyboard>/t"",
+                    ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""ResetElements"",
+                    ""groups"": ""Positional"",
+                    ""action"": ""SummonerD"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -848,7 +858,7 @@ namespace GameAssets.ActionMaps
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
+                    ""groups"": ""Positional"",
                     ""action"": ""Stop"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -905,6 +915,17 @@ namespace GameAssets.ActionMaps
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""LevelUpModifier"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0205849d-d1d2-4edb-869d-8cdb069c109e"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Shop"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1516,16 +1537,17 @@ namespace GameAssets.ActionMaps
             m_Gameplay_Confirm = m_Gameplay.FindAction("Confirm", throwIfNotFound: true);
             m_Gameplay_Cancel = m_Gameplay.FindAction("Cancel", throwIfNotFound: true);
             m_Gameplay_AttackMove = m_Gameplay.FindAction("AttackMove", throwIfNotFound: true);
-            m_Gameplay_Element1 = m_Gameplay.FindAction("Element1", throwIfNotFound: true);
-            m_Gameplay_Element2 = m_Gameplay.FindAction("Element2", throwIfNotFound: true);
-            m_Gameplay_Element3 = m_Gameplay.FindAction("Element3", throwIfNotFound: true);
-            m_Gameplay_CastSpell = m_Gameplay.FindAction("CastSpell", throwIfNotFound: true);
-            m_Gameplay_Signature = m_Gameplay.FindAction("Signature", throwIfNotFound: true);
-            m_Gameplay_ResetElements = m_Gameplay.FindAction("ResetElements", throwIfNotFound: true);
+            m_Gameplay_Ability1 = m_Gameplay.FindAction("Ability1", throwIfNotFound: true);
+            m_Gameplay_Ability2 = m_Gameplay.FindAction("Ability2", throwIfNotFound: true);
+            m_Gameplay_Ability3 = m_Gameplay.FindAction("Ability3", throwIfNotFound: true);
+            m_Gameplay_Ability4 = m_Gameplay.FindAction("Ability4", throwIfNotFound: true);
+            m_Gameplay_SummonerF = m_Gameplay.FindAction("SummonerF", throwIfNotFound: true);
+            m_Gameplay_SummonerD = m_Gameplay.FindAction("SummonerD", throwIfNotFound: true);
             m_Gameplay_Stop = m_Gameplay.FindAction("Stop", throwIfNotFound: true);
             m_Gameplay_CameraLock = m_Gameplay.FindAction("CameraLock", throwIfNotFound: true);
             m_Gameplay_Zoom = m_Gameplay.FindAction("Zoom", throwIfNotFound: true);
             m_Gameplay_LevelUpModifier = m_Gameplay.FindAction("LevelUpModifier", throwIfNotFound: true);
+            m_Gameplay_Shop = m_Gameplay.FindAction("Shop", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1633,16 +1655,17 @@ namespace GameAssets.ActionMaps
         private readonly InputAction m_Gameplay_Confirm;
         private readonly InputAction m_Gameplay_Cancel;
         private readonly InputAction m_Gameplay_AttackMove;
-        private readonly InputAction m_Gameplay_Element1;
-        private readonly InputAction m_Gameplay_Element2;
-        private readonly InputAction m_Gameplay_Element3;
-        private readonly InputAction m_Gameplay_CastSpell;
-        private readonly InputAction m_Gameplay_Signature;
-        private readonly InputAction m_Gameplay_ResetElements;
+        private readonly InputAction m_Gameplay_Ability1;
+        private readonly InputAction m_Gameplay_Ability2;
+        private readonly InputAction m_Gameplay_Ability3;
+        private readonly InputAction m_Gameplay_Ability4;
+        private readonly InputAction m_Gameplay_SummonerF;
+        private readonly InputAction m_Gameplay_SummonerD;
         private readonly InputAction m_Gameplay_Stop;
         private readonly InputAction m_Gameplay_CameraLock;
         private readonly InputAction m_Gameplay_Zoom;
         private readonly InputAction m_Gameplay_LevelUpModifier;
+        private readonly InputAction m_Gameplay_Shop;
         /// <summary>
         /// Provides access to input actions defined in input action map "Gameplay".
         /// </summary>
@@ -1711,29 +1734,29 @@ namespace GameAssets.ActionMaps
             /// </summary>
             public InputAction @AttackMove => m_Wrapper.m_Gameplay_AttackMove;
             /// <summary>
-            /// Provides access to the underlying input action "Gameplay/Element1".
+            /// Provides access to the underlying input action "Gameplay/Ability1".
             /// </summary>
-            public InputAction @Element1 => m_Wrapper.m_Gameplay_Element1;
+            public InputAction @Ability1 => m_Wrapper.m_Gameplay_Ability1;
             /// <summary>
-            /// Provides access to the underlying input action "Gameplay/Element2".
+            /// Provides access to the underlying input action "Gameplay/Ability2".
             /// </summary>
-            public InputAction @Element2 => m_Wrapper.m_Gameplay_Element2;
+            public InputAction @Ability2 => m_Wrapper.m_Gameplay_Ability2;
             /// <summary>
-            /// Provides access to the underlying input action "Gameplay/Element3".
+            /// Provides access to the underlying input action "Gameplay/Ability3".
             /// </summary>
-            public InputAction @Element3 => m_Wrapper.m_Gameplay_Element3;
+            public InputAction @Ability3 => m_Wrapper.m_Gameplay_Ability3;
             /// <summary>
-            /// Provides access to the underlying input action "Gameplay/CastSpell".
+            /// Provides access to the underlying input action "Gameplay/Ability4".
             /// </summary>
-            public InputAction @CastSpell => m_Wrapper.m_Gameplay_CastSpell;
+            public InputAction @Ability4 => m_Wrapper.m_Gameplay_Ability4;
             /// <summary>
-            /// Provides access to the underlying input action "Gameplay/Signature".
+            /// Provides access to the underlying input action "Gameplay/SummonerF".
             /// </summary>
-            public InputAction @Signature => m_Wrapper.m_Gameplay_Signature;
+            public InputAction @SummonerF => m_Wrapper.m_Gameplay_SummonerF;
             /// <summary>
-            /// Provides access to the underlying input action "Gameplay/ResetElements".
+            /// Provides access to the underlying input action "Gameplay/SummonerD".
             /// </summary>
-            public InputAction @ResetElements => m_Wrapper.m_Gameplay_ResetElements;
+            public InputAction @SummonerD => m_Wrapper.m_Gameplay_SummonerD;
             /// <summary>
             /// Provides access to the underlying input action "Gameplay/Stop".
             /// </summary>
@@ -1750,6 +1773,10 @@ namespace GameAssets.ActionMaps
             /// Provides access to the underlying input action "Gameplay/LevelUpModifier".
             /// </summary>
             public InputAction @LevelUpModifier => m_Wrapper.m_Gameplay_LevelUpModifier;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/Shop".
+            /// </summary>
+            public InputAction @Shop => m_Wrapper.m_Gameplay_Shop;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1818,24 +1845,24 @@ namespace GameAssets.ActionMaps
                 @AttackMove.started += instance.OnAttackMove;
                 @AttackMove.performed += instance.OnAttackMove;
                 @AttackMove.canceled += instance.OnAttackMove;
-                @Element1.started += instance.OnElement1;
-                @Element1.performed += instance.OnElement1;
-                @Element1.canceled += instance.OnElement1;
-                @Element2.started += instance.OnElement2;
-                @Element2.performed += instance.OnElement2;
-                @Element2.canceled += instance.OnElement2;
-                @Element3.started += instance.OnElement3;
-                @Element3.performed += instance.OnElement3;
-                @Element3.canceled += instance.OnElement3;
-                @CastSpell.started += instance.OnCastSpell;
-                @CastSpell.performed += instance.OnCastSpell;
-                @CastSpell.canceled += instance.OnCastSpell;
-                @Signature.started += instance.OnSignature;
-                @Signature.performed += instance.OnSignature;
-                @Signature.canceled += instance.OnSignature;
-                @ResetElements.started += instance.OnResetElements;
-                @ResetElements.performed += instance.OnResetElements;
-                @ResetElements.canceled += instance.OnResetElements;
+                @Ability1.started += instance.OnAbility1;
+                @Ability1.performed += instance.OnAbility1;
+                @Ability1.canceled += instance.OnAbility1;
+                @Ability2.started += instance.OnAbility2;
+                @Ability2.performed += instance.OnAbility2;
+                @Ability2.canceled += instance.OnAbility2;
+                @Ability3.started += instance.OnAbility3;
+                @Ability3.performed += instance.OnAbility3;
+                @Ability3.canceled += instance.OnAbility3;
+                @Ability4.started += instance.OnAbility4;
+                @Ability4.performed += instance.OnAbility4;
+                @Ability4.canceled += instance.OnAbility4;
+                @SummonerF.started += instance.OnSummonerF;
+                @SummonerF.performed += instance.OnSummonerF;
+                @SummonerF.canceled += instance.OnSummonerF;
+                @SummonerD.started += instance.OnSummonerD;
+                @SummonerD.performed += instance.OnSummonerD;
+                @SummonerD.canceled += instance.OnSummonerD;
                 @Stop.started += instance.OnStop;
                 @Stop.performed += instance.OnStop;
                 @Stop.canceled += instance.OnStop;
@@ -1848,6 +1875,9 @@ namespace GameAssets.ActionMaps
                 @LevelUpModifier.started += instance.OnLevelUpModifier;
                 @LevelUpModifier.performed += instance.OnLevelUpModifier;
                 @LevelUpModifier.canceled += instance.OnLevelUpModifier;
+                @Shop.started += instance.OnShop;
+                @Shop.performed += instance.OnShop;
+                @Shop.canceled += instance.OnShop;
             }
 
             /// <summary>
@@ -1901,24 +1931,24 @@ namespace GameAssets.ActionMaps
                 @AttackMove.started -= instance.OnAttackMove;
                 @AttackMove.performed -= instance.OnAttackMove;
                 @AttackMove.canceled -= instance.OnAttackMove;
-                @Element1.started -= instance.OnElement1;
-                @Element1.performed -= instance.OnElement1;
-                @Element1.canceled -= instance.OnElement1;
-                @Element2.started -= instance.OnElement2;
-                @Element2.performed -= instance.OnElement2;
-                @Element2.canceled -= instance.OnElement2;
-                @Element3.started -= instance.OnElement3;
-                @Element3.performed -= instance.OnElement3;
-                @Element3.canceled -= instance.OnElement3;
-                @CastSpell.started -= instance.OnCastSpell;
-                @CastSpell.performed -= instance.OnCastSpell;
-                @CastSpell.canceled -= instance.OnCastSpell;
-                @Signature.started -= instance.OnSignature;
-                @Signature.performed -= instance.OnSignature;
-                @Signature.canceled -= instance.OnSignature;
-                @ResetElements.started -= instance.OnResetElements;
-                @ResetElements.performed -= instance.OnResetElements;
-                @ResetElements.canceled -= instance.OnResetElements;
+                @Ability1.started -= instance.OnAbility1;
+                @Ability1.performed -= instance.OnAbility1;
+                @Ability1.canceled -= instance.OnAbility1;
+                @Ability2.started -= instance.OnAbility2;
+                @Ability2.performed -= instance.OnAbility2;
+                @Ability2.canceled -= instance.OnAbility2;
+                @Ability3.started -= instance.OnAbility3;
+                @Ability3.performed -= instance.OnAbility3;
+                @Ability3.canceled -= instance.OnAbility3;
+                @Ability4.started -= instance.OnAbility4;
+                @Ability4.performed -= instance.OnAbility4;
+                @Ability4.canceled -= instance.OnAbility4;
+                @SummonerF.started -= instance.OnSummonerF;
+                @SummonerF.performed -= instance.OnSummonerF;
+                @SummonerF.canceled -= instance.OnSummonerF;
+                @SummonerD.started -= instance.OnSummonerD;
+                @SummonerD.performed -= instance.OnSummonerD;
+                @SummonerD.canceled -= instance.OnSummonerD;
                 @Stop.started -= instance.OnStop;
                 @Stop.performed -= instance.OnStop;
                 @Stop.canceled -= instance.OnStop;
@@ -1931,6 +1961,9 @@ namespace GameAssets.ActionMaps
                 @LevelUpModifier.started -= instance.OnLevelUpModifier;
                 @LevelUpModifier.performed -= instance.OnLevelUpModifier;
                 @LevelUpModifier.canceled -= instance.OnLevelUpModifier;
+                @Shop.started -= instance.OnShop;
+                @Shop.performed -= instance.OnShop;
+                @Shop.canceled -= instance.OnShop;
             }
 
             /// <summary>
@@ -2330,47 +2363,47 @@ namespace GameAssets.ActionMaps
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnAttackMove(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Element1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Ability1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnElement1(InputAction.CallbackContext context);
+            void OnAbility1(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Element2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Ability2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnElement2(InputAction.CallbackContext context);
+            void OnAbility2(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Element3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Ability3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnElement3(InputAction.CallbackContext context);
+            void OnAbility3(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "CastSpell" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Ability4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnCastSpell(InputAction.CallbackContext context);
+            void OnAbility4(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Signature" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "SummonerF" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnSignature(InputAction.CallbackContext context);
+            void OnSummonerF(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "ResetElements" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "SummonerD" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnResetElements(InputAction.CallbackContext context);
+            void OnSummonerD(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Stop" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
@@ -2399,6 +2432,13 @@ namespace GameAssets.ActionMaps
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnLevelUpModifier(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Shop" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnShop(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

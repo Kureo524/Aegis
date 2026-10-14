@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using Features.Characters;
 using Features.Economy;
@@ -100,7 +101,7 @@ namespace Game.Tests.PlayMode {
             Assert.AreEqual(1f, Time.timeScale);
         }
 
-        // Closes every end-of-wave screen in turn (augment, anvil, shop)
+        // Closes every end-of-wave screen in turn (augment, anvil)
         private static void FinishRewards() => FinishRewardsFor(Game);
 
         internal static void FinishRewardsFor(IObjectResolver game) {
@@ -108,7 +109,6 @@ namespace Game.Tests.PlayMode {
             var shop = game.Resolve<ShopService>();
             for (int guard = 0; guard < 10 && run.State == RunState.Reward; guard++) {
                 if (shop.AnvilOpen) shop.Choose(0);
-                else if (shop.IsOpen) shop.Close();
                 else {
                     var augments = game.Resolve<Features.Augments.AugmentController>();
                     if (augments.Phase == AugmentDraftPhase.SlotsFull) augments.ChooseFullSlotsOption(FullSlotsOption.SlotOrGold, 0);
@@ -118,7 +118,7 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator FreePrismaticAnvil_AfterWave2_ThenShopsSpendTheGold() {
+        public IEnumerator FreePrismaticAnvil_AfterWave2_ThenTheBreak_ShopWithoutLimits_StartTheWave() {
             yield return LoadRun();
             var run = Game.Resolve<RunDirector>();
             var shop = Game.Resolve<ShopService>();
@@ -140,24 +140,39 @@ namespace Game.Tests.PlayMode {
             Assert.AreEqual(ItemTier.Prismatic, inventory.Items[0].Tier);
             Assert.AreEqual(RunState.PreWave, run.State, "back to the countdown");
 
-            // Wave 3 → light shop: buy a stat anvil with the gold
-            Bus.Publish(new SkipWaveRequestedEvent());
+            // The break: 30 s, the shop opens by itself, anything can be bought, the HUD starts the wave
+            Assert.AreEqual(Game.Resolve<StageDefinition>().Intermission, run.TimeLeft, 0.5f, "a 30 s break after the rewards");
             yield return null;
-            Bus.Publish(new SkipWaveRequestedEvent());
-            yield return null;
-            Assert.IsTrue(shop.IsOpen && !shop.IsFull, "wave 3 → light shop");
-            yield return null;
-            Assert.IsTrue(Object.FindFirstObjectByType<ShopPanel>().IsOpen);
-            wallet.Add(100);
+            var panel = Object.FindFirstObjectByType<ShopPanel>();
+            Assert.IsTrue(panel.IsOpen, "the shop opens at the start of the break");
+            Assert.IsTrue(shop.CanBuy);
+            wallet.Add(1000);
+            int gold = wallet.Gold;
             float hp = Player.Stats.Value(Features.Stats.StatType.MaxHealth);
             var statAnvil = Game.Resolve<ShopCatalog>().StatAnvils[0];
             Bus.Publish(new ShopBuyRequestedEvent(statAnvil));
             Assert.IsTrue(shop.AnvilOpen);
             shop.Choose(0);
-            Assert.AreEqual(100 - statAnvil.Cost, wallet.Gold);
-            Bus.Publish(new ShopCloseRequestedEvent());
-            Assert.AreEqual(RunState.PreWave, run.State);
             Assert.IsTrue(Player.Stats.Value(Features.Stats.StatType.MaxHealth) >= hp, "stats kept");
+            ItemDefinition[] legendaries = Game.Resolve<ShopCatalog>().Items.Where(i => i.Tier == ItemTier.Legendary && i.UniqueGroup == "").Take(2).ToArray();
+            Bus.Publish(new ShopBuyRequestedEvent(legendaries[0]));
+            Bus.Publish(new ShopBuyRequestedEvent(legendaries[1]));
+            Assert.AreEqual(3, inventory.Items.Count, "two items in the same break: no limit");
+            Assert.AreEqual(gold - statAnvil.Cost - legendaries[0].Cost - legendaries[1].Cost, wallet.Gold);
+            Bus.Publish(new ShopSellRequestedEvent(2));
+            Assert.AreEqual(2, inventory.Items.Count, "sold");
+            Assert.AreEqual(gold - statAnvil.Cost - legendaries[0].Cost - legendaries[1].Cost + legendaries[1].SellValue, wallet.Gold);
+
+            Assert.AreEqual(RunState.PreWave, run.State);
+            Bus.Publish(new NextWaveRequestedEvent());   // HUD "Start the wave"
+            yield return null;
+            Assert.AreEqual(RunState.Combat, run.State, "the wave starts at once");
+            Assert.AreEqual(3, run.WaveNumber);
+            Assert.IsFalse(shop.CanBuy, "no purchase during a wave");
+            Assert.AreEqual(ShopService.BetweenWavesOnly, shop.RefusalReason(legendaries[1]));
+            Assert.IsTrue(panel.IsOpen, "still browsable");
+            Bus.Publish(new ShopCloseRequestedEvent());
+            Assert.IsFalse(panel.IsOpen);
         }
 
         [UnityTest]
@@ -180,6 +195,7 @@ namespace Game.Tests.PlayMode {
             Assert.AreEqual(0f, Time.timeScale, "frozen on the defeat screen");
             yield return null;
             Assert.IsTrue(Object.FindFirstObjectByType<RunEndPanel>().IsOpen);
+            Assert.AreEqual("Défaite", Object.FindFirstObjectByType<RunEndPanel>().Title);
 
             Bus.Publish(new PlayRequestedEvent());   // "Rejouer"
             yield return WaitFor(() => machine.CurrentState == GameState.Game);
@@ -201,11 +217,15 @@ namespace Game.Tests.PlayMode {
             Assert.AreEqual(Game.Resolve<RunDirector>().Lives, Game.Resolve<StageDefinition>().Lives, "no life involved: the run is over");
             yield return null;
             Assert.IsTrue(Object.FindFirstObjectByType<RunEndPanel>().IsOpen);
+            Assert.AreEqual("Défaite", Object.FindFirstObjectByType<RunEndPanel>().Title);
+            StringAssert.StartsWith("Termine le stage", Object.FindFirstObjectByType<RunEndPanel>().Reward, "a defeat pays no meta currency");
         }
 
         [UnityTest]
         public IEnumerator ClearingEveryWave_IncludingTheBonusWaves_WinsTheStage() {
             yield return LoadRun();
+            var meta = Root.Resolve<Features.Meta.MetaProgress>();
+            int currency = meta.Currency;
             var run = Game.Resolve<RunDirector>();
             var machine = Root.Resolve<GameFlowStateMachine>();
             var stage = Game.Resolve<StageDefinition>();
@@ -220,7 +240,14 @@ namespace Game.Tests.PlayMode {
             }
             yield return WaitFor(() => machine.CurrentState == GameState.Win);
             yield return null;
-            Assert.IsTrue(Object.FindFirstObjectByType<RunEndPanel>().IsOpen);
+            var panel = Object.FindFirstObjectByType<RunEndPanel>();
+            Assert.IsTrue(panel.IsOpen);
+            Assert.AreEqual("Victoire !", panel.Title, "the victory screen, not the defeat one");
+            int reward = meta.Settings.Reward(true, stage.TotalWaves);
+            Assert.Greater(reward, 0);
+            Assert.AreEqual(currency + reward, meta.Currency, "the full clear pays the meta currency");
+            Assert.AreEqual($"+{reward} {meta.Settings.CurrencyName}", panel.Reward);
+            MetaSaveFixture.Clear();
         }
     }
 }

@@ -48,7 +48,16 @@ namespace Features.Progression {
             XpChanged?.Invoke();
         }
 
-        /// <summary>Consumes one skill point (spent on an element level, §7.8).</summary>
+        /// <summary>Flat growth of <paramref name="stat"/> at the current level (part of the base value, MOBA style).</summary>
+        public float FlatGrowth(StatType stat) {
+            if (_growth == null) return 0f;
+            float total = 0f;
+            foreach (StatGrowthEntry entry in _growth.Entries)
+                if (entry.Stat == stat && entry.Type == ModifierType.Flat) total += _growth.BonusAt(entry, Level);
+            return total;
+        }
+
+        /// <summary>Consumes one skill point (spent on an ability rank, §7.8).</summary>
         public bool TrySpendSkillPoint() {
             if (SkillPoints <= 0) return false;
             SkillPoints--;

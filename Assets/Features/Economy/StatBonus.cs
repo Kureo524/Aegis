@@ -41,12 +41,14 @@ namespace Features.Economy {
             { StatType.MoveSpeed, "vitesse de déplacement" }, { StatType.Omnivamp, "omnivampirisme" },
             { StatType.Lifesteal, "vol de vie" }, { StatType.HealShieldPower, "puissance des soins" },
             { StatType.AbilityHaste, "accélération" }, { StatType.ManaCostReduction, "coût en mana" },
+            { StatType.AdaptiveForce, "force adaptative" },
         };
 
         // Stats stored as a 0..1 share and shown as a percentage
         private static readonly HashSet<StatType> Shares = new() {
             StatType.CritChance, StatType.ArmorPenPercent, StatType.MagicPenPercent, StatType.Tenacity,
             StatType.SlowResist, StatType.Omnivamp, StatType.Lifesteal, StatType.ManaCostReduction,
+            StatType.HealShieldPower,
         };
 
         public static string Name(StatType stat) => Names.TryGetValue(stat, out string n) ? n : stat.ToString();

@@ -45,7 +45,7 @@ namespace Game.Tests.EditMode {
             var statAnvil = Make<AnvilDefinition>("StatAnvil", ("kind", AnvilKind.Stat));
             var shopCatalog = Make<ShopCatalog>("Shop", ("statAnvils", new[] { statAnvil }), ("statChoices", statChoices.ToArray()));
             var catalog = Make<AugmentCatalog>("Augments", ("augments", augments.ToArray()), ("baseSlots", 2), ("maxSlots", 3),
-                                               ("rerolls", 2), ("fullSlotsAnvil", statAnvil), ("goldPerRarity", new[] { 100, 200, 300 }));
+                                               ("rerollsPerCard", 1), ("fullSlotsAnvil", statAnvil), ("goldPerRarity", new[] { 100, 200, 300 }));
 
             _bus = new EventBus();
             var stats = new StatController();
@@ -93,17 +93,40 @@ namespace Game.Tests.EditMode {
         }
 
         [Test]
-        public void Rerolls_RunWidePool_GoldenGivesRarityPlusOne() {
+        public void Rerolls_OnePerCardPerDraft_KeepTheRarity_NotKeptForTheNextDraft() {
+            _augments.OpenDraft(RarityTier.Silver, golden: false);
+            for (int card = 0; card < _augments.Choices.Count; card++) {
+                Assert.AreEqual(1, _augments.RerollsLeft(card));
+                _augments.Reroll(card);
+                Assert.AreEqual(RarityTier.Silver, _augments.Choices[card].Rarity, "a reroll keeps the rarity");
+                Assert.AreEqual(0, _augments.RerollsLeft(card));
+            }
+            AugmentDefinition before = _augments.Choices[0];
+            _augments.Reroll(0);
+            Assert.AreSame(before, _augments.Choices[0], "one reroll per card");
+
+            _augments.Pick(0);
+            _augments.OpenDraft(RarityTier.Silver, golden: false);
+            Assert.AreEqual(1, _augments.RerollsLeft(0), "a new draft, fresh rerolls (none kept from the last one)");
+        }
+
+        [Test]
+        public void GoldenReroll_IsSeparate_Once_RarityPlusOne() {
             _augments.OpenDraft(RarityTier.Silver, golden: true);
             _augments.Reroll(0);
-            Assert.AreEqual(RarityTier.Gold, _augments.Choices[0].Rarity, "golden reroll: rarity + 1");
-            Assert.IsFalse(_augments.GoldenReroll, "only the first reroll is golden");
-            _augments.Reroll(1);
-            Assert.AreEqual(RarityTier.Silver, _augments.Choices[1].Rarity);
-            Assert.AreEqual(0, _augments.RerollsLeft);
+            Assert.AreEqual(RarityTier.Silver, _augments.Choices[0].Rarity, "the card's own reroll never changes the rarity");
+            Assert.IsTrue(_augments.GoldenReroll);
+
+            _augments.Reroll(1, golden: true);
+            Assert.AreEqual(RarityTier.Gold, _augments.Choices[1].Rarity, "golden reroll: rarity + 1");
+            Assert.AreEqual(1, _augments.RerollsLeft(1), "the card keeps its own reroll");
+            Assert.IsFalse(_augments.GoldenReroll, "once per draft");
             AugmentDefinition before = _augments.Choices[2];
-            _augments.Reroll(2);
-            Assert.AreSame(before, _augments.Choices[2], "no reroll left for the run");
+            _augments.Reroll(2, golden: true);
+            Assert.AreSame(before, _augments.Choices[2]);
+
+            _augments.AddRerollsPerCard(1);
+            Assert.AreEqual(2, _augments.RerollsLeft(2), "meta bonus: one more per card");
         }
 
         [Test]
