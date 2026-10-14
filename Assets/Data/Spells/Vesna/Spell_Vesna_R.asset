@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_Vesna_R
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: Pluie de braises
+  description: "Apr\xE8s 0,9 s, une pluie de feu s'abat sur une large zone : 300/475/650
+    (+100 % AD bonus) (+90 % AP) d\xE9g\xE2ts magiques, \xE9tourdit 1 s et br\xFBle
+    3 s."
+  icon: {fileID: 21300000, guid: b015c7b42ce2d02c48bb9d39ec0228f2, type: 3}
+  color: {r: 1, g: 0.45, b: 0.1, a: 1}
+  rankUnlockLevels: 060000000b00000010000000
+  baseDamage:
+  - 300
+  - 475
+  - 650
+  cooldowns:
+  - 100
+  - 85
+  - 70
+  manaCosts:
+  - 100
+  targeting: 2
+  range: 16
+  radius: 4.5
+  coneAngle: 60
+  castTime: 0.9
+  canMoveWhileCasting: 0
+  kind: 0
+  adRatio: 0
+  bonusAdRatio: 1
+  apRatio: 0.9
+  buffs: []
+  statuses:
+  - Kind: 0
+    Duration: 1
+    Power: 0
+    ScalingStat: 0
+    Ratio: 0
+    TargetMaxHealthRatio: 0
+    MaxStacks: 1
+  - Kind: 5
+    Duration: 3
+    Power: 20
+    ScalingStat: 5
+    Ratio: 0.1
+    TargetMaxHealthRatio: 0
+    MaxStacks: 1
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
+  affectsAllies: 0
+  projectileSpeed: 20
+  pierce: 0
+  blink: 0
+  fixedRange: 0
+  appliesOnHit: 0
+  cooldownRefundOnHit: 0
+  mark:
+    Enabled: 0
+    Duration: 0
+    ManaRefund: []
+  blinkBoltRadius: 0

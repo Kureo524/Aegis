@@ -13,7 +13,7 @@ using UnityEngine;
 namespace EditorTools {
     /// <summary>
     /// Meta-progression content (design doc §9.7), called by <see cref="ProjectSetup"/>: MetaSettings
-    /// (currency, rewards) in the root scope and Ezreal's tree (stats, starting gold, augment
+    /// (currency, rewards) in the root scope and Vesna's tree (stats, starting gold, augment
     /// rerolls, an extra life, a starting augment), plus the Progression screen of the menu scene.
     /// Created once; values are placeholders.
     /// </summary>
@@ -33,8 +33,8 @@ namespace EditorTools {
         private static MetaEffect Stat(StatType s, float v, ModifierType t = ModifierType.Flat) => new() { Kind = MetaEffectKind.Stat, Stat = s, Type = t, Value = v };
         private static MetaEffect Of(MetaEffectKind k, float v) => new() { Kind = k, Value = v };
 
-        private static readonly N[] Ezreal = {
-            new() { Id = "Training", Name = "Entraînement", Description = "Ezreal frappe plus fort.", Icon = $"{StatIcons}/Stat_PhysicalAttack.png",
+        private static readonly N[] Vesna = {
+            new() { Id = "Training", Name = "Entraînement", Description = "Vesna frappe plus fort.", Icon = $"{StatIcons}/Stat_PhysicalAttack.png",
                     Costs = new[] { 15, 25, 35, 50, 70 }, Effects = new[] { Stat(StatType.PhysicalAttack, 3) }, At = new(0, 0) },
             new() { Id = "Endurance", Name = "Endurance", Description = "Plus de PV.", Icon = $"{StatIcons}/Stat_MaxHealth.png",
                     Costs = new[] { 15, 25, 35, 50, 70 }, Effects = new[] { Stat(StatType.MaxHealth, 40) }, At = new(0, 1) },
@@ -46,7 +46,7 @@ namespace EditorTools {
                     Costs = new[] { 25, 40, 60, 80, 110 }, Effects = new[] { Stat(StatType.AbilityHaste, 4) }, Requires = new[] { "Training" }, At = new(1, 1) },
             new() { Id = "Plating", Name = "Cuirasse", Description = "Armure et résistance magique.", Icon = $"{StatIcons}/Stat_Armor.png",
                     Costs = new[] { 30, 50, 75 }, Effects = new[] { Stat(StatType.Armor, 4), Stat(StatType.MagicResist, 4) }, Requires = new[] { "Endurance" }, At = new(1, 2) },
-            new() { Id = "Rerolls", Name = "Second regard", Description = "Plus de relances d'augment pour la partie.", Icon = "Assets/GraphicAssets/Sprites/Augments/Augment_Restart.png",
+            new() { Id = "Rerolls", Name = "Second regard", Description = "Une relance de plus sur chaque carte d'augment.", Icon = "Assets/GraphicAssets/Sprites/Augments/Augment_SecondWind.png",
                     Costs = new[] { 40, 80 }, Effects = new[] { Of(MetaEffectKind.AugmentRerolls, 1) }, Requires = new[] { "Purse" }, At = new(1, 3) },
             new() { Id = "ManaFlow", Name = "Flux de mana", Description = "Régénération de mana.", Icon = $"{StatIcons}/Stat_MaxMana.png",
                     Costs = new[] { 40, 65, 95 }, Effects = new[] { Stat(StatType.ManaRegen, 0.3f) }, Requires = new[] { "Focus" }, At = new(2, 1) },
@@ -54,11 +54,11 @@ namespace EditorTools {
                     Costs = new[] { 40, 65, 95 }, Effects = new[] { Stat(StatType.HealthRegen, 0.4f) }, Requires = new[] { "Plating" }, At = new(2, 2) },
             new() { Id = "Legacy", Name = "Héritage", Description = "Une vie de stage en plus.", Icon = "Assets/GraphicAssets/Sprites/Augments/Augment_Phoenix.png",
                     Costs = new[] { 150 }, Effects = new[] { Of(MetaEffectKind.ExtraLives, 1) }, Requires = new[] { "Vigor" }, At = new(3, 2) },
-            new() { Id = "Mastery", Name = "Maîtrise", Description = "Un pourcentage de toute l'attaque physique.", Icon = "Assets/GraphicAssets/Sprites/Items/Item_InfinityEdge.png",
+            new() { Id = "Mastery", Name = "Maîtrise", Description = "Un pourcentage de toute l'attaque physique.", Icon = "Assets/GraphicAssets/Sprites/Items/Item_SunsteelBlade.png",
                     Costs = new[] { 80, 140, 220 }, Effects = new[] { Stat(StatType.PhysicalAttack, 0.04f, ModifierType.PercentAdd) }, Requires = new[] { "Precision" }, At = new(3, 0) },
             new() { Id = "Swiftness", Name = "Pas léger", Description = "Vitesse de déplacement.", Icon = $"{StatIcons}/Stat_MoveSpeed.png",
                     Costs = new[] { 60, 100 }, Effects = new[] { Stat(StatType.MoveSpeed, 0.03f, ModifierType.PercentAdd) }, Requires = new[] { "ManaFlow" }, At = new(3, 1) },
-            new() { Id = "Favor", Name = "Faveur", Description = "Un augment au début de chaque partie : Argent, puis Or, puis Prismatique.", Icon = "Assets/GraphicAssets/Sprites/Augments/Augment_AcceleratingSorcery.png",
+            new() { Id = "Favor", Name = "Faveur", Description = "Un augment au début de chaque partie : Argent, puis Or, puis Prismatique.", Icon = "Assets/GraphicAssets/Sprites/Augments/Augment_RunawaySorcery.png",
                     Costs = new[] { 90, 180, 320 }, Effects = new[] { Of(MetaEffectKind.StartingAugment, 1) }, Requires = new[] { "Rerolls" }, At = new(2, 3) },
         };
 
@@ -67,12 +67,12 @@ namespace EditorTools {
             if (settings == null) {
                 Directory.CreateDirectory(Dir);
                 var nodes = new Dictionary<string, MetaNodeDefinition>();
-                foreach (N n in Ezreal) {
+                foreach (N n in Vesna) {
                     var node = ScriptableObject.CreateInstance<MetaNodeDefinition>();
-                    AssetDatabase.CreateAsset(node, $"{Dir}/Meta_Ezreal_{n.Id}.asset");
+                    AssetDatabase.CreateAsset(node, $"{Dir}/Meta_Vesna_{n.Id}.asset");
                     nodes[n.Id] = node;
                 }
-                foreach (N n in Ezreal) {
+                foreach (N n in Vesna) {
                     var so = new SerializedObject(nodes[n.Id]);
                     so.FindProperty("displayName").stringValue = n.Name;
                     so.FindProperty("description").stringValue = n.Description;
@@ -89,13 +89,13 @@ namespace EditorTools {
                 }
 
                 var tree = ScriptableObject.CreateInstance<MetaTreeDefinition>();
-                AssetDatabase.CreateAsset(tree, $"{Dir}/MetaTree_Ezreal.asset");
+                AssetDatabase.CreateAsset(tree, $"{Dir}/MetaTree_Vesna.asset");
                 var tso = new SerializedObject(tree);
-                tso.FindProperty("displayName").stringValue = "Ezreal";
+                tso.FindProperty("displayName").stringValue = "Vesna";
                 tso.FindProperty("character").objectReferenceValue = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(ProjectSetup.TestHeroPath);
                 SerializedProperty list = tso.FindProperty("nodes");
-                list.arraySize = Ezreal.Length;
-                for (int i = 0; i < Ezreal.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = nodes[Ezreal[i].Id];
+                list.arraySize = Vesna.Length;
+                for (int i = 0; i < Vesna.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = nodes[Vesna[i].Id];
                 tso.ApplyModifiedPropertiesWithoutUndo();
 
                 settings = ScriptableObject.CreateInstance<MetaSettings>();

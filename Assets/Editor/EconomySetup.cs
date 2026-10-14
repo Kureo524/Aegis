@@ -9,7 +9,7 @@ using UnityEngine;
 namespace EditorTools {
     /// <summary>
     /// Phase 7b content (design doc §9.3), called by <see cref="ProjectSetup"/>: 3 elixirs, the stat choices of the stat anvils, the anvils and the shop
-    /// catalog, with their pixel-art icons (the items themselves: LolItemsSetup). Created once and
+    /// catalog, with their pixel-art icons (the items themselves: ItemsSetup). Created once and
     /// never overwritten: prices and stats are placeholders tuned in the assets.
     /// </summary>
     public static class EconomySetup {
@@ -20,9 +20,9 @@ namespace EditorTools {
         private static StatBonus B(StatType s, float v, ModifierType t = ModifierType.Flat) => new(s, t, v);
 
         private static readonly (string id, string name, int cost, StatBonus[] stats)[] Elixirs = {
-            ("Strength", "Élixir de force", 40, new[] { B(StatType.PhysicalAttack, 25), B(StatType.AttackSpeed, 0.15f, ModifierType.PercentAdd) }),
-            ("Sorcery", "Élixir de sorcellerie", 40, new[] { B(StatType.MagicAttack, 40), B(StatType.ManaRegen, 3) }),
-            ("Iron", "Élixir de fer", 40, new[] { B(StatType.MaxHealth, 300), B(StatType.Armor, 20), B(StatType.MagicResist, 20) }),
+            ("Strength", "Tonique de rage", 40, new[] { B(StatType.PhysicalAttack, 25), B(StatType.AttackSpeed, 0.15f, ModifierType.PercentAdd) }),
+            ("Sorcery", "Philtre des arcanes", 40, new[] { B(StatType.MagicAttack, 40), B(StatType.ManaRegen, 3) }),
+            ("Iron", "Potion de rempart", 40, new[] { B(StatType.MaxHealth, 300), B(StatType.Armor, 20), B(StatType.MagicResist, 20) }),
         };
 
         private static readonly (RarityTier rarity, StatBonus[] stats)[] StatChoices = {
@@ -85,7 +85,7 @@ namespace EditorTools {
             Fill(cso.FindProperty("elixirs"), elixirs);
             Fill(cso.FindProperty("statAnvils"), new List<Object> { statAnvil });
             Fill(cso.FindProperty("itemAnvils"), new List<Object> { legendaryAnvil, prismaticAnvil });
-            // items: LolItemsSetup
+            // items: ItemsSetup
             Fill(cso.FindProperty("statChoices"), choices);
             cso.FindProperty("freeAnvil").objectReferenceValue = prismaticAnvil;
             cso.ApplyModifiedPropertiesWithoutUndo();

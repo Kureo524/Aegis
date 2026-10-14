@@ -5,7 +5,7 @@ using Features.Stats;
 namespace Features.Combat {
     /// <summary>
     /// Hit points of a character (design doc §6). Max is the MaxHealth stat: when it grows (level,
-    /// item) current HP grows by the same amount, LoL style; when it shrinks, current is clamped.
+    /// item) current HP grows by the same amount, MOBA style; when it shrinks, current is clamped.
     /// Shields (§6 step 5) absorb damage before HP, the one expiring first is used first; they
     /// fade out when their duration is over (<see cref="Tick"/>).
     /// Pure C#, owned by Character.

@@ -14,7 +14,7 @@ namespace Game.Tests.EditMode {
 
         [SetUp]
         public void SetUp() {
-            // 18 levels, 10 XP each, a skill point on every level (LoL)
+            // 18 levels, 10 XP each, a skill point on every level (MOBA)
             _curve = ScriptableObject.CreateInstance<ExperienceCurve>();
             var so = new SerializedObject(_curve);
             SerializedProperty xp = so.FindProperty("xpToNextLevel");

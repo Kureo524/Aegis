@@ -34,7 +34,7 @@ namespace Features.UI.Panels {
         private void Start() {
             _overlay = MenuStyles.Overlay(out VisualElement box);
             box.style.width = StyleKeyword.Null;
-            box.AddToClassList("ae-draft");   // Arena: big cards straight on the dimmed scene
+            box.AddToClassList("ae-draft");   // Arena draft: big cards straight on the dimmed scene
             _title = MenuStyles.Title("");
             _title.style.marginBottom = 2;
             box.Add(_title);
@@ -64,20 +64,30 @@ namespace Features.UI.Panels {
 
             if (_draft.Phase == AugmentDraftPhase.Choose) {
                 _title.text = $"Augment {StatLabels.Name(_draft.Rarity)}";
-                _subtitle.text = $"Relances restantes : {_draft.RerollsLeft}"
-                                 + (_draft.GoldenReroll ? "   ·   ✦ Relance dorée : la prochaine relance donne une rareté supérieure" : "");
+                _subtitle.text = "Chaque carte peut être relancée une fois (même rareté)"
+                                 + (_draft.GoldenReroll ? "   ·   ✦ Relance dorée disponible : une carte, rareté supérieure" : "");
                 for (int i = 0; i < _draft.Choices.Count; i++) {
                     int index = i;
                     AugmentDefinition a = _draft.Choices[i];
                     VisualElement card = OfferCard.Build(a.Icon, a.DisplayName, StatLabels.Color(a.Rarity), a.Description, "Choisir",
                                                          () => _eventBus.Publish(new AugmentPickRequestedEvent(index)), true);
-                    Button reroll = MenuStyles.Button(_draft.GoldenReroll ? "Relancer ✦" : "Relancer",
+                    int left = i < _draft.CardRerolls.Count ? _draft.CardRerolls[i] : 0;
+                    Button reroll = MenuStyles.Button(left > 1 ? $"Relancer ({left})" : "Relancer",
                                                       () => _eventBus.Publish(new AugmentRerollRequestedEvent(index)));
                     reroll.style.height = 26;
                     reroll.style.fontSize = 12;
                     reroll.style.alignSelf = Align.Stretch;
-                    reroll.SetEnabled(_draft.RerollsLeft > 0);
+                    reroll.SetEnabled(left > 0);
                     card.Add(reroll);
+                    if (_draft.GoldenReroll && a.Rarity != RarityTier.Prismatic) {
+                        Button golden = MenuStyles.Button("✦ Relance dorée",
+                                                          () => _eventBus.Publish(new AugmentRerollRequestedEvent(index, golden: true)));
+                        golden.AddToClassList("ae-button--golden");
+                        golden.style.height = 26;
+                        golden.style.fontSize = 12;
+                        golden.style.alignSelf = Align.Stretch;
+                        card.Add(golden);
+                    }
                     card.AddToClassList("ae-card--augment");
                     card.AddToClassList("ae-card--" + a.Rarity.ToString().ToLowerInvariant());
                     _cards.Add(card);

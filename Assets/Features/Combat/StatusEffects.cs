@@ -52,7 +52,7 @@ namespace Features.Combat {
     /// - Bleed / Burn: one entry per (kind, source); each application adds a stack (up to MaxStacks)
     ///   and refreshes the duration. Damage per second is snapshotted from the applier's stats and
     ///   dealt every <see cref="TickInterval"/>s through the usual damage pipeline.
-    /// - Mark (Ezreal W, §7.6): one at a time, kept with the spell and rank that set it; the
+    /// - Mark (marking spells, §7.6): one at a time, kept with the spell and rank that set it; the
     ///   marker's next hit by anything but that spell consumes it (SpellExecutor.TryDetonateMark).
     /// </summary>
     public sealed class StatusEffects {

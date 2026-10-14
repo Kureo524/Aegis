@@ -15,7 +15,7 @@ using VContainer;
 using VContainer.Unity;
 
 namespace Game.Tests.PlayMode {
-    /// <summary>The LoL items in the real test scene: adaptive force and the passive bricks they use.</summary>
+    /// <summary>The items in the real test scene: adaptive force and the passive bricks they use.</summary>
     public class ItemTests {
         private static IObjectResolver Game => Object.FindFirstObjectByType<Containers.GameLifetimeScope>().Container;
         private static Character Player => Game.Resolve<EnemyDirector>().Player;
@@ -60,7 +60,7 @@ namespace Game.Tests.PlayMode {
             Player.Events.RaiseBasicAttackHit(target, target.TakeDamage(new DamageInfo(amount, DamageType.True, false, true, Player)));
 
         [UnityTest]
-        public IEnumerator Catalog_IsLoLItems_PrismaticsHaveAdaptiveForce_EveryItemHasItsOwnPassive() {
+        public IEnumerator Catalog_PrismaticsHaveAdaptiveForce_EveryItemHasItsOwnPassive() {
             yield return GameFlowSmokeTests.LoadGameScene();
             var items = Game.Resolve<ShopCatalog>().Items;
             Assert.Greater(items.Count, 50);
@@ -74,7 +74,7 @@ namespace Game.Tests.PlayMode {
             yield return GameFlowSmokeTests.LoadGameScene();
             float ad = Player.Stats.Value(StatType.PhysicalAttack), ap = Player.Stats.Value(StatType.MagicAttack);
             Player.Stats.Get(StatType.AdaptiveForce).AddModifier(new StatModifier(50f, ModifierType.Flat, "test"));
-            Assert.AreEqual(ad + 30f, Player.Stats.Value(StatType.PhysicalAttack), 1e-3f, "Ezreal: 50 force = 30 AD");
+            Assert.AreEqual(ad + 30f, Player.Stats.Value(StatType.PhysicalAttack), 1e-3f, "no bonus AP: 50 force = 30 AD");
             Assert.AreEqual(ap, Player.Stats.Value(StatType.MagicAttack), 1e-3f);
 
             Player.Stats.Get(StatType.MagicAttack).AddModifier(new StatModifier(40f, ModifierType.Flat, "rabadon"));
@@ -84,9 +84,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator RunaansHurricane_BoltsHitTheEnemiesAround() {
+        public IEnumerator GaleBow_BoltsHitTheEnemiesAround() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Equip("RunaansHurricane");
+            Equip("GaleBow");
             Character target = Spawn("Enemy_Goblin", new Vector3(3f, 0f, 0f));
             Character a = Spawn("Enemy_Goblin", new Vector3(4.5f, 0f, 1.5f));
             Character b = Spawn("Enemy_Goblin", new Vector3(4.5f, 0f, -1.5f));
@@ -97,9 +97,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator TitanicHydra_CleavesAroundTheTarget() {
+        public IEnumerator ThunderAxe_CleavesAroundTheTarget() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Equip("TitanicHydra");
+            Equip("ThunderAxe");
             Character target = Spawn("Enemy_Goblin", new Vector3(3f, 0f, 0f));
             Character next = Spawn("Enemy_Goblin", new Vector3(4f, 0f, 0.5f));
             Hit(target);
@@ -108,9 +108,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator TrinityForce_ASpellChargesTheNextAttack() {
+        public IEnumerator TriadSigil_ASpellChargesTheNextAttack() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Equip("TrinityForce");
+            Equip("TriadSigil");
             Passive spellblade = Player.Passives.All.Last();
             Character target = Spawn("Enemy_Brute", new Vector3(3f, 0f, 0f));
             float hp = target.Health.Current;
@@ -126,9 +126,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator SunfireAegis_BurnsWhatStandsNextToYou() {
+        public IEnumerator EmberPlate_BurnsWhatStandsNextToYou() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Equip("SunfireAegis");
+            Equip("EmberPlate");
             Character near = Spawn("Enemy_Goblin", new Vector3(1.5f, 0f, 0f));
             Character far = Spawn("Enemy_Goblin", new Vector3(8f, 0f, 0f));
             yield return Until(() => near.Health.Current < near.Health.Max, 2.5f);
@@ -137,9 +137,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator Thornmail_HurtsTheAttacker() {
+        public IEnumerator BrambleMail_HurtsTheAttacker() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Equip("Thornmail");
+            Equip("BrambleMail");
             Character goblin = Spawn("Enemy_Goblin", new Vector3(2f, 0f, 0f));
             Player.TakeDamage(new DamageInfo(10f, DamageType.Physical, false, true, goblin));
             Assert.Less(goblin.Health.Current, goblin.Health.Max);
@@ -147,18 +147,18 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator ArchangelsStaff_TurnsBonusManaIntoAbilityPower() {
+        public IEnumerator SageStaff_TurnsBonusManaIntoAbilityPower() {
             yield return GameFlowSmokeTests.LoadGameScene();
             float ap = Player.Stats.Value(StatType.MagicAttack);
-            Equip("ArchangelsStaff");
+            Equip("SageStaff");
             yield return new WaitForSeconds(0.4f);   // recomputed a few times per second
             Assert.AreEqual(ap + 70f + 6f, Player.Stats.Value(StatType.MagicAttack), 0.5f, "70 + 1 % of 600 bonus mana");
         }
 
         [UnityTest]
-        public IEnumerator BladeOfTheRuinedKing_HitsForAShareOfCurrentHealth() {
+        public IEnumerator GraveFang_HitsForAShareOfCurrentHealth() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Equip("BladeOfTheRuinedKing");
+            Equip("GraveFang");
             Character brute = Spawn("Enemy_Brute", new Vector3(3f, 0f, 0f));
             float before = brute.Health.Current;
             Hit(brute);
@@ -171,9 +171,9 @@ namespace Game.Tests.PlayMode {
         public IEnumerator Boots_OnlyOnePair() {
             yield return GameFlowSmokeTests.LoadGameScene();
             var inventory = Game.Resolve<Inventory>();
-            Assert.IsTrue(inventory.TryAdd(Item("BerserkersGreaves")));
-            Assert.IsFalse(inventory.CanAdd(Item("SorcerersShoes")), "one pair of boots");
-            Assert.IsTrue(inventory.CanAdd(Item("InfinityEdge")));
+            Assert.IsTrue(inventory.TryAdd(Item("DuelistGreaves")));
+            Assert.IsFalse(inventory.CanAdd(Item("MageSlippers")), "one pair of boots");
+            Assert.IsTrue(inventory.CanAdd(Item("SunsteelBlade")));
         }
     }
 }

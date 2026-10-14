@@ -6,7 +6,7 @@ namespace Features.Combat {
     /// <summary>
     /// Projectile of a ranged basic attack, with the damage snapshotted at launch. Pooled by
     /// ProjectileLauncher.
-    /// - Homing (LoL auto-attacks cannot miss): flies to the target's chest; vanishes if the target
+    /// - Homing (MOBA auto-attacks cannot miss): flies to the target's chest; vanishes if the target
     ///   dies in flight.
     /// - Straight (<see cref="LaunchStraight"/>, enemy archers): flies towards where the target was,
     ///   hits the first enemy of the shooter on its way, vanishes after its range: can be dodged.

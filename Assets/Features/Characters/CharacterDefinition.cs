@@ -41,7 +41,7 @@ namespace Features.Characters {
         [SerializeField] private SpellDefinition[] abilities = new SpellDefinition[0];
         [Tooltip("Summoner spell on D (optional; a picked-up summoner spell fills D when it is empty, §9.5).")]
         [SerializeField] private SpellDefinition summonerD;
-        [Tooltip("Summoner spell on F (Flash for Ezreal).")]
+        [Tooltip("Summoner spell on F (the blink, Bond éclair).")]
         [FormerlySerializedAs("signatureAbility")]
         [SerializeField] private SpellDefinition summonerF;
 

@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
   m_Name: Enemy_GoblinShaman
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
-  displayName: "Larve du N\xE9ant"
+  displayName: "Chaman masqu\xE9"
   faction: 1
-  sprite: {fileID: 832645912, guid: 71394f5da8eaa4dbb82f0d4c4c8b4f8d, type: 3}
-  animations: {fileID: 11400000, guid: cc6d8dbd0d8ae5e70bb148f2180d4171, type: 2}
+  sprite: {fileID: -3665226, guid: b42a18126dfd676ca89b3c1896e022a8, type: 3}
+  animations: {fileID: 11400000, guid: ce47d4ada95548302a1993f6351aea61, type: 2}
   portrait: {fileID: 0}
-  bodySize: {x: 0.7, y: 0.88}
+  bodySize: {x: 0.7, y: 1.27}
   baseStats: {fileID: 11400000, guid: 72d07bd7e6642bad79c471187778be67, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: 596890bcea050194bb67fe78db41c412, type: 2}

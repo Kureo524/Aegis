@@ -15,7 +15,7 @@ namespace Features.Controls {
     /// <summary>
     /// Turns the player's pointer commands into orders for the character (design doc §4).
     /// Right click on an enemy: attack it (chase, then auto-attack). Right click on the ground:
-    /// move there, which cancels the attack (a windup in progress is lost), LoL style.
+    /// move there, which cancels the attack (a windup in progress is lost), MOBA style.
     /// Hold Q and left click: attack-move (§4.6) to the clicked point, attacking first the enemy
     /// closest to the click (if any within attackMoveSelectRadius). Aiming lasts while Q is held
     /// (the attack range is shown, each click gives an order); releasing Q, right click or Escape

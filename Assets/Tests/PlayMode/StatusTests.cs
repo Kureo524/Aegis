@@ -140,9 +140,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator Bloodthirster_ShieldsUnderThreshold_OncePerCooldown() {
+        public IEnumerator CrimsonChalice_ShieldsUnderThreshold_OncePerCooldown() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            ItemDefinition guardian = Game.Resolve<ShopCatalog>().Items.First(i => i.name == "Item_Bloodthirster");
+            ItemDefinition guardian = Game.Resolve<ShopCatalog>().Items.First(i => i.name == "Item_CrimsonChalice");
             Player.Passives.Add(guardian.Passive, guardian);
             Player.TakeDamage(new DamageInfo(Player.Health.Max * 0.3f, DamageType.True, false, false, null));
             Assert.AreEqual(0f, Player.Health.Shield, "above 35 %: nothing");
@@ -155,9 +155,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator Firebrand_BasicAttacksBurnTheTarget() {
+        public IEnumerator BurningFist_BasicAttacksBurnTheTarget() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Player.Passives.Add(Augment("Augment_Firebrand"), "test");
+            Player.Passives.Add(Augment("Augment_BurningFist"), "test");
             Character dummy = Dummy();
             var attacker = Player.GetComponent<BasicAttacker>();
             Time.timeScale = 3f;

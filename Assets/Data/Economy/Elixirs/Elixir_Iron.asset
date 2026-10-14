@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 730d23eea89f8f0f3a1b883fea5a79c2, type: 3}
   m_Name: Elixir_Iron
   m_EditorClassIdentifier: Game.Features::Features.Economy.ElixirDefinition
-  displayName: "\xC9lixir de fer"
+  displayName: "Potion de rempart"
   icon: {fileID: 21300000, guid: 83cc8ec0ba214ffe38480c732a8149d6, type: 3}
   cost: 40
   stats:

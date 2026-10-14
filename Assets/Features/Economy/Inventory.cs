@@ -6,7 +6,7 @@ using VContainer.Unity;
 
 namespace Features.Economy {
     /// <summary>
-    /// The run's items (design doc §9.3): 6 slots like LoL, no components, no selling yet. An item's
+    /// The run's items (design doc §9.3): 6 slots like in MOBAs, no components, no selling yet. An item's
     /// stats are applied through PlayerUpgrades with the item slot as Source. Game scope.
     /// </summary>
     public sealed class Inventory : IStartable {

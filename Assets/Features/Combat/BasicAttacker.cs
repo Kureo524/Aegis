@@ -8,7 +8,7 @@ using VContainer;
 
 namespace Features.Combat {
     /// <summary>
-    /// LoL-style basic attack (design doc §4.5): Idle → Chasing → Windup → (impact) → Chasing…
+    /// MOBA-style basic attack (design doc §4.5): Idle → Chasing → Windup → (impact) → Chasing…
     ///
     /// - Chasing: walks to the target until it is within AttackRange (center to center minus the
     ///   target's body radius, §4.6), refreshing the path a few times per second.
@@ -107,7 +107,7 @@ namespace Features.Combat {
             ClearTarget();
         }
 
-        // A windup cut short does not count as an attack (LoL): its timer is given back
+        // A windup cut short does not count as an attack (MOBA): its timer is given back
         private void AbortWindup() {
             if (_state != State.Windup) return;
             _nextAttackTime = _windupStartedAt;
@@ -258,7 +258,7 @@ namespace Features.Combat {
         }
 
         private void OnHit(Character target, float taken) {
-            Spells.SpellExecutor.TryDetonateMark(owner, target, null);   // Ezreal W (§7.6)
+            Spells.SpellExecutor.TryDetonateMark(owner, target, null);   // marking spells (§7.6)
             owner.Events.RaiseBasicAttackHit(target, taken);
             Hit?.Invoke(target, taken);
         }

@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Features.Economy {
     /// <summary>
-    /// An item (design doc §9.3), copied from LoL: stats while it sits in the inventory and its own
+    /// An item (design doc §9.3), MOBA-inspired: stats while it sits in the inventory and its own
     /// passive (same system as characters and augments, design doc §8.1). Legendary items and boots
-    /// are sold in the full shop; prismatic ones (adaptive force, Arena style) only come from item
+    /// are sold in the full shop; prismatic ones (adaptive force, arena-draft style) only come from item
     /// anvils. A unique group allows one item of the group (boots, Spellblade, Hydra…).
     /// </summary>
     [CreateAssetMenu(menuName = "Game/Economy/Item", fileName = "Item_")]
@@ -17,7 +17,7 @@ namespace Features.Economy {
         [SerializeField] private StatBonus[] stats = Array.Empty<StatBonus>();
         [Tooltip("At most one copy in the inventory.")]
         [SerializeField] private bool unique = true;
-        [Tooltip("At most one item of this group in the inventory (LoL: \"Bottes\", \"Lame enchantée\", \"Hydre\"…). Empty = none.")]
+        [Tooltip("At most one item of this group in the inventory (e.g. \"Bottes\", \"Arme runique\", \"Fendoir\"). Empty = none.")]
         [SerializeField] private string uniqueGroup = "";
         [Tooltip("Optional effect on top of the stats.")]
         [SerializeField] private Passives.PassiveDefinition passive;

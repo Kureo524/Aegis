@@ -7,9 +7,9 @@ using UnityEngine.UIElements;
 
 namespace Features.UI {
     /// <summary>
-    /// LoL-style spell bar of the player HUD (design doc §7.9): the champion's passive, Q W E R (icon,
+    /// MOBA-style spell bar of the player HUD (design doc §7.9): the champion's passive, Q W E R (icon,
     /// key, rank pips, "+" when a skill point can rank it up, greyed while not learned) and D F.
-    /// Cooldowns: LoL-style sweep (CooldownSweep) + seconds left, a flash when the spell is ready again. Hover: tooltip with rank, cost, cooldown and description.
+    /// Cooldowns: MOBA-style sweep (CooldownSweep) + seconds left, a flash when the spell is ready again. Hover: tooltip with rank, cost, cooldown and description.
     /// Styled by the theme (.ae-slot…), built in code, fed by PlayerHud.
     /// </summary>
     public sealed class AbilityBarView {

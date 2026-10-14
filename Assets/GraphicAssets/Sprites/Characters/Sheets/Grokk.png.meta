@@ -1,0 +1,1986 @@
+fileFormatVersion: 2
+guid: 3d96603b82cf483edb46a922b6937315
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -24184161331535045
+    second: Grokk_0
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 99.44
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Grokk_000
+      rect:
+        serializedVersion: 2
+        x: 860
+        y: 3549
+        width: 251
+        height: 355
+      alignment: 9
+      pivot: {x: 0.5239, y: 0.2737}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ac309b8e00f839851c73a5658880a04f
+      internalID: 1111269079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_001
+      rect:
+        serializedVersion: 2
+        x: 1113
+        y: 3550
+        width: 252
+        height: 354
+      alignment: 9
+      pivot: {x: 0.5258, y: 0.2717}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0b78c1567be03fcf2955c27e382df11
+      internalID: -1484561806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_002
+      rect:
+        serializedVersion: 2
+        x: 1367
+        y: 3550
+        width: 253
+        height: 354
+      alignment: 9
+      pivot: {x: 0.5277, y: 0.2689}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad0f015f8a344dd7a594c51219abfa53
+      internalID: -458839911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_003
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3191
+        width: 253
+        height: 353
+      alignment: 9
+      pivot: {x: 0.5316, y: 0.264}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb2261da75ed57fb0a375b649a8d7cba
+      internalID: -605551731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_004
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 3193
+        width: 255
+        height: 351
+      alignment: 9
+      pivot: {x: 0.5353, y: 0.2569}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: da74a0ab0b4bd23559b5770d97190ad8
+      internalID: -1547478135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_005
+      rect:
+        serializedVersion: 2
+        x: 681
+        y: 2841
+        width: 256
+        height: 348
+      alignment: 9
+      pivot: {x: 0.541, y: 0.2505}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd23bbf8639e40b68b711709d84c95ef
+      internalID: 818275183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_006
+      rect:
+        serializedVersion: 2
+        x: 939
+        y: 2841
+        width: 257
+        height: 348
+      alignment: 9
+      pivot: {x: 0.5428, y: 0.2476}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af884bb830887b0cca768ba73dce6330
+      internalID: -985250098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_007
+      rect:
+        serializedVersion: 2
+        x: 1198
+        y: 2841
+        width: 257
+        height: 348
+      alignment: 9
+      pivot: {x: 0.5428, y: 0.2476}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f4c929c5d0aaad69b24cfa5d281bdf0
+      internalID: 1503750617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_008
+      rect:
+        serializedVersion: 2
+        x: 1457
+        y: 2841
+        width: 257
+        height: 348
+      alignment: 9
+      pivot: {x: 0.5428, y: 0.2476}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ef903efeca3124f6f3cc1dacec15f061
+      internalID: 338035351
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_009
+      rect:
+        serializedVersion: 2
+        x: 1716
+        y: 2841
+        width: 256
+        height: 348
+      alignment: 9
+      pivot: {x: 0.541, y: 0.2505}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b213067810198d584aa451aaa3f5b23
+      internalID: 2007463620
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_010
+      rect:
+        serializedVersion: 2
+        x: 1382
+        y: 3194
+        width: 255
+        height: 350
+      alignment: 9
+      pivot: {x: 0.5353, y: 0.2548}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: def8e8d038fcebac21c4453a22964067
+      internalID: -1757685134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_011
+      rect:
+        serializedVersion: 2
+        x: 767
+        y: 3193
+        width: 253
+        height: 351
+      alignment: 9
+      pivot: {x: 0.5316, y: 0.2598}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b448e2e15900fe748144cf1fc6dd0722
+      internalID: -40285970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_012
+      rect:
+        serializedVersion: 2
+        x: 255
+        y: 3191
+        width: 253
+        height: 353
+      alignment: 9
+      pivot: {x: 0.5277, y: 0.2668}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 82bab0ea9350488a35bfed6b75bf98d1
+      internalID: 684764801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_013
+      rect:
+        serializedVersion: 2
+        x: 1622
+        y: 3550
+        width: 252
+        height: 354
+      alignment: 9
+      pivot: {x: 0.5258, y: 0.2717}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5ba68b902b746a3e3471fa9a4f7fe8d
+      internalID: -795552097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_014
+      rect:
+        serializedVersion: 2
+        x: 1055
+        y: 871
+        width: 347
+        height: 294
+      alignment: 9
+      pivot: {x: 0.5231, y: 0.0959}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a0c869bb9387b1c7a5389d091f3301f4
+      internalID: 2020748560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_015
+      rect:
+        serializedVersion: 2
+        x: 1260
+        y: 571
+        width: 342
+        height: 290
+      alignment: 9
+      pivot: {x: 0.557, y: 0.1006}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d000732e1e4f64229f86217184e65c0c
+      internalID: -1603058603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_016
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 276
+        width: 319
+        height: 289
+      alignment: 9
+      pivot: {x: 0.5878, y: 0.1217}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b919a34d0b0739972fc49fd2f91682e2
+      internalID: -1344243454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_017
+      rect:
+        serializedVersion: 2
+        x: 1493
+        y: 2150
+        width: 275
+        height: 337
+      alignment: 9
+      pivot: {x: 0.5, y: 0.2498}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 584a7a2efdeb353f39059ed4ea88046e
+      internalID: -999691073
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_018
+      rect:
+        serializedVersion: 2
+        x: 360
+        y: 3547
+        width: 250
+        height: 357
+      alignment: 9
+      pivot: {x: 0.45, y: 0.2694}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d3f0f741a445b32ce33f64e8d05a872
+      internalID: -1207430156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_019
+      rect:
+        serializedVersion: 2
+        x: 1795
+        y: 1492
+        width: 245
+        height: 318
+      alignment: 9
+      pivot: {x: 0.451, y: 0.1515}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dab3149469cd40b13499cbc51a598917
+      internalID: -1032319503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_020
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 1173
+        width: 242
+        height: 309
+      alignment: 9
+      pivot: {x: 0.4525, y: 0.0621}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bce17d097d590cd0b7d1df7aedba49e3
+      internalID: 379616569
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_021
+      rect:
+        serializedVersion: 2
+        x: 864
+        y: 2495
+        width: 244
+        height: 342
+      alignment: 9
+      pivot: {x: 0.4488, y: 0.1029}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3fa2aeaaafb5b6ad557cb0b1410dca24
+      internalID: 466162424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_022
+      rect:
+        serializedVersion: 2
+        x: 428
+        y: 3979
+        width: 249
+        height: 385
+      alignment: 9
+      pivot: {x: 0.4478, y: 0.1901}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 40bcc8aaed9484d9e6954e8433c000b8
+      internalID: -1131343825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_023
+      rect:
+        serializedVersion: 2
+        x: 679
+        y: 3987
+        width: 253
+        height: 377
+      alignment: 9
+      pivot: {x: 0.4526, y: 0.2419}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bce77a8010de61f481c94bc03c12484e
+      internalID: -768446635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_024
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1484
+        width: 257
+        height: 326
+      alignment: 9
+      pivot: {x: 0.4767, y: 0.2275}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6276fbebe3918cce9e42a9e929f8f497
+      internalID: 520585783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_025
+      rect:
+        serializedVersion: 2
+        x: 1404
+        y: 871
+        width: 303
+        height: 294
+      alignment: 9
+      pivot: {x: 0.5363, y: 0.1265}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 12c9a07b19fde782440ab95c390b0cbe
+      internalID: -462115397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_026
+      rect:
+        serializedVersion: 2
+        x: 593
+        y: 2492
+        width: 269
+        height: 345
+      alignment: 9
+      pivot: {x: 0.5372, y: 0.244}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78e4454dd8fe36e443f0a793e5b334e0
+      internalID: -1086313028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_027
+      rect:
+        serializedVersion: 2
+        x: 585
+        y: 569
+        width: 288
+        height: 292
+      alignment: 9
+      pivot: {x: 0.5503, y: 0.1102}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 64aef3159c5b49dafb25e2d0356cfbb7
+      internalID: -1424050425
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_028
+      rect:
+        serializedVersion: 2
+        x: 666
+        y: 277
+        width: 345
+        height: 288
+      alignment: 9
+      pivot: {x: 0.5812, y: 0.084}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d319a591f540c5608cfa182cd48733a8
+      internalID: 609554499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_029
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 863
+        width: 354
+        height: 302
+      alignment: 9
+      pivot: {x: 0.5946, y: 0.0768}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba9b3c056d4e8cd177e28e34334b947c
+      internalID: -441641703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_030
+      rect:
+        serializedVersion: 2
+        x: 1273
+        y: 1175
+        width: 279
+        height: 307
+      alignment: 9
+      pivot: {x: 0.6039, y: 0.1211}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 91e4372b81eaebdc53606739bd40cd57
+      internalID: 1669596103
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_031
+      rect:
+        serializedVersion: 2
+        x: 1217
+        y: 1490
+        width: 319
+        height: 320
+      alignment: 9
+      pivot: {x: 0.5815, y: 0.2006}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a187c178446c9c451f23320bb1aa7883
+      internalID: -397613384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_032
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 1485
+        width: 276
+        height: 325
+      alignment: 9
+      pivot: {x: 0.5634, y: 0.2036}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: acbcff734a49e408f2c95e5d513d49a7
+      internalID: -76876008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_033
+      rect:
+        serializedVersion: 2
+        x: 1639
+        y: 3194
+        width: 233
+        height: 350
+      alignment: 9
+      pivot: {x: 0.5043, y: 0.2519}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59cc319442933d3d09c4c3f9263371cc
+      internalID: 1371280079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_034
+      rect:
+        serializedVersion: 2
+        x: 612
+        y: 3547
+        width: 246
+        height: 357
+      alignment: 9
+      pivot: {x: 0.5142, y: 0.2694}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cec4b85f72c8f53049de6b6448ef633f
+      internalID: -1538029429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_035
+      rect:
+        serializedVersion: 2
+        x: 1357
+        y: 2496
+        width: 250
+        height: 341
+      alignment: 9
+      pivot: {x: 0.526, y: 0.241}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 63749ed610cac99a2453007d2c3a4499
+      internalID: -987342337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_036
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2148
+        width: 251
+        height: 339
+      alignment: 9
+      pivot: {x: 0.5279, y: 0.2365}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d241c5278078c247b45b64933aa984c
+      internalID: -688069291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_037
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 1818
+        width: 279
+        height: 328
+      alignment: 9
+      pivot: {x: 0.4319, y: 0.2262}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f1517ba9ac0e5fc81b4268fdf876a75
+      internalID: 1093685915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_038
+      rect:
+        serializedVersion: 2
+        x: 1310
+        y: 1818
+        width: 287
+        height: 328
+      alignment: 9
+      pivot: {x: 0.378, y: 0.2627}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 83ea8c18bce07d9a85a4991ff4cc14ca
+      internalID: 1695157676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_039
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2839
+        width: 281
+        height: 350
+      alignment: 9
+      pivot: {x: 0.3363, y: 0.3005}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 443402048e9fed8a3d2a65a910d5af9e
+      internalID: -479205198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_040
+      rect:
+        serializedVersion: 2
+        x: 253
+        y: 2148
+        width: 339
+        height: 339
+      alignment: 9
+      pivot: {x: 0.3997, y: 0.2247}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1223148820142b20d0e11b4120e838a3
+      internalID: -1523221228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_041
+      rect:
+        serializedVersion: 2
+        x: 875
+        y: 570
+        width: 383
+        height: 291
+      alignment: 9
+      pivot: {x: 0.4608, y: 0.0831}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0ef66e6fc65e814a24761c89eb9fc93b
+      internalID: -1294102536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_042
+      rect:
+        serializedVersion: 2
+        x: 1013
+        y: 282
+        width: 387
+        height: 283
+      alignment: 9
+      pivot: {x: 0.5233, y: 0.0466}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 39745bb1d83ff7d90377ed6d537dc0c0
+      internalID: 1158559535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_043
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 864
+        width: 370
+        height: 301
+      alignment: 9
+      pivot: {x: 0.6149, y: 0.0172}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 809715105206a8d8fc391049161eecb1
+      internalID: -379568881
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_044
+      rect:
+        serializedVersion: 2
+        x: 1402
+        y: 282
+        width: 344
+        height: 283
+      alignment: 9
+      pivot: {x: 0.7282, y: -0.0029}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7550e9a60f2ce7e7d41c798822d991e3
+      internalID: 122063944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_045
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 276
+        width: 343
+        height: 289
+      alignment: 9
+      pivot: {x: 0.7974, y: -0.0098}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 893e49a4e7a18c6d396dd2636be70e08
+      internalID: -849624369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_046
+      rect:
+        serializedVersion: 2
+        x: 934
+        y: 3988
+        width: 351
+        height: 376
+      alignment: 9
+      pivot: {x: 0.7735, y: 0.1601}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 969c96ab7738c73805cb0d686a9a3e91
+      internalID: -1182735676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_047
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3546
+        width: 358
+        height: 358
+      alignment: 9
+      pivot: {x: 0.7723, y: 0.1709}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 325e4fb9c3a51638edc88101bf254e52
+      internalID: 681367446
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_048
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1167
+        width: 384
+        height: 315
+      alignment: 9
+      pivot: {x: 0.7904, y: 0.1053}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca27fd0b0275fece729ef022b2cee607
+      internalID: -1493951516
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_049
+      rect:
+        serializedVersion: 2
+        x: 634
+        y: 1170
+        width: 393
+        height: 312
+      alignment: 9
+      pivot: {x: 0.8079, y: 0.1096}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc809a915012c0b2711c93a7f92f7b4b
+      internalID: 1880098970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_050
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 2840
+        width: 396
+        height: 349
+      alignment: 9
+      pivot: {x: 0.8093, y: 0.1696}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 146328195ff777fdfd939c9373753dfa
+      internalID: -195747860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_051
+      rect:
+        serializedVersion: 2
+        x: 1539
+        y: 3993
+        width: 399
+        height: 371
+      alignment: 9
+      pivot: {x: 0.8058, y: 0.1973}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8dd8516b7cecf8f06c17b4b491240cf3
+      internalID: -1595882904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_052
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1812
+        width: 245
+        height: 334
+      alignment: 9
+      pivot: {x: 0.5571, y: 0.2401}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0d41a8c87870b5c4a9f2b6a649dae256
+      internalID: 1685762921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_053
+      rect:
+        serializedVersion: 2
+        x: 743
+        y: 1817
+        width: 284
+        height: 329
+      alignment: 9
+      pivot: {x: 0.5475, y: 0.2346}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 682769de5684d7aa7e901fb60a966bb9
+      internalID: -1295617912
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_054
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 2490
+        width: 284
+        height: 347
+      alignment: 9
+      pivot: {x: 0.5651, y: 0.2368}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d64042511fb032d3c2c4da7232cfd43
+      internalID: -422356648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_055
+      rect:
+        serializedVersion: 2
+        x: 594
+        y: 2148
+        width: 251
+        height: 339
+      alignment: 9
+      pivot: {x: 0.5757, y: 0.2483}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9c515a2e5fe0a0ad833f55ea0fafdca
+      internalID: 1495727988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_056
+      rect:
+        serializedVersion: 2
+        x: 1770
+        y: 2151
+        width: 241
+        height: 336
+      alignment: 9
+      pivot: {x: 0.5664, y: 0.2446}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b4ae8216262ecbab49d9cd5a86443e7
+      internalID: 553216308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_057
+      rect:
+        serializedVersion: 2
+        x: 247
+        y: 1812
+        width: 245
+        height: 334
+      alignment: 9
+      pivot: {x: 0.5571, y: 0.2401}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9bac7353b567346a147724ca22dda77c
+      internalID: -908222439
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_058
+      rect:
+        serializedVersion: 2
+        x: 1219
+        y: 2149
+        width: 272
+        height: 338
+      alignment: 9
+      pivot: {x: 0.5423, y: 0.2491}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43e34f30e87fb7109911975b8d3823f0
+      internalID: -1407387865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_059
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2489
+        width: 305
+        height: 348
+      alignment: 9
+      pivot: {x: 0.4475, y: 0.262}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b437622f96c9daa47f02be955e3a8dd0
+      internalID: -1895939040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_060
+      rect:
+        serializedVersion: 2
+        x: 187
+        y: 3940
+        width: 239
+        height: 424
+      alignment: 9
+      pivot: {x: 0.5544, y: 0.2198}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a49d935f3a0a492fa5879ea090f98a8a
+      internalID: 907273538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_061
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3906
+        width: 185
+        height: 458
+      alignment: 9
+      pivot: {x: 0.7649, y: 0.1467}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: beab08da70d21821e5d4e4e205f55518
+      internalID: -1889006514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_062
+      rect:
+        serializedVersion: 2
+        x: 1022
+        y: 3193
+        width: 358
+        height: 351
+      alignment: 9
+      pivot: {x: 0.4372, y: 0.1487}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c587b27c0005d00756b3ac552885eb69
+      internalID: -1842299129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_063
+      rect:
+        serializedVersion: 2
+        x: 847
+        y: 2148
+        width: 370
+        height: 339
+      alignment: 9
+      pivot: {x: 0.5392, y: 0.2424}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb43892db226c0ec02205c4416dad75c
+      internalID: -1007884455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_064
+      rect:
+        serializedVersion: 2
+        x: 1599
+        y: 1819
+        width: 410
+        height: 327
+      alignment: 9
+      pivot: {x: 0.4793, y: 0.288}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c17ec9fe55391d001a130cf17392fc07
+      internalID: 2072866499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_065
+      rect:
+        serializedVersion: 2
+        x: 537
+        y: 1487
+        width: 408
+        height: 323
+      alignment: 9
+      pivot: {x: 0.4718, y: 0.2854}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7632e458bcec08b44fd80322770738a4
+      internalID: 270151939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_066
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 381
+        height: 274
+      alignment: 9
+      pivot: {x: 0.479, y: 0.1393}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca715da33450c0d3378eadb69bacf509
+      internalID: -206357063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_067
+      rect:
+        serializedVersion: 2
+        x: 728
+        y: 869
+        width: 325
+        height: 296
+      alignment: 9
+      pivot: {x: 0.4877, y: 0.1729}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3baca595128f091f4bec854369ef1344
+      internalID: -979659884
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_068
+      rect:
+        serializedVersion: 2
+        x: 947
+        y: 1488
+        width: 268
+        height: 322
+      alignment: 9
+      pivot: {x: 0.5093, y: 0.2211}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 04f4d5aaf1da9a4b94d97fb3435f0153
+      internalID: 13823590
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_069
+      rect:
+        serializedVersion: 2
+        x: 494
+        y: 1813
+        width: 247
+        height: 333
+      alignment: 9
+      pivot: {x: 0.5526, y: 0.2378}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e28c1c1230a6b08a16a48402a172c117
+      internalID: -244129302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_070
+      rect:
+        serializedVersion: 2
+        x: 1709
+        y: 871
+        width: 336
+        height: 294
+      alignment: 9
+      pivot: {x: 0.5074, y: 0.0959}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d4c6b13b57ae4b35c8ae4c2bb0a7d2e
+      internalID: 1984430068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_071
+      rect:
+        serializedVersion: 2
+        x: 1604
+        y: 571
+        width: 328
+        height: 290
+      alignment: 9
+      pivot: {x: 0.5473, y: 0.1041}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e94c5a800e5303018dc284da987a0a7a
+      internalID: -1202461321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_072
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 567
+        width: 296
+        height: 294
+      alignment: 9
+      pivot: {x: 0.549, y: 0.1401}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e442f327ca805c688a44f5abb151dd2
+      internalID: -1576749332
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_073
+      rect:
+        serializedVersion: 2
+        x: 1609
+        y: 2497
+        width: 253
+        height: 340
+      alignment: 9
+      pivot: {x: 0.4526, y: 0.2476}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee7d9ab332c62c24b80cf213c8c74d18
+      internalID: 896780030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_074
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 1168
+        width: 246
+        height: 314
+      alignment: 9
+      pivot: {x: 0.4492, y: 0.1439}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b528185cbcce3ef602dfd9ec81e7ce2
+      internalID: -752062013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_075
+      rect:
+        serializedVersion: 2
+        x: 1554
+        y: 1179
+        width: 242
+        height: 303
+      alignment: 9
+      pivot: {x: 0.4525, y: 0.0435}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53e7ec6b52b0e9a5710d0d5296782231
+      internalID: -1870869474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_076
+      rect:
+        serializedVersion: 2
+        x: 1110
+        y: 2495
+        width: 245
+        height: 342
+      alignment: 9
+      pivot: {x: 0.451, y: 0.0912}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 986a42b031274cc9ada85da645fcb1fa
+      internalID: -701112016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_077
+      rect:
+        serializedVersion: 2
+        x: 1287
+        y: 3988
+        width: 250
+        height: 376
+      alignment: 9
+      pivot: {x: 0.45, y: 0.184}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e5f1ce2a60c542a7b685e42109293cb
+      internalID: -293728003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_078
+      rect:
+        serializedVersion: 2
+        x: 1538
+        y: 1490
+        width: 255
+        height: 320
+      alignment: 9
+      pivot: {x: 0.4647, y: 0.2099}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e1539a123208c96a79b5631a50a479b
+      internalID: 1512031306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grokk_079
+      rect:
+        serializedVersion: 2
+        x: 298
+        y: 567
+        width: 285
+        height: 294
+      alignment: 9
+      pivot: {x: 0.5175, y: 0.1299}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c60a3fcca44bff70b53ea3e9b4bd7bb7
+      internalID: 1864188778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: f7f2dfcbac0886c25a7c5194355ccab4
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Grokk_000: 1111269079
+      Grokk_001: -1484561806
+      Grokk_002: -458839911
+      Grokk_003: -605551731
+      Grokk_004: -1547478135
+      Grokk_005: 818275183
+      Grokk_006: -985250098
+      Grokk_007: 1503750617
+      Grokk_008: 338035351
+      Grokk_009: 2007463620
+      Grokk_010: -1757685134
+      Grokk_011: -40285970
+      Grokk_012: 684764801
+      Grokk_013: -795552097
+      Grokk_014: 2020748560
+      Grokk_015: -1603058603
+      Grokk_016: -1344243454
+      Grokk_017: -999691073
+      Grokk_018: -1207430156
+      Grokk_019: -1032319503
+      Grokk_020: 379616569
+      Grokk_021: 466162424
+      Grokk_022: -1131343825
+      Grokk_023: -768446635
+      Grokk_024: 520585783
+      Grokk_025: -462115397
+      Grokk_026: -1086313028
+      Grokk_027: -1424050425
+      Grokk_028: 609554499
+      Grokk_029: -441641703
+      Grokk_030: 1669596103
+      Grokk_031: -397613384
+      Grokk_032: -76876008
+      Grokk_033: 1371280079
+      Grokk_034: -1538029429
+      Grokk_035: -987342337
+      Grokk_036: -688069291
+      Grokk_037: 1093685915
+      Grokk_038: 1695157676
+      Grokk_039: -479205198
+      Grokk_040: -1523221228
+      Grokk_041: -1294102536
+      Grokk_042: 1158559535
+      Grokk_043: -379568881
+      Grokk_044: 122063944
+      Grokk_045: -849624369
+      Grokk_046: -1182735676
+      Grokk_047: 681367446
+      Grokk_048: -1493951516
+      Grokk_049: 1880098970
+      Grokk_050: -195747860
+      Grokk_051: -1595882904
+      Grokk_052: 1685762921
+      Grokk_053: -1295617912
+      Grokk_054: -422356648
+      Grokk_055: 1495727988
+      Grokk_056: 553216308
+      Grokk_057: -908222439
+      Grokk_058: -1407387865
+      Grokk_059: -1895939040
+      Grokk_060: 907273538
+      Grokk_061: -1889006514
+      Grokk_062: -1842299129
+      Grokk_063: -1007884455
+      Grokk_064: 2072866499
+      Grokk_065: 270151939
+      Grokk_066: -206357063
+      Grokk_067: -979659884
+      Grokk_068: 13823590
+      Grokk_069: -244129302
+      Grokk_070: 1984430068
+      Grokk_071: -1202461321
+      Grokk_072: -1576749332
+      Grokk_073: 896780030
+      Grokk_074: -752062013
+      Grokk_075: -1870869474
+      Grokk_076: -701112016
+      Grokk_077: -293728003
+      Grokk_078: 1512031306
+      Grokk_079: 1864188778
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

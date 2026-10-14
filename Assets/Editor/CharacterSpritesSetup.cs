@@ -12,36 +12,37 @@ using UnityEngine;
 namespace EditorTools {
     /// <summary>
     /// Animated characters (design doc §3), called by <see cref="ProjectSetup"/>: each sheet of
-    /// Assets/GraphicAssets/Sprites/Characters/LoL (frames pre-rendered in Blender from the League of
-    /// Legends models, see the README there) is sliced from its .sheet.json (rect and feet pivot of
-    /// every frame), turned into a SpriteAnimationSet and given to its character definitions, with
-    /// the LoL names of the creatures. Re-runnable: sheets and sets are refreshed, nothing else.
+    /// Assets/GraphicAssets/Sprites/Characters/Sheets (frames pre-rendered in Blender from CC0
+    /// models, see the README there) is sliced from its .sheet.json (rect and feet pivot of every
+    /// frame), turned into a SpriteAnimationSet and given to its character definitions, with the
+    /// creature's name. Re-runnable: sheets and sets are refreshed, nothing else.
     /// </summary>
     public static class CharacterSpritesSetup {
-        public const string SheetsDir = "Assets/GraphicAssets/Sprites/Characters/LoL";
+        public const string SheetsDir = "Assets/GraphicAssets/Sprites/Characters/Sheets";
         private const string AnimDir = "Assets/Data/Characters/Animations";
         private const string Enemies = "Assets/Data/Characters/Enemies";
+        private const string BossTitle = "Démon de la horde";
 
         // sheet → (definitions using it, display name, null = keep)
         private static readonly (string sheet, string[] definitions, string displayName)[] Looks = {
-            ("Ezreal", new[] { ProjectSetup.TestHeroPath }, null),
-            ("MeleeMinion", new[] { $"{Enemies}/Enemy_Goblin.asset" }, "Sbire de mêlée"),
-            ("CasterMinion", new[] { $"{Enemies}/Enemy_SkeletonArcher.asset" }, "Sbire lanceur"),
-            ("SuperMinion", new[] { $"{Enemies}/Enemy_Brute.asset" }, "Super-sbire"),
-            ("MurkWolf", new[] { $"{Enemies}/Enemy_Wolf.asset" }, "Loup sombre"),
-            ("Gromp", new[] { $"{Enemies}/Enemy_SkeletonMage.asset" }, "Gromp"),
-            ("Voidgrub", new[] { $"{Enemies}/Enemy_GoblinShaman.asset" }, "Larve du Néant"),
-            ("Krug", new[] { $"{Enemies}/Enemy_StoneGolem.asset" }, "Krug"),
-            ("RiftHerald", new[] { "Assets/Data/Characters/Bosses/Boss_GoblinKing.asset" }, "Héraut de la Faille"),
-            ("TargetDummy", new[] { "Assets/Data/Characters/TrainingDummy/Enemy_TrainingDummy.asset" }, "Mannequin d'entraînement"),
+            ("Vesna", new[] { ProjectSetup.TestHeroPath }, HeroSetup.HeroName),
+            ("Goblin", new[] { $"{Enemies}/Enemy_Goblin.asset" }, "Gobelin"),
+            ("SkeletonArcher", new[] { $"{Enemies}/Enemy_SkeletonArcher.asset" }, "Archer squelette"),
+            ("Brute", new[] { $"{Enemies}/Enemy_Brute.asset" }, "Brute"),
+            ("Wolf", new[] { $"{Enemies}/Enemy_Wolf.asset" }, "Loup"),
+            ("FrostSpecter", new[] { $"{Enemies}/Enemy_SkeletonMage.asset" }, "Spectre glacial"),
+            ("MaskedShaman", new[] { $"{Enemies}/Enemy_GoblinShaman.asset" }, "Chaman masqué"),
+            ("StoneGolem", new[] { $"{Enemies}/Enemy_StoneGolem.asset" }, "Golem de pierre"),
+            ("Grokk", new[] { "Assets/Data/Characters/Bosses/Boss_GoblinKing.asset" }, "Grokk"),
+            ("TrainingDummy", new[] { "Assets/Data/Characters/TrainingDummy/Enemy_TrainingDummy.asset" }, "Mannequin d'entraînement"),
         };
 
-        // Ezreal's own clip per spell
-        private static readonly (string clip, string spell)[] EzrealSpells = {
-            ("cast_Q", "Assets/Data/Spells/Ezreal/Spell_Ezreal_Q.asset"),
-            ("cast_W", "Assets/Data/Spells/Ezreal/Spell_Ezreal_W.asset"),
-            ("cast_E", "Assets/Data/Spells/Ezreal/Spell_Ezreal_E.asset"),
-            ("cast_R", "Assets/Data/Spells/Ezreal/Spell_Ezreal_R.asset"),
+        // The hero's own clip per spell
+        private static readonly (string clip, string spell)[] HeroSpells = {
+            ("cast_Q", "Assets/Data/Spells/Vesna/Spell_Vesna_Q.asset"),
+            ("cast_W", "Assets/Data/Spells/Vesna/Spell_Vesna_W.asset"),
+            ("cast_E", "Assets/Data/Spells/Vesna/Spell_Vesna_E.asset"),
+            ("cast_R", "Assets/Data/Spells/Vesna/Spell_Vesna_R.asset"),
         };
 
         [System.Serializable] private class Frame { public string clip; public float[] rect; public float[] pivot; }
@@ -171,7 +172,7 @@ namespace EditorTools {
             Fill("dash", "dash");
             Fill("cast", "cast");
 
-            var spells = sheetName == "Ezreal" ? EzrealSpells : System.Array.Empty<(string, string)>();
+            var spells = sheetName == "Vesna" ? HeroSpells : System.Array.Empty<(string, string)>();
             SerializedProperty list = so.FindProperty("spellClips");
             list.arraySize = 0;
             foreach (var (clip, spellPath) in spells) {
@@ -216,7 +217,7 @@ namespace EditorTools {
             var portrait = AssetDatabase.LoadAssetAtPath<Sprite>(portraitPath);
             if (portrait != null) so.FindProperty("portrait").objectReferenceValue = portrait;
             if (displayName != null) so.FindProperty("displayName").stringValue = displayName;
-            if (definition is Features.Enemies.BossDefinition) so.FindProperty("title").stringValue = "Gardien du Néant";
+            if (definition is Features.Enemies.BossDefinition) so.FindProperty("title").stringValue = BossTitle;
             // Body as tall as the sprite stands: health bar over the head, clicks on the body
             if (set.Still != null) {
                 SerializedProperty body = so.FindProperty("bodySize");

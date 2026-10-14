@@ -1,0 +1,2492 @@
+fileFormatVersion: 2
+guid: 966cf3fd8191862848bfc6b52f2624b4
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7589170661830947621
+    second: Vesna_0
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 82.94
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Vesna_000
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 520
+        width: 63
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3611, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1261e3f114dba952e4a3f19687c9e705
+      internalID: 934678258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_001
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 520
+        width: 63
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3611, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4170d9da97a52706501479bf99efaeb
+      internalID: -814755182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_002
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 520
+        width: 63
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3611, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 594de2821b3694e52c5350e530d630e3
+      internalID: 1878164089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_003
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62a82590eb087293ec963025780a691f
+      internalID: -1340774975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_004
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6671e8a356300109a4ed28f7c11f329a
+      internalID: 34684637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_005
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 045540581735a7007ca1bc81f85c5cad
+      internalID: -127074179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_006
+      rect:
+        serializedVersion: 2
+        x: 387
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c5736f7c945c94114e8d98f4f3d3dcc
+      internalID: -1236816043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_007
+      rect:
+        serializedVersion: 2
+        x: 451
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fff1060a05826e345ae8ea9990fdc504
+      internalID: -733425805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_008
+      rect:
+        serializedVersion: 2
+        x: 515
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b007e33c3015d87cd988b3c9b17186d
+      internalID: 2127361480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_009
+      rect:
+        serializedVersion: 2
+        x: 579
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 322d55cbd84f84c9db7ffc70462bb50e
+      internalID: 966033175
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_010
+      rect:
+        serializedVersion: 2
+        x: 643
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6cb7ff72057ce20577b0a400550546cd
+      internalID: 1173919528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_011
+      rect:
+        serializedVersion: 2
+        x: 707
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b48ac56c8b96d1ead214cb7b7f02f0b8
+      internalID: 1508013849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_012
+      rect:
+        serializedVersion: 2
+        x: 771
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5660cd80066117876220d404194d2682
+      internalID: 1658339966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_013
+      rect:
+        serializedVersion: 2
+        x: 835
+        y: 520
+        width: 62
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3508, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7bc39f8eb10613983f8fe4402f1fb0ea
+      internalID: -415200395
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_014
+      rect:
+        serializedVersion: 2
+        x: 899
+        y: 520
+        width: 63
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3611, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e816e7d3c705bf42c4d3e0cb9be2051
+      internalID: -1787352033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_015
+      rect:
+        serializedVersion: 2
+        x: 964
+        y: 520
+        width: 63
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3611, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a07cb5c85a590de1f93705c9066f97fc
+      internalID: 1771224052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_016
+      rect:
+        serializedVersion: 2
+        x: 746
+        y: 383
+        width: 102
+        height: 135
+      alignment: 9
+      pivot: {x: 0.4975, y: 0.1682}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f2e037f52934488edb676adf9e78d91
+      internalID: -502958616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_017
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 112
+        width: 85
+        height: 128
+      alignment: 9
+      pivot: {x: 0.4324, y: 0.1306}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b799f6cd74fc371f6ac492bc74189298
+      internalID: 407646561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_018
+      rect:
+        serializedVersion: 2
+        x: 935
+        y: 123
+        width: 78
+        height: 117
+      alignment: 9
+      pivot: {x: 0.3814, y: 0.0488}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2447a238131cacb903f6aa51b6aa7958
+      internalID: 171168440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_019
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 115
+        width: 96
+        height: 125
+      alignment: 9
+      pivot: {x: 0.487, y: 0.0777}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 357f6588565618c3d1e7450be11891bc
+      internalID: 1072037333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_020
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 382
+        width: 118
+        height: 136
+      alignment: 9
+      pivot: {x: 0.4809, y: 0.1376}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 093ecf8eebd69a3911f5ab6c0f1287be
+      internalID: -1010074581
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_021
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 382
+        width: 116
+        height: 136
+      alignment: 9
+      pivot: {x: 0.4892, y: 0.1449}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c09792ac976bd747e6aef4720dd615ce
+      internalID: -1936875181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_022
+      rect:
+        serializedVersion: 2
+        x: 850
+        y: 383
+        width: 97
+        height: 135
+      alignment: 9
+      pivot: {x: 0.616, y: 0.1534}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 089549c793431fa336beccb216bc6693
+      internalID: 464767663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_023
+      rect:
+        serializedVersion: 2
+        x: 347
+        y: 116
+        width: 80
+        height: 124
+      alignment: 9
+      pivot: {x: 0.5344, y: 0.0944}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f772b6e1edef6b3c3a5290b013d7f046
+      internalID: -1534127533
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_024
+      rect:
+        serializedVersion: 2
+        x: 1185
+        y: 126
+        width: 72
+        height: 114
+      alignment: 9
+      pivot: {x: 0.3438, y: 0.0238}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df74a464c18e8fee884193c0eb8bc8e1
+      internalID: -1705897269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_025
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 115
+        width: 86
+        height: 125
+      alignment: 9
+      pivot: {x: 0.439, y: 0.1017}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f66737f3d33c5b30a981cb4346944421
+      internalID: 737428232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_026
+      rect:
+        serializedVersion: 2
+        x: 1045
+        y: 664
+        width: 95
+        height: 143
+      alignment: 9
+      pivot: {x: 0.5026, y: 0.2008}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: efb9385173a162708ce2fe4b88231a20
+      internalID: -912828199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_027
+      rect:
+        serializedVersion: 2
+        x: 1142
+        y: 664
+        width: 107
+        height: 143
+      alignment: 9
+      pivot: {x: 0.493, y: 0.2078}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0eebe9f3574cc1338db2424ba3de88fc
+      internalID: -1260282353
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_028
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 810
+        width: 108
+        height: 145
+      alignment: 9
+      pivot: {x: 0.4514, y: 0.2049}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: be918fc18238a8826190e063071fcda9
+      internalID: 1987813465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_029
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 810
+        width: 107
+        height: 145
+      alignment: 9
+      pivot: {x: 0.4556, y: 0.2049}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af5c8c1b73482f4916ddb9b6c3817ad3
+      internalID: 1784164508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_030
+      rect:
+        serializedVersion: 2
+        x: 357
+        y: 810
+        width: 103
+        height: 145
+      alignment: 9
+      pivot: {x: 0.4733, y: 0.2049}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c58a3971e6625f69b39ab9f071468f36
+      internalID: 470477306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_031
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 810
+        width: 103
+        height: 145
+      alignment: 9
+      pivot: {x: 0.4733, y: 0.2049}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f302543e2e1d21d641ec8823631f51e
+      internalID: -848442205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_032
+      rect:
+        serializedVersion: 2
+        x: 1157
+        y: 811
+        width: 103
+        height: 144
+      alignment: 9
+      pivot: {x: 0.4733, y: 0.2063}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e5b0fe80cc1248ed3e4095cc5510c626
+      internalID: 1342099256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_033
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 663
+        width: 103
+        height: 144
+      alignment: 9
+      pivot: {x: 0.4733, y: 0.2063}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f90409bd40ec0e6a08379d9d9c93a6fc
+      internalID: -1450639386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_034
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 663
+        width: 105
+        height: 144
+      alignment: 9
+      pivot: {x: 0.4643, y: 0.2063}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa6e93d773a7f268fabd0d63691e25e7
+      internalID: 156277753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_035
+      rect:
+        serializedVersion: 2
+        x: 567
+        y: 810
+        width: 107
+        height: 145
+      alignment: 9
+      pivot: {x: 0.4556, y: 0.2049}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9d157482a1db4ae3e0632da2464d09d0
+      internalID: -189810915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_036
+      rect:
+        serializedVersion: 2
+        x: 676
+        y: 810
+        width: 107
+        height: 145
+      alignment: 9
+      pivot: {x: 0.4556, y: 0.2049}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd0b8eed001802193e2cd01cd97d52e4
+      internalID: -1367062951
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_037
+      rect:
+        serializedVersion: 2
+        x: 785
+        y: 810
+        width: 108
+        height: 145
+      alignment: 9
+      pivot: {x: 0.4514, y: 0.2049}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a83585d6c2a0db99b47b5f051df8bdf4
+      internalID: -456445400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_038
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 520
+        width: 63
+        height: 141
+      alignment: 9
+      pivot: {x: 0.3611, y: 0.1823}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 548997c35f5fa1867ba15ac454f4ea2d
+      internalID: 849538674
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_039
+      rect:
+        serializedVersion: 2
+        x: 1189
+        y: 521
+        width: 64
+        height: 140
+      alignment: 9
+      pivot: {x: 0.3711, y: 0.1836}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61c23852bab2b60b85d78564f284783b
+      internalID: -1491696262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_040
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 378
+        width: 87
+        height: 140
+      alignment: 9
+      pivot: {x: 0.319, y: 0.1908}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78ea6d3aa8a3357d7e529e0a2b6007da
+      internalID: -200065792
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_041
+      rect:
+        serializedVersion: 2
+        x: 1094
+        y: 520
+        width: 93
+        height: 141
+      alignment: 9
+      pivot: {x: 0.4059, y: 0.2036}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb2945f33f2afe3bd2a9ffc1088c476a
+      internalID: 1843476934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_042
+      rect:
+        serializedVersion: 2
+        x: 895
+        y: 810
+        width: 94
+        height: 145
+      alignment: 9
+      pivot: {x: 0.5931, y: 0.2118}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c3aee853a47641ffc40e7f79b27e252c
+      internalID: -835745807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_043
+      rect:
+        serializedVersion: 2
+        x: 711
+        y: 971
+        width: 108
+        height: 148
+      alignment: 9
+      pivot: {x: 0.6829, y: 0.2143}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 948b4ce898f7e4816d37c8223ef9d260
+      internalID: 968616561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_044
+      rect:
+        serializedVersion: 2
+        x: 821
+        y: 971
+        width: 130
+        height: 148
+      alignment: 9
+      pivot: {x: 0.7135, y: 0.2143}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 288eaa1beb1517ede5e3e13c3e188b21
+      internalID: -267515167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_045
+      rect:
+        serializedVersion: 2
+        x: 594
+        y: 382
+        width: 150
+        height: 136
+      alignment: 9
+      pivot: {x: 0.7383, y: 0.1891}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7b7a1045b97a86d4e27502372a945280
+      internalID: 429686660
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_046
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 118
+        width: 163
+        height: 122
+      alignment: 9
+      pivot: {x: 0.7715, y: 0.137}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cdf1e4207a10db21e15390304b3383eb
+      internalID: -1979574679
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_047
+      rect:
+        serializedVersion: 2
+        x: 1015
+        y: 123
+        width: 168
+        height: 117
+      alignment: 9
+      pivot: {x: 0.8318, y: 0.083}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fcaa8a98b16f9ac8829909d1db05bf95
+      internalID: -1239241875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_048
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 122
+        width: 169
+        height: 118
+      alignment: 9
+      pivot: {x: 0.8328, y: 0.1331}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5df708a8f78fb32207c17222d941b06f
+      internalID: -518329741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_049
+      rect:
+        serializedVersion: 2
+        x: 899
+        y: 246
+        width: 178
+        height: 130
+      alignment: 9
+      pivot: {x: 0.7907, y: 0.2362}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 742874ce9b951c495c1f7b31f41c13ec
+      internalID: 1123328316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_050
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 244
+        width: 182
+        height: 132
+      alignment: 9
+      pivot: {x: 0.7734, y: 0.2478}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 215d9e8e7b92cfb4e7a791f058c7703d
+      internalID: -1176723042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_051
+      rect:
+        serializedVersion: 2
+        x: 553
+        y: 244
+        width: 182
+        height: 132
+      alignment: 9
+      pivot: {x: 0.7734, y: 0.2478}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d95fe43d227eb1fba2118f4fca00a10
+      internalID: 397507071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_052
+      rect:
+        serializedVersion: 2
+        x: 1042
+        y: 973
+        width: 66
+        height: 146
+      alignment: 9
+      pivot: {x: 0.375, y: 0.1966}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de9d0a0946a948064898b392adafddc4
+      internalID: -1768240397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_053
+      rect:
+        serializedVersion: 2
+        x: 1110
+        y: 973
+        width: 75
+        height: 146
+      alignment: 9
+      pivot: {x: 0.45, y: 0.1966}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 403604a47a8060a11b5852f2fc7edfa5
+      internalID: -693567935
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_054
+      rect:
+        serializedVersion: 2
+        x: 1187
+        y: 973
+        width: 76
+        height: 146
+      alignment: 9
+      pivot: {x: 0.4572, y: 0.1966}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eb82f70500e3a7b7c10764d289b2ac62
+      internalID: 1017083474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_055
+      rect:
+        serializedVersion: 2
+        x: 991
+        y: 810
+        width: 75
+        height: 145
+      alignment: 9
+      pivot: {x: 0.41, y: 0.198}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a31c102ef6a03fa872ecd9dc664a7b74
+      internalID: 478567072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_056
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 809
+        width: 68
+        height: 146
+      alignment: 9
+      pivot: {x: 0.3934, y: 0.1966}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 46e0107d574b98755c18c720a692ae8c
+      internalID: 563342306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_057
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 809
+        width: 66
+        height: 146
+      alignment: 9
+      pivot: {x: 0.375, y: 0.1966}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2115a6d321085034f126af27cd250c0
+      internalID: 812683004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_058
+      rect:
+        serializedVersion: 2
+        x: 212
+        y: 663
+        width: 82
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2774, y: 0.1994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c5d1817388263395094db1f056e2101
+      internalID: -1944270269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_059
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 663
+        width: 83
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2861, y: 0.1994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b4e7b9359a7037ce81baab450c9f0f0
+      internalID: -1766824986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_060
+      rect:
+        serializedVersion: 2
+        x: 381
+        y: 663
+        width: 82
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2896, y: 0.1994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 40edd1c7fc5df1a99fe79ab2c362e0ac
+      internalID: 143618354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_061
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 663
+        width: 82
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2896, y: 0.1994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 596bb1b82fea14658beb761b4ed2a783
+      internalID: -854267689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_062
+      rect:
+        serializedVersion: 2
+        x: 549
+        y: 663
+        width: 82
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2896, y: 0.1994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9099c29f3d8aa10c86167cbffb9a26bf
+      internalID: 2104938865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_063
+      rect:
+        serializedVersion: 2
+        x: 633
+        y: 663
+        width: 80
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2844, y: 0.1994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e48a7bd74b1f9bfa93c3f3490152260a
+      internalID: 1316391319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_064
+      rect:
+        serializedVersion: 2
+        x: 715
+        y: 663
+        width: 80
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2844, y: 0.1994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 30006b903ed89e3eb0df09ff1281864a
+      internalID: 1693586386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_065
+      rect:
+        serializedVersion: 2
+        x: 797
+        y: 663
+        width: 80
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2844, y: 0.1994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7c599fc867a3e78243f32bc4c0234fa7
+      internalID: -486511595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_066
+      rect:
+        serializedVersion: 2
+        x: 879
+        y: 663
+        width: 80
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2844, y: 0.1994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9c44edcf753bb41b4ed2649e7bc6b1c3
+      internalID: 376608945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_067
+      rect:
+        serializedVersion: 2
+        x: 961
+        y: 663
+        width: 82
+        height: 144
+      alignment: 9
+      pivot: {x: 0.2774, y: 0.1994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d2426a404cf71b4fa6d2b6ea072cc904
+      internalID: 1224362135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_068
+      rect:
+        serializedVersion: 2
+        x: 1079
+        y: 246
+        width: 77
+        height: 130
+      alignment: 9
+      pivot: {x: 0.3994, y: 0.167}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 362951b4b936ce4846b765b0afea547d
+      internalID: -1630989678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_069
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 243
+        width: 84
+        height: 133
+      alignment: 9
+      pivot: {x: 0.4256, y: 0.1632}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7a9b1589d0d1940ffdca6ccf2137900
+      internalID: 231577727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_070
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 242
+        width: 92
+        height: 134
+      alignment: 9
+      pivot: {x: 0.4647, y: 0.162}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e78ef841dc5203da620c95c1115daa5
+      internalID: 393743358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_071
+      rect:
+        serializedVersion: 2
+        x: 737
+        y: 244
+        width: 76
+        height: 132
+      alignment: 9
+      pivot: {x: 0.4836, y: 0.1645}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7ec766df018ac0cdbe1893933bc851a1
+      internalID: -97814841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_072
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 111
+        width: 72
+        height: 129
+      alignment: 9
+      pivot: {x: 0.4688, y: 0.1683}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb299a672fa4044e133015b4b844daed
+      internalID: 1845109959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_073
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 243
+        width: 83
+        height: 133
+      alignment: 9
+      pivot: {x: 0.3825, y: 0.1632}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cdf27a8c3e0ddebcf9907af3ef79c01f
+      internalID: -430807534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_074
+      rect:
+        serializedVersion: 2
+        x: 949
+        y: 383
+        width: 100
+        height: 135
+      alignment: 9
+      pivot: {x: 0.3375, y: 0.1608}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5194d245dd4dc10d6556666fa62bb75d
+      internalID: 395092840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_075
+      rect:
+        serializedVersion: 2
+        x: 1051
+        y: 383
+        width: 98
+        height: 135
+      alignment: 9
+      pivot: {x: 0.3342, y: 0.1608}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8decf8944d4c9a8e41073880aed15d51
+      internalID: -945225758
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_076
+      rect:
+        serializedVersion: 2
+        x: 815
+        y: 244
+        width: 82
+        height: 132
+      alignment: 9
+      pivot: {x: 0.375, y: 0.1645}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 79302899b48bee11bd9a74a18d1825bf
+      internalID: -1444259161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_077
+      rect:
+        serializedVersion: 2
+        x: 1158
+        y: 246
+        width: 77
+        height: 130
+      alignment: 9
+      pivot: {x: 0.3994, y: 0.167}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7432f72c9dda641b1855d1adc479d84f
+      internalID: -1910694573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_078
+      rect:
+        serializedVersion: 2
+        x: 1151
+        y: 383
+        width: 102
+        height: 135
+      alignment: 9
+      pivot: {x: 0.4975, y: 0.1682}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d89364f1500f64a3e88201845fc80926
+      internalID: 1077682815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_079
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 14
+        width: 120
+        height: 95
+      alignment: 9
+      pivot: {x: 0.3229, y: -0.003}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b526d293c9189f77425d1c425bb18360
+      internalID: 450591506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_080
+      rect:
+        serializedVersion: 2
+        x: 703
+        y: 29
+        width: 148
+        height: 80
+      alignment: 9
+      pivot: {x: 0.4105, y: 0.1089}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec7a3f299a87f9dfd30eb887ab5d67b4
+      internalID: -320537172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_081
+      rect:
+        serializedVersion: 2
+        x: 565
+        y: 25
+        width: 136
+        height: 84
+      alignment: 9
+      pivot: {x: 0.5129, y: 0.1632}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1768c2fc20522136630ee4f3d7d2728c
+      internalID: -1732370884
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_082
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 117
+        height: 109
+      alignment: 9
+      pivot: {x: 0.4594, y: 0.2084}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a88e80ebab193d17dc723af59d3c994
+      internalID: -948222204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_083
+      rect:
+        serializedVersion: 2
+        x: 842
+        y: 122
+        width: 91
+        height: 118
+      alignment: 9
+      pivot: {x: 0.4038, y: 0.2518}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06c740ca3937f25c3b76780bba753f65
+      internalID: -863535041
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_084
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 3
+        width: 90
+        height: 106
+      alignment: 9
+      pivot: {x: 0.3972, y: 0.2331}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c81736b4766e7b68342a21633f796cb0
+      internalID: -1696336577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_085
+      rect:
+        serializedVersion: 2
+        x: 853
+        y: 37
+        width: 106
+        height: 72
+      alignment: 9
+      pivot: {x: 0.5071, y: 0.1904}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9730921ee50bd101e84780909aa33479
+      internalID: -462222380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_086
+      rect:
+        serializedVersion: 2
+        x: 442
+        y: 21
+        width: 121
+        height: 88
+      alignment: 9
+      pivot: {x: 0.4773, y: 0.1104}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f3a194ec8aa829ff6d5377fd828727b
+      internalID: -2064376950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_087
+      rect:
+        serializedVersion: 2
+        x: 119
+        y: 0
+        width: 107
+        height: 109
+      alignment: 9
+      pivot: {x: 0.4089, y: 0.2634}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d0c2e8d5e47a837159e9f8f14e46615
+      internalID: -1665156994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_088
+      rect:
+        serializedVersion: 2
+        x: 594
+        y: 120
+        width: 75
+        height: 120
+      alignment: 9
+      pivot: {x: 0.37, y: 0.1976}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 46ab703d3828162edef015d0a686777f
+      internalID: 943523172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_089
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 242
+        width: 102
+        height: 134
+      alignment: 9
+      pivot: {x: 0.4975, y: 0.1695}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 093462fb1fd19b93cba521d8184f6dbf
+      internalID: 1620771036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_090
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 380
+        width: 87
+        height: 138
+      alignment: 9
+      pivot: {x: 0.5833, y: 0.1646}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b6fe4d586c128f53b4f8293689a38dc
+      internalID: -1800595575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_091
+      rect:
+        serializedVersion: 2
+        x: 178
+        y: 380
+        width: 87
+        height: 138
+      alignment: 9
+      pivot: {x: 0.5833, y: 0.1646}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8ee7c8babd508e84abc307557d914fcd
+      internalID: 1965488958
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_092
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 964
+        width: 116
+        height: 155
+      alignment: 9
+      pivot: {x: 0.4375, y: 0.1465}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49121be8f1a6c622494b432c8eda187e
+      internalID: -991597785
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_093
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 965
+        width: 93
+        height: 154
+      alignment: 9
+      pivot: {x: 0.5457, y: 0.1475}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72014143824d4124c2da5e191d311de8
+      internalID: 757682830
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_094
+      rect:
+        serializedVersion: 2
+        x: 509
+        y: 970
+        width: 87
+        height: 149
+      alignment: 9
+      pivot: {x: 0.5833, y: 0.1524}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9254a634fc96518b17d58094c88f8547
+      internalID: 1517011339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_095
+      rect:
+        serializedVersion: 2
+        x: 953
+        y: 971
+        width: 87
+        height: 148
+      alignment: 9
+      pivot: {x: 0.5833, y: 0.1535}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6359c8fc0a75a8fe538b2dc9adb4af26
+      internalID: -1621285555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_096
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 960
+        width: 92
+        height: 159
+      alignment: 9
+      pivot: {x: 0.5516, y: 0.1428}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e6312c28b732d1e46f63c1810f5f147d
+      internalID: -942931453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_097
+      rect:
+        serializedVersion: 2
+        x: 1068
+        y: 810
+        width: 87
+        height: 145
+      alignment: 9
+      pivot: {x: 0.5833, y: 0.1566}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c467873ea6f81cae809197e6607bbba9
+      internalID: 1749316024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_098
+      rect:
+        serializedVersion: 2
+        x: 204
+        y: 962
+        width: 90
+        height: 157
+      alignment: 9
+      pivot: {x: 0.5639, y: 0.1447}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2833794fbb9b9ca0fd932b3608a4657a
+      internalID: -1616097590
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_099
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 957
+        width: 108
+        height: 162
+      alignment: 9
+      pivot: {x: 0.4699, y: 0.1402}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9bb3d9ca906203efc70edfb3cc6872ba
+      internalID: -1164352436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_100
+      rect:
+        serializedVersion: 2
+        x: 598
+        y: 970
+        width: 111
+        height: 149
+      alignment: 9
+      pivot: {x: 0.4572, y: 0.1524}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73f3abff6537d241d859849ae3f51153
+      internalID: -656259366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vesna_101
+      rect:
+        serializedVersion: 2
+        x: 267
+        y: 380
+        width: 87
+        height: 138
+      alignment: 9
+      pivot: {x: 0.5833, y: 0.1646}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a2575bdf91fb520ad18f1a803bff0e16
+      internalID: 816979017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 2f0922349a66c4986b676016846237b8
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Vesna_000: 934678258
+      Vesna_001: -814755182
+      Vesna_002: 1878164089
+      Vesna_003: -1340774975
+      Vesna_004: 34684637
+      Vesna_005: -127074179
+      Vesna_006: -1236816043
+      Vesna_007: -733425805
+      Vesna_008: 2127361480
+      Vesna_009: 966033175
+      Vesna_010: 1173919528
+      Vesna_011: 1508013849
+      Vesna_012: 1658339966
+      Vesna_013: -415200395
+      Vesna_014: -1787352033
+      Vesna_015: 1771224052
+      Vesna_016: -502958616
+      Vesna_017: 407646561
+      Vesna_018: 171168440
+      Vesna_019: 1072037333
+      Vesna_020: -1010074581
+      Vesna_021: -1936875181
+      Vesna_022: 464767663
+      Vesna_023: -1534127533
+      Vesna_024: -1705897269
+      Vesna_025: 737428232
+      Vesna_026: -912828199
+      Vesna_027: -1260282353
+      Vesna_028: 1987813465
+      Vesna_029: 1784164508
+      Vesna_030: 470477306
+      Vesna_031: -848442205
+      Vesna_032: 1342099256
+      Vesna_033: -1450639386
+      Vesna_034: 156277753
+      Vesna_035: -189810915
+      Vesna_036: -1367062951
+      Vesna_037: -456445400
+      Vesna_038: 849538674
+      Vesna_039: -1491696262
+      Vesna_040: -200065792
+      Vesna_041: 1843476934
+      Vesna_042: -835745807
+      Vesna_043: 968616561
+      Vesna_044: -267515167
+      Vesna_045: 429686660
+      Vesna_046: -1979574679
+      Vesna_047: -1239241875
+      Vesna_048: -518329741
+      Vesna_049: 1123328316
+      Vesna_050: -1176723042
+      Vesna_051: 397507071
+      Vesna_052: -1768240397
+      Vesna_053: -693567935
+      Vesna_054: 1017083474
+      Vesna_055: 478567072
+      Vesna_056: 563342306
+      Vesna_057: 812683004
+      Vesna_058: -1944270269
+      Vesna_059: -1766824986
+      Vesna_060: 143618354
+      Vesna_061: -854267689
+      Vesna_062: 2104938865
+      Vesna_063: 1316391319
+      Vesna_064: 1693586386
+      Vesna_065: -486511595
+      Vesna_066: 376608945
+      Vesna_067: 1224362135
+      Vesna_068: -1630989678
+      Vesna_069: 231577727
+      Vesna_070: 393743358
+      Vesna_071: -97814841
+      Vesna_072: 1845109959
+      Vesna_073: -430807534
+      Vesna_074: 395092840
+      Vesna_075: -945225758
+      Vesna_076: -1444259161
+      Vesna_077: -1910694573
+      Vesna_078: 1077682815
+      Vesna_079: 450591506
+      Vesna_080: -320537172
+      Vesna_081: -1732370884
+      Vesna_082: -948222204
+      Vesna_083: -863535041
+      Vesna_084: -1696336577
+      Vesna_085: -462222380
+      Vesna_086: -2064376950
+      Vesna_087: -1665156994
+      Vesna_088: 943523172
+      Vesna_089: 1620771036
+      Vesna_090: -1800595575
+      Vesna_091: 1965488958
+      Vesna_092: -991597785
+      Vesna_093: 757682830
+      Vesna_094: 1517011339
+      Vesna_095: -1621285555
+      Vesna_096: -942931453
+      Vesna_097: 1749316024
+      Vesna_098: -1616097590
+      Vesna_099: -1164352436
+      Vesna_100: -656259366
+      Vesna_101: 816979017
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

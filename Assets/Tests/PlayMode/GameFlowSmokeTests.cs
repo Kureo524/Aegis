@@ -266,13 +266,13 @@ namespace Game.Tests.PlayMode {
             Object.FindFirstObjectByType<CameraController>().GetComponent<Camera>().WorldToScreenPoint(world);
 
         [UnityTest]
-        public IEnumerator Abilities_RankUpWithSkillPoints_LoLStyle() {
+        public IEnumerator Abilities_RankUpWithSkillPoints() {
             yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
             var abilities = player.GetComponent<Features.Spells.AbilityCaster>();
             var bus = Root.Resolve<IEventBus>();
-            Assert.AreEqual("Ezreal", player.Definition.DisplayName);
+            Assert.AreEqual("Vesna", player.Definition.DisplayName);
 
             string feedback = null;
             Features.Events.AbilitiesChangedEvent state = default;
@@ -300,7 +300,7 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator MysticShot_HitsTheAimedDummy_PaysMana_HitRefundsCooldown() {
+        public IEnumerator EmberSpray_TheConeHitsTheAimedDummy_PaysMana_Slows() {
             yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
@@ -311,16 +311,16 @@ namespace Game.Tests.PlayMode {
             Key(bus, 0, levelUp: true);
             float manaBefore = player.Mana.Current;
             float cost = abilities.ManaCost(0);
-            Assert.AreEqual(28f, cost, 1e-3f, "Q rank 1");
+            Assert.AreEqual(25f, cost, 1e-3f, "Q rank 1");
 
             Key(bus, 0);                                           // A: aim
             Assert.IsTrue(targeting.IsAiming);
             bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(dummy.transform.position)));
             Assert.IsFalse(targeting.IsAiming);
             yield return WaitFor(() => dummy.Health.Current < dummy.Health.Max, 3f);
-            Assert.Less(dummy.Health.Current, dummy.Health.Max, "Q hit the dummy");
+            Assert.Less(dummy.Health.Current, dummy.Health.Max, "the cone hit the dummy");
+            Assert.IsTrue(dummy.Status.IsSlowed, "and slowed it");
             Assert.LessOrEqual(player.Mana.Current, manaBefore - cost + player.Stats.Value(Features.Stats.StatType.ManaRegen) * 3f, "mana paid");
-            Assert.Less(abilities.CooldownRemaining(0), 5.5f - 1.5f + 0.01f, "the hit took 1.5 s off the cooldown");
             Assert.Greater(abilities.CooldownRemaining(0), 0f);
 
             string feedback = null;
@@ -330,7 +330,7 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator EssenceFlux_MarksTheTarget_ABasicAttackDetonatesIt_AndGivesManaBack() {
+        public IEnumerator AshBomb_ExplodesAtThePoint_AndBurnsTheArea() {
             yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
@@ -340,22 +340,14 @@ namespace Game.Tests.PlayMode {
             float hp = dummy.Health.Current;
 
             Key(bus, 1);
-            bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(dummy.transform.position)));
-            yield return WaitFor(() => dummy.Status.IsMarkedBy(player), 3f);
-            Assert.IsTrue(dummy.Status.IsMarkedBy(player), "W sticks to the dummy");
-            Assert.AreEqual(hp, dummy.Health.Current, 1e-3f, "no damage before the detonation");
-
-            player.Mana.Set(100f);                                 // room for the refund
-            float mana = player.Mana.Current;
-            player.GetComponent<Features.Combat.BasicAttacker>().Attack(dummy);
-            yield return WaitFor(() => !dummy.Status.IsMarked, 5f);
-            Assert.IsFalse(dummy.Status.IsMarked, "the basic attack detonated the mark");
-            Assert.Greater(player.Mana.Current, mana + 55f, "60 mana given back");
-            Assert.Less(dummy.Health.Current, hp - 80f, "the detonation dealt W's damage");
+            bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(dummy.transform.position + new Vector3(0.8f, 0f, 0f))));
+            yield return WaitFor(() => dummy.Health.Current < hp, 3f);
+            Assert.Less(dummy.Health.Current, hp - 30f, "the blast hit the dummy next to the point");
+            Assert.IsTrue(dummy.Status.IsBurning, "the area burns");
         }
 
         [UnityTest]
-        public IEnumerator ArcaneShift_BlinksTowardsTheCursor_ThenBoltsTheNearestEnemy() {
+        public IEnumerator Roll_DodgesTowardsTheCursor_ThenAttackSpeed() {
             yield return LoadGameScene();
             yield return null;
             var player = FindPlayer();
@@ -364,15 +356,15 @@ namespace Game.Tests.PlayMode {
             Key(bus, 2, levelUp: true);                            // learn E
             Vector3 start = player.transform.position;
             Vector3 towards = SpellMathFlat(start, dummy.transform.position);
+            float speed = player.Stats.Value(Features.Stats.StatType.AttackSpeed);
 
             Key(bus, 2);
             bus.Publish(new Systems.Inputs.Events.ConfirmEvent(ScreenOf(start + towards * 3f)));
-            yield return new WaitForSeconds(0.4f);                 // 0.25 s cast
+            yield return new WaitForSeconds(0.3f);                 // 0.1 s cast
             Vector3 moved = player.transform.position - start;
             moved.y = 0f;
-            Assert.Greater(Vector3.Dot(moved, towards), 2.5f, "blinked towards the cursor");
-            yield return WaitFor(() => dummy.Health.Current < dummy.Health.Max, 3f);
-            Assert.Less(dummy.Health.Current, dummy.Health.Max, "the bolt found the dummy");
+            Assert.Greater(Vector3.Dot(moved, towards), 2.5f, "rolled towards the cursor");
+            Assert.Greater(player.Stats.Value(Features.Stats.StatType.AttackSpeed), speed * 1.3f, "+40 % attack speed");
         }
 
         private static Vector3 SpellMathFlat(Vector3 from, Vector3 to) =>
@@ -393,7 +385,7 @@ namespace Game.Tests.PlayMode {
 
             Vector3 moved = player.transform.position - start;
             moved.y = 0f;
-            Assert.AreEqual(abilities.Spell(Features.Spells.AbilitySlots.SummonerF).Range, moved.magnitude, 0.3f, "full Flash range, however close the cursor");
+            Assert.AreEqual(abilities.Spell(Features.Spells.AbilitySlots.SummonerF).Range, moved.magnitude, 0.3f, "full blink range, however close the cursor");
             Assert.Less(moved.x, -4f, "towards the cursor");
             Assert.Greater(abilities.CooldownRemaining(Features.Spells.AbilitySlots.SummonerF), 19f);
 
@@ -485,7 +477,7 @@ namespace Game.Tests.PlayMode {
                 Key(bus, f);
                 bus.Publish(new Systems.Inputs.Events.CancelEvent());
                 Key(bus, f, released: true);
-                Assert.AreEqual(0f, abilities.CooldownRemaining(f), "cancelled: no Flash");
+                Assert.AreEqual(0f, abilities.CooldownRemaining(f), "cancelled: no blink");
 
                 // Normal mode: releasing the key keeps the aim, the left click casts
                 options.CastMode = Systems.Inputs.CastMode.Normal;

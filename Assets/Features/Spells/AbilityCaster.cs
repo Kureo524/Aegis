@@ -8,7 +8,7 @@ using VContainer;
 
 namespace Features.Spells {
     /// <summary>
-    /// The player's spells, LoL style (design doc §7): 6 slots (AbilitySlots) = the champion's Q W E R
+    /// The player's spells, MOBA style (design doc §7): 6 slots (AbilitySlots) = the champion's Q W E R
     /// abilities and the D F summoner spells. Player prefab variant only (enemies cast through
     /// EnemyAI / PatternRunner).
     ///
@@ -18,7 +18,7 @@ namespace Features.Spells {
     /// - Confirm: mana paid (× (1 − ManaCostReduction)), SpellCaster.Cast at the ability's rank,
     ///   cooldown = the rank's cooldown × 100 / (100 + AbilityHaste) (summoner spells ignore haste).
     /// - Ctrl + key / HUD "+": spends a skill point on the ability (AbilityRanks).
-    /// - CharacterEvents.CooldownRefund (Ezreal Q) shortens the 4 abilities' cooldowns.
+    /// - CharacterEvents.CooldownRefund (cooldown refund on hit) shortens the 4 abilities' cooldowns.
     /// - A picked-up summoner spell (§9.5) fills D when it is empty, for one use.
     /// </summary>
     public class AbilityCaster : MonoBehaviour {
@@ -167,7 +167,7 @@ namespace Features.Spells {
             _eventBus.Publish(new CooldownStartedEvent(slot, cooldown));
         }
 
-        /// <summary>Shortens the cooldowns of the 4 abilities (Ezreal Q hits).</summary>
+        /// <summary>Shortens the cooldowns of the 4 abilities (cooldown refund on hit).</summary>
         public void ReduceCooldowns(float seconds) {
             for (int slot = 0; slot < AbilitySlots.AbilityCount; slot++) {
                 if (_readyAt[slot] <= Time.time) continue;

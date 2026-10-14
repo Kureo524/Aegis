@@ -1,29 +1,27 @@
-# Head-and-shoulders portraits (HUD) of each character: front 3/4, low pitch, idle pose.
+# Head-and-shoulders portraits (HUD) of the hero and the boss: front 3/4, low pitch, idle pose.
 import bpy, sys, os, json, math
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 import common
 ROOT = os.environ.get('AEGIS_BAKE', '/tmp/aegis-bake')
-cfg = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'chars.json')))
-FRAME = {'Ezreal': (0.77, 0.42), 'RiftHerald': (0.6, 0.6), 'MurkWolf': (0.55, 0.7), 'Krug': (0.55, 0.6), 'Gromp': (0.55, 0.65), 'Voidgrub': (0.5, 0.8)}
-for name, c in cfg.items():
-    if name not in ('Ezreal', 'RiftHerald'): continue
+cfg = json.load(open(os.path.join(HERE, 'chars.json')))
+FRAME = {'Vesna': (0.8, 0.42), 'Grokk': (0.62, 0.6)}
+for name, (center, size) in FRAME.items():
+    c = cfg[name]
     common.reset()
-    arm, meshes = common.import_glb(f'{ROOT}/lol/glb/{c["glb"]}.glb')
-    for o in list(bpy.data.objects):
-        if o.type == 'MESH' and o.name.startswith('Icosphere'): bpy.data.objects.remove(o)
-    meshes = [o for o in bpy.data.objects if o.type == 'MESH']
+    arm, meshes = common.import_glb(os.path.join(ROOT, c['src']))
+    common.drop_helpers(); meshes = [o for o in bpy.data.objects if o.type == 'MESH']
+    if c.get('recolor'): common.recolor({k: tuple(v) for k, v in c['recolor'].items()})
     idle = c['clips']['idle'][0]
-    common.play(arm, idle); bpy.context.scene.frame_set(int(bpy.data.actions[idle].frame_range[0]))
-    lo, hi = common.bounds(meshes)
-    h = hi.z - lo.z
-    center, size = FRAME.get(name, (0.65, 0.55))
+    act = common.play(arm, idle); bpy.context.scene.frame_set(int(act.frame_range[0]) + 3)
+    lo, hi = common.bounds(meshes); h = hi.z - lo.z
     common.PITCH = 12
-    cam = common.setup_scene(512, h * size, lo.z + h * center, 0)
+    common.setup_scene(512, h * size, lo.z + h * center, 0)
     pivot = bpy.data.objects.new('pivot', None); bpy.context.scene.collection.objects.link(pivot)
     for o in bpy.context.scene.objects:
         if o.type in ('CAMERA', 'LIGHT'): o.parent = pivot
     pivot.rotation_euler.z = math.radians(-25)
     bpy.context.scene.eevee.taa_render_samples = 64
-    bpy.context.scene.render.filepath = f'{ROOT}/sprites/Portrait_{name}.png'
+    bpy.context.scene.render.filepath = os.path.join(ROOT, 'sprites', f'Portrait_{name}.png')
     bpy.ops.render.render(write_still=True)
     print('PORTRAIT', name)

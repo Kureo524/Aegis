@@ -12,7 +12,7 @@ using VContainer;
 using VContainer.Unity;
 
 namespace Game.Tests.PlayMode {
-    /// <summary>The LoL-style HUD and shop (design doc §7.9, §9.3) in the real test scene.</summary>
+    /// <summary>The MOBA-style HUD and shop (design doc §7.9, §9.3) in the real test scene.</summary>
     public class HudTests {
         private static IObjectResolver Game => Object.FindFirstObjectByType<Containers.GameLifetimeScope>().Container;
 
@@ -31,7 +31,7 @@ namespace Game.Tests.PlayMode {
             yield return null;
             Assert.AreEqual(12, HudRoot.Query(className: "ae-stat").ToList().Count, "12 stats in the panel");
             Assert.AreEqual(6, HudRoot.Query(className: "ae-item").ToList().Count, "6 item slots");
-            Game.Resolve<Inventory>().TryAdd(Item("InfinityEdge"));
+            Game.Resolve<Inventory>().TryAdd(Item("SunsteelBlade"));
             yield return null;
             Assert.AreEqual(1, HudRoot.Query(className: "ae-item").ToList().Count(e => !e.ClassListContains("ae-slot--empty")));
             Assert.IsNotNull(HudRoot.Q(className: "ae-portrait__image").resolvedStyle.backgroundImage.sprite, "champion portrait");
@@ -41,7 +41,7 @@ namespace Game.Tests.PlayMode {
         public IEnumerator Hud_BuffBar_ShowsAChargedSpellblade() {
             yield return GameFlowSmokeTests.LoadGameScene();
             var player = Game.Resolve<EnemyDirector>().Player;
-            ItemDefinition trinity = Item("TrinityForce");
+            ItemDefinition trinity = Item("TriadSigil");
             player.Passives.Add(trinity.Passive, trinity);
             player.Events.RaiseSpellCast(player.Definition.Abilities[0]);
             float end = Time.time + 2f;
@@ -58,7 +58,7 @@ namespace Game.Tests.PlayMode {
             var panel = Object.FindFirstObjectByType<ShopPanel>();
             VisualElement root = panel.GetComponent<UIDocument>().rootVisualElement;
             Assert.Greater(root.Query(className: "ae-offer").ToList().Count, 50, "every offer in the grid");
-            ItemDefinition edge = Item("InfinityEdge");
+            ItemDefinition edge = Item("SunsteelBlade");
             panel.Select(edge);
             Assert.AreSame(edge, panel.Selected);
             Assert.IsTrue(root.Query<Label>(className: "ae-detail__name").ToList().Any(l => l.text == edge.DisplayName), "details of the selection");

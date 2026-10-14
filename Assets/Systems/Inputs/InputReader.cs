@@ -124,7 +124,7 @@ namespace Systems.Inputs {
 
         /// <summary>
         /// Moves every single-letter keyboard binding to where that letter is on <paramref name="layout"/>,
-        /// except the positional ones (LoL keys stay where QWERTY has them: A Z E R in AZERTY).
+        /// except the positional ones (MOBA keys stay where QWERTY has them: A Z E R in AZERTY).
         /// </summary>
         public static void ApplyKeyboardLayout(InputActionAsset asset, KeyboardLayout layout) {
             const string prefix = "<Keyboard>/";

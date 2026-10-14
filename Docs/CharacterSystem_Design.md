@@ -81,7 +81,7 @@ Déplacement sur le plan **XZ** (vue de dessus), caméra inclinée, sprites en b
 
 ### Sprites animés (14/10/2026)
 
-Les personnages sont des **sprites pré-rendus depuis les modèles 3D de League of Legends** (export GLB de modelviewer.lol, rendu Blender headless, `Tools/SpriteBaking`) : caméra orthographique à l'inclinaison du jeu (~51°), vue 3/4 tournée vers la droite (flip pour la gauche), contour sombre, pivot aux pieds, découpe serrée par image. Une `SpriteAnimationSet` (SO, par personnage) porte les clips **idle, course, attaque, coup reçu, mort, ruée** et un **clip par sort** (Ezreal : Q W E R), avec le moment d'impact de l'attaque. `CharacterVisual` les joue : idle / course (cadence calée sur la vitesse réelle), ruée pendant une charge, attaque **étirée pour que l'impact tombe à la fin du windup**, clip du sort à chaque `SpellCaster.Cast`, figé sous étourdissement ; à la mort, `DeathAnimationEvent` → **`DeathAnimations`** (service du scope de jeu) joue le clip à l'endroit puis l'estompe pendant que le corps retourne au pool. **Ombre portée** douce sous chaque personnage (`Character.shadow`). Bestiaire LoL : sbire de mêlée (ex-gobelin), sbire lanceur (ex-archer), super-sbire (ex-brute), loup sombre, Gromp (ex-mage), larve du Néant (ex-chaman), Krug (ex-golem), Héraut de la Faille (boss, « Gardien du Néant »), mannequin de l'outil d'entraînement. Les tailles affichées sont calées par rapport à Ezreal, et la hauteur du corps (`BodySize.y`) sur le sprite.
+Les personnages sont des **sprites pré-rendus depuis des modèles 3D CC0** (Quaternius, rendu Blender headless, `Tools/SpriteBaking` ; le mannequin est modélisé par le script) : caméra orthographique à l'inclinaison du jeu (~51°), vue 3/4 tournée vers la droite (flip pour la gauche), contour sombre, pivot aux pieds, découpe serrée par image. Une `SpriteAnimationSet` (SO, par personnage) porte les clips **idle, course, attaque, coup reçu, mort, ruée** et un **clip par sort** (Vesna : Q W E R), avec le moment d'impact de l'attaque. `CharacterVisual` les joue : idle / course (cadence calée sur la vitesse réelle), ruée pendant une charge, attaque **étirée pour que l'impact tombe à la fin du windup**, clip du sort à chaque `SpellCaster.Cast`, figé sous étourdissement ; à la mort, `DeathAnimationEvent` → **`DeathAnimations`** (service du scope de jeu) joue le clip à l'endroit puis l'estompe pendant que le corps retourne au pool. **Ombre portée** douce sous chaque personnage (`Character.shadow`). Bestiaire (14/10/2026) : gobelin, archer squelette, brute, loup, spectre glacial (ex-mage squelette), chaman masqué, golem de pierre, Grokk (boss, « Démon de la horde »), mannequin d'entraînement. Les tailles affichées sont calées par rapport au héros, et la hauteur du corps (`BodySize.y`) sur le sprite.
 
 ### Prefabs (en place)
 
@@ -409,7 +409,9 @@ S'applique au délai de chaque sort du champion (§7.4) ; les sorts d'invocateur
 
 ---
 
-## 7. Sorts de champion (modèle LoL)
+## 7. Sorts de champion
+
+> **Contenu original (14/10/2026)** : le jeu s'inspire du modèle MOBA (sorts Q W E R à rangs, objets à passif, augments en draft) mais **ne reprend plus aucun contenu de League of Legends** : champion, sorts, objets, augments, sorts d'invocateur, élixirs, monstres, modèles et icônes sont originaux ou libres (Quaternius CC0, Kenney CC0, game-icons.net CC BY 3.0). Les sections historiques ci-dessous gardent la trace des étapes précédentes.
 
 > **Refonte du 13/10/2026** : la mécanique d'éléments (empiler A/Z/E puis lancer avec R, 19 recettes par perso) est **abandonnée** au profit du modèle de League of Legends : **chaque champion a ses propres sorts** Q W E R, un passif et deux sorts d'invocateur. Personnage d'essai : **Ezreal**.
 
@@ -475,20 +477,22 @@ Composant du variant `Player`, 6 emplacements (`AbilitySlots` : Q W E R D F) :
 - **1 point de compétence à chaque niveau, de 1 à 18** (`ExperienceCurve.LastSkillPointLevel = 18`) : 5 + 5 + 5 + 3 = 18.
 - `AbilityRanks` (C# pur, testé) : un rang n'est accessible qu'au niveau écrit dans le sort (Q W E : rang n au niveau 2n − 1 ; R : 6 / 11 / 16) ; un sort au rang 0 ne peut pas être lancé. Refus expliqués (« Disponible au niveau 6 », « Rang maximum », « Aucun point de compétence »).
 
-### 7.8 Ezreal (personnage d'essai)
+### 7.8 Vesna, la Lanceuse de braises (champion, 14/10/2026)
 
-Valeurs de LoL (portées et vitesses / 100), `EzrealSetup` :
+Champion **original** (remplace l'Ezreal d'essai : tout contenu repris de LoL a été retiré le 14/10/2026). Lanceuse de feu à distance qui enchaîne sorts et attaques chargées. `HeroSetup` (réécrit à chaque setup) :
 
 | Sort | Effet |
 |---|---|
-| **Passif — Sursaut de puissance** | chaque sort qui touche donne +10 % vitesse d'attaque pendant 6 s, cumulable 5 fois (stacks `PerSpellHit`) |
-| **Q — Tir mystique** | skillshot (portée 12) : 20/45/70/95/120 + 130 % AD + 15 % AP physiques ; effets à l'impact ; toucher réduit ses délais de 1,5 s ; 5,5 → 4,5 s ; 28 → 40 mana |
-| **W — Flux d'essence** | skillshot qui marque 4 s ; une attaque ou un autre sort fait exploser la marque : 80/135/190/245/300 + 60 % AD bonus + 70 % AP magiques, et rend 60 → 100 mana ; 8 s ; 50 mana |
-| **E — Transfert arcanique** | blink (4,75) puis trait sur l'ennemi le plus proche (marqué en priorité, rayon 7,5) : 80/130/180/230/280 + 50 % AD bonus + 75 % AP ; 26 → 14 s ; 90 mana |
-| **R — Barrage de précision** | 1 s d'incantation, vague large (rayon 1,6) qui traverse tout sur 30 : 350/550/750 + 100 % AD bonus + 90 % AP ; 120/105/90 s ; 100 mana |
-| **F — Flash** | blink de longueur fixe (4,5) vers le curseur, 20 s |
+| **Passif — Surchauffe** | après un sort, la prochaine attaque (dans les 6 s) explose : 15 + 50 % AD magiques aux ennemis à moins de 2,5 m de la cible, qui brûle 2 s (`Charge` + `Splash` + `ApplyStatus`, une charge peut déclencher plusieurs effets) |
+| **Q — Gerbe de braises** | cône (5,5 m, 55°) : 30/55/80/105/130 + 110 % AD + 30 % AP physiques, ralentit de 25 % 1 s ; 5 → 3 s ; 25 → 37 mana |
+| **W — Bombe de cendres** | zone au point visé (portée 9, rayon 2,6) : 70/110/150/190/230 + 40 % AD bonus + 60 % AP magiques, brûlure 3 s ; 10 → 8 s ; 60 mana |
+| **E — Roulade** | saut de 4 m vers le curseur puis +40 → 80 % vitesse d'attaque 3 s (pour encaisser la Surchauffe) ; 16 → 10 s ; 40 mana |
+| **R — Pluie de braises** | après 0,9 s, large zone (portée 16, rayon 4,5) : 300/475/650 + 100 % AD bonus + 90 % AP magiques, étourdit 1 s, brûle 3 s ; 100/85/70 s ; 100 mana |
+| **F — Bond éclair** | saut de longueur fixe (4,5) vers le curseur, 20 s |
 
-Stats : 600 PV (+102), 375 mana (+70), 62 AD (+2,5), 0,625 AS (+2,5 %), portée 5,5, 24 armure (+4,7), 30 RM (+1,3), régénération de mana **3/s (+0,15)** au lieu de 1,7 : les hordes demandent plus de sorts qu'une phase de lane (provisoire).
+Stats : 590 PV (+100), 360 mana (+65), 60 AD (+2,6), 0,66 AS (+2,5 %), portée 5,5, 24 armure (+4,5), 30 RM (+1,3), régénération de mana 3/s (+0,15). Modèle : aventurière Quaternius (CC0) recolorée aux tons de braise, braise lumineuse dans la main.
+
+Les briques `Mark` et `CooldownRefundOnHit` (marques, remboursement de délai) restent dans le moteur pour de futurs champions.
 
 ### 7.9 UI
 
@@ -500,7 +504,7 @@ Stats : 600 PV (+102), 375 mana (+70), 62 AD (+2,5), 0,625 AS (+2,5 %), portée 
 - Enclumes et augments : cartes du thème, bordure à la couleur de la rareté, survol qui soulève la carte. HUD du haut et barre de boss au thème.
 - **Polish (13/10/2026)** : recharge des sorts en **balayage circulaire** façon LoL (`CooldownSweep`, Painter2D) et **flash** de la case quand le sort redevient prêt ; **flash rouge et écrasement** du sprite à chaque coup subi (`CharacterVisual.PlayHit`) ; **anneau doré** à la montée de niveau ; **bannières de vague** en fondu zoomé (serif dorée) ; **écran d'augments façon Arena** (pas de fenêtre, trois grandes cartes 290 × 400 sur fond de la rareté, survol qui les soulève) ; **menu principal** en français au thème (titre AEGIS / La Horde, fond nocturne pixel-art avec les yeux de la horde à l'horizon).
 
-- **Refonte « pro » (14/10/2026)** : HUD en **dock d'un seul tenant collé au bas de l'écran** (panneaux en dégradé, liseré or, ornement au-dessus du centre), barres PV / mana avec reflet et **graduations LoL** (trait tous les 100 PV, plus marqué tous les 1000), or avec pièce ; **icônes officielles LoL** (Data Dragon / CommunityDragon : sorts, Flash, objets, élixirs, augments d'Arena, stats ; voir `Sprites/ICONS.md`) ; barres de vie des unités façon LoL (cadre noir, fond sombre, reflet, graduations sur le joueur et les boss, largeur selon la taille). **Aucune UGUI** : tout est en UI Toolkit, le package `com.unity.ugui` n'est plus une dépendance du projet (il reste une dépendance interne d'URP).
+- **Refonte « pro » (14/10/2026)** : HUD en **dock d'un seul tenant collé au bas de l'écran** (panneaux en dégradé, liseré or, ornement au-dessus du centre), barres PV / mana avec reflet et **graduations LoL** (trait tous les 100 PV, plus marqué tous les 1000), or avec pièce ; **icônes générées depuis game-icons.net** (CC BY 3.0, `Tools/IconBaking` : glyphe sur fond en dégradé par catégorie ou rareté ; crédits dans `Sprites/ICONS.md`) ; barres de vie des unités façon LoL (cadre noir, fond sombre, reflet, graduations sur le joueur et les boss, largeur selon la taille). **Aucune UGUI** : tout est en UI Toolkit, le package `com.unity.ugui` n'est plus une dépendance du projet (il reste une dépendance interne d'URP).
 
 ## 8. CharacterDefinition (le "preset" de perso)
 
@@ -706,6 +710,8 @@ public class ElixirDefinition : ScriptableObject {   // consommable acheté en b
 
 ### 9.4 Augments (façon Arena)
 
+> **Relances (corrigé le 14/10/2026)** : **chaque carte a sa propre relance par choix d'augments** (`AugmentCatalog.RerollsPerCard` = 1, + bonus méta « Second regard »), remise à zéro à chaque draft ; une relance **garde la rareté** de la carte. La **relance dorée** (5 % des drafts) est un **bouton à part**, une seule fois par draft : elle relance une carte en rareté + 1. Seule elle change une rareté.
+
 - `AugmentDefinition` (SO) : nom, icône, **rareté** (Argent / Or / Prismatique), effets = `PassiveDefinition` et/ou `StatModifierData`, **capacités accordées**, tags/prérequis. Le système est **générique** : n'importe quel effet exprimable par ces briques est un augment valide.
 - **4 slots d'augments** de base (`AugmentSlots`), **augmentables jusqu'à 6** (`MaxAugmentSlots`).
 - **Draft** : **toutes les 3 vagues**, selon le `WaveRewardSchedule` (§9.3), **1 augment parmi 3** (jeu en pause). Les **3 choix sont de la même rareté de base**.
@@ -807,7 +813,7 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 - `MetaProgress` (service racine) : monnaie et niveaux, `TryBuy` / `RefusalReason`, sauvegarde JSON (`meta.json` dans `persistentDataPath`, `meta.editor.json` dans l'éditeur ; les tests PlayMode la mettent de côté), gain sur `RunEndedEvent` → `MetaRewardEvent` (affiché sur l'écran de fin).
 - `RunModifiers` (scope de jeu) lit l'arbre du champion au début de la run : vies en plus (`RunDirector`), puis `MetaApplier` au `PlayerSpawnedEvent` : modificateurs de stats (Source = le nœud), or de départ, relances d'augment, augment de départ.
 - Écran **Progression** du menu (`MetaPanel`) : nœuds par colonnes reliés à leurs prérequis (doré si acquis), niveau, bouton « Améliorer · coût », infobulle (effet actuel / suivant / raison du refus).
-- Arbre d'Ezreal (`MetaSetup`, valeurs provisoires) : Entraînement (+3 AD/niv.), Endurance (+40 PV), Bourse (+60 or) → Précision (+3 % crit), Concentration (+4 haste), Cuirasse (+4 armure/RM), Second regard (+1 relance) → Flux de mana, Vigueur, Faveur (augment de départ) → Maîtrise (+4 % AD), Pas léger (+3 % vitesse), Héritage (+1 vie).
+- Arbre de Vesna (`MetaSetup`, valeurs provisoires) : Entraînement (+3 AD/niv.), Endurance (+40 PV), Bourse (+60 or) → Précision (+3 % crit), Concentration (+4 haste), Cuirasse (+4 armure/RM), Second regard (+1 relance par carte) → Flux de mana, Vigueur, Faveur (augment de départ) → Maîtrise (+4 % AD), Pas léger (+3 % vitesse), Héritage (+1 vie).
 
 ### 9.8 Technique & perf
 - **Object Pooling** : `UnityEngine.Pool.ObjectPool<T>` (intégré), via `PrefabPool` (`Systems.Pooling`, service du `GameLifetimeScope` : un pool par prefab, instances créées par le conteneur). Utilisé par les projectiles et les VFX de sorts.
@@ -872,7 +878,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **8** ✅ | `CharacterEvents`, passifs (briques génériques : stats, triggers, stacks, ennemis proches), capacités (`SpellCrit`), augments (4 → 6 slots, relances, relance dorée, slots pleins), passifs d'items, loot (enclume à stats, sorts d'invocateur) | Builds variés |
 | **9** 🟡 | Boss à patterns et items ✅ (9a). Statuts (stun, root, silence, ralentissement, saignement, brûlure, ténacité), soins et boucliers, statuts sur les sorts, +14 items, +7 augments ✅ (9b). 4 nouveaux ennemis (loup, mage squelette, chaman gobelin, golem de pierre) ✅ (9c). *Reste : nouveaux éléments et sorts (avec un deuxième personnage), équilibrage.* | Prototype riche |
 | **10** 🟡 | **Refonte LoL** : sorts par champion (Q W E R à rangs, D F), Ezreal, touches par position, dézoom de la caméra ✅. Objets de LoL (65, passif propre, force adaptative sur les prismatiques, groupes uniques) ✅. Rééquilibrage (bot `BalanceSimulation`) ✅. UI façon LoL ✅ (§7.9). *Reste : boutique complète plus tôt dans le calendrier des récompenses (à valider), boss encore dur.* | Ezreal jouable |
-| **11** 🟡 | Méta-progression : monnaie persistante, arbre d'Ezreal, écran Progression, bonus appliqués en début de run ✅ (§9.7). *Reste : `RunSnapshot` (quitter/reprendre), polish, audio.* | Prototype solide |
+| **11** 🟡 | Contenu 100 % original (Vesna, objets, augments, bestiaire, icônes) ✅. Méta-progression : monnaie persistante, arbre du champion, écran Progression, bonus appliqués en début de run ✅ (§9.7). *Reste : `RunSnapshot` (quitter/reprendre), polish, audio.* | Prototype solide |
 
 ---
 
@@ -1091,7 +1097,7 @@ Un **`GameLifetimeScope` par stage** donne gratuitement la **remise à zéro** d
 | Options | **`GameOptions`** (valeurs par défaut : volumes, qualité, sensibilité, bindings par défaut) ; les choix du joueur (`UserOptions`) sont **sauvegardés en JSON** par-dessus |
 | Catalogues | `CharacterCatalog`, `ItemCatalog`, `AugmentCatalog`, `StageCatalog` |
 
-**Nommage** : `Char_<Nom>`, `Enemy_<Nom>`, `Spell_<Champion>_<Touche>` (ex. `Spell_Ezreal_Q`), `Item_<Nom>`, `Aug_<Nom>`, `Stage_<Nom>`, `Wave_<Stage>_<N>`.
+**Nommage** : `Char_<Nom>`, `Enemy_<Nom>`, `Spell_<Champion>_<Touche>` (ex. `Spell_Vesna_Q`), `Item_<Nom>`, `Aug_<Nom>`, `Stage_<Nom>`, `Wave_<Stage>_<N>`.
 
 ### 14.6 Arborescence et assemblies
 
@@ -1136,7 +1142,7 @@ Assets/
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
 ├── Editor/                  Game.Editor — ProjectSetup, CharacterPrefabSetup, EnemySetup, RunSetup, EconomySetup, PassiveSetup, BossSetup, TestSceneSetup, BuildScript
 ├── Data/                    Settings/ (GameFlowSettings, CameraSettings, ControlsSettings, SpellSettings, HordeSettings, VContainerSettings),
-│                            Spells/Ezreal/ (Spell_Ezreal_Q…R), Spells/Signature/Spell_Flash,
+│                            Spells/Vesna/ (Spell_Vesna_Q…R), Spells/Signature/Spell_Flash,
 │                            Progression/ExperienceCurve, Characters/TestHero/ (Char_TestHero…),
 │                            Characters/TrainingDummy/ (Enemy_TrainingDummy : 1000 PV, 30 armure/RM, 150 XP),
 │                            Characters/Enemies/ (Enemy_Goblin, Enemy_SkeletonArcher, Enemy_Brute + StatBlock / BasicAttack),
@@ -1147,7 +1153,7 @@ Assets/
 ├── GameAssets/ActionMaps/   Game.Input — GameActionMaps (.inputactions + C# généré)
 ├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy, Enemy, Boss),
 │                            Combat/ (Projectile_ArcaneBolt, Projectile_Skillshot, Vfx_SpellShape)
-├── GraphicAssets/           Sprites/ (Characters/…, Items/…, Augments/…, Spells/ (Flash, Ezreal_*), Status/…, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
+├── GraphicAssets/           Sprites/ (Characters/…, Items/…, Augments/…, Spells/ (Flash, Vesna_*), Status/…, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
 ├── Scenes/                  Releases/Menu, Tests/TestScene (+ Releases/Game : ancienne scène WASD, hors build)
 ├── Tests/                   EditMode/, PlayMode/
 └── UI Toolkit/   Settings/

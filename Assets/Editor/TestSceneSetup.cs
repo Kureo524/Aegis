@@ -240,7 +240,7 @@ namespace EditorTools {
             var panel = Object.FindFirstObjectByType<AugmentPanel>();
             if (panel == null) panel = CreateOverlayDocument<AugmentPanel>("AugmentPanel");
             scope.augmentPanel = panel;
-            // The augment slots and the items are part of the PlayerHud now (LoL-style HUD)
+            // The augment slots and the items are part of the PlayerHud now (MOBA-style HUD)
             if (scope.playerHud != null) GameObjectUtility.RemoveMonoBehavioursWithMissingScript(scope.playerHud.gameObject);
             EditorUtility.SetDirty(scope);
         }

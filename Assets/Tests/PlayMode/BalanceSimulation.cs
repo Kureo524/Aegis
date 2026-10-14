@@ -27,10 +27,10 @@ using VContainer.Unity;
 
 namespace Game.Tests.PlayMode {
     /// <summary>
-    /// Balancing tool (design doc §9, not part of the regular suite: [Explicit]). A bot plays Ezreal
+    /// Balancing tool (design doc §9, not part of the regular suite: [Explicit]). A bot plays Vesna
     /// through the whole test stage at high speed, through the same inputs as the player (quick
     /// cast): it kites, casts Q / W at the nearest enemy, E and Flash away when low, R into groups,
-    /// ranks R &gt; Q &gt; W &gt; E, buys an Ezreal build and takes the first augment. One line per wave
+    /// ranks R &gt; Q &gt; W &gt; E, buys an attack build and takes the first augment. One line per wave
     /// (time to the quota, lowest HP, level, gold, items) goes to the file named by the
     /// AEGIS_BALANCE_LOG environment variable (Temp/balance.log by default).
     /// Run it with -testFilter BalanceSimulation.
@@ -38,8 +38,8 @@ namespace Game.Tests.PlayMode {
     [Explicit("Balancing tool: long, run on demand.")]
     public class BalanceSimulation {
         private static readonly string[] Build = {
-            "Item_EssenceReaver", "Item_BerserkersGreaves", "Item_KrakenSlayer", "Item_InfinityEdge",
-            "Item_LordDominiksRegards", "Item_Bloodthirster",
+            "Item_RuneSickle", "Item_DuelistGreaves", "Item_TideBreaker", "Item_SunsteelBlade",
+            "Item_GiantsBane", "Item_CrimsonChalice",
         };
         private const float Speed = 4f;
         private static readonly int[] RankOrder = { 3, 0, 1, 2 };
@@ -64,7 +64,7 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest, Timeout(3_000_000)]
-        public IEnumerator EzrealBot_PlaysTheTestStage() {
+        public IEnumerator HeroBot_PlaysTheTestStage() {
             yield return SceneManager.LoadSceneAsync("TestScene", LoadSceneMode.Single);
             yield return null;
             _root = VContainerSettings.Instance.GetOrCreateRootLifetimeScopeInstance().Container;

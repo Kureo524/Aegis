@@ -22,7 +22,7 @@ namespace Features.Characters {
         public event Action<SpellDefinition> SpellCast;
         /// <summary>This character dashed or teleported (from, to).</summary>
         public event Action<UnityEngine.Vector3, UnityEngine.Vector3> Blink;
-        /// <summary>A hit asks to reduce this character's ability cooldowns (seconds, Ezreal Q).</summary>
+        /// <summary>A hit asks to reduce this character's ability cooldowns (seconds, refund Q).</summary>
         public event Action<float> CooldownRefund;
         /// <summary>This character's level went up (new level).</summary>
         public event Action<int> LevelUp;

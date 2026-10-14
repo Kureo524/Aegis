@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_Vesna_Q
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: Gerbe de braises
+  description: "Projette une gerbe de braises devant Vesna : 30/55/80/105/130 (+110
+    % AD) (+30 % AP) d\xE9g\xE2ts physiques aux ennemis du c\xF4ne, ralentis de 25
+    % pendant 1 s."
+  icon: {fileID: 21300000, guid: 91f4c39882ec987cf80730a4f9693502, type: 3}
+  color: {r: 1, g: 0.55, b: 0.2, a: 1}
+  rankUnlockLevels: 0100000003000000050000000700000009000000
+  baseDamage:
+  - 30
+  - 55
+  - 80
+  - 105
+  - 130
+  cooldowns:
+  - 5
+  - 4.5
+  - 4
+  - 3.5
+  - 3
+  manaCosts:
+  - 25
+  - 28
+  - 31
+  - 34
+  - 37
+  targeting: 3
+  range: 5.5
+  radius: 0.5
+  coneAngle: 55
+  castTime: 0.2
+  canMoveWhileCasting: 0
+  kind: 1
+  adRatio: 1.1
+  bonusAdRatio: 0
+  apRatio: 0.3
+  buffs: []
+  statuses:
+  - Kind: 3
+    Duration: 1
+    Power: 0.25
+    ScalingStat: 0
+    Ratio: 0
+    TargetMaxHealthRatio: 0
+    MaxStacks: 1
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
+  affectsAllies: 0
+  projectileSpeed: 20
+  pierce: 0
+  blink: 0
+  fixedRange: 0
+  appliesOnHit: 0
+  cooldownRefundOnHit: 0
+  mark:
+    Enabled: 0
+    Duration: 0
+    ManaRefund: []
+  blinkBoltRadius: 0
