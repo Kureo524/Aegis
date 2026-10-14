@@ -71,6 +71,7 @@ namespace Containers {
             builder.RegisterEntryPoint<EnemyDirector>().AsSelf();
             builder.RegisterEntryPoint<HordeSpawner>().AsSelf();
             builder.RegisterEntryPoint<Wallet>().AsSelf();
+            builder.RegisterEntryPoint<Features.Characters.DeathAnimations>().AsSelf();
             builder.RegisterComponent(cameraController);
             if (quitOverlay != null) builder.RegisterComponent(quitOverlay);
             if (characterDebugPanel != null) builder.RegisterComponent(characterDebugPanel);
