@@ -38,7 +38,8 @@ namespace Game.Tests.EditMode {
             _legendaries.Clear();
             for (int i = 0; i < 8; i++)
                 _legendaries.Add(Make<ItemDefinition>($"Legendary{i}", ("cost", 100), ("tier", ItemTier.Legendary),
-                                                      ("stats", Bonus(StatType.PhysicalAttack, 10 + i))));
+                                                      ("stats", Bonus(StatType.PhysicalAttack, 10 + i)),
+                                                      ("roles", i < 4 ? ItemRole.Mage : ItemRole.Tank)));
             var prismatics = new List<ItemDefinition>();
             for (int i = 0; i < 4; i++)
                 prismatics.Add(Make<ItemDefinition>($"Prismatic{i}", ("tier", ItemTier.Prismatic), ("stats", Bonus(StatType.MagicAttack, 50))));
@@ -157,6 +158,22 @@ namespace Game.Tests.EditMode {
             Assert.AreSame(after, _shop.AnvilChoices[1], "1 reroll per choice");
             _shop.Choose(1);
             Assert.IsTrue(_inventory.Contains((ItemDefinition)after));
+        }
+
+        [Test]
+        public void RoleAnvil_OffersOnlyItemsOfItsRole() {
+            var mageAnvil = Make<AnvilDefinition>("MageAnvil", ("kind", AnvilKind.Item), ("itemTier", ItemTier.Legendary), ("cost", 80),
+                                                  ("rerollsPerChoice", 1), ("role", ItemRole.Mage));
+            Break();
+            for (int n = 0; n < 5; n++) {
+                Assert.IsTrue(_shop.TryBuy(mageAnvil));
+                Assert.AreEqual(3, _shop.AnvilChoices.Count);
+                foreach (ScriptableObject c in _shop.AnvilChoices) Assert.AreEqual(ItemRole.Mage, ((ItemDefinition)c).Roles, "mage items only");
+                _shop.Reroll(0);
+                Assert.AreEqual(ItemRole.Mage, ((ItemDefinition)_shop.AnvilChoices[0]).Roles, "rerolls too");
+                _shop.Choose(0);
+                _shop.TrySell(0);
+            }
         }
 
         [Test]

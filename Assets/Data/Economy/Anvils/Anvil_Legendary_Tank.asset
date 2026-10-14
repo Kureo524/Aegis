@@ -10,16 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ab9e4dd1b98301f939dbf9ef63a71145, type: 3}
-  m_Name: Anvil_Legendary
+  m_Name: Anvil_Legendary_Tank
   m_EditorClassIdentifier: Game.Features::Features.Economy.AnvilDefinition
-  displayName: "Enclume l\xE9gendaire"
-  icon: {fileID: 21300000, guid: 4733198591c3fd5af869a6048ed49769, type: 3}
+  displayName: "Enclume l\xE9gendaire du tank"
+  icon: {fileID: 21300000, guid: 67030a670526e885ca0e79d0b7c29358, type: 3}
   kind: 1
   rarityWeights:
   - 70
   - 25
   - 5
   itemTier: 0
-  cost: 220
+  cost: 280
   choiceCount: 3
   rerollsPerChoice: 1
+  role: 8

@@ -310,6 +310,51 @@ namespace EditorTools {
             }
             RenameElixirs();
             ArmGrokk();
+            RoleAnvils(catalog);
+        }
+
+        // ---- Legendary anvils by role (design doc §9.3): 3 legendary items of that role, 1 reroll each ----
+
+        private const int RoleAnvilCost = 280;
+        private static readonly (ItemRole role, string id, string name)[] AnvilRoles = {
+            (ItemRole.Marksman, "Marksman", "Enclume légendaire du tireur"), (ItemRole.Mage, "Mage", "Enclume légendaire du mage"),
+            (ItemRole.Fighter, "Fighter", "Enclume légendaire du combattant"), (ItemRole.Assassin, "Assassin", "Enclume légendaire de l'assassin"),
+            (ItemRole.Tank, "Tank", "Enclume légendaire du tank"),
+        };
+
+        private static void RoleAnvils(ShopCatalog catalog) {
+            if (catalog == null) return;
+            string dir = $"{EconomySetup.Dir}/Anvils";
+            var anvils = new List<Object>();
+            var prismatic = AssetDatabase.LoadAssetAtPath<AnvilDefinition>($"{dir}/Anvil_Prismatic.asset");
+            if (prismatic != null) anvils.Add(prismatic);
+            foreach ((ItemRole role, string id, string name) in AnvilRoles) {
+                string path = $"{dir}/Anvil_Legendary_{id}.asset";
+                var anvil = AssetDatabase.LoadAssetAtPath<AnvilDefinition>(path);
+                if (anvil == null) {
+                    anvil = ScriptableObject.CreateInstance<AnvilDefinition>();
+                    AssetDatabase.CreateAsset(anvil, path);
+                }
+                string icon = $"{IconsDir}/Anvil_Legendary_{id}.png";
+                EconomySetup.ConfigureIcon(icon);
+                var so = new SerializedObject(anvil);
+                so.FindProperty("displayName").stringValue = name;
+                so.FindProperty("icon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(icon);
+                so.FindProperty("kind").enumValueIndex = (int)AnvilKind.Item;
+                so.FindProperty("itemTier").enumValueIndex = (int)ItemTier.Legendary;
+                so.FindProperty("cost").intValue = RoleAnvilCost;
+                so.FindProperty("rerollsPerChoice").intValue = 1;
+                so.FindProperty("role").intValue = (int)role;
+                so.ApplyModifiedPropertiesWithoutUndo();
+                anvils.Add(anvil);
+            }
+            var cso = new SerializedObject(catalog);
+            SerializedProperty list = cso.FindProperty("itemAnvils");
+            list.arraySize = anvils.Count;
+            for (int k = 0; k < anvils.Count; k++) list.GetArrayElementAtIndex(k).objectReferenceValue = anvils[k];
+            cso.ApplyModifiedPropertiesWithoutUndo();
+            // The generic legendary anvil is replaced by these
+            if (AssetDatabase.LoadAssetAtPath<AnvilDefinition>($"{dir}/Anvil_Legendary.asset") != null) AssetDatabase.DeleteAsset($"{dir}/Anvil_Legendary.asset");
         }
 
         private static ItemDefinition ItemOnce(Item i) {
