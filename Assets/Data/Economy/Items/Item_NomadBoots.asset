@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Bottes du nomade
   icon: {fileID: 21300000, guid: 66cbb6646bddf4132943affdb5c65e89, type: 3}
-  cost: 110
+  cost: 160
   tier: 0
   stats:
   - Stat: 15
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: Bottes
   passive: {fileID: 11400000, guid: 1532cb17180cf830587e1c8b2210ea68, type: 2}
+  roles: 31

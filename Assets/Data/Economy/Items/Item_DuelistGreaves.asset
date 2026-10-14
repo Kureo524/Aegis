@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_DuelistGreaves
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: Grèves du bretteur
+  displayName: "Gr\xE8ves du bretteur"
   icon: {fileID: 21300000, guid: a3cbb721cf2c9d613a023173809628a1, type: 3}
-  cost: 110
+  cost: 155
   tier: 0
   stats:
   - Stat: 6
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: Bottes
   passive: {fileID: 11400000, guid: ae238f8963c87c306a347339969eec95, type: 2}
+  roles: 31

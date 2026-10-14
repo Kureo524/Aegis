@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_CometHeart
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: Cœur de comète
+  displayName: "C\u0153ur de com\xE8te"
   icon: {fileID: 21300000, guid: 4574843f72a389266a612ead8077f023, type: 3}
-  cost: 300
+  cost: 380
   tier: 0
   stats:
   - Stat: 5
@@ -32,3 +32,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 44a8ccc90d8e6df1989c17e6f4c87916, type: 2}
+  roles: 2

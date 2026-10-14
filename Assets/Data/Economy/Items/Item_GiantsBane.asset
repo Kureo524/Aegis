@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_GiantsBane
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: Fléau des colosses
+  displayName: "Fl\xE9au des colosses"
   icon: {fileID: 21300000, guid: 821326c68e226b079b1303aa5eaf6caf, type: 3}
-  cost: 300
+  cost: 420
   tier: 0
   stats:
   - Stat: 4
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: a13928d46f607c0658f5864f74fd3078, type: 2}
+  roles: 1

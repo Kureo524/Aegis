@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_WrathBlade
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: Lame de colère
+  displayName: "Lame de col\xE8re"
   icon: {fileID: 21300000, guid: 31359b2b6d8bea5da86fe71090db0047, type: 3}
-  cost: 300
+  cost: 285
   tier: 0
   stats:
   - Stat: 4
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 96dc0ef12b694ed07bd55f4b7c12fb4a, type: 2}
+  roles: 3

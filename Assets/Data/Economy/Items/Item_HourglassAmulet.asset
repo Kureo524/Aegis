@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: d1fdadaafad5d380e8d8ac279dd17578, type: 2}
+  roles: 8

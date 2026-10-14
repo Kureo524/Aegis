@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Plaque glaciaire
   icon: {fileID: 21300000, guid: cb2a2239f1578d4a9b895c8fc6028043, type: 3}
-  cost: 250
+  cost: 290
   tier: 0
   stats:
   - Stat: 14
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 8fd19c626a611ef478418bf05eff48f6, type: 2}
+  roles: 8

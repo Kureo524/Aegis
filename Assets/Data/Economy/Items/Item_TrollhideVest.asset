@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Gilet en cuir de troll
   icon: {fileID: 21300000, guid: b7b503d0e3a142a5093dc4e7c6a8c0e7, type: 3}
-  cost: 310
+  cost: 340
   tier: 0
   stats:
   - Stat: 0
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 12cdffc0e6b24cb46ab08db692b4c9ff, type: 2}
+  roles: 8

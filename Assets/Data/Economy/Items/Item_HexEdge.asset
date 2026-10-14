@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Lame maudite
   icon: {fileID: 21300000, guid: 55de861fcace7eb839a7b23907dde698, type: 3}
-  cost: 280
+  cost: 295
   tier: 0
   stats:
   - Stat: 6
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 7e04b35cf175d08fd841fdcaa59bc577, type: 2}
+  roles: 5

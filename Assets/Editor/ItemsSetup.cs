@@ -291,7 +291,14 @@ namespace EditorTools {
         public static void Run() {
             foreach (string png in Directory.GetFiles(IconsDir, "Item_*.png")) EconomySetup.ConfigureIcon(png.Replace('\\', '/'));
             var items = new List<Object>();
-            foreach (Item i in Items) items.Add(ItemOnce(i));
+            var prices = new System.Text.StringBuilder("[ItemsSetup] prices:");
+            foreach (Item i in Items) {
+                ItemDefinition item = ItemOnce(i);
+                PriceAndRoles(item, i);
+                prices.Append($" {i.Id}={item.Cost}");
+                items.Add(item);
+            }
+            Debug.Log(prices.ToString());
 
             var catalog = AssetDatabase.LoadAssetAtPath<ShopCatalog>(EconomySetup.CatalogPath);
             if (catalog != null && !SameItems(catalog, items)) {
@@ -323,6 +330,84 @@ namespace EditorTools {
             if (i.Passive != null) so.FindProperty("passive").objectReferenceValue = PassiveSetup.Passive(i.Passive, null, icon);
             so.ApplyModifiedPropertiesWithoutUndo();
             return item;
+        }
+
+        // ---- Prices and roles (design doc §9.3), rewritten on every run ----
+
+        // Gold per unit of each stat (percent stats: per 1.0 = 100 %)
+        private static float StatValue(StatType stat) => stat switch {
+            StatType.PhysicalAttack => 3.5f, StatType.MagicAttack => 2.2f, StatType.MaxHealth => 0.27f,
+            StatType.Armor => 2f, StatType.MagicResist => 1.8f, StatType.AttackSpeed => 250f,
+            StatType.CritChance => 400f, StatType.CritDamage => 200f, StatType.AbilityHaste => 2.7f,
+            StatType.MoveSpeed => 400f, StatType.Lifesteal => 375f, StatType.Omnivamp => 400f,
+            StatType.MaxMana => 0.14f, StatType.ManaRegen => 12f, StatType.HealthRegen => 9f,
+            StatType.ArmorPenFlat => 5f, StatType.ArmorPenPercent => 420f, StatType.MagicPenFlat => 3.1f,
+            StatType.MagicPenPercent => 470f, StatType.Tenacity => 200f, StatType.HealShieldPower => 250f,
+            StatType.AdaptiveForce => 2.5f,
+            _ => 0f,
+        };
+
+        // Percent stats (attack speed, crit…) are already shares; a percent of a flat stat is
+        // valued on a typical late-run amount of it; flat move speed is worth more than a percent
+        private static float BonusValue(StatBonus b) {
+            if (b.Stat == StatType.MoveSpeed) return b.Type == ModifierType.Flat ? 77f * b.Value : 395f * b.Value;
+            if (b.Type == ModifierType.Flat || b.Stat is StatType.AttackSpeed or StatType.CritChance or StatType.CritDamage
+                    or StatType.Lifesteal or StatType.Omnivamp or StatType.ArmorPenPercent or StatType.MagicPenPercent
+                    or StatType.Tenacity or StatType.HealShieldPower)
+                return StatValue(b.Stat) * b.Value;
+            float typical = b.Stat switch {
+                StatType.PhysicalAttack => 200f, StatType.MagicAttack => 300f, StatType.MaxHealth => 2500f,
+                StatType.Armor => 150f, StatType.MagicResist => 120f, StatType.MaxMana => 1500f, _ => 50f,
+            };
+            return StatValue(b.Stat) * b.Value * typical;
+        }
+
+        private const float PassiveValue = 50f;     // a passive that does something (triggers, aura, stacks…)
+        private const float StatShare = 1f;         // items are a bit more efficient than raw stats
+
+        /// <summary>Price from the stats (and the passive's own stats), plus the value of its effect.</summary>
+        public static int PriceOf(StatBonus[] stats, PassiveDefinition passive, bool boots) {
+            float value = 0f;
+            foreach (StatBonus b in stats) value += BonusValue(b);
+            bool effect = false;
+            if (passive != null) {
+                foreach (StatBonus b in passive.Stats) value += BonusValue(b);
+                effect = passive.Triggers.Length > 0 || passive.Stacks.Source != StackSource.None || passive.NearbyEnemies.Radius > 0f
+                         || passive.Aura.Radius > 0f || passive.Conversions.Length > 0;
+            }
+            float price = value * StatShare + (effect ? PassiveValue : 0f);
+            price = boots ? Mathf.Clamp(price, 90f, 160f) : Mathf.Clamp(price, 260f, 420f);
+            return Mathf.RoundToInt(price / 5f) * 5;
+        }
+
+        private static readonly Dictionary<string, ItemRole> RoleOverrides = new() {
+            { "WraithKnife", ItemRole.Assassin }, { "TrophyCrown", ItemRole.Assassin | ItemRole.Fighter },
+            { "FrostbiteAxe", ItemRole.Assassin | ItemRole.Marksman }, { "MoonblightBlade", ItemRole.Assassin | ItemRole.Fighter },
+            { "GraveFang", ItemRole.Marksman | ItemRole.Fighter }, { "HexEdge", ItemRole.Marksman | ItemRole.Fighter },
+            { "WrathBlade", ItemRole.Marksman | ItemRole.Mage }, { "SerpentFang", ItemRole.Mage | ItemRole.Marksman },
+            { "BoneLantern", ItemRole.Mage | ItemRole.Assassin }, { "GloomTorch", ItemRole.Mage | ItemRole.Assassin },
+            { "TriadSigil", ItemRole.Fighter | ItemRole.Marksman }, { "IronCleaver", ItemRole.Fighter | ItemRole.Tank },
+            { "OathGauntlet", ItemRole.Fighter | ItemRole.Tank }, { "TitanHeart", ItemRole.Tank | ItemRole.Fighter },
+            { "SoulLocket", ItemRole.Tank | ItemRole.Fighter },
+        };
+
+        // Role of the table section, unless overridden
+        private static ItemRole RoleOf(Item i, int index) {
+            if (RoleOverrides.TryGetValue(i.Id, out ItemRole role)) return role;
+            if (i.Group == Boots) return ItemRole.Marksman | ItemRole.Mage | ItemRole.Fighter | ItemRole.Tank | ItemRole.Assassin;
+            bool Has(StatType t) => System.Array.Exists(i.Stats, b => b.Stat == t);
+            if (Has(StatType.MagicAttack) && !Has(StatType.PhysicalAttack)) return ItemRole.Mage;
+            if (Has(StatType.Armor) || Has(StatType.MagicResist)) return Has(StatType.PhysicalAttack) ? ItemRole.Fighter : ItemRole.Tank;
+            if (Has(StatType.CritChance) || Has(StatType.AttackSpeed)) return ItemRole.Marksman;
+            if (Has(StatType.MaxHealth)) return Has(StatType.PhysicalAttack) ? ItemRole.Fighter : ItemRole.Tank;
+            return Has(StatType.PhysicalAttack) ? ItemRole.Fighter : ItemRole.None;
+        }
+
+        private static void PriceAndRoles(ItemDefinition item, Item i) {
+            var so = new SerializedObject(item);
+            if (i.Tier == ItemTier.Legendary) so.FindProperty("cost").intValue = PriceOf(i.Stats, item.Passive, i.Group == Boots);
+            so.FindProperty("roles").intValue = (int)RoleOf(i, 0);
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static bool SameItems(ShopCatalog catalog, List<Object> items) {

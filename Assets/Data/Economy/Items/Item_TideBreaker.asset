@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471d3f3f572465f6daef868f1109915a, type: 3}
   m_Name: Item_TideBreaker
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
-  displayName: Brise-marée
+  displayName: "Brise-mar\xE9e"
   icon: {fileID: 21300000, guid: 90e39a9453b53bf8abf5620a221f5a41, type: 3}
-  cost: 310
+  cost: 325
   tier: 0
   stats:
   - Stat: 4
@@ -29,3 +29,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 73c2aedd91a8e060ea19ea8c592df9e1, type: 2}
+  roles: 1

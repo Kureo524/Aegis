@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Lame lune-noire
   icon: {fileID: 21300000, guid: 0553068f10a975b4192e23a9742adbe7, type: 3}
-  cost: 290
+  cost: 300
   tier: 0
   stats:
   - Stat: 4
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 41f3439c47aaa5dcea80eb4d1df4fec2, type: 2}
+  roles: 20

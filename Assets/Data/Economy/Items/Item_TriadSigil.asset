@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Sceau de la triade
   icon: {fileID: 21300000, guid: e6f2c00e5d01c4ad3b8f86db973f92c5, type: 3}
-  cost: 333
+  cost: 380
   tier: 0
   stats:
   - Stat: 4
@@ -32,3 +32,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: Arme runique
   passive: {fileID: 11400000, guid: 1da6f86c111adbb4286a4be890f2da5f, type: 2}
+  roles: 5

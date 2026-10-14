@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Croc du serpent
   icon: {fileID: 21300000, guid: a8ad4614add0ec0519e50a8cafce5b24, type: 3}
-  cost: 290
+  cost: 350
   tier: 0
   stats:
   - Stat: 6
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: 
   passive: {fileID: 11400000, guid: 95dd93b2d2de329678a75ffbf143822f, type: 2}
+  roles: 3

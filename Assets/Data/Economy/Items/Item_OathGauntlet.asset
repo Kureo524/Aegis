@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Economy.ItemDefinition
   displayName: Gantelet du serment
   icon: {fileID: 21300000, guid: cc5616756f57b09fe9c95923f89dc71f, type: 3}
-  cost: 320
+  cost: 420
   tier: 0
   stats:
   - Stat: 0
@@ -26,3 +26,4 @@ MonoBehaviour:
   unique: 1
   uniqueGroup: Dernier rempart
   passive: {fileID: 11400000, guid: 674cc5d8628eff0c39e7bcd9dc8b79d4, type: 2}
+  roles: 12
