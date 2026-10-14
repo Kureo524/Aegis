@@ -101,6 +101,8 @@ namespace EditorTools {
             SetBuildScenes();
             MigrateMenuScene();
             MetaSetup.Run(RootPrefabPath, MenuScenePath);   // meta progression: settings, Ezreal's tree, Progression screen
+            CharacterSpritesSetup.Run();   // animated LoL sprites, creature names, ground shadows
+            ArenaSetup.Run();   // forest clearing: rocks, trees, ruins, painted ground, light, fog, post-processing
             MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings, stage, shopCatalog, augmentCatalog, lootSettings);
 
             AssetDatabase.SaveAssets();

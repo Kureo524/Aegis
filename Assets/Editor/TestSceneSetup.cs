@@ -257,12 +257,12 @@ namespace EditorTools {
             EditorUtility.SetDirty(scope);
         }
 
-        private const string ObstaclesRoot = "=== Obstacles ===";
+        internal const string ObstaclesRoot = "=== Obstacles ===";
         private const string NavMeshAssetPath = "Assets/Scenes/Tests/TestScene/NavMesh-Ground.asset";
 
         // Pathfinding test course around the spawn (player at the origin, ground is 100 x 100):
         // (name, position, size). Height 2 so the character cannot step onto them.
-        private static readonly (string name, Vector3 position, Vector3 size)[] Obstacles = {
+        internal static readonly (string name, Vector3 position, Vector3 size)[] Obstacles = {
             ("Wall_Front",     new Vector3(  0f, 1f,   6f), new Vector3(10f,  2f, 1f)),   // straight wall: go around
             ("L_Long",         new Vector3(  9f, 1f,  -4f), new Vector3( 1f,  2f, 9f)),   // L corner
             ("L_Short",        new Vector3( 12f, 1f,  -8f), new Vector3( 7f,  2f, 1f)),
@@ -321,7 +321,7 @@ namespace EditorTools {
 
         // Bakes and stores the NavMeshData as an asset next to the scene: data left inside the
         // scene would force Unity to save the scene in binary.
-        private static void BakeNavMesh(Unity.AI.Navigation.NavMeshSurface surface) {
+        internal static void BakeNavMesh(Unity.AI.Navigation.NavMeshSurface surface) {
             surface.BuildNavMesh();
             System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(NavMeshAssetPath)!);
             AssetDatabase.DeleteAsset(NavMeshAssetPath);
@@ -362,6 +362,10 @@ namespace EditorTools {
             var quit = Object.FindFirstObjectByType<QuitOverlay>();
             Check(quit != null, "QuitOverlay present in scene");
 
+            Check(GameObject.Find("=== Arena ===") != null, "arena dressing present (ArenaSetup)");
+            Check(UnityEngine.AI.NavMesh.SamplePosition(new Vector3(ArenaSetup.Radius - 3f, 0f, 0f), out _, 1f, UnityEngine.AI.NavMesh.AllAreas)
+                  && !UnityEngine.AI.NavMesh.SamplePosition(new Vector3(ArenaSetup.Radius + 6f, 0f, 0f), out _, 3f, UnityEngine.AI.NavMesh.AllAreas),
+                  "NavMesh limited to the clearing");
             var obstacles = GameObject.Find(ObstaclesRoot);
             Check(obstacles != null && obstacles.transform.childCount == Obstacles.Length, "pathfinding obstacles present");
             Check(surface != null && surface.navMeshData != null && AssetDatabase.Contains(surface.navMeshData),
