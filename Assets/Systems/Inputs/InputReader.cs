@@ -47,6 +47,7 @@ namespace Systems.Inputs {
             }
             g.Stop.performed            += OnStop;
             g.CameraLock.performed      += OnCameraLock;
+            g.Shop.performed            += OnShop;
             g.Zoom.performed            += OnZoom;
             g.Zoom.canceled             += OnZoom;
             _input.UI.Cancel.performed  += OnUiCancel;
@@ -85,6 +86,7 @@ namespace Systems.Inputs {
             }
             g.Stop.performed            -= OnStop;
             g.CameraLock.performed      -= OnCameraLock;
+            g.Shop.performed            -= OnShop;
             g.Zoom.performed            -= OnZoom;
             g.Zoom.canceled             -= OnZoom;
             _input.UI.Cancel.performed  -= OnUiCancel;
@@ -118,6 +120,7 @@ namespace Systems.Inputs {
         }
         private void OnStop(InputAction.CallbackContext ctx)           => _eventBus.Publish(new StopEvent());
         private void OnCameraLock(InputAction.CallbackContext ctx)     => _eventBus.Publish(new CameraLockEvent());
+        private void OnShop(InputAction.CallbackContext ctx)           => _eventBus.Publish(new ShopKeyEvent());
         private void OnUiCancel(InputAction.CallbackContext ctx)       => _eventBus.Publish(new UiCancelEvent());
         /// <summary>Binding group of keys bound by position (Q W E R, D F, attack-move…): never remapped.</summary>
         public const string PositionalGroup = "Positional";
