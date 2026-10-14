@@ -18,7 +18,7 @@ namespace EditorTools {
     /// Only the clearing is walkable: the NavMesh is baked from the physics colliders, from a disc
     /// of radius <see cref="Radius"/> (the Ground object) and the obstacles; everything under
     /// "=== Arena ===" is left out of it. An invisible wall around the clearing backs the NavMesh
-    /// clamp of CharacterMovement. Rebuilt from scratch on every run (fixed seed: same arena).
+    /// clamp of CharacterMovement. Built once (fixed seed); Tools > Rebuild Arena rebuilds it.
     /// </summary>
     public static class ArenaSetup {
         public const float Radius = 40f;
@@ -85,9 +85,17 @@ namespace EditorTools {
         private static System.Random _rng;
         private static Dictionary<string, Material> _materials;
 
-        public static void Run() {
+        /// <summary>Builds the arena once (an existing one is kept, so the scene file does not churn).</summary>
+        public static void Run() => Build(force: false);
+
+        /// <summary>Rebuilds the arena from scratch (after changing this script).</summary>
+        [MenuItem("Tools/Rebuild Arena")]
+        public static void Rebuild() => Build(force: true);
+
+        private static void Build(bool force) {
             ImportModels();
             var scene = EditorSceneManager.OpenScene(ProjectSetup.TestScenePath, OpenSceneMode.Single);
+            if (!force && GameObject.Find(Root) != null && GameObject.Find(LandmarksRoot) != null) return;
             _rng = new System.Random(1337);
 
             foreach (string name in new[] { Root, LandmarksRoot }) {
