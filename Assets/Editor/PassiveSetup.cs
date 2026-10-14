@@ -42,16 +42,16 @@ namespace EditorTools {
         }
 
         private static readonly (RarityTier rarity, P passive)[] Augments = {
-            (RarityTier.Gold, new P { Id = "JeweledGauntlet", Name = "Gantelet serti", Description = "Tes sorts peuvent infliger des coups critiques. +15 % chances de critique.",
+            (RarityTier.Gold, new P { Id = "GoldsmithGlove", Name = "Gant d'orfèvre", Description = "Tes sorts peuvent infliger des coups critiques. +15 % chances de critique.",
                 Stats = new[] { B(StatType.CritChance, 0.15f) }, Capabilities = new[] { Capability.SpellCrit } }),
-            (RarityTier.Gold, new P { Id = "Frenzy", Name = "Frénésie", Description = "Chaque attaque de base donne +6 % vitesse d'attaque (6 max), perdus après 3 s sans attaquer.",
+            (RarityTier.Gold, new P { Id = "Fury", Name = "Furie", Description = "Chaque attaque de base donne +6 % vitesse d'attaque (6 max), perdus après 3 s sans attaquer.",
                 Stacks = new StackSettings { Source = StackSource.PerBasicAttack, Reset = ResetPolicy.AfterDuration, Max = 6, Duration = 3f,
                                              PerStack = new[] { B(StatType.AttackSpeed, 0.06f, ModifierType.PercentAdd) } } }),
             (RarityTier.Gold, new P { Id = "Gambler", Name = "Flambeur", Description = "6 % de chances par kill de faire tomber une enclume à stats, ouverte en fin de vague.",
                 Triggers = new[] { new PassiveTrigger { On = PassiveEvent.Kill, EveryN = 1, Chance = 0.06f, Effect = PassiveEffectKind.DropLoot, Loot = LootKind.StatAnvil } } }),
-            (RarityTier.Gold, new P { Id = "Melee", Name = "Au cœur de la mêlée", Description = "+3 attaque physique et +5 puissance magique par ennemi à moins de 5 m (8 max).",
+            (RarityTier.Gold, new P { Id = "HotBlood", Name = "Sang chaud", Description = "+3 attaque physique et +5 puissance magique par ennemi à moins de 5 m (8 max).",
                 Nearby = new NearbyEnemiesBonus { Radius = 5f, Max = 8, PerEnemy = new[] { B(StatType.PhysicalAttack, 3), B(StatType.MagicAttack, 5) } } }),
-            (RarityTier.Prismatic, new P { Id = "Summoner", Name = "Invocateur", Description = "8 % de chances par kill de faire tomber un sort d'invocateur (usage unique sur F). +10 accélération.",
+            (RarityTier.Prismatic, new P { Id = "SealCaller", Name = "Appel des sceaux", Description = "8 % de chances par kill de faire tomber un sort d'invocateur (usage unique sur F). +10 accélération.",
                 Stats = new[] { B(StatType.AbilityHaste, 10) },
                 Triggers = new[] { new PassiveTrigger { On = PassiveEvent.Kill, EveryN = 1, Chance = 0.08f, Effect = PassiveEffectKind.DropLoot, Loot = LootKind.SummonerSpell } } }),
         };
@@ -94,11 +94,12 @@ namespace EditorTools {
             return (catalog, loot);
         }
 
-        internal static PassiveDefinition Passive(P p, string iconId, Sprite icon = null) {
+        /// <param name="overwrite">Rewrite an existing asset (the champion's passive follows the code).</param>
+        internal static PassiveDefinition Passive(P p, string iconId, Sprite icon = null, bool overwrite = false) {
             string path = $"{Dir}/Passive_{p.Id}.asset";
             var passive = AssetDatabase.LoadAssetAtPath<PassiveDefinition>(path);
-            if (passive != null) return passive;
-            passive = CreateAsset<PassiveDefinition>(path);
+            if (passive != null && !overwrite) return passive;
+            if (passive == null) passive = CreateAsset<PassiveDefinition>(path);
             var so = new SerializedObject(passive);
             so.FindProperty("displayName").stringValue = p.Name;
             so.FindProperty("description").stringValue = p.Description;
@@ -128,7 +129,7 @@ namespace EditorTools {
             if (spell != null) return spell;
             spell = CreateAsset<SpellDefinition>(path);
             var so = new SerializedObject(spell);
-            so.FindProperty("displayName").stringValue = "Fantôme";
+            so.FindProperty("displayName").stringValue = "Pas du vent";
             so.FindProperty("icon").objectReferenceValue = Icon("Spell_Ghost");
             so.FindProperty("color").colorValue = new Color(0.75f, 0.9f, 1f);
             so.FindProperty("targeting").enumValueIndex = (int)TargetingType.Self;
@@ -153,7 +154,7 @@ namespace EditorTools {
             if (spell != null) return spell;
             spell = CreateAsset<SpellDefinition>(path);
             var so = new SerializedObject(spell);
-            so.FindProperty("displayName").stringValue = "Embrasement";
+            so.FindProperty("displayName").stringValue = "Tison";
             so.FindProperty("icon").objectReferenceValue = Icon("Spell_Ignite");
             so.FindProperty("color").colorValue = new Color(1f, 0.5f, 0.2f);
             so.FindProperty("targeting").enumValueIndex = (int)TargetingType.UnitTarget;

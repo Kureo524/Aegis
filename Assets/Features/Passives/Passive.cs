@@ -219,6 +219,7 @@ namespace Features.Passives {
 
         private void Fire(PassiveEvent happened, Character target) {
             PassiveTrigger[] triggers = Definition.Triggers;
+            bool consumed = false;   // every charged trigger of this event goes off, then the charge is used
             for (int i = 0; i < triggers.Length; i++) {
                 PassiveTrigger t = triggers[i];
                 if (t.On != happened || happened == PassiveEvent.Periodic) continue;
@@ -230,9 +231,10 @@ namespace Features.Passives {
                 _counters[i] = 0;
                 if (UnityEngine.Random.value > t.Chance) continue;
                 if (t.Cooldown > 0f) _readyAt[i] = Time.time + t.Cooldown;
-                if (t.ConsumesCharge) _chargedUntil = -1f;
+                consumed |= t.ConsumesCharge;
                 Apply(t, target);
             }
+            if (consumed) _chargedUntil = -1f;
         }
 
         private void Apply(in PassiveTrigger t, Character target) {
