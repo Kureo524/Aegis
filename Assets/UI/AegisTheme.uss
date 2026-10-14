@@ -162,28 +162,53 @@
     border-bottom-color: var(--gold-dark);
 }
 
-/* ---- HUD layout ---- */
+/* ---- HUD layout: one dock along the bottom edge, LoL style ---- */
 .ae-hud {
     position: absolute;
-    left: 0; right: 0; bottom: 10px;
+    left: 0; right: 0; bottom: 0;
     flex-direction: row;
     justify-content: center;
     align-items: flex-end;
 }
-.ae-hud__side {
-    width: 204px;
-    padding: 6px 8px 8px 8px;
-    margin: 0 6px;
-    background-color: rgba(1, 10, 19, 0.85);
+.ae-dock-panel {
+    background-image: url("project://database/Assets/UI/Textures/Panel.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    background-color: rgba(4, 10, 20, 0.0);
+    border-width: 2px;
+    border-bottom-width: 0;
+    border-top-color: var(--gold);
+    border-left-color: var(--gold-dark);
+    border-right-color: var(--gold-dark);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
+.ae-hud__side {
+    width: 212px;
+    height: 150px;
+    padding: 6px 10px 6px 10px;
+    margin: 0;
+}
+.ae-hud__side--left { border-right-width: 0; border-top-right-radius: 0; }
+.ae-hud__side--right { border-left-width: 0; border-top-left-radius: 0; }
 .ae-hud__center { align-items: center; }
 .ae-hud__main {
     flex-direction: row;
     align-items: flex-end;
-    padding: 8px 12px 8px 8px;
-    border-top-color: var(--gold);
+    padding: 10px 14px 10px 12px;
+    border-top-width: 3px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
-.ae-hud__items { width: 168px; align-items: center; }
+.ae-hud__items { align-items: center; justify-content: flex-start; }
+.ae-hud__ornament {
+    position: absolute;
+    top: -8px; left: 20%; right: 20%;
+    height: 12px;
+    background-image: url("project://database/Assets/UI/Textures/Divider.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
 
 /* ---- portrait ---- */
 .ae-portrait { width: 84px; height: 100px; align-items: center; }
@@ -250,23 +275,30 @@
 
 /* ---- bars ---- */
 .ae-bar { margin-top: 3px; width: 100%; }
-.ae-bar--hp { height: 18px; }
-.ae-bar--mana { height: 12px; }
-.ae-bar--xp { height: 4px; border-width: 0; }
-.ae-bar__fill { height: 100%; width: 100%; }
-.ae-bar--hp .ae-bar__fill { background-color: #2fa84f; border-top-width: 2px; border-color: #6fe08a; }
-.ae-bar--mana .ae-bar__fill { background-color: #2a6fd0; border-top-width: 1px; border-color: #7fb4ff; }
-.ae-bar--xp .ae-bar__fill { background-color: #a070ff; }
+.ae-bar--hp { height: 20px; border-color: #000000; background-color: #120d0d; }
+.ae-bar--mana { height: 14px; background-color: #0b0f1d; }
+.ae-bar--xp { height: 5px; border-width: 0; background-color: #0e0a18; }
+.ae-bar__fill { height: 100%; width: 100%; transition-property: width; transition-duration: 0.15s; }
+.ae-bar--hp .ae-bar__fill { background-color: #1f9a43; }
+.ae-bar--mana .ae-bar__fill { background-color: #1d63c8; }
+.ae-bar--xp .ae-bar__fill { background-color: #9b6bff; }
+.ae-bar__gloss {
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+    background-image: url("project://database/Assets/UI/Textures/Gloss.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+.ae-bar__ticks { position: absolute; left: 0; right: 0; top: 0; bottom: 0; }
 .ae-bar__shield { position: absolute; top: 0; bottom: 0; background-color: rgba(235, 235, 245, 0.92); }
 .ae-bar__text {
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 0;
     -unity-text-align: middle-center;
-    font-size: 11px;
+    font-size: 12px;
     -unity-font-style: bold;
     color: #ffffff;
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(0, 0, 0, 0.9);
+    -unity-text-outline-width: 1.2px;
+    -unity-text-outline-color: rgba(0, 0, 0, 1);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.9);
     padding: 0;
     margin: 0;
 }
@@ -302,7 +334,7 @@
 }
 
 /* ---- stats and augments panel ---- */
-.ae-stat { flex-direction: row; align-items: center; width: 50%; height: 22px; }
+.ae-stat { flex-direction: row; align-items: center; width: 50%; height: 19px; }
 .ae-stat__icon { width: 16px; height: 16px; margin-right: 5px; -unity-background-scale-mode: scale-to-fit; }
 .ae-stat__value { font-size: 13px; color: var(--text); }
 .ae-augment {
@@ -319,15 +351,18 @@
 .ae-augment--prismatic { border-color: var(--prismatic); }
 
 /* ---- items ---- */
-.ae-items { flex-direction: row; flex-wrap: wrap; width: 150px; justify-content: center; }
+.ae-items { flex-direction: row; flex-wrap: wrap; width: 156px; justify-content: center; }
 .ae-item {
-    width: 44px; height: 44px;
+    width: 46px; height: 46px;
     margin: 2px;
     -unity-background-scale-mode: scale-to-fit;
+    border-color: #3c3220;
+    background-color: rgba(0, 4, 10, 0.9);
 }
 .ae-elixir { font-size: 11px; color: #73e6b3; margin-top: 2px; }
+.ae-goldrow { flex-direction: row; align-items: center; margin-top: 4px; }
+.ae-coin { width: 18px; height: 18px; margin-right: 5px; background-image: url("project://database/Assets/UI/Textures/Coin.png"); -unity-background-scale-mode: scale-to-fit; }
 .ae-gold {
-    margin-top: 4px;
     font-size: 16px;
     -unity-font-style: bold;
     color: #f5c542;
@@ -406,11 +441,19 @@
 
 /* ---- top run HUD and boss bar ---- */
 .ae-runhud {
-    padding: 6px 18px;
-    background-color: rgba(1, 10, 19, 0.85);
+    padding: 6px 22px 8px 22px;
+    background-image: url("project://database/Assets/UI/Textures/Panel.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    background-color: rgba(0, 0, 0, 0);
     border-top-width: 0;
+    border-bottom-width: 2px;
+    border-bottom-color: var(--gold);
+    border-left-color: var(--gold-dark);
+    border-right-color: var(--gold-dark);
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
 }
 .ae-bossbar { border-width: 2px; border-color: var(--gold-dark); background-color: rgba(30, 6, 10, 0.9); }
 
