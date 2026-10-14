@@ -29,6 +29,10 @@ namespace EditorTools {
         private static readonly int[] BasicRanks = { 1, 3, 5, 7, 9 };
         private static readonly int[] UltimateRanks = { 6, 11, 16 };
 
+        private static readonly string[] Recommended = {
+            "DuelistGreaves", "TriadSigil", "WrathBlade", "GaleBow", "SunsteelBlade", "CrimsonChalice", "GiantsBane", "HungryAxe",
+        };
+
         public static void Run(SpellDefinition flash) {
             foreach (string png in Directory.GetFiles(IconsDir, "Vesna_*.png")) EconomySetup.ConfigureIcon(png.Replace('\\', '/'));
             SpellDefinition q = EmberSpray(), w = AshBomb(), e = Roll(), r = EmberRain();
@@ -46,6 +50,15 @@ namespace EditorTools {
             abilities.GetArrayElementAtIndex(3).objectReferenceValue = r;
             so.FindProperty("summonerF").objectReferenceValue = flash;
             so.FindProperty("passive").objectReferenceValue = Passive();
+            // Shop "Recommended" tab: attack speed and spellblade to cash in Overheat, then damage
+            var recommended = new System.Collections.Generic.List<ItemDefinition>();
+            foreach (string id in Recommended) {
+                var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/Data/Economy/Items/Item_{id}.asset");
+                if (item != null) recommended.Add(item);
+            }
+            SerializedProperty list = so.FindProperty("recommendedItems");
+            list.arraySize = recommended.Count;
+            for (int i = 0; i < recommended.Count; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = recommended[i];
             so.ApplyModifiedPropertiesWithoutUndo();
 
             WriteStats(hero.BaseStats);

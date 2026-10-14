@@ -323,7 +323,7 @@ namespace Features.Characters {
                 stat.Changed += value => _eventBus.Publish(new StatChangedEvent(type, value));
             }
 
-            _eventBus.Publish(new PlayerChampionEvent(Definition.DisplayName, Definition.Portrait, Definition.Passive));
+            _eventBus.Publish(new PlayerChampionEvent(Definition.DisplayName, Definition.Portrait, Definition.Passive, Definition.RecommendedItems));
             _lastBuffs = "?";   // the buff bar starts from a fresh snapshot
 
             // Initial snapshot for whoever displays it

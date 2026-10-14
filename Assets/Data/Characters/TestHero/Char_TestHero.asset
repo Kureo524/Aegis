@@ -28,4 +28,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ce607921ca63e8f4583eef3db5564c94, type: 2}
   summonerD: {fileID: 0}
   summonerF: {fileID: 11400000, guid: 686457718ecb8036f934c742aac8362a, type: 2}
+  recommendedItems:
+  - {fileID: 11400000, guid: ca9be6a876ca30eba883a117c6888f77, type: 2}
+  - {fileID: 11400000, guid: 01f84add28d69e298bba778b132364d0, type: 2}
+  - {fileID: 11400000, guid: 7725cb8fbcae15e46a71248567ff6202, type: 2}
+  - {fileID: 11400000, guid: 5d140bf9adb1ecc0a95482c13b4a270a, type: 2}
+  - {fileID: 11400000, guid: c84e0a9bdb03b6af39b04b264bcb892f, type: 2}
+  - {fileID: 11400000, guid: 2ec00d73e40eec1e48181ffd727dc7c6, type: 2}
+  - {fileID: 11400000, guid: f300fa57c48f475d1abee5ef40520528, type: 2}
+  - {fileID: 11400000, guid: e0eef515abea07504a758d825a36b119, type: 2}
   passive: {fileID: 11400000, guid: ab3caa3a1b4f0dc0db6a4b8f9adb054c, type: 2}

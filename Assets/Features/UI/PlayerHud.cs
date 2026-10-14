@@ -17,7 +17,7 @@ namespace Features.UI {
     /// - left: one panel with two tabs, Stats (AD, AP, armor… from StatChangedEvent) and Augments;
     /// - center: buff bar (passive stacks, charged spellblade), feedback line, champion portrait
     ///   with its level, the spell bar (passive, Q W E R, D F) and the HP (shield) / mana / XP bars;
-    /// - right: the 6 item slots, the active elixir and the gold.
+    /// - right: the 6 item slots, the active elixir, the gold and the shop button.
     /// Every icon has a tooltip (UiTooltip).
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
@@ -357,6 +357,10 @@ namespace Features.UI {
             _gold = new Label { pickingMode = PickingMode.Ignore };
             _gold.AddToClassList("ae-gold");
             goldRow.Add(_gold);
+            var shop = new Button(() => _eventBus.Publish(new ShopToggleRequestedEvent())) { text = "Boutique" };
+            shop.AddToClassList("ae-hud__shop");
+            _tooltip.Attach(shop, () => ("Boutique", "P", "Ouverte à tout moment ; achats et ventes entre les vagues."));
+            goldRow.Add(shop);
             panel.Add(goldRow);
             return panel;
         }
