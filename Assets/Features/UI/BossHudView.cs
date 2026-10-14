@@ -60,7 +60,7 @@ namespace Features.UI {
             header.style.flexDirection = FlexDirection.Row;
             header.style.width = 520;
             header.style.justifyContent = Justify.SpaceBetween;
-            _name = UiStyles.Text("", 16, new Color(1f, 0.85f, 0.5f));
+            _name = UiStyles.Text("", 16, new Color(0.86f, 0.8f, 1f));
             _phase = UiStyles.Text("", 14, Color.white);
             header.Add(_name);
             header.Add(_phase);

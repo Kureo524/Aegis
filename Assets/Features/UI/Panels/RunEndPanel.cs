@@ -75,7 +75,7 @@ namespace Features.UI.Panels {
             _overlay.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
             if (!open) return;
             _title.text = _won ? "Victoire !" : "Défaite";
-            _title.style.color = _won ? new Color(1f, 0.85f, 0.35f) : new Color(1f, 0.4f, 0.35f);
+            _title.style.color = _won ? new Color(0.6f, 0.9f, 1f) : new Color(1f, 0.4f, 0.5f);
             _summary.text = $"Vagues terminées : {_waves}\nNiveau {_level}  ·  {_gold} or";
             _reward.text = _rewardText;
         }

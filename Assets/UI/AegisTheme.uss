@@ -1,21 +1,24 @@
-/* Aegis UI theme (design doc §7.9, §9.3): MOBA-like palette — deep navy panels, gold frames,
-   cream text, teal accents. Every view built in code adds this sheet and uses its classes. */
+/* Aegis UI theme (design doc §7.9, §9.3): cold aurora palette — night-blue panels, violet
+   frames, ice text, cyan and violet glows. Every view built in code adds this sheet and uses its classes. */
 
 :root {
-    --gold: #c8aa6e;
-    --gold-light: #f0e6d2;
-    --gold-dark: #785a28;
-    --navy-0: #010a13;
-    --navy-1: #0a1428;
-    --navy-2: #091428;
-    --navy-3: #1e2328;
-    --teal: #0ac8b9;
-    --text: #f0e6d2;
-    --text-dim: #a09b8c;
-    --red: #e84057;
-    --green: #2ecc71;
-    --blue: #3a8ee6;
-    --prismatic: #c27cff;
+    /* aurora: night-blue panels, violet frames, ice text, cyan glow (the old names are kept) */
+    --gold: #8f80ff;
+    --gold-light: #e2e8ff;
+    --gold-dark: #3d3b86;
+    --navy-0: #04051a;
+    --navy-1: #0a0d2e;
+    --navy-2: #0b1032;
+    --navy-3: #171b46;
+    --teal: #5ce1ff;
+    --text: #e2e8ff;
+    --text-dim: #8e97c6;
+    --red: #ff5a7a;
+    --green: #3fe0a0;
+    --blue: #5b8cff;
+    --prismatic: #d08cff;
+    --aurora-cyan: #5ce1ff;
+    --aurora-violet: #a77bff;
 }
 
 .ae-root {
@@ -26,15 +29,15 @@
 
 /* ---- frames ---- */
 .ae-panel {
-    background-color: rgba(1, 10, 19, 0.92);
+    background-color: rgba(6, 8, 30, 0.92);
     border-width: 2px;
     border-color: var(--gold-dark);
     border-radius: 4px;
     padding: 10px;
 }
 .ae-panel--glass {
-    background-color: rgba(10, 20, 40, 0.78);
-    border-color: rgba(200, 170, 110, 0.55);
+    background-color: rgba(14, 16, 48, 0.78);
+    border-color: rgba(150, 130, 255, 0.55);
 }
 .ae-frame-gold {
     border-width: 2px;
@@ -45,7 +48,7 @@
 }
 .ae-divider {
     height: 1px;
-    background-color: rgba(200, 170, 110, 0.35);
+    background-color: rgba(150, 130, 255, 0.35);
     margin: 8px 0;
 }
 
@@ -84,23 +87,23 @@
     transition-duration: 0.12s;
 }
 .ae-button:hover {
-    background-color: #2a3036;
+    background-color: #262b66;
     border-color: var(--gold);
     scale: 1.03 1.03;
 }
-.ae-button:active { background-color: #13181c; }
+.ae-button:active { background-color: #0c0f2a; }
 .ae-button:disabled { opacity: 0.45; }
 .ae-button--primary {
-    background-color: #1e4f5c;
+    background-color: #1b3a7a;
     border-color: var(--teal);
 }
-.ae-button--primary:hover { background-color: #26697a; border-color: #5df5e8; }
+.ae-button--primary:hover { background-color: #2752a6; border-color: #a8f2ff; }
 .ae-button--golden { background-color: #5a4310; border-color: #ffd65c; color: #fff2c4; }
 .ae-button--golden:hover { background-color: #7a5c18; border-color: #fff0a0; }
 
 /* ---- slots (abilities, items) ---- */
 .ae-slot {
-    background-color: rgba(1, 10, 19, 0.95);
+    background-color: rgba(6, 8, 30, 0.95);
     border-width: 2px;
     border-color: var(--gold-dark);
     border-radius: 3px;
@@ -117,7 +120,7 @@
 .ae-tooltip {
     position: absolute;
     width: 300px;
-    background-color: rgba(1, 10, 19, 0.97);
+    background-color: rgba(6, 8, 30, 0.97);
     border-width: 1px;
     border-color: var(--gold);
     border-radius: 3px;
@@ -147,7 +150,7 @@
 
 /* ---- bars ---- */
 .ae-bar {
-    background-color: rgba(1, 10, 19, 0.95);
+    background-color: rgba(6, 8, 30, 0.95);
     border-width: 1px;
     border-color: #000000;
     border-radius: 2px;
@@ -155,9 +158,11 @@
 }
 
 /* ---- overlays and windows ---- */
-.ae-overlay { background-color: rgba(0, 3, 8, 0.62); }
+.ae-overlay { background-color: rgba(2, 2, 14, 0.62); }
 .ae-window {
     padding: 22px 26px;
+    background-image: url("project://database/Assets/UI/Textures/Aurora.png");
+    background-size: cover; background-position-y: top; background-position-x: center;
     border-top-color: var(--gold);
     border-left-color: var(--gold);
     border-right-color: var(--gold-dark);
@@ -219,7 +224,7 @@
     border-radius: 40px;
     border-width: 3px;
     border-color: var(--gold);
-    background-color: #0a1a2a;
+    background-color: #0b1036;
     -unity-background-scale-mode: scale-and-crop;
     overflow: hidden;
 }
@@ -240,7 +245,7 @@
 /* ---- ability slots ---- */
 .ae-slot--ability { border-color: var(--gold); }
 .ae-slot--empty { opacity: 0.45; }
-.ae-slot__locked { background-color: rgba(4, 6, 12, 0.72); }
+.ae-slot__locked { background-color: rgba(4, 5, 20, 0.72); }
 .ae-slot__cooldown { background-color: rgba(0, 0, 0, 0.62); }
 .ae-slot__key {
     position: absolute;
@@ -248,7 +253,7 @@
     padding: 0 3px;
     font-size: 11px;
     color: var(--gold-light);
-    background-color: rgba(1, 10, 19, 0.85);
+    background-color: rgba(6, 8, 30, 0.85);
     border-top-right-radius: 3px;
 }
 .ae-plus {
@@ -256,7 +261,7 @@
     margin: 0 0 3px 0;
     padding: 0;
     border-width: 1px;
-    border-color: #5a4210;
+    border-color: #3d3b86;
     border-radius: 9px;
     background-color: #f0c040;
     color: #1a1204;
@@ -271,15 +276,15 @@
     border-width: 1px;
     border-color: rgba(0, 0, 0, 0.85);
     border-radius: 1px;
-    background-color: #2a2f38;
+    background-color: #262a55;
 }
 .ae-pip--on { background-color: #f0c040; }
 
 /* ---- bars ---- */
 .ae-bar { margin-top: 3px; width: 100%; }
-.ae-bar--hp { height: 20px; border-color: #000000; background-color: #120d0d; }
-.ae-bar--mana { height: 14px; background-color: #0b0f1d; }
-.ae-bar--xp { height: 5px; border-width: 0; background-color: #0e0a18; }
+.ae-bar--hp { height: 20px; border-color: #000000; background-color: #0d0a1a; }
+.ae-bar--mana { height: 14px; background-color: #090c22; }
+.ae-bar--xp { height: 5px; border-width: 0; background-color: #0c0920; }
 .ae-bar__fill { height: 100%; width: 100%; transition-property: width; transition-duration: 0.15s; }
 .ae-bar--hp .ae-bar__fill { background-color: #1f9a43; }
 .ae-bar--mana .ae-bar__fill { background-color: #1d63c8; }
@@ -313,7 +318,7 @@
     border-width: 1px;
     border-color: var(--gold-dark);
     border-radius: 3px;
-    background-color: rgba(1, 10, 19, 0.9);
+    background-color: rgba(6, 8, 30, 0.9);
     -unity-background-scale-mode: scale-to-fit;
 }
 .ae-buff--charged { border-color: #ffe070; border-width: 2px; }
@@ -345,7 +350,7 @@
     border-radius: 15px;
     border-width: 2px;
     border-color: rgba(255, 255, 255, 0.15);
-    background-color: rgba(1, 10, 19, 0.9);
+    background-color: rgba(6, 8, 30, 0.9);
     -unity-background-scale-mode: scale-to-fit;
 }
 .ae-augment--silver { border-color: #c8d0dc; }
@@ -358,8 +363,8 @@
     width: 46px; height: 46px;
     margin: 2px;
     -unity-background-scale-mode: scale-to-fit;
-    border-color: #3c3220;
-    background-color: rgba(0, 4, 10, 0.9);
+    border-color: #2e2c6a;
+    background-color: rgba(4, 5, 22, 0.9);
 }
 .ae-elixir { font-size: 11px; color: #73e6b3; margin-top: 2px; }
 .ae-goldrow { flex-direction: row; align-items: center; margin-top: 4px; }
@@ -373,18 +378,18 @@
 }
 
 /* ---- shop ---- */
-.ae-shop-overlay { background-color: rgba(0, 3, 8, 0.45); }
+.ae-shop-overlay { background-color: rgba(2, 2, 14, 0.45); }
 .ae-shop {
     width: 1290px; height: 760px; padding: 0;
-    background-image: url("project://database/Assets/UI/Textures/Panel.png");
-    -unity-background-scale-mode: stretch-to-fill;
+    background-image: url("project://database/Assets/UI/Textures/Aurora.png");
+    background-size: cover; background-position-y: top; background-position-x: center;
     border-width: 2px; border-color: var(--gold-dark); border-top-color: var(--gold);
     border-radius: 6px; overflow: hidden;
 }
 .ae-shop__header {
     flex-direction: row; align-items: center; height: 54px; padding: 0 14px;
-    background-color: rgba(1, 10, 19, 0.85);
-    border-bottom-width: 1px; border-bottom-color: rgba(200, 170, 110, 0.4);
+    background-color: rgba(6, 8, 30, 0.85);
+    border-bottom-width: 1px; border-bottom-color: rgba(150, 130, 255, 0.4);
 }
 .ae-shop__title { font-size: 20px; margin: 0 18px 0 0; -unity-text-align: middle-left; }
 .ae-shop__search { width: 260px; margin: 0; }
@@ -399,37 +404,38 @@
 .ae-shop__drawers { width: 236px; flex-shrink: 0; margin-right: 8px; }
 .ae-drawer {
     margin-bottom: 8px;
-    background-color: rgba(1, 10, 19, 0.7);
-    border-width: 1px; border-color: var(--gold-dark); border-left-width: 3px; border-left-color: var(--gold);
+    background-color: rgba(6, 8, 30, 0.72);
+    border-width: 1px; border-color: var(--gold-dark); border-left-width: 3px; border-left-color: var(--gold-dark);
     border-radius: 3px;
+    transition-property: border-color, background-color; transition-duration: 0.15s;
 }
+.ae-drawer--open { border-left-color: var(--aurora-cyan); border-color: var(--gold); background-color: rgba(14, 16, 52, 0.92); }
 .ae-drawer__head {
-    background-color: rgba(200, 170, 110, 0.08); border-width: 0; border-radius: 0; margin: 0;
-    color: var(--gold-light); font-size: 12px; -unity-font-style: bold; letter-spacing: 1px;
-    -unity-text-align: middle-left; height: 28px; padding: 0 10px;
+    background-color: rgba(150, 130, 255, 0.08); margin: 0;
+    color: var(--text-dim); font-size: 12px; -unity-font-style: bold; letter-spacing: 1px;
+    -unity-text-align: middle-left; height: 32px; padding: 0 10px;
 }
-.ae-drawer__head:hover { background-color: rgba(200, 170, 110, 0.18); }
-.ae-drawer__head--folded { color: var(--text-dim); }
+.ae-drawer--open .ae-drawer__head { color: var(--gold-light); background-color: rgba(92, 225, 255, 0.10); }
 .ae-drawer__body { flex-direction: row; flex-wrap: wrap; padding: 4px 4px 6px 4px; }
 .ae-shop__owned { width: 50px; height: 50px; margin: 3px 3px; }
 .ae-shop__owned.ae-slot--selected { border-color: var(--gold-light); }
 /* center: the base panel */
 .ae-shop__main {
     flex-grow: 1; flex-shrink: 1;
-    background-color: rgba(1, 10, 19, 0.55);
+    background-color: rgba(6, 8, 30, 0.55);
     border-width: 1px; border-color: var(--gold-dark); border-radius: 3px;
 }
 .ae-shop__categories {
     flex-direction: row; justify-content: center; padding: 6px 8px; flex-shrink: 0;
-    border-bottom-width: 1px; border-bottom-color: rgba(200, 170, 110, 0.3);
-    background-color: rgba(1, 10, 19, 0.6);
+    border-bottom-width: 1px; border-bottom-color: rgba(150, 130, 255, 0.3);
+    background-color: rgba(6, 8, 30, 0.6);
 }
 .ae-shop__categories .ae-iconbutton { width: 44px; height: 44px; margin: 0 5px; }
 .ae-shop__main-row { flex-direction: row; flex-grow: 1; flex-shrink: 1; }
 .ae-shop__stats {
     width: 46px; flex-shrink: 0; align-items: center; padding-top: 6px;
-    border-left-width: 1px; border-left-color: rgba(200, 170, 110, 0.3);
-    background-color: rgba(1, 10, 19, 0.6);
+    border-right-width: 1px; border-right-color: rgba(150, 130, 255, 0.3);
+    background-color: rgba(6, 8, 30, 0.6);
 }
 .ae-shop__stats .ae-iconbutton { width: 34px; height: 34px; margin: 2px 0; }
 .ae-iconbutton {
@@ -437,16 +443,16 @@
     background-color: transparent; align-items: center; justify-content: center;
     transition-property: border-color, background-color; transition-duration: 0.1s;
 }
-.ae-iconbutton:hover { background-color: rgba(200, 170, 110, 0.12); border-color: var(--gold-dark); }
-.ae-iconbutton--active { background-color: rgba(200, 170, 110, 0.22); border-color: var(--gold); }
+.ae-iconbutton:hover { background-color: rgba(150, 130, 255, 0.12); border-color: var(--gold-dark); }
+.ae-iconbutton--active { background-color: rgba(150, 130, 255, 0.22); border-color: var(--gold); }
 .ae-iconbutton__icon { width: 100%; height: 100%; -unity-background-scale-mode: scale-to-fit; opacity: 0.7; }
 .ae-iconbutton:hover .ae-iconbutton__icon { opacity: 0.95; }
 .ae-iconbutton--active .ae-iconbutton__icon { opacity: 1; }
-.ae-shop__grid { flex-grow: 1; flex-shrink: 1; padding: 0 8px 6px 10px; }
+.ae-shop__grid { flex-grow: 1; flex-shrink: 1; padding: 0 6px 6px 10px; }
 .ae-shop__anvils { padding-bottom: 4px; }
 .ae-shop__section {
     color: var(--gold-light); font-size: 12px; margin: 10px 0 6px 2px; -unity-font-style: bold; letter-spacing: 1px;
-    padding-bottom: 3px; border-bottom-width: 1px; border-bottom-color: rgba(200, 170, 110, 0.25);
+    padding-bottom: 3px; border-bottom-width: 1px; border-bottom-color: rgba(150, 130, 255, 0.25);
 }
 .ae-shop__row { flex-direction: row; flex-wrap: wrap; }
 .ae-offer { width: 62px; align-items: center; margin: 3px 2px; }
@@ -454,12 +460,12 @@
 .ae-offer:hover .ae-offer__icon { scale: 1.07 1.07; border-color: var(--gold); }
 .ae-offer__price { font-size: 12px; color: #f5c542; -unity-font-style: bold; margin-top: 2px; }
 .ae-offer--refused .ae-offer__icon { opacity: 0.38; }
-.ae-offer--refused .ae-offer__price { color: #8c8577; }
+.ae-offer--refused .ae-offer__price { color: #6f78a8; }
 .ae-offer--poor .ae-offer__price { color: var(--red); }
 .ae-offer--owned .ae-offer__icon { border-color: var(--teal); }
 .ae-shop__detail {
     width: 300px; flex-shrink: 0; margin-left: 10px; margin-bottom: 2px; padding: 14px;
-    background-color: rgba(1, 10, 19, 0.75);
+    background-color: rgba(6, 8, 30, 0.75);
     border-width: 1px; border-color: var(--gold-dark); border-radius: 3px;
 }
 .ae-detail__head { flex-direction: row; align-items: center; margin-bottom: 8px; }
@@ -473,8 +479,8 @@
 .ae-button--sell:hover { background-color: #7a2828; border-color: #ff8080; }
 .ae-shop__footer {
     flex-direction: row; align-items: center; height: 58px; padding: 0 14px; margin-top: 8px; flex-shrink: 0;
-    background-color: rgba(1, 10, 19, 0.85);
-    border-top-width: 1px; border-top-color: rgba(200, 170, 110, 0.4);
+    background-color: rgba(6, 8, 30, 0.85);
+    border-top-width: 1px; border-top-color: rgba(150, 130, 255, 0.4);
 }
 .ae-shop__header { flex-shrink: 0; }
 .ae-shop__status { flex-grow: 1; color: var(--text); font-size: 13px; -unity-text-align: middle-left; white-space: normal; }
@@ -493,14 +499,14 @@
     margin: 6px;
     padding: 12px 10px 10px 10px;
     align-items: center;
-    background-color: rgba(10, 20, 40, 0.92);
+    background-color: rgba(14, 16, 48, 0.92);
     border-width: 2px;
     border-color: var(--gold-dark);
     border-radius: 4px;
     transition-property: translate, border-color;
     transition-duration: 0.12s;
 }
-.ae-card--clickable:hover { translate: 0 -4px; border-color: var(--gold); background-color: rgba(20, 34, 60, 0.95); }
+.ae-card--clickable:hover { translate: 0 -4px; border-color: var(--gold); background-color: rgba(30, 32, 86, 0.95); }
 .ae-card--clickable:active { scale: 0.98 0.98; }
 .ae-card--disabled { opacity: 0.5; }
 .ae-card-column { align-items: stretch; margin: 0 6px; }
@@ -535,9 +541,9 @@
 .ae-banner {
     -unity-font: url("project://database/Assets/UI/Fonts/NotoSerif-Bold.ttf");
     font-size: 34px;
-    color: #f0e6d2;
+    color: #e2e8ff;
     -unity-text-outline-width: 2px;
-    -unity-text-outline-color: rgba(120, 90, 40, 0.9);
+    -unity-text-outline-color: rgba(70, 60, 170, 0.9);
     margin-top: 18px;
     opacity: 0;
     scale: 0.85 0.85;
@@ -548,7 +554,7 @@
 .ae-banner--show { opacity: 1; scale: 1 1; }
 
 /* ---- augment draft, arena-draft style ---- */
-.ae-draft { background-color: transparent; border-width: 0; width: 960px; }
+.ae-draft { background-color: transparent; background-image: none; border-width: 0; width: 960px; }
 .ae-card--augment { width: 290px; min-height: 400px; margin: 10px 0; padding: 22px 16px 14px 16px; border-width: 3px; border-radius: 8px; flex-shrink: 0; }
 .ae-card--augment .ae-card__icon { width: 112px; height: 112px; margin-bottom: 14px; }
 .ae-card--augment .ae-card__name { font-size: 21px; }
@@ -567,7 +573,7 @@
 .ae-meta__tree { margin: 16px auto 14px auto; align-self: center; }
 .ae-meta__node {
     padding: 8px 10px;
-    background-color: rgba(10, 20, 40, 0.95);
+    background-color: rgba(14, 16, 48, 0.95);
     border-width: 2px;
     border-color: var(--gold-dark);
     border-radius: 5px;
@@ -575,9 +581,27 @@
     transition-duration: 0.12s;
 }
 .ae-meta__node:hover { border-color: var(--gold); translate: 0 -2px; }
-.ae-meta__node--owned { border-color: var(--gold); background-color: rgba(40, 32, 12, 0.95); }
+.ae-meta__node--owned { border-color: var(--gold); background-color: rgba(34, 26, 78, 0.95); }
 .ae-meta__node--max { border-color: #ffe080; }
 .ae-meta__node--locked { opacity: 0.5; }
 .ae-meta__icon { width: 40px; height: 40px; margin-right: 8px; -unity-background-scale-mode: scale-to-fit; }
 .ae-meta__name { -unity-font: url("project://database/Assets/UI/Fonts/NotoSerif-Bold.ttf"); font-size: 14px; color: var(--gold-light); white-space: normal; }
 .ae-reward { -unity-font: url("project://database/Assets/UI/Fonts/NotoSerif-Bold.ttf"); font-size: 20px; color: #c8a0ff; margin-bottom: 10px; -unity-text-align: middle-center; }
+
+/* ---- scrollbars: thin aurora rail, glowing thumb, no arrows ---- */
+.ae-root .unity-scroller--vertical { width: 10px; margin-left: 2px; }
+.ae-root .unity-scroller--horizontal { height: 10px; }
+.ae-root .unity-scroller .unity-repeat-button { display: none; }
+.ae-root .unity-scroller .unity-slider { margin: 2px 0; flex-grow: 1; }
+.ae-root .unity-scroller .unity-base-slider__tracker {
+    background-image: url("project://database/Assets/UI/Textures/ScrollTrack.png");
+    -unity-slice-top: 6; -unity-slice-bottom: 6; -unity-slice-left: 4; -unity-slice-right: 4;
+    background-color: rgba(0, 0, 0, 0); border-width: 0; border-radius: 0; left: 2px; right: 2px; width: auto;
+}
+.ae-root .unity-scroller .unity-base-slider__dragger {
+    background-image: url("project://database/Assets/UI/Textures/ScrollThumb.png");
+    -unity-slice-top: 8; -unity-slice-bottom: 8; -unity-slice-left: 4; -unity-slice-right: 4;
+    background-color: rgba(0, 0, 0, 0); border-width: 0; border-radius: 0; left: 1px; right: 1px; width: auto; min-height: 28px;
+}
+.ae-root .unity-scroller .unity-base-slider__dragger:hover { -unity-background-image-tint-color: #d6f6ff; }
+.ae-root .unity-scroller .unity-base-slider__dragger-border { display: none; }
