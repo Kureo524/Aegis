@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb268d7b3b865bd4fa4aca45803ef906, type: 3}
+  m_Name: Passive_Item_BindingChain
+  m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
+  displayName: Entrave
+  description: "Les attaques ralentissent de 30 % pendant 1 s ; une sur cinq \xE9tourdit
+    0,6 s."
+  icon: {fileID: 21300000, guid: 159595c0408319caab549aa5393503b2, type: 3}
+  stats: []
+  capabilities: 
+  triggers:
+  - On: 0
+    EveryN: 1
+    Chance: 1
+    HealthBelow: 0
+    Cooldown: 0
+    ConsumesCharge: 0
+    Effect: 3
+    Stats: []
+    Duration: 0
+    Damage: 0
+    ScalingStat: 0
+    DamageRatio: 0
+    TargetMaxHealthRatio: 0
+    TargetCurrentHealthRatio: 0
+    DamageType: 0
+    Count: 0
+    Radius: 0
+    BoltColor: {r: 0, g: 0, b: 0, a: 0}
+    Loot: 0
+    Status:
+      Kind: 3
+      Duration: 1
+      Power: 0.3
+      ScalingStat: 0
+      Ratio: 0
+      TargetMaxHealthRatio: 0
+      MaxStacks: 0
+    Amount: 0
+    AmountStat: 0
+    AmountRatio: 0
+  - On: 0
+    EveryN: 5
+    Chance: 1
+    HealthBelow: 0
+    Cooldown: 0
+    ConsumesCharge: 0
+    Effect: 3
+    Stats: []
+    Duration: 0
+    Damage: 0
+    ScalingStat: 0
+    DamageRatio: 0
+    TargetMaxHealthRatio: 0
+    TargetCurrentHealthRatio: 0
+    DamageType: 0
+    Count: 0
+    Radius: 0
+    BoltColor: {r: 0, g: 0, b: 0, a: 0}
+    Loot: 0
+    Status:
+      Kind: 0
+      Duration: 0.6
+      Power: 0
+      ScalingStat: 0
+      Ratio: 0
+      TargetMaxHealthRatio: 0
+      MaxStacks: 0
+    Amount: 0
+    AmountStat: 0
+    AmountRatio: 0
+  stacks:
+    Source: 0
+    Reset: 0
+    Max: 0
+    Duration: 0
+    PerStack: []
+  nearbyEnemies:
+    Radius: 0
+    Max: 0
+    PerEnemy: []
+  aura:
+    Radius: 0
+    Interval: 0
+    Damage: 0
+    ScalingStat: 0
+    Ratio: 0
+    DamageType: 0
+    HealPerEnemy: 0
+  conversions: []

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
   m_Name: Spell_Ignite
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
-  displayName: Embrasement
+  displayName: "Tison"
   icon: {fileID: 21300000, guid: d1d3ff290ea1d2792bd38f9966b5a8a3, type: 3}
   color: {r: 1, g: 0.5, b: 0.2, a: 1}
   description: 

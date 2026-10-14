@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
   m_Name: Spell_Ghost
   m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
-  displayName: "Fant\xF4me"
+  displayName: "Pas du vent"
   icon: {fileID: 21300000, guid: 12d989b7042e5ca29962be75f0cd13d2, type: 3}
   color: {r: 0.75, g: 0.9, b: 1, a: 1}
   description: 

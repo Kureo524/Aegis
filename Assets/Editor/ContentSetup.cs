@@ -17,7 +17,7 @@ namespace EditorTools {
     /// boss:
     /// - statuses on the enemy spells; tenacity for the brute and Grokk;
     /// - 7 augments, built from the generic passive bricks and added to the augment catalog (the
-    ///   9b items were replaced by LoL's, LolItemsSetup).
+    ///   9b items were replaced by ItemsSetup's).
     /// Everything is only filled when missing (a spell whose statuses were set by hand is kept), so
     /// running it again changes nothing. Values are placeholders, names are original.
     /// </summary>

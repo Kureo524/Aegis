@@ -116,7 +116,7 @@ namespace EditorTools {
             so.FindProperty("goldReward").intValue = 150;
             so.FindProperty("pattern").objectReferenceValue = pattern;
             SerializedProperty items = so.FindProperty("items");
-            string[] itemIds = { "SunfireAegis", "BlackCleaver" };
+            string[] itemIds = { "EmberPlate", "IronCleaver" };
             items.arraySize = itemIds.Length;
             for (int i = 0; i < itemIds.Length; i++)
                 items.GetArrayElementAtIndex(i).objectReferenceValue = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"{EconomySetup.Dir}/Items/Item_{itemIds[i]}.asset");
