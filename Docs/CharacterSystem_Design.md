@@ -494,6 +494,25 @@ Stats : 590 PV (+100), 360 mana (+65), 60 AD (+2,6), 0,66 AS (+2,5 %), portée 5
 
 Les briques `Mark` et `CooldownRefundOnHit` (marques, remboursement de délai) restent dans le moteur pour de futurs champions.
 
+### 7.10 Aldric, le Gardien de l'aurore, et la sélection du champion (14/10/2026)
+
+**Deuxième champion**, original : vieux chevalier du givre au **corps à corps** (combattant / tank), à l'opposé de Vesna. `AldricSetup` (réécrit à chaque setup ; données dans `Assets/Data/Characters/Aldric`, sorts dans `Assets/Data/Spells/Aldric`) ; attaque de base sans projectile (mêlée, windup 30 %).
+
+| Sort | Effet |
+|---|---|
+| **Passif — Givre mordant** | toutes les 3 attaques : 20 + 60 % AD physiques aux ennemis à moins de 2 m de la cible, qui est ralentie de 30 % 1 s (`Splash` + `ApplyStatus`, `EveryN` 3) |
+| **Q — Taille boréale** | cône large (3,6 m, 120°) : 45/75/105/135/165 + 110 % AD physiques, −20 % armure et RM 3 s (`Shred`) ; 6 → 4 s ; 20 → 28 mana |
+| **W — Rempart de givre** | sur lui : bouclier 80 (3 s), +20 armure et RM 3 s, onde de 3 m : 40/65/90/115/140 + 60 % AD bonus magiques, ralentit de 35 % 1,5 s ; 16 → 12 s ; 50 mana |
+| **E — Bond polaire** | saut de 6,5 m au point visé, impact de 2,2 m : 60/90/120/150/180 + 70 % AD bonus physiques, enracine 0,75 s ; 15 → 9 s ; 45 mana |
+| **R — Couronne d'aurore** | après 0,6 s, explosion de 5 m autour de lui : 250/400/550 + 120 % AD bonus magiques, étourdit 1 s, puis +50 % vitesse d'attaque 5 s ; 90/75/60 s ; 100 mana |
+| **F — Bond éclair** | comme Vesna |
+
+Stats : 640 PV (+105), 300 mana (+45), 64 AD (+3,2), 0,70 AS (+2,2 %), portée 1,8, 30 armure (+4,8), 30 RM (+1,8), vitesse 5,2. Bot d'équilibrage (`AEGIS_BALANCE_CHAMPION=Aldric`, mode mêlée) : stage gagné. Objets recommandés : bottes ferrées, sceau de la triade, fendoir de fer, cœur de titan, marteau de l'aube, gantelet du serment, hache-tonnerre, plaque glaciaire. Modèle : « King » de Quaternius (CC0) recoloré givre / violet, **épée de glace ajoutée au rendu** (option `blade` de `Tools/SpriteBaking/render_sprites.py`, attachée au poignet droit) ; icônes game-icons (sword-slice, ice-shield, jump-across, polar-star, snowflake-2).
+
+**Moteur** (génériques, pilotés par les données) : un sort `Self` qui inflige des dégâts touche tous les ennemis dans son rayon autour du lanceur (nova) ; un saut (`blink`) qui inflige des dégâts (sans `blinkBoltRadius`) touche les ennemis dans son rayon au point d'arrivée.
+
+**Sélection du champion** : `ChampionRoster` (SO du root scope, `Assets/Data/Settings/ChampionRoster.asset` : Vesna, Aldric ; le premier est le champion par défaut) et `ChampionSelection` (service du root scope : champion des prochaines runs, gardé pour la session, changé par `ChampionPickRequestedEvent` → `ChampionSelectedEvent`). « Jouer » du menu principal ouvre l'**écran de sélection** (`ChampionSelectPanel`, `ChampionSelectRequestedEvent`) : une carte par champion (portrait, nom, épithète `CharacterDefinition.Epithet`, résumé `Summary`, passif et Q W E R avec infobulles) ; un clic choisit, « Jouer ▶ » ou un double-clic lance la run (`PlayRequestedEvent`). Le `GameLifetimeScope` fait apparaître le champion choisi (son `playerDefinition` ne sert que si le roster est vide). **Méta-progression** : un arbre par champion (`MetaSetup`, arbre d'Aldric axé résistances, contrôle et PV), l'écran Progression a un onglet par champion et ouvre celui du champion choisi.
+
 ### 7.9 UI
 
 **UI façon LoL (13/10/2026)**, UI Toolkit :
@@ -883,7 +902,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **8** ✅ | `CharacterEvents`, passifs (briques génériques : stats, triggers, stacks, ennemis proches), capacités (`SpellCrit`), augments (4 → 6 slots, relances, relance dorée, slots pleins), passifs d'items, loot (enclume à stats, sorts d'invocateur) | Builds variés |
 | **9** 🟡 | Boss à patterns et items ✅ (9a). Statuts (stun, root, silence, ralentissement, saignement, brûlure, ténacité), soins et boucliers, statuts sur les sorts, +14 items, +7 augments ✅ (9b). 4 nouveaux ennemis (loup, mage squelette, chaman gobelin, golem de pierre) ✅ (9c). *Reste : nouveaux éléments et sorts (avec un deuxième personnage), équilibrage.* | Prototype riche |
 | **10** 🟡 | **Refonte LoL** : sorts par champion (Q W E R à rangs, D F), Ezreal, touches par position, dézoom de la caméra ✅. Objets de LoL (65, passif propre, force adaptative sur les prismatiques, groupes uniques) ✅. Rééquilibrage (bot `BalanceSimulation`) ✅. UI façon LoL ✅ (§7.9). *Reste : boutique complète plus tôt dans le calendrier des récompenses (à valider), boss encore dur.* | Ezreal jouable |
-| **11** 🟡 | Contenu 100 % original (Vesna, objets, augments, bestiaire, icônes) ✅. Méta-progression : monnaie persistante, arbre du champion, écran Progression, bonus appliqués en début de run ✅ (§9.7). *Reste : `RunSnapshot` (quitter/reprendre), polish, audio.* | Prototype solide |
+| **11** 🟡 | Contenu 100 % original (Vesna, objets, augments, bestiaire, icônes) ✅. Méta-progression : monnaie persistante, arbre du champion, écran Progression, bonus appliqués en début de run ✅ (§9.7). Deuxième champion (Aldric, mêlée) et écran de sélection du champion ✅ (§7.10). *Reste : `RunSnapshot` (quitter/reprendre), polish, audio.* | Prototype solide |
 
 ---
 

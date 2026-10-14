@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_Aldric_W
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: Rempart de givre
+  description: "Dresse un rempart de givre : bouclier de 80 pendant 3 s, +20 armure
+    et r\xE9sistance magique pendant 3 s, et une onde de froid autour de lui (40/65/90/115/140
+    (+60 % AD bonus) d\xE9g\xE2ts magiques, ralentit de 35 % pendant 1,5 s)."
+  icon: {fileID: 21300000, guid: 0143d0dd47f9b2ba2afe6edc22dd0f23, type: 3}
+  color: {r: 0.55, g: 0.75, b: 1, a: 1}
+  rankUnlockLevels: 0100000003000000050000000700000009000000
+  baseDamage:
+  - 40
+  - 65
+  - 90
+  - 115
+  - 140
+  cooldowns:
+  - 16
+  - 15
+  - 14
+  - 13
+  - 12
+  manaCosts:
+  - 50
+  targeting: 0
+  range: 8
+  radius: 3
+  coneAngle: 60
+  castTime: 0.15
+  canMoveWhileCasting: 1
+  kind: 0
+  adRatio: 0
+  bonusAdRatio: 0.6
+  apRatio: 0
+  buffs:
+  - Stat: 14
+    Type: 0
+    Value: 20
+    Duration: 3
+  - Stat: 15
+    Type: 0
+    Value: 20
+    Duration: 3
+  statuses:
+  - Kind: 3
+    Duration: 1.5
+    Power: 0.35
+    ScalingStat: 0
+    Ratio: 0
+    TargetMaxHealthRatio: 0
+    MaxStacks: 1
+  selfSustain:
+    Heal: 0
+    Shield: 80
+    PowerRatio: 0
+    ShieldDuration: 3
+  affectsAllies: 0
+  projectileSpeed: 18
+  pierce: 0
+  blink: 0
+  fixedRange: 0
+  appliesOnHit: 0
+  cooldownRefundOnHit: 0
+  mark:
+    Enabled: 0
+    Duration: 0
+    ManaRefund: []
+  blinkBoltRadius: 0

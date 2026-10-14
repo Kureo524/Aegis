@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
   displayName: Loup
   faction: 1
+  epithet: 
+  summary: 
   sprite: {fileID: -942682772, guid: 2986fb9d144899d14829e9694810d082, type: 3}
   animations: {fileID: 11400000, guid: c232d8454ca22531683088b1acca3758, type: 2}
   portrait: {fileID: 0}

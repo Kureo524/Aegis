@@ -26,8 +26,8 @@ namespace EditorTools {
         public const string HeroName = "Vesna";
         private const string SpellsDir = "Assets/Data/Spells/Vesna";
         private const string IconsDir = "Assets/GraphicAssets/Sprites/Spells";
-        private static readonly int[] BasicRanks = { 1, 3, 5, 7, 9 };
-        private static readonly int[] UltimateRanks = { 6, 11, 16 };
+        internal static readonly int[] BasicRanks = { 1, 3, 5, 7, 9 };
+        internal static readonly int[] UltimateRanks = { 6, 11, 16 };
 
         private static readonly string[] Recommended = {
             "DuelistGreaves", "TriadSigil", "WrathBlade", "GaleBow", "SunsteelBlade", "CrimsonChalice", "GiantsBane", "HungryAxe",
@@ -42,6 +42,8 @@ namespace EditorTools {
             if (hero == null) return;
             var so = new SerializedObject(hero);
             so.FindProperty("displayName").stringValue = HeroName;
+            so.FindProperty("epithet").stringValue = "la Lanceuse de braises";
+            so.FindProperty("summary").stringValue = "Lanceuse de sorts à distance : enchaîne un sort puis une attaque pour faire exploser sa Surchauffe, brûle les groupes et roule hors de portée. Fragile mais redoutable de loin.";
             SerializedProperty abilities = so.FindProperty("abilities");
             abilities.arraySize = 4;
             abilities.GetArrayElementAtIndex(0).objectReferenceValue = q;
@@ -51,18 +53,22 @@ namespace EditorTools {
             so.FindProperty("summonerF").objectReferenceValue = flash;
             so.FindProperty("passive").objectReferenceValue = Passive();
             // Shop "Recommended" tab: attack speed and spellblade to cash in Overheat, then damage
-            var recommended = new System.Collections.Generic.List<ItemDefinition>();
-            foreach (string id in Recommended) {
-                var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/Data/Economy/Items/Item_{id}.asset");
-                if (item != null) recommended.Add(item);
-            }
-            SerializedProperty list = so.FindProperty("recommendedItems");
-            list.arraySize = recommended.Count;
-            for (int i = 0; i < recommended.Count; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = recommended[i];
+            SetRecommended(so, Recommended);
             so.ApplyModifiedPropertiesWithoutUndo();
 
             WriteStats(hero.BaseStats);
             WriteGrowth(hero.GrowthPerLevel);
+        }
+
+        internal static void SetRecommended(SerializedObject champion, string[] ids) {
+            var recommended = new System.Collections.Generic.List<ItemDefinition>();
+            foreach (string id in ids) {
+                var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/Data/Economy/Items/Item_{id}.asset");
+                if (item != null) recommended.Add(item);
+            }
+            SerializedProperty list = champion.FindProperty("recommendedItems");
+            list.arraySize = recommended.Count;
+            for (int i = 0; i < recommended.Count; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = recommended[i];
         }
 
         // Q: cone in front of her, physical, slows
@@ -145,7 +151,7 @@ namespace EditorTools {
                     new StatusApplication { Kind = StatusKind.Burn, Power = 20f, ScalingStat = StatType.MagicAttack, Ratio = 0.1f, Duration = 3f, MaxStacks = 1 });
             });
 
-        private static void Statuses(SerializedObject so, params StatusApplication[] statuses) {
+        internal static void Statuses(SerializedObject so, params StatusApplication[] statuses) {
             SerializedProperty list = so.FindProperty("statuses");
             list.arraySize = statuses.Length;
             for (int i = 0; i < statuses.Length; i++) {
@@ -161,11 +167,16 @@ namespace EditorTools {
         }
 
         private static SpellDefinition Ability(string id, string name, string description, Color color, int[] ranks,
-                                               System.Action<SerializedObject> configure) {
-            string path = $"{SpellsDir}/Spell_{id}.asset";
+                                               System.Action<SerializedObject> configure) =>
+            Ability(SpellsDir, id, name, description, color, ranks, configure);
+
+        /// <summary>A champion ability asset (Spell_&lt;id&gt; in <paramref name="dir"/>), reset then configured.</summary>
+        internal static SpellDefinition Ability(string dir, string id, string name, string description, Color color, int[] ranks,
+                                                System.Action<SerializedObject> configure) {
+            string path = $"{dir}/Spell_{id}.asset";
             var spell = AssetDatabase.LoadAssetAtPath<SpellDefinition>(path);
             if (spell == null) {
-                Directory.CreateDirectory(SpellsDir);
+                Directory.CreateDirectory(dir);
                 spell = ScriptableObject.CreateInstance<SpellDefinition>();
                 AssetDatabase.CreateAsset(spell, path);
             }
@@ -184,6 +195,11 @@ namespace EditorTools {
             so.FindProperty("mark").FindPropertyRelative("Enabled").boolValue = false;
             so.FindProperty("buffs").arraySize = 0;
             so.FindProperty("statuses").arraySize = 0;
+            so.FindProperty("targeting").enumValueIndex = (int)TargetingType.Skillshot;
+            SerializedProperty sustain = so.FindProperty("selfSustain");
+            sustain.FindPropertyRelative("Heal").floatValue = 0f;
+            sustain.FindPropertyRelative("Shield").floatValue = 0f;
+            sustain.FindPropertyRelative("PowerRatio").floatValue = 0f;
             so.FindProperty("adRatio").floatValue = 0f;
             so.FindProperty("bonusAdRatio").floatValue = 0f;
             so.FindProperty("apRatio").floatValue = 0f;
@@ -210,29 +226,33 @@ namespace EditorTools {
         }
 
         // Ranged caster: a bit frailer than a bruiser, a lot of mana for her spell chains
-        private static void WriteStats(StatBlock block) {
-            if (block == null) return;
-            WriteList(block, "entries", new (StatType, float)[] {
+        private static void WriteStats(StatBlock block) => WriteStats(block, new (StatType, float)[] {
                 (StatType.MaxHealth, 590f), (StatType.HealthRegen, 0.8f),
                 (StatType.MaxMana, 360f), (StatType.ManaRegen, 3f),
                 (StatType.PhysicalAttack, 60f), (StatType.MagicAttack, 0f),
                 (StatType.AttackSpeed, 0.66f), (StatType.AttackRange, 5.5f),
                 (StatType.CritDamage, 1.75f), (StatType.Armor, 24f), (StatType.MagicResist, 30f),
                 (StatType.MoveSpeed, 5f), (StatType.HealShieldPower, 1f),
-            }, (e, v) => {
+            });
+
+        internal static void WriteStats(StatBlock block, (StatType, float)[] values) {
+            if (block == null) return;
+            WriteList(block, "entries", values, (e, v) => {
                 e.FindPropertyRelative("Type").enumValueIndex = (int)v.Item1;
                 e.FindPropertyRelative("Value").floatValue = v.Item2;
             });
         }
 
-        private static void WriteGrowth(StatGrowth growth) {
-            if (growth == null) return;
-            WriteList(growth, "entries", new (StatType, float, ModifierType)[] {
+        private static void WriteGrowth(StatGrowth growth) => WriteGrowth(growth, new (StatType, float, ModifierType)[] {
                 (StatType.MaxHealth, 100f, ModifierType.Flat), (StatType.HealthRegen, 0.13f, ModifierType.Flat),
                 (StatType.MaxMana, 65f, ModifierType.Flat), (StatType.ManaRegen, 0.15f, ModifierType.Flat),
                 (StatType.PhysicalAttack, 2.6f, ModifierType.Flat), (StatType.AttackSpeed, 0.025f, ModifierType.PercentAdd),
                 (StatType.Armor, 4.5f, ModifierType.Flat), (StatType.MagicResist, 1.3f, ModifierType.Flat),
-            }, (e, v) => {
+            });
+
+        internal static void WriteGrowth(StatGrowth growth, (StatType, float, ModifierType)[] values) {
+            if (growth == null) return;
+            WriteList(growth, "entries", values, (e, v) => {
                 e.FindPropertyRelative("Stat").enumValueIndex = (int)v.Item1;
                 e.FindPropertyRelative("GainPerLevel").floatValue = v.Item2;
                 e.FindPropertyRelative("Type").enumValueIndex = (int)v.Item3;
@@ -248,7 +268,7 @@ namespace EditorTools {
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void WriteList<T>(Object target, string field, T[] values, System.Action<SerializedProperty, T> write) {
+        internal static void WriteList<T>(Object target, string field, T[] values, System.Action<SerializedProperty, T> write) {
             var so = new SerializedObject(target);
             SerializedProperty list = so.FindProperty(field);
             list.arraySize = values.Length;

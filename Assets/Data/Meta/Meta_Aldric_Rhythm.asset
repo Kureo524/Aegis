@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa1d26b6a60a3d3c68b2d37a15dde8d6, type: 3}
+  m_Name: Meta_Aldric_Rhythm
+  m_EditorClassIdentifier: Game.Features::Features.Meta.MetaNodeDefinition
+  displayName: Cadence
+  description: Vitesse d'attaque.
+  icon: {fileID: 21300000, guid: 77249c691fde55becb934923927ccc54, type: 3}
+  costs: 28000000410000005f000000
+  prerequisites:
+  - {fileID: 11400000, guid: 24d3dd57a88421d57be7dfc83927f566, type: 2}
+  effects:
+  - Kind: 0
+    Stat: 6
+    Type: 1
+    Value: 0.04
+  position: {x: 2, y: 0}

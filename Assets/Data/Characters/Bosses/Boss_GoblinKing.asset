@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Enemies.BossDefinition
   displayName: Grokk
   faction: 1
+  epithet: 
+  summary: 
   sprite: {fileID: 1111269079, guid: 3d96603b82cf483edb46a922b6937315, type: 3}
   animations: {fileID: 11400000, guid: c0b8b6bb61fd12af7af84d30a4b22249, type: 2}
   portrait: {fileID: -7094847895762900040, guid: 5e4cf5d9d88afe76e9f1a2ea25f1515a, type: 3}

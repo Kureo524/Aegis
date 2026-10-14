@@ -18,3 +18,4 @@ MonoBehaviour:
   perWaveOnDefeat: 0
   trees:
   - {fileID: 11400000, guid: db999a4bca03d06808049a3d7427e0f1, type: 2}
+  - {fileID: 11400000, guid: 574af1bd9aed5a39badff9e1d0b6f7c0, type: 2}

@@ -623,3 +623,33 @@
 }
 .ae-root .unity-scroller .unity-base-slider__dragger:hover { -unity-background-image-tint-color: #d6f6ff; }
 .ae-root .unity-scroller .unity-base-slider__dragger-border { display: none; }
+
+/* ---- champion select ---- */
+.ae-champselect { width: 1060px; padding: 22px 26px 18px 26px; }
+.ae-champselect__cards { flex-direction: row; justify-content: center; margin: 14px 0 16px 0; }
+.ae-champ {
+    width: 440px; margin: 0 14px; padding: 16px 18px 14px 18px; align-items: center;
+    background-color: rgba(10, 12, 40, 0.85);
+    border-width: 2px; border-color: var(--gold-dark); border-radius: 8px;
+    transition-property: border-color, translate, background-color; transition-duration: 0.15s;
+}
+.ae-champ:hover { border-color: var(--gold); translate: 0 -4px; }
+.ae-champ--selected { border-color: var(--aurora-cyan); background-color: rgba(24, 28, 84, 0.92); }
+.ae-champ__portrait {
+    width: 220px; height: 220px; border-radius: 110px; border-width: 3px; border-color: var(--gold-dark);
+    background-color: rgba(30, 32, 86, 0.8); -unity-background-scale-mode: scale-and-crop;
+}
+.ae-champ--selected .ae-champ__portrait { border-color: var(--aurora-cyan); }
+.ae-champ__name { -unity-font: url("project://database/Assets/UI/Fonts/NotoSerif-Bold.ttf"); font-size: 26px; color: var(--gold-light); margin-top: 10px; }
+.ae-champ__epithet { font-size: 14px; color: var(--aurora-violet); -unity-font-style: italic; margin-bottom: 8px; }
+.ae-champ__summary { font-size: 13px; color: var(--text); white-space: normal; -unity-text-align: middle-center; min-height: 72px; }
+.ae-champ__kit { flex-direction: row; justify-content: center; margin-top: 10px; }
+.ae-champ__spell { width: 54px; height: 54px; margin: 0 4px; -unity-background-scale-mode: scale-to-fit; }
+.ae-champ__key {
+    position: absolute; bottom: 0; right: 2px; font-size: 11px; -unity-font-style: bold; color: var(--gold-light);
+    -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.9);
+}
+.ae-champselect__footer { flex-direction: row; align-items: center; }
+.ae-champselect__play { width: 240px; height: 46px; font-size: 18px; }
+.ae-meta__tabs { flex-direction: row; justify-content: center; margin: 6px 0 2px 0; }
+.ae-meta__tabs .ae-tab { font-size: 15px; padding: 4px 18px 8px 18px; margin: 0 6px; }

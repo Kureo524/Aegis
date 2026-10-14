@@ -6,6 +6,7 @@ vue 3/4 tournée vers la droite, contour sombre, pivot aux pieds) par `Tools/Spr
 | Planche | Modèle source | Licence |
 |---|---|---|
 | Vesna | « Adventurer » de Quaternius (https://quaternius.com), recoloré, braise ajoutée | CC0 |
+| Aldric | « King » de Quaternius (https://quaternius.com), recoloré (givre, violet), épée de glace ajoutée | CC0 |
 | Goblin | « Orc » (Ultimate Monsters), Quaternius | CC0 |
 | SkeletonArcher | « Skeleton », Quaternius | CC0 |
 | Brute | « Blue Demon » (Ultimate Monsters), Quaternius | CC0 |

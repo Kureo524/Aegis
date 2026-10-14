@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45f014c6ae418d65281ee01e40135079, type: 3}
+  m_Name: Char_Aldric
+  m_EditorClassIdentifier: Game.Features::Features.Characters.CharacterDefinition
+  displayName: Aldric
+  faction: 0
+  epithet: le Gardien de l'aurore
+  summary: "Vieux chevalier du givre au corps \xE0 corps : encaisse derri\xE8re son
+    rempart, bondit au milieu de la horde, l'enracine et la g\xE8le, puis fait \xE9clater
+    l'aurore autour de lui. Solide, mais il doit aller au contact."
+  sprite: {fileID: 1801324476, guid: f81d7306df423b9a3bdaaed3fd6ea9dc, type: 3}
+  animations: {fileID: 11400000, guid: abdb434aab49875d98bc596a25fc4732, type: 2}
+  portrait: {fileID: 7719326812870660107, guid: 90c9f7db53ff2634db122388bee86ace, type: 3}
+  bodySize: {x: 0.9, y: 1.6}
+  baseStats: {fileID: 11400000, guid: 035391c6ba0a0f79cb47fd256fdeb541, type: 2}
+  growthPerLevel: {fileID: 11400000, guid: ed2f96457af81440a8f85c56925e5253, type: 2}
+  basicAttack: {fileID: 11400000, guid: b58fb667ed076673a9233cabb691d418, type: 2}
+  abilities:
+  - {fileID: 11400000, guid: 910db6415a35e4fac84f422bbdba0459, type: 2}
+  - {fileID: 11400000, guid: f284d74229547be33a46bef2fd78635c, type: 2}
+  - {fileID: 11400000, guid: d2b211981485335c089edcf09f77b6b6, type: 2}
+  - {fileID: 11400000, guid: 74042f031eafe79768bda978421b8b57, type: 2}
+  summonerD: {fileID: 0}
+  summonerF: {fileID: 11400000, guid: 686457718ecb8036f934c742aac8362a, type: 2}
+  recommendedItems:
+  - {fileID: 11400000, guid: ed61cfc63c6df3abdad3cbed0eef7c10, type: 2}
+  - {fileID: 11400000, guid: 01f84add28d69e298bba778b132364d0, type: 2}
+  - {fileID: 11400000, guid: 21b333efa21f42eaeba1df1107a3ad40, type: 2}
+  - {fileID: 11400000, guid: 039f644573dea6a40ab89dfc7aef5478, type: 2}
+  - {fileID: 11400000, guid: faee62044566fa88496376a0952cbd57, type: 2}
+  - {fileID: 11400000, guid: c7922e936d0edb42a9506c7f7de438dc, type: 2}
+  - {fileID: 11400000, guid: 90e19625177a821f9b30d20ecfe22ed6, type: 2}
+  - {fileID: 11400000, guid: 9f666caadd1f1b814bf1da2f05142026, type: 2}
+  passive: {fileID: 11400000, guid: 7f25d1ae9cd80c8569d17c434e9e3b96, type: 2}

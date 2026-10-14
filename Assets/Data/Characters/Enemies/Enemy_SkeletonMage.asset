@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
   displayName: Spectre glacial
   faction: 1
+  epithet: 
+  summary: 
   sprite: {fileID: -455579479, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
   animations: {fileID: 11400000, guid: 9fe6e24ed02fe3976a776b82625477f9, type: 2}
   portrait: {fileID: 0}

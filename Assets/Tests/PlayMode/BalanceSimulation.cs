@@ -33,10 +33,14 @@ namespace Game.Tests.PlayMode {
     /// ranks R &gt; Q &gt; W &gt; E, buys an attack build and takes the first augment. One line per wave
     /// (time to the quota, lowest HP, level, gold, items) goes to the file named by the
     /// AEGIS_BALANCE_LOG environment variable (Temp/balance.log by default).
+    /// AEGIS_BALANCE_CHAMPION=Aldric plays the melee champion instead: no kiting, W and R in the
+    /// middle of the horde, E onto groups, his recommended items.
     /// Run it with -testFilter BalanceSimulation.
     /// </summary>
     [Explicit("Balancing tool: long, run on demand.")]
     public class BalanceSimulation {
+        private string[] _build;
+        private bool _melee;
         private static readonly string[] Build = {
             "Item_RuneSickle", "Item_DuelistGreaves", "Item_TideBreaker", "Item_SunsteelBlade",
             "Item_GiantsBane", "Item_CrimsonChalice",
@@ -66,6 +70,12 @@ namespace Game.Tests.PlayMode {
 
         [UnityTest, Timeout(3_000_000)]
         public IEnumerator HeroBot_PlaysTheTestStage() {
+            string champion = System.Environment.GetEnvironmentVariable("AEGIS_BALANCE_CHAMPION");
+            if (!string.IsNullOrEmpty(champion)) {
+                IObjectResolver root = VContainerSettings.Instance.GetOrCreateRootLifetimeScopeInstance().Container;
+                CharacterDefinition pick = root.Resolve<ChampionSelection>().Champions.FirstOrDefault(c => c.DisplayName == champion);
+                if (pick != null) root.Resolve<IEventBus>().Publish(new ChampionPickRequestedEvent(pick));
+            }
             yield return SceneManager.LoadSceneAsync("TestScene", LoadSceneMode.Single);
             yield return null;
             _root = VContainerSettings.Instance.GetOrCreateRootLifetimeScopeInstance().Container;
@@ -75,6 +85,9 @@ namespace Game.Tests.PlayMode {
             _root.Resolve<UserOptions>().CastMode = CastMode.Quick;
             _player = _game.Resolve<EnemyDirector>().Player;
             _abilities = _player.GetComponent<AbilityCaster>();
+            _melee = !_player.Definition.BasicAttack.IsRanged;
+            _build = _melee ? _player.Definition.RecommendedItems.Select(i => i.name).ToArray() : Build;
+            _log.Add($"champion={_player.Definition.DisplayName}");
             _camera = Object.FindFirstObjectByType<CameraController>().GetComponent<Camera>();
             var run = _game.Resolve<RunDirector>();
             var machine = _root.Resolve<GameFlowStateMachine>();
@@ -135,7 +148,7 @@ namespace Game.Tests.PlayMode {
                 shop.Choose(0);
                 return;
             }
-            foreach (string id in Build) {
+            foreach (string id in _build) {
                 ItemDefinition item = _game.Resolve<ShopCatalog>().Items.FirstOrDefault(i => i.name == id);
                 if (item != null && shop.RefusalReason(item) == null) shop.TryBuy(item);
             }
@@ -162,6 +175,10 @@ namespace Game.Tests.PlayMode {
             float distance = Flat(nearest.transform.position - _player.transform.position).magnitude;
             Vector3 away = Flat(_player.transform.position - Centroid(6f)).normalized;
 
+            if (_melee) {
+                PlayMelee(nearest, distance, away);
+                return;
+            }
             if (_player.Health.Ratio < 0.25f) Cast(AbilitySlots.SummonerF, _player.transform.position + away * 4f);
             if (_player.Health.Ratio < 0.45f || distance < 1.6f) Cast(2, _player.transform.position + away * 4f);
             if (CountWithin(14f) >= 6) Cast(3, Centroid(14f));
@@ -177,6 +194,17 @@ namespace Game.Tests.PlayMode {
                 movement.SetDestination(_player.transform.position + away * 3f);
             }
             else if (attacker.Target != focus) attacker.Attack(focus);
+        }
+
+        // Melee: into the horde, W when surrounded, E onto the biggest group, R when 5+ are close
+        private void PlayMelee(Character nearest, float distance, Vector3 away) {
+            if (_player.Health.Ratio < 0.2f) Cast(AbilitySlots.SummonerF, _player.transform.position + away * 4f);
+            if (CountWithin(3f) >= 2 || _player.Health.Ratio < 0.5f) Cast(1, _player.transform.position);
+            if (CountWithin(5f) >= 5) Cast(3, _player.transform.position);
+            if (distance > 3f && distance < 6.5f) Cast(2, nearest.transform.position);
+            if (distance < 3.6f) Cast(0, nearest.transform.position);
+            var attacker = _player.GetComponent<BasicAttacker>();
+            if (attacker.Target != nearest) attacker.Attack(nearest);
         }
 
         private void Cast(int slot, Vector3 at) {

@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_Aldric_Q
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: "Taille bor\xE9ale"
+  description: "Balaie l'avant d'Aldric de sa lame de givre : 45/75/105/135/165 (+110
+    % AD) d\xE9g\xE2ts physiques aux ennemis touch\xE9s, qui perdent 20 % d'armure
+    et de r\xE9sistance magique pendant 3 s."
+  icon: {fileID: 21300000, guid: 5cac7959bd34cdd2dbfcda13f37b6fc1, type: 3}
+  color: {r: 0.45, g: 0.85, b: 1, a: 1}
+  rankUnlockLevels: 0100000003000000050000000700000009000000
+  baseDamage:
+  - 45
+  - 75
+  - 105
+  - 135
+  - 165
+  cooldowns:
+  - 6
+  - 5.5
+  - 5
+  - 4.5
+  - 4
+  manaCosts:
+  - 20
+  - 22
+  - 24
+  - 26
+  - 28
+  targeting: 3
+  range: 3.6
+  radius: 0.5
+  coneAngle: 120
+  castTime: 0.25
+  canMoveWhileCasting: 0
+  kind: 1
+  adRatio: 1.1
+  bonusAdRatio: 0
+  apRatio: 0
+  buffs: []
+  statuses:
+  - Kind: 6
+    Duration: 3
+    Power: 0.2
+    ScalingStat: 0
+    Ratio: 0
+    TargetMaxHealthRatio: 0
+    MaxStacks: 1
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
+  affectsAllies: 0
+  projectileSpeed: 18
+  pierce: 0
+  blink: 0
+  fixedRange: 0
+  appliesOnHit: 0
+  cooldownRefundOnHit: 0
+  mark:
+    Enabled: 0
+    Duration: 0
+    ManaRefund: []
+  blinkBoltRadius: 0

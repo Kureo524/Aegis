@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
   displayName: Brute
   faction: 1
+  epithet: 
+  summary: 
   sprite: {fileID: 630115612, guid: 04b68ac4bdfbf5a90b1e2c0057f0ebd3, type: 3}
   animations: {fileID: 11400000, guid: 85a45c9cbdf51d6fc9e8f7501d7b57d9, type: 2}
   portrait: {fileID: 0}

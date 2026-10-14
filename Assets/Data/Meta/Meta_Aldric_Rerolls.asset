@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa1d26b6a60a3d3c68b2d37a15dde8d6, type: 3}
+  m_Name: Meta_Aldric_Rerolls
+  m_EditorClassIdentifier: Game.Features::Features.Meta.MetaNodeDefinition
+  displayName: Second regard
+  description: Une relance de plus sur chaque carte d'augment.
+  icon: {fileID: 21300000, guid: fc3bccb560c49bc45a6abd3802e08386, type: 3}
+  costs: 2800000050000000
+  prerequisites:
+  - {fileID: 11400000, guid: d6a6cc16145453a6897d0e566f34aaa2, type: 2}
+  effects:
+  - Kind: 2
+    Stat: 0
+    Type: 0
+    Value: 1
+  position: {x: 1, y: 3}

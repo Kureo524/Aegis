@@ -13,6 +13,19 @@ namespace Features.Events {
 
     /// <summary>Open the options screen (main menu "Settings" button).</summary>
     public readonly struct OptionsRequestedEvent : IEvent { }
+    /// <summary>Main menu "Play": open the champion select screen.</summary>
+    public readonly struct ChampionSelectRequestedEvent : IEvent { }
+    /// <summary>The player picks a champion of the roster for the next runs.</summary>
+    public readonly struct ChampionPickRequestedEvent : IEvent {
+        public readonly Characters.CharacterDefinition Champion;
+        public ChampionPickRequestedEvent(Characters.CharacterDefinition champion) => Champion = champion;
+    }
+    /// <summary>The champion of the next runs changed (ChampionSelection).</summary>
+    public readonly struct ChampionSelectedEvent : IEvent {
+        public readonly Characters.CharacterDefinition Champion;
+        public ChampionSelectedEvent(Characters.CharacterDefinition champion) => Champion = champion;
+    }
+
     /// <summary>A UserOptions value changed (already saved).</summary>
     public readonly struct UserOptionsChangedEvent : IEvent { }
 }
