@@ -64,9 +64,21 @@ namespace Game.Tests.PlayMode {
             Assert.IsTrue(root.Query<Label>(className: "ae-shop__section").ToList().Any(l => l.text.StartsWith("Recommandés pour")));
 
             panel.ShowAllItems();
-            Assert.Greater(root.Query(className: "ae-offer").ToList().Count, 50, "every offer in the grid");
-            string[] sections = root.Query<Label>(className: "ae-shop__section").ToList().Select(l => l.text).ToArray();
-            CollectionAssert.IsSubsetOf(new[] { "Consommables", "Enclumes", "Bottes", "Objets légendaires" }, sections);
+            Assert.Greater(root.Query(className: "ae-offer").ToList().Count, 50, "every offer: drawers, anvils and items");
+            string[] drawers = root.Query<Button>(className: "ae-shop__drawer-title").ToList().Select(l => l.text).ToArray();
+            CollectionAssert.AreEqual(new[] { "Élixirs & enclumes à stats", "Bottes", "Mes objets" }, drawers, "the three drawers on the left");
+            Assert.AreEqual(6, root.Query(className: "ae-shop__anvils").Children<VisualElement>().ToList().Count,
+                            "every item anvil: prismatic + one legendary per role");
+
+            // A category: its own legendary anvil and only its items
+            panel.SetCategory(ItemRole.Mage);
+            Assert.AreEqual(ItemRole.Mage, panel.Category);
+            Assert.AreEqual(2, root.Query(className: "ae-shop__anvils").Children<VisualElement>().ToList().Count, "prismatic + the mage's anvil");
+            var shop = Game.Resolve<ShopCatalog>();
+            int mages = shop.Items.Count(i => i.Tier == ItemTier.Legendary && i.UniqueGroup != "Bottes" && (i.Roles & ItemRole.Mage) != 0);
+            Assert.AreEqual(mages, root.Q(className: "ae-shop__main").Query(className: "ae-offer").ToList().Count - 2, "the mage items in the grid");
+            Assert.Greater(root.Query(className: "ae-iconbutton").ToList().Count, 15, "categories and stat filters as icons");
+            panel.ShowAllItems();
 
             ItemDefinition edge = Item("SunsteelBlade");
             panel.Select(edge);
@@ -89,6 +101,60 @@ namespace Game.Tests.PlayMode {
 
             bus.Publish(new Features.Events.ShopCloseRequestedEvent());   // Escape / ✕
             Assert.IsFalse(panel.IsOpen);
+        }
+
+        private static void Press(VisualElement target, int button = 0) {
+            var e = new Event { type = EventType.MouseDown, button = button, mousePosition = target.worldBound.center, clickCount = 1 };
+            using var down = PointerDownEvent.GetPooled(e);
+            down.target = target;
+            target.SendEvent(down);
+        }
+
+        private static void Click(VisualElement target) {
+            var e = new Event { type = EventType.MouseUp, button = 0, mousePosition = target.worldBound.center, clickCount = 1 };
+            using var click = ClickEvent.GetPooled(e);
+            click.target = target;
+            target.SendEvent(click);
+        }
+
+        [UnityTest]
+        public IEnumerator Shop_DoubleClickOnACell_Buys_OneClickSelects() {
+            yield return GameFlowSmokeTests.LoadGameScene();
+            var bus = VContainerSettings.Instance.GetOrCreateRootLifetimeScopeInstance().Container.Resolve<Systems.EventBusses.IEventBus>();
+            Game.Resolve<Wallet>().Add(1000);
+            var panel = Object.FindFirstObjectByType<ShopPanel>();
+            bus.Publish(new Features.Events.ShopToggleRequestedEvent());
+            yield return null;
+            panel.ShowAllItems();
+            yield return null;
+            VisualElement root = panel.GetComponent<UIDocument>().rootVisualElement;
+            ItemDefinition item = Item("SunsteelBlade");
+            VisualElement Cell() => root.Query(className: "ae-offer").ToList()
+                                        .First(c => c.Q(className: "ae-offer__icon").resolvedStyle.backgroundImage.sprite == item.Icon);
+            Press(Cell());
+            Assert.AreSame(item, panel.Selected, "one click selects");
+            Assert.IsFalse(Game.Resolve<Inventory>().Contains(item));
+            Press(Cell());
+            Assert.IsTrue(Game.Resolve<Inventory>().Contains(item), "the second click buys");
+        }
+
+        [UnityTest]
+        public IEnumerator AugmentDraft_TheWholeCardPicks_RerollUnderIt() {
+            yield return GameFlowSmokeTests.LoadGameScene();
+            var augments = Game.Resolve<Features.Augments.AugmentController>();
+            augments.OpenDraft(RarityTier.Gold, false);
+            yield return null;
+            VisualElement root = Object.FindFirstObjectByType<AugmentPanel>().GetComponent<UIDocument>().rootVisualElement;
+            Assert.IsFalse(root.Query<Button>().ToList().Any(b => b.text == "Choisir"), "no Choose button");
+            VisualElement[] columns = root.Query(className: "ae-card-column").ToList().ToArray();
+            Assert.AreEqual(3, columns.Length);
+            Button reroll = columns[1].Q<Button>(className: "ae-card-column__button");
+            Assert.IsNotNull(reroll, "Reroll under the card");
+            Assert.IsNull(columns[1].Q(className: "ae-card").Q<Button>(), "nothing to press on the card itself");
+            Features.Augments.AugmentDefinition second = augments.Choices[1];
+            Click(columns[1].Q(className: "ae-card"));
+            CollectionAssert.Contains(augments.Owned, second, "a click on the card picks it");
+            Assert.AreEqual(Features.Events.AugmentDraftPhase.Closed, augments.Phase);
         }
     }
 }
