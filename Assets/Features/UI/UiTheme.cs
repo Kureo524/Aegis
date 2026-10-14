@@ -16,13 +16,34 @@ namespace Features.UI {
             public Sprite Icon;
         }
 
+        [Serializable]
+        public struct RoleIcon {
+            public Economy.ItemRole Role;
+            public Sprite Icon;
+        }
+
         [Tooltip("Stats of the HUD stats panel, in display order, with their icon.")]
         [SerializeField] private StatIcon[] stats = Array.Empty<StatIcon>();
+        [Tooltip("Other stat icons (shop filters).")]
+        [SerializeField] private StatIcon[] otherStats = Array.Empty<StatIcon>();
+        [Header("Shop")]
+        [Tooltip("Item role icons (shop categories); Role None = every item.")]
+        [SerializeField] private RoleIcon[] roles = Array.Empty<RoleIcon>();
+        [SerializeField] private Sprite recommendedIcon;
+        [SerializeField] private Sprite noFilterIcon;
 
         public StatIcon[] Stats => stats;
+        public Sprite RecommendedIcon => recommendedIcon;
+        public Sprite NoFilterIcon => noFilterIcon;
 
         public Sprite Icon(StatType stat) {
             foreach (StatIcon s in stats) if (s.Stat == stat) return s.Icon;
+            foreach (StatIcon s in otherStats) if (s.Stat == stat) return s.Icon;
+            return null;
+        }
+
+        public Sprite Icon(Economy.ItemRole role) {
+            foreach (RoleIcon r in roles) if (r.Role == role) return r.Icon;
             return null;
         }
     }

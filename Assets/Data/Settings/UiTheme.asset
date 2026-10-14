@@ -37,3 +37,23 @@ MonoBehaviour:
     Icon: {fileID: 21300000, guid: 58526fcb92056f46898ced4e898709df, type: 3}
   - Stat: 16
     Icon: {fileID: 21300000, guid: 5c30e7c3403e9da02b1bade816044d4d, type: 3}
+  otherStats:
+  - Stat: 0
+    Icon: {fileID: 21300000, guid: 0b2df478bd135b791983321f620c3eeb, type: 3}
+  - Stat: 2
+    Icon: {fileID: 21300000, guid: 81f50c742d585c97b8ddac1942dd8813, type: 3}
+  roles:
+  - Role: 0
+    Icon: {fileID: 21300000, guid: a6804e9b4dc6ec7bb82ce3b19935e3e4, type: 3}
+  - Role: 1
+    Icon: {fileID: 21300000, guid: af7d03e8319ace4aca03f28878642ce7, type: 3}
+  - Role: 2
+    Icon: {fileID: 21300000, guid: 5ba5d1d66b92bb3f0826bf7f29cef790, type: 3}
+  - Role: 4
+    Icon: {fileID: 21300000, guid: 00faa4096e67f85e0919ec07702dae8a, type: 3}
+  - Role: 16
+    Icon: {fileID: 21300000, guid: c65a007d49bdc6318af6daefff943b24, type: 3}
+  - Role: 8
+    Icon: {fileID: 21300000, guid: 98ca7f2758a40b7c39b92ec69e4f39f7, type: 3}
+  recommendedIcon: {fileID: 21300000, guid: 2a1c546784a5027b090bd7646a037ea2, type: 3}
+  noFilterIcon: {fileID: 21300000, guid: 67c8fc0b88c1e65f5bd3a2d8504aefd6, type: 3}
