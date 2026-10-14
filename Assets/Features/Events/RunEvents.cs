@@ -75,4 +75,7 @@ namespace Features.Events {
 
     /// <summary>Debug: end the current wave at once (quota and timer done).</summary>
     public readonly struct SkipWaveRequestedEvent : IEvent { }
+
+    /// <summary>Start the next wave now instead of waiting for the end of the break (HUD button).</summary>
+    public readonly struct NextWaveRequestedEvent : IEvent { }
 }

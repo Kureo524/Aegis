@@ -27,8 +27,9 @@ namespace Features.Run {
         [Header("Timings")]
         [Tooltip("Countdown before the first wave (seconds, not paused).")]
         [SerializeField, Min(0f)] private float firstWaveCountdown = 5f;
-        [Tooltip("Countdown after an end-of-wave screen (PreWaveCountdown).")]
-        [SerializeField, Min(0f)] private float preWaveCountdown = 10f;
+        [Tooltip("Break after the end-of-wave rewards: the time to shop (seconds, not paused). The HUD can start the wave sooner.")]
+        [UnityEngine.Serialization.FormerlySerializedAs("preWaveCountdown")]
+        [SerializeField, Min(0f)] private float intermission = 30f;
 
         public string DisplayName => displayName;
         public WaveDefinition[] Waves => waves;
@@ -38,7 +39,7 @@ namespace Features.Run {
         public float LifeLossInterval => lifeLossInterval;
         public PlayerDeathRule PlayerDeath => playerDeath;
         public float FirstWaveCountdown => firstWaveCountdown;
-        public float PreWaveCountdown => preWaveCountdown;
+        public float Intermission => intermission;
         public int TotalWaves => waves.Length + bonusWaves.Length;
     }
 }

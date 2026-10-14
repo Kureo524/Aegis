@@ -22,22 +22,15 @@ namespace Features.Events {
     }
 
     /// <summary>
-    /// Shop snapshot (ShopService → ShopPanel): open or not, which shop, what was bought, the offers
-    /// in display order and, for each, why it cannot be bought (null: it can).
+    /// Shop snapshot (ShopService → ShopPanel): everything it sells and, for each offer, why it
+    /// cannot be bought right now (null: it can). Purchases happen between waves only (CanBuy).
     /// </summary>
     public readonly struct ShopStateEvent : IEvent {
-        public readonly bool Open;
-        public readonly bool Full;
-        public readonly bool ElixirBought;
-        public readonly bool ItemBought;
+        public readonly bool CanBuy;
         public readonly IReadOnlyList<ScriptableObject> Offers;
         public readonly IReadOnlyList<string> Refusals;
-        public ShopStateEvent(bool open, bool full, bool elixirBought, bool itemBought,
-                              IReadOnlyList<ScriptableObject> offers, IReadOnlyList<string> refusals) {
-            Open = open;
-            Full = full;
-            ElixirBought = elixirBought;
-            ItemBought = itemBought;
+        public ShopStateEvent(bool canBuy, IReadOnlyList<ScriptableObject> offers, IReadOnlyList<string> refusals) {
+            CanBuy = canBuy;
             Offers = offers;
             Refusals = refusals;
         }
@@ -49,7 +42,23 @@ namespace Features.Events {
         public ShopBuyRequestedEvent(ScriptableObject offer) => Offer = offer;
     }
 
+    /// <summary>Close the shop screen (Escape, close button).</summary>
     public readonly struct ShopCloseRequestedEvent : IEvent { }
+
+    /// <summary>Open or close the shop screen (shop key, HUD button).</summary>
+    public readonly struct ShopToggleRequestedEvent : IEvent { }
+
+    /// <summary>The shop screen opened or closed (input: Escape closes it first).</summary>
+    public readonly struct ShopVisibilityChangedEvent : IEvent {
+        public readonly bool Open;
+        public ShopVisibilityChangedEvent(bool open) => Open = open;
+    }
+
+    /// <summary>Sell the item of inventory slot <see cref="Slot"/> (between waves, 70 % of its price).</summary>
+    public readonly struct ShopSellRequestedEvent : IEvent {
+        public readonly int Slot;
+        public ShopSellRequestedEvent(int slot) => Slot = slot;
+    }
 
     /// <summary>
     /// Anvil snapshot (ShopService → AnvilPanel): its choices (ItemDefinition or
