@@ -68,11 +68,7 @@ namespace Features.Enemies {
             _phase = -1;
             _state = StepState.None;
             if (_boss == null) return;
-            foreach (ItemDefinition item in _boss.Items) {
-                if (item == null) continue;
-                foreach (StatBonus bonus in item.Stats) character.Stats.Get(bonus.Stat)?.AddModifier(bonus.ToModifier(item));
-                character.Passives.Add(item.Passive, item);
-            }
+            character.Carry(_boss.Items);   // stats, passives, icons over the health bar
             _eventBus.Publish(new BossSpawnedEvent(_boss.DisplayName, _boss.Title));
             EnterPhase(0);
         }

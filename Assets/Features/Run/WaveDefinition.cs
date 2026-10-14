@@ -32,6 +32,12 @@ namespace Features.Run {
         [SerializeField, Min(0.1f)] private float healthMultiplier = 1f;
         [SerializeField, Min(0.1f)] private float damageMultiplier = 1f;
 
+        [Header("Elites (design doc §9.6)")]
+        [Tooltip("Chance that an enemy of the horde spawns as an elite carrying items (0 = never).")]
+        [SerializeField, Range(0f, 1f)] private float eliteChance;
+        [Tooltip("Items an elite carries, drawn from HordeSettings.EliteItems.")]
+        [SerializeField, Range(1, 3)] private int eliteItems = 1;
+
         public int KillQuota => killQuota;
         public float TimeLimit => timeLimit;
         public HordeSpawnEntry[] SpawnTable => spawnTable;
@@ -40,6 +46,8 @@ namespace Features.Run {
         public int MaxAlive => maxAlive;
         public float HealthMultiplier => healthMultiplier;
         public float DamageMultiplier => damageMultiplier;
+        public float EliteChance => eliteChance;
+        public int EliteItems => eliteItems;
         public BossDefinition Boss => boss;
         public Characters.Character BossPrefab => bossPrefab;
         public bool HasBoss => boss != null && bossPrefab != null;

@@ -11,6 +11,16 @@ namespace Features.Events {
         }
     }
 
+    /// <summary>An enemy of the horde spawned as an elite carrying items (design doc §9.6).</summary>
+    public readonly struct EliteSpawnedEvent : IEvent {
+        public readonly string Name;
+        public readonly int Items;
+        public EliteSpawnedEvent(string name, int items) {
+            Name = name;
+            Items = items;
+        }
+    }
+
     /// <summary>Boss HP and phase (1-based), for the boss bar.</summary>
     public readonly struct BossHealthEvent : IEvent {
         public readonly float Current;

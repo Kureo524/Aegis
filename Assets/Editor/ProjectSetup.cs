@@ -97,6 +97,7 @@ namespace EditorTools {
             ContentSetup.Run();           // phase 9b: statuses on spells, more items and augments
             EnemyContentSetup.Run(enemyPrefab);   // phase 9c: wolf, skeleton mage, goblin shaman, stone golem
             AugmentsSetup.Run();         // the augments (catalog = exactly that list)
+            EliteSetup.Run(hordeSettings, stage);   // elites carrying items, break between waves
             RootLifetimeScope rootPrefab = CreateOrUpdateRootPrefab(flowSettings, cameraSettings, experienceCurve, controlsSettings, spellSettings);
             RegisterVContainerSettings(rootPrefab);
             UiSetup.Run();               // MOBA-style UI: theme on the PanelSettings, stat icons

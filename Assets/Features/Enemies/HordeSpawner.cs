@@ -37,7 +37,9 @@ namespace Features.Enemies {
         private HordeSpawnEntry[] _table;
         private float _interval;
         private int _maxAlive;
-        private float _healthMultiplier = 1f, _damageMultiplier = 1f;
+        private float _healthMultiplier = 1f, _damageMultiplier = 1f, _eliteChance;
+        private int _eliteItems = 1;
+        private readonly List<Economy.ItemDefinition> _elitePick = new();
 
         public bool Spawning { get; private set; }
         public int Alive => _alive.Count;
@@ -63,7 +65,10 @@ namespace Features.Enemies {
         }
 
         /// <summary>What and how fast to spawn (a wave, or the HordeSettings defaults).</summary>
-        public void Configure(HordeSpawnEntry[] table, float interval, int maxAlive, float healthMultiplier, float damageMultiplier) {
+        public void Configure(HordeSpawnEntry[] table, float interval, int maxAlive, float healthMultiplier, float damageMultiplier,
+                              float eliteChance = 0f, int eliteItems = 1) {
+            _eliteChance = eliteChance;
+            _eliteItems = Mathf.Max(1, eliteItems);
             _table = table ?? System.Array.Empty<HordeSpawnEntry>();
             _interval = Mathf.Max(0.05f, interval);
             _maxAlive = maxAlive;
@@ -101,7 +106,24 @@ namespace Features.Enemies {
         public Character TrySpawn(Vector3 center) {
             HordeSpawnEntry entry = Pick();
             if (entry.Prefab == null || !TryFindSpot(center, entry.Definition, out Vector3 spot)) return null;
-            return Spawn(entry.Prefab, entry.Definition, spot);
+            Character enemy = Spawn(entry.Prefab, entry.Definition, spot);
+            if (_eliteChance > 0f && Random.value < _eliteChance) MakeElite(enemy, _eliteItems);
+            return enemy;
+        }
+
+        /// <summary>
+        /// Turns a spawned enemy into an elite (design doc §9.6): <paramref name="count"/> different
+        /// items of HordeSettings.EliteItems, more health, more gold and XP, bigger, marked.
+        /// </summary>
+        public void MakeElite(Character enemy, int count) {
+            Economy.ItemDefinition[] pool = _settings.EliteItems;
+            _elitePick.Clear();
+            for (int tries = 0; tries < 20 && _elitePick.Count < Mathf.Min(count, pool.Length); tries++) {
+                Economy.ItemDefinition item = pool[Random.Range(0, pool.Length)];
+                if (item != null && !_elitePick.Contains(item)) _elitePick.Add(item);
+            }
+            enemy.Carry(_elitePick, elite: true, _settings.EliteHealthMultiplier, _settings.EliteRewardMultiplier);
+            _eventBus.Publish(new EliteSpawnedEvent(enemy.Definition.DisplayName, _elitePick.Count));
         }
 
         /// <summary>Spawns <paramref name="definition"/> on the spawn ring around the player (wave boss). Null if no spot.</summary>

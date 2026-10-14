@@ -34,3 +34,20 @@ MonoBehaviour:
   maxAlive: 18
   minSpawnDistance: 16
   maxSpawnDistance: 22
+  eliteItems:
+  - {fileID: 11400000, guid: 8737a8fb26fbefc52aa7eb488d1bd3f1, type: 2}
+  - {fileID: 11400000, guid: 039f644573dea6a40ab89dfc7aef5478, type: 2}
+  - {fileID: 11400000, guid: 9f666caadd1f1b814bf1da2f05142026, type: 2}
+  - {fileID: 11400000, guid: e0eef515abea07504a758d825a36b119, type: 2}
+  - {fileID: 11400000, guid: 442c8d731e9d0ab39adc567ff0d01b65, type: 2}
+  - {fileID: 11400000, guid: b1ee72b007e33c765a5151149e4dbb9d, type: 2}
+  - {fileID: 11400000, guid: dcb20f0a1a71e09bdb7a57930eedbbcf, type: 2}
+  - {fileID: 11400000, guid: faee62044566fa88496376a0952cbd57, type: 2}
+  - {fileID: 11400000, guid: 90e19625177a821f9b30d20ecfe22ed6, type: 2}
+  - {fileID: 11400000, guid: c7ad6a1102b930f769f0c1f8123f0133, type: 2}
+  - {fileID: 11400000, guid: 50836013eb04753a295f38e114406cab, type: 2}
+  - {fileID: 11400000, guid: 17ddb51a701d136daa53b2b7801084a9, type: 2}
+  - {fileID: 11400000, guid: b4a5f3d4024dd061bb1d255622582fd0, type: 2}
+  - {fileID: 11400000, guid: 21b333efa21f42eaeba1df1107a3ad40, type: 2}
+  eliteHealthMultiplier: 1.7
+  eliteRewardMultiplier: 4
