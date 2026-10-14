@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f978ccf1df618837a8c7d12ccbb77e10, type: 3}
   m_Name: Boss_GoblinKing
   m_EditorClassIdentifier: Game.Features::Features.Enemies.BossDefinition
-  displayName: "H\xE9raut de la Faille"
+  displayName: Grokk
   faction: 1
-  sprite: {fileID: -541386945, guid: 043edf70d5afd2b2e8aa277af913cf6d, type: 3}
-  animations: {fileID: 11400000, guid: 8be6730646af6990595f7c906ad87c8e, type: 2}
-  portrait: {fileID: -478591969759070709, guid: 2f254494a1ed8e429a4537cb457d6d38, type: 3}
-  bodySize: {x: 1.8, y: 3.22}
+  sprite: {fileID: 1111269079, guid: 3d96603b82cf483edb46a922b6937315, type: 3}
+  animations: {fileID: 11400000, guid: c0b8b6bb61fd12af7af84d30a4b22249, type: 2}
+  portrait: {fileID: -7094847895762900040, guid: 5e4cf5d9d88afe76e9f1a2ea25f1515a, type: 3}
+  bodySize: {x: 1.8, y: 3.28}
   baseStats: {fileID: 11400000, guid: ff4d8277b2712607b9252ea07ea18155, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: 465b557e9ed6cfee1a6686ac1c42099b, type: 2}
@@ -33,7 +33,7 @@ MonoBehaviour:
   manaPerSecond: 5
   manaPerAttack: 10
   manaPerHitTaken: 2
-  title: "Gardien du N\xE9ant"
+  title: "D\xE9mon de la horde"
   pattern: {fileID: 11400000, guid: 50369d3ca288fea649f80662f3187f63, type: 2}
   items:
   - {fileID: 11400000, guid: c7ad6a1102b930f769f0c1f8123f0133, type: 2}

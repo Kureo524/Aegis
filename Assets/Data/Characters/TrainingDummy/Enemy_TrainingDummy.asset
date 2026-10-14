@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
   displayName: "Mannequin d'entra\xEEnement"
   faction: 1
-  sprite: {fileID: -848611644, guid: 8564b3f845456a8018062bc57041ab4c, type: 3}
-  animations: {fileID: 11400000, guid: 31fa1c2fd177376a6b26c6c53e15b29a, type: 2}
+  sprite: {fileID: -249896831, guid: 641d55fd736874491905e90b3c678044, type: 3}
+  animations: {fileID: 11400000, guid: 555ea3ed5c3c84d5195362d327daf2f7, type: 2}
   portrait: {fileID: 0}
-  bodySize: {x: 0.9, y: 1.48}
+  bodySize: {x: 0.9, y: 1.49}
   baseStats: {fileID: 11400000, guid: 34d5b14e04088b7a19549c482a9412a6, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 0}

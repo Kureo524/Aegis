@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
   m_Name: Enemy_Brute
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
-  displayName: Super-sbire
+  displayName: Brute
   faction: 1
-  sprite: {fileID: -1130406027, guid: 5c43638d4e91964ee829f2d79c796aee, type: 3}
-  animations: {fileID: 11400000, guid: fb50af7bb7b3cc44db69d6a6cffd07fe, type: 2}
+  sprite: {fileID: 630115612, guid: 04b68ac4bdfbf5a90b1e2c0057f0ebd3, type: 3}
+  animations: {fileID: 11400000, guid: 85a45c9cbdf51d6fc9e8f7501d7b57d9, type: 2}
   portrait: {fileID: 0}
-  bodySize: {x: 1.3, y: 2.03}
+  bodySize: {x: 1.3, y: 2.11}
   baseStats: {fileID: 11400000, guid: a76aa8460f1fe922db18312c2451d0c3, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: 465b557e9ed6cfee1a6686ac1c42099b, type: 2}

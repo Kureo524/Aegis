@@ -71,3 +71,17 @@ def play(arm, name):
     if hasattr(arm.animation_data, 'action_slot') and act.slots:
         arm.animation_data.action_slot = act.slots[0]
     return act
+
+
+def drop_helpers():
+    for o in list(bpy.data.objects):
+        if o.type == 'MESH' and o.name.startswith('Icosphere'): bpy.data.objects.remove(o)
+
+def recolor(colors):
+    """{material name: (r, g, b)} in linear space; base color of the Principled BSDF."""
+    for m in bpy.data.materials:
+        if m.name in colors and m.node_tree:
+            bsdf = m.node_tree.nodes.get('Principled BSDF')
+            if bsdf:
+                c = colors[m.name]
+                bsdf.inputs[0].default_value = (c[0], c[1], c[2], 1.0)

@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
   m_Name: Enemy_Wolf
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
-  displayName: Loup sombre
+  displayName: Loup
   faction: 1
-  sprite: {fileID: 1468390671, guid: a73f76c7dc77feb948f813801f8712db, type: 3}
-  animations: {fileID: 11400000, guid: 4615d672d7939eaf28c52786c55567bf, type: 2}
+  sprite: {fileID: -942682772, guid: 2986fb9d144899d14829e9694810d082, type: 3}
+  animations: {fileID: 11400000, guid: c232d8454ca22531683088b1acca3758, type: 2}
   portrait: {fileID: 0}
-  bodySize: {x: 1.1, y: 1.32}
+  bodySize: {x: 1.1, y: 1.25}
   baseStats: {fileID: 11400000, guid: 586bd5477c8e049319e3b31a45a534c6, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: 66412ccaddfdf8e74a7eac43bd76a609, type: 2}

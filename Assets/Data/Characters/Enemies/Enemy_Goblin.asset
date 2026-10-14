@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
   m_Name: Enemy_Goblin
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
-  displayName: "Sbire de m\xEAl\xE9e"
+  displayName: Gobelin
   faction: 1
-  sprite: {fileID: 1462202808, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
-  animations: {fileID: 11400000, guid: 8817776d858c9e22bb52d76f5b175782, type: 2}
+  sprite: {fileID: -1086599569, guid: 934844abd5ca08c5d8acc42297d9c977, type: 3}
+  animations: {fileID: 11400000, guid: 40e589132308eaeeba6a9f9cadd0a7a8, type: 2}
   portrait: {fileID: 0}
-  bodySize: {x: 0.7, y: 1.18}
+  bodySize: {x: 0.7, y: 1.22}
   baseStats: {fileID: 11400000, guid: 0cd866e5f0d7ba90c8f524490cb947c2, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: 465b557e9ed6cfee1a6686ac1c42099b, type: 2}

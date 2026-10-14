@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c58604379ce9cdca08ba4b1092853e8f, type: 3}
+  m_Name: Anim_FrostSpecter
+  m_EditorClassIdentifier: Game.Features::Features.Characters.SpriteAnimationSet
+  idle:
+    Frames:
+    - {fileID: -455579479, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1028950876, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1979409139, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -745397544, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 504832357, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 2089140546, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1196762613, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1947126721, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1480361216, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -973539655, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1722100591, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -2060447095, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    Duration: 1.167
+    Loop: 1
+  run:
+    Frames:
+    - {fileID: -1599705216, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 24171739, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 544367293, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 407961334, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -507492445, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1803298192, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1756609378, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1687802468, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 366326977, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1165525157, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    Duration: 0.833
+    Loop: 1
+  attack:
+    Frames:
+    - {fileID: 773639181, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1455890536, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 358060062, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 343348310, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1933342007, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 328103385, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 420021009, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1105963194, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1617979303, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1930710928, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    Duration: 1.167
+    Loop: 0
+  attackImpact: 0.45
+  hit:
+    Frames:
+    - {fileID: 1965050897, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -621635630, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1626869121, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1416882941, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1609114468, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1212798626, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    Duration: 0.458
+    Loop: 0
+  death:
+    Frames:
+    - {fileID: 1020589392, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 346364950, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -272365897, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1469375873, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1753008241, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 327511678, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -37997393, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1139820052, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1998712188, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 838849034, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -69215724, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 232164082, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    Duration: 0.667
+    Loop: 0
+  dash:
+    Frames: []
+    Duration: 1
+    Loop: 1
+  cast:
+    Frames:
+    - {fileID: 1045472727, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -295505847, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1296225581, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 238322430, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -996741566, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -396930681, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 110868283, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: -1161847279, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 1322084194, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    - {fileID: 46857126, guid: f3b97b1adab35cedc93ce937d30d7105, type: 3}
+    Duration: 1.167
+    Loop: 0
+  spellClips: []
+  runReferenceSpeed: 2.9
