@@ -587,7 +587,7 @@ Une **run** est une partie sur un **stage**, **équivalent d'un niveau de BTD6**
    ▼
  Fin de vague = timer écoulé ET quota atteint
    ▼
- Événement de fin de vague selon le WaveRewardSchedule (§9.3) : augment, enclume prismatique gratuite, boutique légère ou complète
+ Événement de fin de vague selon le WaveRewardSchedule (§9.3) : augment, enclume prismatique gratuite ou rien, puis une pause de 30 s, boutique ouverte
    ▼  (jeu en pause)
  fermeture ──► compte à rebours 10 s ──► vague suivante
 ```
@@ -665,29 +665,26 @@ public class ElixirDefinition : ScriptableObject {   // consommable acheté en b
 
 - **Inventaire : 6 slots** comme LoL (`Inventory`). Stats d'item = `StatModifier` (Source = l'instance d'item), passifs via `PassiveController`.
 
-**Ordre des fins de vague** (`WaveRewardSchedule`, SO piloté par les données : un prélude, puis une boucle) :
+**Boutique toujours accessible (14/10/2026)** : la boutique s'ouvre **à tout moment** (touche **P**, bouton du HUD, et d'elle-même au début de chaque pause) ; on peut toujours la parcourir, mais **acheter et vendre ne se fait qu'entre les vagues** (`RunState.PreWave`). **Aucune limite par visite** : seul l'or limite. Un seul élixir actif à la fois (un nouveau remplace l'ancien). **Revente à 70 %** du prix (`ItemDefinition.SellValue`, 150 or pour un prismatique obtenu en enclume).
+
+**Pause entre les vagues** : après les récompenses de fin de vague, **30 s** (`StageDefinition.Intermission`) avant la vague suivante, boutique ouverte ; le bouton **« Lancer la vague »** (HUD du haut et pied de la boutique, `NextWaveRequestedEvent`) la démarre tout de suite. Avant la première vague : 10 s.
+
+**Récompenses de fin de vague** (`WaveRewardSchedule`, SO piloté par les données : un prélude, puis une boucle ; `None` = juste la pause) :
 
 ```
- Vague 1  → fin : Augment
- Vague 2  → fin : Enclume à items prismatique (gratuite)
- ┌─ boucle ───────────────────────────────────────────────┐
- │ Vague → fin : Boutique légère (élixirs + enclumes à stats) │
- │ Vague → fin : Augment                                      │
- │ Vague → fin : Boutique complète                            │
- └────────────────────────────────────────────────────────┘
+ Vague 1  → Augment
+ Vague 2  → Enclume à items prismatique (gratuite)
+ ┌─ boucle ─────────────┐
+ │ Vague → (pause seule) │
+ │ Vague → Augment       │
+ │ Vague → (pause seule) │
+ └──────────────────────┘
+ Vagues bonus : un augment toutes les 2 vagues
 ```
 
-| Événement | Contenu |
-|---|---|
-| **Augment** | draft d'augments (§9.4), **toutes les 3 vagues** |
-| **Enclume prismatique gratuite** | comme en Arena : le joueur reçoit **gratuitement une enclume à items prismatique** (une seule fois, après la vague 2) : **3 choix**, **1 reroll par choix** |
-| **Boutique légère** | **élixirs** et **enclumes à stats** |
-| **Boutique complète** | boutique légère + **tous les items légendaires** + **enclumes à items** (légendaire, prismatique) ; **en vagues bonus, après chaque vague** |
+**Écran de boutique** (`ShopPanel`) : onglets **Recommandés** (objets conseillés pour le champion, `CharacterDefinition.recommendedItems`) et **Tous les objets**, **recherche** (insensible aux accents), filtres par **rôle** (Tireur, Mage, Combattant, Assassin, Tank : `ItemDefinition.Roles`) et par **statistique** ; grille par sections (Consommables, Enclumes, Bottes, Objets légendaires, triés par prix) ; **fiche** de l'objet (rôles, stats, passif, groupe unique, revente, Acheter) ou de l'objet possédé sélectionné dans l'inventaire (**Vendre**) ; pied de page : inventaire, temps de pause restant ou « Achats entre les vagues », Lancer la vague. Clic : sélection ; double-clic ou clic droit : achat. Échap ou P ferment la boutique sans ouvrir la pause. Les clics sur l'interface ne donnent plus d'ordre au personnage (`UiPicking`, UI Toolkit).
 
-**Limites d'achat par boutique**
-- **Un seul élixir** : il **s'active immédiatement** et **dure jusqu'à la fin de la vague qui suit**.
-- **Un seul item (boutique complète)** : les **enclumes à items comptent dans cette limite**. Elles permettent de **dépenser moins** et de **tenter sa chance** (par exemple pour garder du gold pour une enclume à stats ou un élixir).
-- **Enclumes à stats** : quantité **libre**.
+**Prix** (`ItemsSetup.PriceOf`, réécrits à chaque setup) : valeur des stats de l'objet et de son passif (barème par point : 3,5 or par AD, 2,2 par AP, 0,27 par PV, 2 par armure, 250 pour 100 % de vitesse d'attaque…), + 50 pour un passif qui agit, arrondi à 5 ; légendaires 260 à 420, bottes 90 à 160. Or des ennemis à 75 % de l'équilibrage précédent (qui compensait des boutiques rares). Bot : vagues tenues, boss battu avec 3 à 5 objets.
 
 **Enclumes**
 - **Une enclume ouvre toujours 3 choix de la même rareté.**
@@ -970,7 +967,7 @@ public enum RunState { PreWave, Combat, Overtime, Reward }
 | Overtime | Reward | quota atteint |
 | Reward | PreWave | écran de fin de vague fermé |
 
-Le type d'écran de `Reward` (augment, enclume gratuite, boutique légère, boutique complète) est une **donnée** (`WaveRewardSchedule`), pas un état. Victoire (dernière vague bonus terminée) et défaite (0 vie) sont **publiées en événements** ; `GameFlowController` les transforme en `GameState.Win` / `GameState.GameOver`.
+Le type d'écran de `Reward` (augment, enclume gratuite) est une **donnée** (`WaveRewardSchedule`), pas un état. Victoire (dernière vague bonus terminée) et défaite (0 vie) sont **publiées en événements** ; `GameFlowController` les transforme en `GameState.Win` / `GameState.GameOver`.
 
 **Autres machines** :
 - **Lanceur du joueur** : `Idle → Targeting → Casting` (§7.4).
