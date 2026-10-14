@@ -12,12 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
   m_Name: Enemy_TrainingDummy
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
-  displayName: Training Dummy
+  displayName: "Mannequin d'entra\xEEnement"
   faction: 1
-  sprite: {fileID: 21300000, guid: 8bf3b67cf0da40369cfd9b2bf85dc381, type: 3}
-  bodySize: {x: 0.9, y: 1.6}
+  sprite: {fileID: -848611644, guid: 8564b3f845456a8018062bc57041ab4c, type: 3}
+  animations: {fileID: 11400000, guid: 31fa1c2fd177376a6b26c6c53e15b29a, type: 2}
+  portrait: {fileID: 0}
+  bodySize: {x: 0.9, y: 1.48}
   baseStats: {fileID: 11400000, guid: 34d5b14e04088b7a19549c482a9412a6, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 0}
+  abilities: []
+  summonerD: {fileID: 0}
+  summonerF: {fileID: 0}
+  passive: {fileID: 0}
   xpReward: 150
   goldReward: 25
+  navigation: 0
+  specialSpell: {fileID: 0}
+  startMana: 0
+  manaPerSecond: 5
+  manaPerAttack: 10
+  manaPerHitTaken: 2

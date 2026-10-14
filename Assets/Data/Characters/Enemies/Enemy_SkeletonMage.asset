@@ -12,20 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
   m_Name: Enemy_SkeletonMage
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
-  displayName: Mage squelette
+  displayName: Gromp
   faction: 1
-  sprite: {fileID: 21300000, guid: d3951675c609aa8a6821efc6e079de56, type: 3}
-  bodySize: {x: 0.7, y: 1.7}
+  sprite: {fileID: 1600204368, guid: 8e7501c63b183d0d2a103d1d0a50685a, type: 3}
+  animations: {fileID: 11400000, guid: b9c94355ff6fc32caa0526eef8f56bc8, type: 2}
+  portrait: {fileID: 0}
+  bodySize: {x: 0.7, y: 1.64}
   baseStats: {fileID: 11400000, guid: 18ba909816080e321a8d2fc92f58af2e, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: 596890bcea050194bb67fe78db41c412, type: 2}
-  elements:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  elementUnlockLevels: 010000000300000005000000
-  spellBook: {fileID: 0}
-  signatureAbility: {fileID: 0}
+  abilities: []
+  summonerD: {fileID: 0}
+  summonerF: {fileID: 0}
   passive: {fileID: 0}
   xpReward: 117
   goldReward: 12

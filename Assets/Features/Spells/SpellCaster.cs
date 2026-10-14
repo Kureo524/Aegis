@@ -48,6 +48,7 @@ namespace Features.Spells {
                 movement.Stop();
             }
             if (visual != null && spell.Targeting != TargetingType.Self) visual.Face(context.Direction);
+            if (visual != null) visual.PlayCast(spell, spell.CastTime);
 
             if (spell.CastTime <= 0f) Resolve();
             return true;

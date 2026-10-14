@@ -25,6 +25,8 @@ namespace Features.Characters {
     public class Character : MonoBehaviour {
         [SerializeField] private CharacterMovement movement;
         [SerializeField] private CharacterVisual visual;
+        [Tooltip("Soft shadow on the ground, sized from the body width.")]
+        [SerializeField] private Transform shadow;
         [SerializeField] private BoxCollider body;
         [SerializeField] private NavMeshAgent agent;
         [SerializeField] private BasicAttacker attacker;
@@ -266,6 +268,7 @@ namespace Features.Characters {
             if (attacker != null) attacker.Cancel();
             if (movement != null) movement.Stop();
             Status.Clear();
+            if (visual != null) visual.PlayDeath();   // before the body goes away
             SetBodyActive(false);
 
             if (Definition is EnemyDefinition enemy)
@@ -278,15 +281,17 @@ namespace Features.Characters {
         // A dead body is invisible, cannot be hit or clicked, and does not fall through the floor.
         private void SetBodyActive(bool active) {
             if (visual != null) visual.gameObject.SetActive(active);
+            if (shadow != null) shadow.gameObject.SetActive(active);
             if (body != null) body.enabled = active;
             if (_rigidbody != null) _rigidbody.isKinematic = !active;
         }
 
         // Root pivot at the feet: the box stands on the ground, the agent matches it.
         private void ApplyBody(CharacterDefinition definition) {
-            if (visual != null) visual.SetSprite(definition.Sprite);
+            if (visual != null) visual.SetLook(definition.Sprite, definition.Animations);
 
             Vector2 size = definition.BodySize;
+            if (shadow != null) shadow.localScale = new Vector3(size.x * 1.7f, size.x * 1.1f, 1f);
             if (body != null) {
                 body.size = new Vector3(size.x, size.y, size.x);
                 body.center = new Vector3(0f, size.y / 2f, 0f);
@@ -318,7 +323,7 @@ namespace Features.Characters {
                 stat.Changed += value => _eventBus.Publish(new StatChangedEvent(type, value));
             }
 
-            _eventBus.Publish(new PlayerChampionEvent(Definition.DisplayName, Definition.Sprite, Definition.Passive));
+            _eventBus.Publish(new PlayerChampionEvent(Definition.DisplayName, Definition.Portrait, Definition.Passive));
             _lastBuffs = "?";   // the buff bar starts from a fresh snapshot
 
             // Initial snapshot for whoever displays it

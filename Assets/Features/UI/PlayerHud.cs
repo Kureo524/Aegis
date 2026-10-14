@@ -30,6 +30,7 @@ namespace Features.UI {
         private readonly DisposableBag _subscriptions = new();
         private UiTooltip _tooltip;
         private AbilityBarView _abilities;
+        private BarTicks _hpTicks;
         private VisualElement _hpFill, _shieldFill, _manaFill, _xpFill, _portrait, _items, _buffs, _statsPage, _augmentsPage;
         private Label _hpText, _manaText, _level, _feedback, _gold, _elixir, _augmentCount;
         private Button _statsTab, _augmentsTab;
@@ -109,12 +110,13 @@ namespace Features.UI {
         // ---- left: stats / augments ----
         private VisualElement BuildLeft() {
             var panel = new VisualElement();
-            panel.AddToClassList("ae-panel");
+            panel.AddToClassList("ae-dock-panel");
             panel.AddToClassList("ae-hud__side");
+            panel.AddToClassList("ae-hud__side--left");
 
             var tabs = new VisualElement();
             tabs.style.flexDirection = FlexDirection.Row;
-            tabs.style.marginBottom = 6;
+            tabs.style.marginBottom = 4;
             _statsTab = new Button(() => ShowTab(stats: true)) { text = "Statistiques" };
             _augmentsTab = new Button(() => ShowTab(stats: false)) { text = "Augments" };
             _statsTab.AddToClassList("ae-tab");
@@ -230,8 +232,11 @@ namespace Features.UI {
             center.Add(_feedback);
 
             var main = new VisualElement { pickingMode = PickingMode.Ignore };
-            main.AddToClassList("ae-panel");
+            main.AddToClassList("ae-dock-panel");
             main.AddToClassList("ae-hud__main");
+            var ornament = new VisualElement { pickingMode = PickingMode.Ignore };
+            ornament.AddToClassList("ae-hud__ornament");
+            main.Add(ornament);
 
             var portraitColumn = new VisualElement { pickingMode = PickingMode.Ignore };
             portraitColumn.AddToClassList("ae-portrait");
@@ -254,6 +259,8 @@ namespace Features.UI {
             _shieldFill = new VisualElement { pickingMode = PickingMode.Ignore };
             _shieldFill.AddToClassList("ae-bar__shield");
             hpBar.Insert(1, _shieldFill);
+            _hpTicks = new BarTicks();
+            hpBar.Insert(2, _hpTicks);
             right.Add(hpBar);
             right.Add(Bar("ae-bar--mana", out _manaFill, out _manaText));
             right.Add(Bar("ae-bar--xp", out _xpFill, out _));
@@ -269,6 +276,9 @@ namespace Features.UI {
             fill = new VisualElement { pickingMode = PickingMode.Ignore };
             fill.AddToClassList("ae-bar__fill");
             bar.Add(fill);
+            var gloss = new VisualElement { pickingMode = PickingMode.Ignore };
+            gloss.AddToClassList("ae-bar__gloss");
+            bar.Add(gloss);
             text = new Label { pickingMode = PickingMode.Ignore };
             text.AddToClassList("ae-bar__text");
             bar.Add(text);
@@ -319,6 +329,7 @@ namespace Features.UI {
             _hpText.text = $"{Mathf.CeilToInt(_hp)} / {Mathf.CeilToInt(_hpMax)}{shield}";
             _manaFill.style.width = Percent(_mana, _manaMax);
             _manaText.text = $"{Mathf.FloorToInt(_mana)} / {Mathf.CeilToInt(_manaMax)}";
+            _hpTicks.SetMax(total);
             _xpFill.style.width = _xp.XpToNext > 0 ? Length.Percent(Mathf.Clamp01((float)_xp.Xp / _xp.XpToNext) * 100f) : Length.Percent(100f);
             _level.text = Math.Max(_xp.Level, 1).ToString();
         }
@@ -328,8 +339,9 @@ namespace Features.UI {
         // ---- right: items, elixir, gold ----
         private VisualElement BuildRight() {
             var panel = new VisualElement();
-            panel.AddToClassList("ae-panel");
+            panel.AddToClassList("ae-dock-panel");
             panel.AddToClassList("ae-hud__side");
+            panel.AddToClassList("ae-hud__side--right");
             panel.AddToClassList("ae-hud__items");
             _items = new VisualElement();
             _items.AddToClassList("ae-items");
@@ -337,9 +349,15 @@ namespace Features.UI {
             _elixir = new Label { pickingMode = PickingMode.Ignore };
             _elixir.AddToClassList("ae-elixir");
             panel.Add(_elixir);
+            var goldRow = new VisualElement { pickingMode = PickingMode.Ignore };
+            goldRow.AddToClassList("ae-goldrow");
+            var coin = new VisualElement { pickingMode = PickingMode.Ignore };
+            coin.AddToClassList("ae-coin");
+            goldRow.Add(coin);
             _gold = new Label { pickingMode = PickingMode.Ignore };
             _gold.AddToClassList("ae-gold");
-            panel.Add(_gold);
+            goldRow.Add(_gold);
+            panel.Add(goldRow);
             return panel;
         }
 
@@ -349,7 +367,7 @@ namespace Features.UI {
             for (int i = 0; i < Inventory.Capacity; i++) _items.Add(ItemSlot(i < _inventory.Count ? _inventory[i] : null, _tooltip));
             _elixir.text = _activeElixir != null ? _activeElixir.DisplayName : "";
             _elixir.style.display = _activeElixir != null ? DisplayStyle.Flex : DisplayStyle.None;
-            _gold.text = $"{_goldValue} or";
+            _gold.text = _goldValue.ToString();
         }
 
         /// <summary>An item slot with its tooltip (HUD, shop inventory).</summary>
@@ -372,6 +390,40 @@ namespace Features.UI {
             string text = StatLabels.Format(item.Stats);
             if (item.Passive != null) text += $"\n\n{item.Passive.DisplayName} : {item.Passive.Description}";
             return (item.DisplayName, item.Cost > 0 ? $"{tier} · {item.Cost} or" : tier, text);
+        }
+
+        /// <summary>LoL health bar ticks: a thin line every 100 HP, a bolder one every 1000.</summary>
+        private sealed class BarTicks : VisualElement {
+            private float _max;
+
+            public BarTicks() {
+                pickingMode = PickingMode.Ignore;
+                AddToClassList("ae-bar__ticks");
+                generateVisualContent += Draw;
+            }
+
+            public void SetMax(float max) {
+                if (Mathf.Approximately(max, _max)) return;
+                _max = max;
+                MarkDirtyRepaint();
+            }
+
+            private void Draw(MeshGenerationContext ctx) {
+                if (_max <= 100f) return;
+                Rect r = contentRect;
+                Painter2D p = ctx.painter2D;
+                int step = _max > 6000f ? 1000 : 100;   // huge pools: the 1000s only
+                for (int hp = step; hp < _max && hp < 100000; hp += step) {
+                    bool big = hp % 1000 == 0;
+                    float x = r.width * hp / _max;
+                    p.strokeColor = new Color(0f, 0f, 0f, big ? 0.85f : 0.55f);
+                    p.lineWidth = big ? 2f : 1f;
+                    p.BeginPath();
+                    p.MoveTo(new Vector2(x, 0f));
+                    p.LineTo(new Vector2(x, big ? r.height : r.height * 0.55f));
+                    p.Stroke();
+                }
+            }
         }
 
         private void ShowFeedback(string message) {

@@ -21,6 +21,10 @@ namespace Features.Characters {
         [Header("Body")]
         [Tooltip("Facing right, pivot at the feet.")]
         [SerializeField] private Sprite sprite;
+        [Tooltip("Animated look (idle, run, attack, casts, death). Without it the sprite above stands still.")]
+        [SerializeField] private SpriteAnimationSet animations;
+        [Tooltip("HUD portrait; the sprite when empty.")]
+        [SerializeField] private Sprite portrait;
         [Tooltip("x = width (and depth), y = height of the physics body, in world units.")]
         [SerializeField] private Vector2 bodySize = new(0.8f, 1.8f);
 
@@ -48,6 +52,8 @@ namespace Features.Characters {
         public string DisplayName => displayName;
         public Faction Faction => faction;
         public Sprite Sprite => sprite;
+        public SpriteAnimationSet Animations => animations;
+        public Sprite Portrait => portrait != null ? portrait : sprite;
         public Vector2 BodySize => bodySize;
         public StatBlock BaseStats => baseStats;
         public StatGrowth GrowthPerLevel => growthPerLevel;
