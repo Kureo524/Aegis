@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace EditorTools {
     /// <summary>
-    /// The LoL-style UI (design doc §7.9), called by <see cref="ProjectSetup"/>: the UiTheme asset
+    /// The MOBA-style UI (design doc §7.9), called by <see cref="ProjectSetup"/>: the UiTheme asset
     /// (stats of the HUD panel and their icons) registered by the root scope, and the Aegis theme
     /// (Assets/UI/AegisTheme.tss = Unity's default runtime theme + AegisTheme.uss) on the shared
     /// PanelSettings, so every document gets the styles. Idempotent.

@@ -12,7 +12,7 @@ using VContainer;
 
 namespace Features.UI {
     /// <summary>
-    /// Bottom player HUD, LoL style (design doc §7.9), UI Toolkit styled by the theme, fed only by
+    /// Bottom player HUD, MOBA style (design doc §7.9), UI Toolkit styled by the theme, fed only by
     /// bus events:
     /// - left: one panel with two tabs, Stats (AD, AP, armor… from StatChangedEvent) and Augments;
     /// - center: buff bar (passive stacks, charged spellblade), feedback line, champion portrait
@@ -172,7 +172,7 @@ namespace Features.UI {
 
         private static string FormatStat(StatType type, float v) => type switch {
             StatType.AttackSpeed => v.ToString("0.00"),
-            StatType.MoveSpeed => Mathf.RoundToInt(v * 65f).ToString(),   // LoL units (325 = 5)
+            StatType.MoveSpeed => Mathf.RoundToInt(v * 65f).ToString(),   // MOBA units (325 = 5)
             StatType.CritChance or StatType.Lifesteal or StatType.Omnivamp or StatType.ArmorPenPercent
                 or StatType.MagicPenPercent or StatType.Tenacity => $"{Mathf.RoundToInt(v * 100f)} %",
             _ => Mathf.RoundToInt(v).ToString(),
@@ -392,7 +392,7 @@ namespace Features.UI {
             return (item.DisplayName, item.Cost > 0 ? $"{tier} · {item.Cost} or" : tier, text);
         }
 
-        /// <summary>LoL health bar ticks: a thin line every 100 HP, a bolder one every 1000.</summary>
+        /// <summary>MOBA health bar ticks: a thin line every 100 HP, a bolder one every 1000.</summary>
         private sealed class BarTicks : VisualElement {
             private float _max;
 

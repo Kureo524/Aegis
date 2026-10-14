@@ -48,7 +48,7 @@ namespace Features.Progression {
             XpChanged?.Invoke();
         }
 
-        /// <summary>Flat growth of <paramref name="stat"/> at the current level (part of the base value, LoL style).</summary>
+        /// <summary>Flat growth of <paramref name="stat"/> at the current level (part of the base value, MOBA style).</summary>
         public float FlatGrowth(StatType stat) {
             if (_growth == null) return 0f;
             float total = 0f;

@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 
 namespace Features.Augments {
     /// <summary>
-    /// Augments of the run (design doc §9.4), Arena style:
+    /// Augments of the run (design doc §9.4), arena-draft style:
     /// - Draft (RewardKind.Augment): a rarity is drawn, 3 augments of that rarity not owned yet.
     /// - Rerolls: each card of a draft has its own reroll (RerollsPerCard, + meta bonus), reset on
     ///   every draft; a reroll keeps the card's rarity. A draft may also offer a golden reroll

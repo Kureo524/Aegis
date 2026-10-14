@@ -42,7 +42,7 @@ namespace Features.Spells {
     }
 
     /// <summary>
-    /// The projectile marks instead of dealing damage (Ezreal W, §7.6): the caster's next basic
+    /// The projectile marks instead of dealing damage (marking spells, §7.6): the caster's next basic
     /// attack or other spell on the target detonates the mark for this spell's damage and gives
     /// back ManaRefund (per rank).
     /// </summary>

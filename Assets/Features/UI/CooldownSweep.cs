@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace Features.UI {
     /// <summary>
-    /// LoL-style cooldown veil (design doc §7.9): a dark pie covering the part of the cooldown still
+    /// MOBA-style cooldown veil (design doc §7.9): a dark pie covering the part of the cooldown still
     /// left, shrinking clockwise from the top. Drawn with Painter2D.
     /// </summary>
     public sealed class CooldownSweep : VisualElement {

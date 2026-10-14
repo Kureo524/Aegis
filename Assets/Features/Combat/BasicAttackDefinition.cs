@@ -12,7 +12,7 @@ namespace Features.Combat {
         [SerializeField, Range(0f, 1f)] private float windupPercent = 0.25f;
         [Tooltip("Null = instant melee hit. Otherwise a projectile (must carry a Projectile).")]
         [SerializeField] private Projectile projectilePrefab;
-        [Tooltip("Ranged: true = homing, cannot miss (LoL auto-attack). False = flies straight towards where the target was when fired: can be dodged (enemy archers).")]
+        [Tooltip("Ranged: true = homing, cannot miss (MOBA auto-attack). False = flies straight towards where the target was when fired: can be dodged (enemy archers).")]
         [SerializeField] private bool homing = true;
         [Tooltip("World units per second.")]
         [SerializeField] private float projectileSpeed = 20f;

@@ -34,7 +34,7 @@ namespace Features.UI.Panels {
         private void Start() {
             _overlay = MenuStyles.Overlay(out VisualElement box);
             box.style.width = StyleKeyword.Null;
-            box.AddToClassList("ae-draft");   // Arena: big cards straight on the dimmed scene
+            box.AddToClassList("ae-draft");   // Arena draft: big cards straight on the dimmed scene
             _title = MenuStyles.Title("");
             _title.style.marginBottom = 2;
             box.Add(_title);

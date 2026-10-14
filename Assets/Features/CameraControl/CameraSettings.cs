@@ -1,7 +1,7 @@
 using UnityEngine;
 
 namespace Features.CameraControl {
-    /// <summary>Tuning of the LoL-style camera (design doc §14.5). Read-only at runtime.</summary>
+    /// <summary>Tuning of the MOBA-style camera (design doc §14.5). Read-only at runtime.</summary>
     [CreateAssetMenu(menuName = "Game/Settings/Camera Settings", fileName = "CameraSettings")]
     public class CameraSettings : ScriptableObject {
         [Header("Follow (locked)")]

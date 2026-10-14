@@ -11,7 +11,7 @@ using VContainer;
 
 namespace Features.UI.Panels {
     /// <summary>
-    /// Shop screen, LoL style (design doc §9.3), drawn from the ShopService snapshots only
+    /// Shop screen, MOBA style (design doc §9.3), drawn from the ShopService snapshots only
     /// (ShopStateEvent): filters by stat on the left, a grid of icons with their price (greyed when
     /// refused, red price when too expensive), the details of the selected offer on the right
     /// (stats, passive, why it cannot be bought, Buy), the inventory and Continue at the bottom.
@@ -205,7 +205,7 @@ namespace Features.UI.Panels {
                 else Select(offer);
             });
             cell.RegisterCallback<PointerDownEvent>(e => {
-                if (e.button == 1) Buy(offer);   // right click buys, like LoL
+                if (e.button == 1) Buy(offer);   // right click buys, like in MOBAs
             });
             _tooltip.Attach(cell, () => (name, cost > 0 ? $"{cost} or" : "", refusal));
             return cell;

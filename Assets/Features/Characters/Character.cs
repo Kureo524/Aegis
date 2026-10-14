@@ -66,7 +66,7 @@ namespace Features.Characters {
 
         /// <summary>
         /// Bonus part of a stat (items, augments, buffs): total minus base and level growth, like
-        /// LoL's "bonus AD" (§5.1). Ability ratios and adaptive force use it.
+        /// MOBA "bonus AD" (§5.1). Ability ratios and adaptive force use it.
         /// </summary>
         public float BonusStat(StatType type) {
             if (Definition == null) return 0f;

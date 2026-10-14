@@ -107,7 +107,7 @@ namespace Features.Spells {
         public void Execute(Character caster, SpellDefinition spell, CastContext ctx, int rank) {
             if (caster == null || !caster.IsAlive) return;
             Vector3 origin = caster.transform.position;
-            // A marking spell (Ezreal W) deals its damage when the mark is detonated, not on hit
+            // A marking spell (marking spells) deals its damage when the mark is detonated, not on hit
             DamageInfo damage = spell.Mark.Enabled ? default : BuildDamage(caster, spell, rank);
             System.Action<Character, float> onHit = (target, taken) => OnSpellHit(caster, spell, rank, target, taken);
 
@@ -185,7 +185,7 @@ namespace Features.Spells {
         /// <summary>
         /// A hit of <paramref name="attacker"/> (basic attack, or a spell other than the marking one)
         /// on a target it marked: the mark goes off for the marking spell's damage and gives back its
-        /// mana (Ezreal W, §7.6).
+        /// mana (marking spells, §7.6).
         /// </summary>
         public static void TryDetonateMark(Character attacker, Character target, SpellDefinition hitBy) {
             if (attacker == null || target == null || !target.IsAlive) return;

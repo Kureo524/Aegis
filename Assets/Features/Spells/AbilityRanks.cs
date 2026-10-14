@@ -15,7 +15,7 @@ namespace Features.Spells {
     }
 
     /// <summary>
-    /// Ranks of a champion's 4 abilities (design doc §7.8), LoL style: every level gives a skill
+    /// Ranks of a champion's 4 abilities (design doc §7.8), MOBA style: every level gives a skill
     /// point (CharacterLevel), spent with Ctrl + key or the HUD "+". A rank needs the champion level
     /// written in the ability (SpellDefinition.UnlockLevel: Q W E 1/3/5/7/9, R 6/11/16). Rank 0 =
     /// not learned, the ability cannot be cast. Pure C#, owned by AbilityCaster.

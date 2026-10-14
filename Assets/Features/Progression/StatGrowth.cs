@@ -7,8 +7,8 @@ namespace Features.Progression {
     public enum GrowthMode {
         /// <summary>bonus = gain × (level − 1)</summary>
         Linear,
-        /// <summary>bonus = gain × (n − 1) × (0.7025 + 0.0175 × (n − 1)), LoL's non-linear curve</summary>
-        LoL
+        /// <summary>bonus = gain × (n − 1) × (0.7025 + 0.0175 × (n − 1)), the usual MOBA non-linear curve</summary>
+        Curved
     }
 
     [Serializable]
@@ -32,7 +32,7 @@ namespace Features.Progression {
         public float BonusAt(StatGrowthEntry entry, int level) {
             int n = Mathf.Max(level, 1) - 1;
             return mode switch {
-                GrowthMode.LoL => entry.GainPerLevel * n * (0.7025f + 0.0175f * n),
+                GrowthMode.Curved => entry.GainPerLevel * n * (0.7025f + 0.0175f * n),
                 _ => entry.GainPerLevel * n,
             };
         }

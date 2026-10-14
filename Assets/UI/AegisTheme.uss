@@ -1,4 +1,4 @@
-/* Aegis UI theme (design doc §7.9, §9.3): LoL-like palette — deep navy panels, gold frames,
+/* Aegis UI theme (design doc §7.9, §9.3): MOBA-like palette — deep navy panels, gold frames,
    cream text, teal accents. Every view built in code adds this sheet and uses its classes. */
 
 :root {
@@ -164,7 +164,7 @@
     border-bottom-color: var(--gold-dark);
 }
 
-/* ---- HUD layout: one dock along the bottom edge, LoL style ---- */
+/* ---- HUD layout: one dock along the bottom edge, MOBA style ---- */
 .ae-hud {
     position: absolute;
     left: 0; right: 0; bottom: 0;
@@ -477,7 +477,7 @@
 }
 .ae-banner--show { opacity: 1; scale: 1 1; }
 
-/* ---- augment draft, Arena style ---- */
+/* ---- augment draft, arena-draft style ---- */
 .ae-draft { background-color: transparent; border-width: 0; width: 960px; }
 .ae-card--augment { width: 290px; min-height: 400px; margin: 10px; padding: 22px 16px 14px 16px; border-width: 3px; border-radius: 8px; flex-shrink: 0; }
 .ae-card--augment .ae-card__icon { width: 112px; height: 112px; margin-bottom: 14px; }

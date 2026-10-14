@@ -5,13 +5,13 @@ using VContainer;
 
 namespace Features.UI {
     /// <summary>
-    /// World-space HP bar above a character, LoL style: a black frame, a dark well, the fill with a
+    /// World-space HP bar above a character, MOBA style: a black frame, a dark well, the fill with a
     /// light top edge and, on the player and bosses, a tick every 100 HP; sized from the body
     /// (wider for big creatures, a bit taller for the player). Sprites rather than UI so hundreds
     /// of them stay cheap. Same-prefab component: listens to its
-    /// character's C# events directly. A shield shows as a white part after the HP (LoL style);
+    /// character's C# events directly. A shield shows as a white part after the HP (MOBA style);
     /// the strongest status (§5.7, StatusKind order) shows as an icon left of the bar, else the icon
-    /// of the spell whose mark the character carries (Ezreal W).
+    /// of the spell whose mark the character carries (marking spells).
     /// </summary>
     public class HealthBarView : MonoBehaviour {
         [SerializeField] private SpriteRenderer background;
