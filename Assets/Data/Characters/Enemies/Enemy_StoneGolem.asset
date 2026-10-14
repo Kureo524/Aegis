@@ -12,20 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
   m_Name: Enemy_StoneGolem
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
-  displayName: Golem de pierre
+  displayName: Krug
   faction: 1
-  sprite: {fileID: 21300000, guid: f32881830ac5dc4cd980f3853f1b3615, type: 3}
-  bodySize: {x: 1.6, y: 2.6}
+  sprite: {fileID: -466697035, guid: 89b440daa8db4c108928e1a63caf1a16, type: 3}
+  animations: {fileID: 11400000, guid: 3ee6c71a1e045c462ba17b4d4efea09c, type: 2}
+  portrait: {fileID: 0}
+  bodySize: {x: 1.6, y: 2.1}
   baseStats: {fileID: 11400000, guid: f980bbea96815e01dae9c231df006838, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: fb85d959a15e8f1a598c3149066aba7e, type: 2}
-  elements:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  elementUnlockLevels: 010000000300000005000000
-  spellBook: {fileID: 0}
-  signatureAbility: {fileID: 0}
+  abilities: []
+  summonerD: {fileID: 0}
+  summonerF: {fileID: 0}
   passive: {fileID: 0}
   xpReward: 675
   goldReward: 62

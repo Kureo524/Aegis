@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c58604379ce9cdca08ba4b1092853e8f, type: 3}
+  m_Name: Anim_MeleeMinion
+  m_EditorClassIdentifier: Game.Features::Features.Characters.SpriteAnimationSet
+  idle:
+    Frames:
+    - {fileID: 1462202808, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -787512201, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1176563564, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1226036176, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1190126791, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1907214681, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 452558086, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1926732961, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1181863392, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 85105952, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1358643556, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1968053669, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    Duration: 1
+    Loop: 1
+  run:
+    Frames:
+    - {fileID: -1179444312, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1439641005, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1895823253, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1440350402, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1268147152, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -53571000, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1743298685, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 851503021, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 673188365, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1522208525, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 277503946, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -654836438, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    Duration: 0.8
+    Loop: 1
+  attack:
+    Frames:
+    - {fileID: -680939563, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1926631508, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 405582265, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 176512115, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 652576576, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 2022667788, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1636902880, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 969866925, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1726487376, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1093320055, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    Duration: 0.933
+    Loop: 0
+  attackImpact: 0.45
+  hit:
+    Frames: []
+    Duration: 1
+    Loop: 0
+  death:
+    Frames:
+    - {fileID: 1358166401, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -913204167, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -633060084, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1120264262, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1015299787, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -1722319303, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: -744980548, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 423242906, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1720898437, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1459517465, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1623335885, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    - {fileID: 1912206412, guid: bd861f56db16c78768a85d95b4efa3ad, type: 3}
+    Duration: 1.35
+    Loop: 0
+  dash:
+    Frames: []
+    Duration: 1
+    Loop: 1
+  cast:
+    Frames: []
+    Duration: 1
+    Loop: 0
+  spellClips: []
+  runReferenceSpeed: 3.4

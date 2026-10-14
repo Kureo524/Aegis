@@ -12,20 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acf4a1c6bce6ac26f9b237e96d844c1b, type: 3}
   m_Name: Enemy_SkeletonArcher
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
-  displayName: Archer squelette
+  displayName: Sbire lanceur
   faction: 1
-  sprite: {fileID: 21300000, guid: 14292b87d214e01dd80fe3c911fca7d5, type: 3}
-  bodySize: {x: 0.7, y: 1.6}
+  sprite: {fileID: 705921435, guid: c9e6780802aca29dfa304d64f32acfa3, type: 3}
+  animations: {fileID: 11400000, guid: bdbbf3e88e84292b38987dd08cdc2945, type: 2}
+  portrait: {fileID: 0}
+  bodySize: {x: 0.7, y: 1.22}
   baseStats: {fileID: 11400000, guid: 72d6198966ae69db1a557dd896ab76db, type: 2}
   growthPerLevel: {fileID: 0}
   basicAttack: {fileID: 11400000, guid: 46a11fef046425121aad49387f562fcf, type: 2}
-  elements:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  elementUnlockLevels: 010000000300000005000000
-  spellBook: {fileID: 0}
-  signatureAbility: {fileID: 0}
+  abilities: []
+  summonerD: {fileID: 0}
+  summonerF: {fileID: 0}
+  passive: {fileID: 0}
   xpReward: 99
   goldReward: 10
   navigation: 0
