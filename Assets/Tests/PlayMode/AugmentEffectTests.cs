@@ -17,8 +17,8 @@ using VContainer;
 using VContainer.Unity;
 
 namespace Game.Tests.PlayMode {
-    /// <summary>The augments after LoL Arena (design doc §9.4) and the passive bricks they need.</summary>
-    public class ArenaAugmentTests {
+    /// <summary>The augments (design doc §9.4) and the passive bricks they need.</summary>
+    public class AugmentEffectTests {
         private static IObjectResolver Game => Object.FindFirstObjectByType<Containers.GameLifetimeScope>().Container;
         private static Character Player => Game.Resolve<EnemyDirector>().Player;
 
@@ -67,22 +67,22 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator Executioner_MoreDamageOnLowHealthTargets() {
+        public IEnumerator CoupDeGrace_MoreDamageOnLowHealthTargets() {
             yield return GameFlowSmokeTests.LoadGameScene();
             Character brute = Spawn("Enemy_Brute", new Vector3(3f, 0f, 0f));
             var hit = new DamageInfo(100f, DamageType.True, false, false, Player);
             float full = brute.TakeDamage(hit);
-            Take("Executioner");
+            Take("CoupDeGrace");
             Assert.AreEqual(full, brute.TakeDamage(hit), 0.01f, "above 50 %: no bonus");
             brute.TakeDamage(new DamageInfo(brute.Health.Current - brute.Health.Max * 0.4f, DamageType.True, false, false, null));
             Assert.AreEqual(full * 1.2f, brute.TakeDamage(hit), 0.01f, "under 50 %: +20 %");
         }
 
         [UnityTest]
-        public IEnumerator FrostWraith_RootsTheEnemiesAround_Periodically() {
+        public IEnumerator FrostGrip_RootsTheEnemiesAround_Periodically() {
             yield return GameFlowSmokeTests.LoadGameScene();
             Invulnerable();
-            Take("FrostWraith");
+            Take("FrostGrip");
             Character goblin = Spawn("Enemy_Goblin", new Vector3(2.5f, 0f, 0f));
             Time.timeScale = 3f;
             float end = Time.realtimeSinceStartup + 5f;
@@ -91,9 +91,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator EtherealWeapon_SpellHitsApplyOnHitEffects() {
+        public IEnumerator SpellEdge_SpellHitsApplyOnHitEffects() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Take("EtherealWeapon");
+            Take("SpellEdge");
             Character goblin = Spawn("Enemy_Goblin", new Vector3(3f, 0f, 0f));
             int onHits = 0;
             Player.Events.BasicAttackHit += (_, __) => onHits++;
@@ -105,9 +105,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator BreadAndButter_HalvesTheQCooldown() {
+        public IEnumerator WellPracticed_HalvesTheQCooldown() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Take("BreadAndButter");
+            Take("WellPracticed");
             var abilities = Player.GetComponent<AbilityCaster>();
             abilities.RankUp(0);
             var options = VContainerSettings.Instance.GetOrCreateRootLifetimeScopeInstance().Container.Resolve<Features.Options.UserOptions>();
@@ -115,7 +115,7 @@ namespace Game.Tests.PlayMode {
             options.CastMode = Systems.Inputs.CastMode.Quick;
             try {
                 abilities.TryCast(0);   // towards nothing: no refund on hit
-                Assert.AreEqual(5.5f * 100f / 200f, abilities.CooldownRemaining(0), 0.1f, "+100 haste on Q");
+                Assert.AreEqual(5f * 100f / 200f, abilities.CooldownRemaining(0), 0.1f, "+100 haste on Q");
             }
             finally {
                 options.CastMode = previous;
@@ -124,9 +124,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator Earthwake_ABlinkExplodesAroundTheLandingSpot() {
+        public IEnumerator QuakeStep_ABlinkExplodesAroundTheLandingSpot() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Take("Earthwake");
+            Take("QuakeStep");
             Character goblin = Spawn("Enemy_Goblin", new Vector3(4.5f, 0f, 0f));
             Player.Events.RaiseBlink(Player.transform.position, Player.transform.position);
             Player.GetComponent<CharacterMovement>().Teleport(goblin.transform.position + new Vector3(-1.5f, 0f, 0f));
@@ -136,9 +136,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator ChainLightning_DamageJumpsToTheNearestOtherEnemy() {
+        public IEnumerator ArcLightning_DamageJumpsToTheNearestOtherEnemy() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Take("ChainLightning");
+            Take("ArcLightning");
             Character a = Spawn("Enemy_Brute", new Vector3(3f, 0f, 0f));
             Character b = Spawn("Enemy_Brute", new Vector3(5f, 0f, 1f));
             a.TakeDamage(new DamageInfo(200f, DamageType.True, false, false, Player));
@@ -148,22 +148,22 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator GlassCannon_LessHealth_MoreDamage() {
+        public IEnumerator AllOrNothing_LessHealth_MoreDamage() {
             yield return GameFlowSmokeTests.LoadGameScene();
             float hp = Player.Health.Max;
             Character brute = Spawn("Enemy_Brute", new Vector3(3f, 0f, 0f));
             var hit = new DamageInfo(100f, DamageType.True, false, false, Player);
             float before = brute.TakeDamage(hit);
-            Take("GlassCannon");
+            Take("AllOrNothing");
             Assert.AreEqual(hp * 0.7f, Player.Health.Max, 1f);
             Assert.AreEqual(before * 1.25f, brute.TakeDamage(hit), 0.01f);
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator CantTouchThis_TheUltimateMakesYouInvulnerable() {
+        public IEnumerator EternalMoment_TheUltimateMakesYouInvulnerable() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Take("CantTouchThis");
+            Take("EternalMoment");
             Player.Events.RaiseSpellCast(Player.Definition.Abilities[0]);
             Assert.AreEqual(0f, Player.Health.Shield, "not on a basic ability");
             Player.Events.RaiseSpellCast(Player.Definition.Abilities[AbilitySlots.Ultimate]);
@@ -174,9 +174,9 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator Erosion_ShredsArmor_StackByStack() {
+        public IEnumerator Corrosion_ShredsArmor_StackByStack() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Take("Erosion");
+            Take("Corrosion");
             Character brute = Spawn("Enemy_Brute", new Vector3(3f, 0f, 0f));
             float armor = brute.Stats.Value(StatType.Armor);
             for (int i = 0; i < 5; i++) Player.Events.RaiseBasicAttackHit(brute, 1f);

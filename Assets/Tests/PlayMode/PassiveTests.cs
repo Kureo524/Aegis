@@ -58,26 +58,30 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator EzrealPassive_SpellHitsStackAttackSpeed() {
+        public IEnumerator Overheat_ASpellChargesTheNextAttack_ItExplodesAroundTheTarget_AndBurnsIt() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Assert.IsNotNull(Player.Definition.Passive, "Ezreal has his passive");
+            Assert.IsNotNull(Player.Definition.Passive, "Vesna has her passive");
             Passive passive = null;
             foreach (Passive p in Player.Passives.All) if (p.Definition == Player.Definition.Passive) passive = p;
             Assert.IsNotNull(passive);
-            float speed = Player.Stats.Value(StatType.AttackSpeed);
             Character dummy = Dummy();
-            SpellDefinition q = Player.Definition.Abilities[0];
-            Game.Resolve<SpellExecutor>().Execute(Player, q, Ctx(dummy), 1);
-            float end = Time.time + 2f;
-            while (passive.Stacks == 0 && Time.time < end) yield return null;
-            Assert.AreEqual(1, passive.Stacks, "one stack per spell hit");
-            Assert.Greater(Player.Stats.Value(StatType.AttackSpeed), speed * 1.05f, "+10 % attack speed");
+            Assert.IsFalse(passive.IsCharged);
+
+            Player.Events.RaiseSpellCast(Player.Definition.Abilities[0]);
+            Assert.IsTrue(passive.IsCharged, "a spell charges the next attack");
+            var attacker = Player.GetComponent<BasicAttacker>();
+            attacker.Attack(dummy);
+            float end = Time.time + 5f;
+            while (passive.IsCharged && Time.time < end) yield return null;
+            attacker.Cancel();
+            Assert.IsFalse(passive.IsCharged, "the attack used the charge");
+            Assert.IsTrue(dummy.Status.IsBurning, "and set the target on fire");
         }
 
         [UnityTest]
-        public IEnumerator Frenzy_StacksAttackSpeed_ThenFallsOff() {
+        public IEnumerator Fury_StacksAttackSpeed_ThenFallsOff() {
             yield return GameFlowSmokeTests.LoadGameScene();
-            Passive frenzy = Player.Passives.Add(Augment("Augment_Frenzy"), "test");
+            Passive frenzy = Player.Passives.Add(Augment("Augment_Fury"), "test");
             float speed = Player.Stats.Value(StatType.AttackSpeed);
             var attacker = Player.GetComponent<BasicAttacker>();
             Time.timeScale = 4f;
@@ -96,7 +100,7 @@ namespace Game.Tests.PlayMode {
             yield return GameFlowSmokeTests.LoadGameScene();
             Player.Stats.Get(StatType.CritChance).AddModifier(new StatModifier(1f, ModifierType.Flat, "test"));
             var executor = Game.Resolve<SpellExecutor>();
-            SpellDefinition fireball = Player.Definition.Abilities[0];   // Ezreal Q
+            SpellDefinition fireball = Player.Definition.Abilities[0];   // Vesna Q (cone)
             Character dummy = Dummy();
 
             bool crit = false;
@@ -106,7 +110,7 @@ namespace Game.Tests.PlayMode {
             }
             Assert.IsFalse(crit, "no crit without the capability, even at 100 % crit chance");
 
-            Player.Passives.Add(Augment("Augment_JeweledGauntlet"), "test");
+            Player.Passives.Add(Augment("Augment_GoldsmithGlove"), "test");
             using (Bus.Subscribe<DamageDealtEvent>(e => crit |= e.IsCrit && !e.TargetIsPlayer)) {
                 executor.Execute(Player, fireball, Ctx(dummy), 1);
                 yield return new WaitForSeconds(1f);

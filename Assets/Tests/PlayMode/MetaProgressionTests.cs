@@ -28,7 +28,7 @@ namespace Game.Tests.PlayMode {
         }
 
         private static MetaNodeDefinition Node(MetaTreeDefinition tree, string id) {
-            foreach (MetaNodeDefinition n in tree.Nodes) if (n.name == $"Meta_Ezreal_{id}") return n;
+            foreach (MetaNodeDefinition n in tree.Nodes) if (n.name == $"Meta_Vesna_{id}") return n;
             Assert.Fail($"No node {id}");
             return null;
         }

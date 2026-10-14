@@ -129,8 +129,8 @@ namespace Game.Tests.EditMode {
         }
 
         [Test]
-        public void LoLGrowth_FollowsTheNonLinearCurve() {
-            StatGrowth lol = CreateGrowth(GrowthMode.LoL, (StatType.PhysicalAttack, 10f, ModifierType.Flat));
+        public void CurvedGrowth_FollowsTheNonLinearCurve() {
+            StatGrowth lol = CreateGrowth(GrowthMode.Curved, (StatType.PhysicalAttack, 10f, ModifierType.Flat));
             var level = new CharacterLevel(_stats, lol, _curve);
             level.AddXp(10_000);   // level 5, n − 1 = 4
 

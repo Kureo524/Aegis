@@ -11,7 +11,7 @@ using VContainer;
 using VContainer.Unity;
 
 namespace Game.Tests.PlayMode {
-    /// <summary>Animated sprites (LoL models pre-rendered): loops, attack on the windup, death after the body is gone.</summary>
+    /// <summary>Animated sprites (CC0 models pre-rendered): loops, attack on the windup, death after the body is gone.</summary>
     public class CharacterAnimationTests {
         private static IObjectResolver Game => Object.FindFirstObjectByType<Containers.GameLifetimeScope>().Container;
         private static Character Player => Game.Resolve<EnemyDirector>().Player;
@@ -23,7 +23,7 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator EveryCharacter_HasItsAnimations_AndItsLoLName() {
+        public IEnumerator EveryCharacter_HasItsAnimations_AndItsName() {
             yield return GameFlowSmokeTests.LoadGameScene();
             var stage = Game.Resolve<StageDefinition>();
             var seen = new System.Collections.Generic.HashSet<CharacterDefinition> { Player.Definition };
