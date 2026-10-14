@@ -27,6 +27,7 @@ MonoBehaviour:
     Cooldown: 0
     ConsumesCharge: 0
     UltimateOnly: 0
+    EliteOnly: 0
     Effect: 7
     Stats: []
     Duration: 0
@@ -59,6 +60,7 @@ MonoBehaviour:
     Cooldown: 0
     ConsumesCharge: 0
     UltimateOnly: 0
+    EliteOnly: 0
     Effect: 3
     Stats: []
     Duration: 0
