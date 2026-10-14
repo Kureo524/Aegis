@@ -50,26 +50,45 @@ namespace Game.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator Shop_GridAndDetails_SelectThenBuyThroughTheBus() {
+        public IEnumerator Shop_OpensAnytime_RecommendedThenAll_BuyAndSellThroughTheBus() {
             yield return GameFlowSmokeTests.LoadGameScene();
+            var bus = VContainerSettings.Instance.GetOrCreateRootLifetimeScopeInstance().Container.Resolve<Systems.EventBusses.IEventBus>();
             Game.Resolve<Wallet>().Add(1000);
-            Game.Resolve<ShopService>().Open(full: true);
-            yield return null;
             var panel = Object.FindFirstObjectByType<ShopPanel>();
+            Assert.IsFalse(panel.IsOpen);
+            bus.Publish(new Features.Events.ShopToggleRequestedEvent());   // HUD button / P
+            yield return null;
+            Assert.IsTrue(panel.IsOpen);
             VisualElement root = panel.GetComponent<UIDocument>().rootVisualElement;
+            Assert.IsTrue(panel.ShowsRecommended, "the champion's recommendations first");
+            Assert.IsTrue(root.Query<Label>(className: "ae-shop__section").ToList().Any(l => l.text.StartsWith("Recommandés pour")));
+
+            panel.ShowAllItems();
             Assert.Greater(root.Query(className: "ae-offer").ToList().Count, 50, "every offer in the grid");
+            string[] sections = root.Query<Label>(className: "ae-shop__section").ToList().Select(l => l.text).ToArray();
+            CollectionAssert.IsSubsetOf(new[] { "Consommables", "Enclumes", "Bottes", "Objets légendaires" }, sections);
+
             ItemDefinition edge = Item("SunsteelBlade");
             panel.Select(edge);
             Assert.AreSame(edge, panel.Selected);
             Assert.IsTrue(root.Query<Label>(className: "ae-detail__name").ToList().Any(l => l.text == edge.DisplayName), "details of the selection");
             Button buy = root.Query<Button>().ToList().First(b => b.text == "Acheter");
-            Assert.IsTrue(buy.enabledSelf, "affordable: Buy is enabled");
+            Assert.IsTrue(buy.enabledSelf, "affordable, between waves: Buy is enabled");
             // What the Buy button, a double click or a right click on the icon send
-            VContainerSettings.Instance.GetOrCreateRootLifetimeScopeInstance().Container.Resolve<Systems.EventBusses.IEventBus>()
-                .Publish(new Features.Events.ShopBuyRequestedEvent(edge));
+            bus.Publish(new Features.Events.ShopBuyRequestedEvent(edge));
             yield return null;
             Assert.IsTrue(Game.Resolve<Inventory>().Contains(edge));
-            Assert.IsFalse(root.Query<Button>().ToList().First(b => b.text == "Acheter").enabledSelf, "one item per shop: Buy is now disabled");
+
+            panel.SelectSlot(0);
+            Button sell = root.Query<Button>().ToList().First(b => b.text.StartsWith("Vendre"));
+            Assert.IsTrue(sell.enabledSelf);
+            StringAssert.Contains(edge.SellValue.ToString(), sell.text);
+            bus.Publish(new Features.Events.ShopSellRequestedEvent(0));
+            yield return null;
+            Assert.IsFalse(Game.Resolve<Inventory>().Contains(edge), "sold");
+
+            bus.Publish(new Features.Events.ShopCloseRequestedEvent());   // Escape / ✕
+            Assert.IsFalse(panel.IsOpen);
         }
     }
 }

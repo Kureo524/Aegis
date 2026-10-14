@@ -44,6 +44,7 @@ namespace Game.Tests.PlayMode {
         private const float Speed = 4f;
         private static readonly int[] RankOrder = { 3, 0, 1, 2 };
         private CastMode _previousMode;
+        private bool _waveEnded;   // set by WaveRewardEvent: waves without rewards skip the Reward state at once
 
         private IObjectResolver _root, _game;
         private IEventBus _bus;
@@ -77,6 +78,7 @@ namespace Game.Tests.PlayMode {
             _camera = Object.FindFirstObjectByType<CameraController>().GetComponent<Camera>();
             var run = _game.Resolve<RunDirector>();
             var machine = _root.Resolve<GameFlowStateMachine>();
+            _bus.Subscribe<WaveRewardEvent>(_ => { _waveEnded = true; Track(run); });
             _bus.Subscribe<PlayerDiedEvent>(_ => _log.Add($"DIED wave={run.WaveNumber} t={Time.time - _waveStart:0}s alive={_enemies.Count(c => c.IsAlive)} " +
                                                        $"lvl={_player.Level.Level} ranks={_abilities.Rank(0)}{_abilities.Rank(1)}{_abilities.Rank(2)}{_abilities.Rank(3)} {BossHealth()}"));
 
@@ -84,7 +86,8 @@ namespace Game.Tests.PlayMode {
             while (Time.realtimeSinceStartup < end && machine.CurrentState is GameState.Game) {
                 Time.timeScale = run.State == RunState.Reward ? 1f : Speed;
                 Track(run);
-                if (run.State == RunState.Reward) Shop();
+                if (run.State == RunState.Reward) Rewards();
+                else if (run.State == RunState.PreWave && run.WaveNumber > 1) Break();
                 else if (_player.IsAlive) Play();
                 yield return null;
             }
@@ -107,7 +110,8 @@ namespace Game.Tests.PlayMode {
                 if (_quotaAt < 0f && run.QuotaReached) _quotaAt = Time.time - _waveStart;
                 if (_player.IsAlive) _minHp = Mathf.Min(_minHp, _player.Health.Ratio);
             }
-            if (run.State == RunState.Reward && _wave > 0 && (_log.Count == 0 || !_log[^1].StartsWith($"wave {_wave} "))) {
+            if (_waveEnded && _wave > 0 && (_log.Count == 0 || !_log[^1].StartsWith($"wave {_wave} "))) {
+                _waveEnded = false;
                 var inventory = _game.Resolve<Inventory>();
                 _log.Add($"wave {_wave} time={Time.time - _waveStart:0}s quota@{_quotaAt:0}s minHp={_minHp:P0} lvl={_player.Level.Level} " +
                          $"gold={_game.Resolve<Wallet>().Gold} lives={run.Lives} AD={_player.Stats.Value(StatType.PhysicalAttack):0} " +
@@ -115,27 +119,27 @@ namespace Game.Tests.PlayMode {
             }
         }
 
-        // ---- rewards: build order, then the first augment / anvil choice ----
-        private void Shop() {
+        // ---- rewards: the first augment / anvil choice ----
+        private void Rewards() {
             var shop = _game.Resolve<ShopService>();
             var augments = _game.Resolve<AugmentController>();
+            if (shop.AnvilOpen) shop.Choose(0);
+            else if (augments.Phase == AugmentDraftPhase.SlotsFull) augments.ChooseFullSlotsOption(FullSlotsOption.SlotOrGold, 0);
+            else if (augments.Phase == AugmentDraftPhase.Choose) augments.Pick(0);
+        }
+
+        // ---- the break: buys whatever it can of its build, in order, then starts the wave ----
+        private void Break() {
+            var shop = _game.Resolve<ShopService>();
             if (shop.AnvilOpen) {
                 shop.Choose(0);
                 return;
             }
-            if (shop.IsOpen) {
-                foreach (string id in Build) {
-                    ItemDefinition item = _game.Resolve<ShopCatalog>().Items.FirstOrDefault(i => i.name == id);
-                    if (item != null && shop.RefusalReason(item) == null) {
-                        shop.TryBuy(item);
-                        break;
-                    }
-                }
-                shop.Close();
-                return;
+            foreach (string id in Build) {
+                ItemDefinition item = _game.Resolve<ShopCatalog>().Items.FirstOrDefault(i => i.name == id);
+                if (item != null && shop.RefusalReason(item) == null) shop.TryBuy(item);
             }
-            if (augments.Phase == AugmentDraftPhase.SlotsFull) augments.ChooseFullSlotsOption(FullSlotsOption.SlotOrGold, 0);
-            else if (augments.Phase == AugmentDraftPhase.Choose) augments.Pick(0);
+            _bus.Publish(new NextWaveRequestedEvent());
         }
 
         // ---- fighting ----

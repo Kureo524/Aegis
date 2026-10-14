@@ -95,6 +95,13 @@ namespace Game.Tests.PlayMode {
             yield return null;
             Assert.AreEqual(RunState.Combat, run.State);
             Assert.IsTrue(run.BossAlive, "the boss spawned with the wave");
+            Character boss = null;
+            foreach (Character c in spawner.AliveEnemies) if (c.Definition is BossDefinition) boss = c;
+            Assert.IsNotNull(boss);
+            // The player fights back on her own: no basic attacks, the boss must outlast the timer at 60x
+            var attacker = Player.GetComponent<Features.Combat.BasicAttacker>();
+            attacker.Cancel();
+            attacker.enabled = false;
 
             // Quota reached, timer over: the boss still stands → overtime
             HordeSpawnEntry entry = bossWave.SpawnTable[0];
@@ -109,11 +116,12 @@ namespace Game.Tests.PlayMode {
             Time.timeScale = 1f;
             Assert.AreEqual(RunState.Overtime, run.State, "the boss is alive: the wave is not over");
 
-            Character boss = null;
-            foreach (Character c in spawner.AliveEnemies) if (c.Definition is BossDefinition) boss = c;
-            Assert.IsNotNull(boss);
-            Hit(boss, 1e7f);
-            Assert.AreEqual(RunState.Reward, run.State, "boss dead + quota: the wave ends");
+            int wave = run.WaveNumber;
+            bool ended = false;
+            using (Game.Resolve<Systems.EventBusses.IEventBus>().Subscribe<Features.Events.WaveRewardEvent>(_ => ended = true)) Hit(boss, 1e7f);
+            Assert.IsTrue(ended, "boss dead + quota: the wave ends");
+            Assert.IsTrue(run.State == RunState.Reward || (run.State == RunState.PreWave && run.WaveNumber == wave + 1),
+                          "its rewards, or straight to the break when it has none");
         }
     }
 }
