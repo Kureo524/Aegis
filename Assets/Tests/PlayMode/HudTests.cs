@@ -69,10 +69,17 @@ namespace Game.Tests.PlayMode {
             CollectionAssert.AreEqual(new[] { "Élixirs & enclumes à stats", "Bottes", "Mes objets" }, drawers, "the three drawers on the left");
             Assert.AreEqual(6, root.Query(className: "ae-shop__anvils").Children<VisualElement>().ToList().Count,
                             "every item anvil: prismatic + one legendary per role");
-            VisualElement[] bodies = root.Query(className: "ae-drawer__body").ToList().ToArray();
-            Assert.IsTrue(bodies.All(b => b.resolvedStyle.display == DisplayStyle.None || b.style.display == DisplayStyle.None), "the drawers are folded");
+            Assert.AreEqual(3, root.Query(className: "ae-sidetab").ToList().Count, "three vertical tabs on the left edge");
+            Assert.IsFalse(Enumerable.Range(0, 3).Any(panel.IsDrawerOpen), "their panels are in");
+            VisualElement[] flyouts = root.Query(className: "ae-drawer").ToList().ToArray();
+            Assert.AreEqual(Visibility.Hidden, flyouts[1].resolvedStyle.visibility);
             panel.OpenDrawer(1);
-            Assert.AreEqual(DisplayStyle.Flex, bodies[1].style.display.value, "the pointer over a drawer unfolds it");
+            yield return null;
+            yield return null;
+            Assert.IsTrue(panel.IsDrawerOpen(1), "the pointer over a tab slides its panel out");
+            Assert.AreEqual(Visibility.Visible, flyouts[1].resolvedStyle.visibility);
+            Assert.IsTrue(flyouts[1].ClassListContains("ae-drawer--open"));
+            Assert.Less(flyouts[1].worldBound.xMax, root.Q(className: "ae-shop").worldBound.xMin + 1f, "out to the left of the window");
             panel.OpenDrawer(1, false);
 
             // A category: its own legendary anvil and only its items
@@ -86,9 +93,9 @@ namespace Game.Tests.PlayMode {
             // Categories and stat filters only sort the main panel: the drawers keep everything
             panel.SetStatFilter(3);
             int boots = shop.Items.Count(i => i.UniqueGroup == "Bottes");
-            VisualElement[] drawers2 = root.Query(className: "ae-drawer").ToList().ToArray();
-            Assert.AreEqual(boots, drawers2[1].Query(className: "ae-offer").ToList().Count, "every boot, whatever the filter");
-            Assert.AreEqual(shop.Elixirs.Count + shop.StatAnvils.Count, drawers2[0].Query(className: "ae-offer").ToList().Count);
+            VisualElement Drawer(string title) => root.Query(className: "ae-drawer").ToList().First(d => d.Q<Label>(className: "ae-shop__drawer-title").text == title);
+            Assert.AreEqual(boots, Drawer("Bottes").Query(className: "ae-offer").ToList().Count, "every boot, whatever the filter");
+            Assert.AreEqual(shop.Elixirs.Count + shop.StatAnvils.Count, Drawer("Élixirs & enclumes à stats").Query(className: "ae-offer").ToList().Count);
             panel.ShowAllItems();
 
             ItemDefinition edge = Item("SunsteelBlade");

@@ -380,7 +380,7 @@
 /* ---- shop ---- */
 .ae-shop-overlay { background-color: rgba(2, 2, 14, 0.45); }
 .ae-shop {
-    width: 1290px; height: 760px; padding: 0;
+    width: 1230px; height: 760px; padding: 0;
     background-image: url("project://database/Assets/UI/Textures/Aurora.png");
     background-size: cover; background-position-y: top; background-position-x: center;
     border-width: 2px; border-color: var(--gold-dark); border-top-color: var(--gold);
@@ -400,23 +400,41 @@
 .ae-shop__search > .unity-text-field__input:focus { border-color: var(--gold); }
 .ae-shop__close { width: 34px; height: 34px; padding: 0; margin-left: 14px; font-size: 16px; }
 .ae-shop__body { flex-direction: row; flex-grow: 1; flex-shrink: 1; padding: 10px 12px 0 12px; }
-/* left: the folding drawers */
-.ae-shop__drawers { width: 236px; flex-shrink: 0; margin-right: 8px; }
+/* left edge: vertical tabs, their panels slide out to the left of the window */
+.ae-shop-frame { position: relative; }
+.ae-shop__side { position: absolute; right: 100%; top: 70px; flex-direction: row-reverse; align-items: flex-start; }
+.ae-shop__tabs { width: 36px; }
+.ae-sidetab {
+    width: 36px; height: 150px; margin-bottom: 6px;
+    background-image: url("project://database/Assets/UI/Textures/Panel.png");
+    border-width: 2px; border-right-width: 0; border-color: var(--gold-dark); border-left-color: var(--gold);
+    border-top-left-radius: 6px; border-bottom-left-radius: 6px;
+    transition-property: border-color, translate, background-color; transition-duration: 0.15s;
+}
+.ae-sidetab:hover, .ae-sidetab--open { border-color: var(--gold); border-left-color: var(--aurora-cyan); translate: -3px 0; background-color: rgba(30, 32, 86, 0.6); }
+.ae-sidetab__label {
+    position: absolute; width: 150px; height: 36px; left: -57px; top: 57px; rotate: -90deg;
+    -unity-text-align: middle-center; font-size: 12px; -unity-font-style: bold; letter-spacing: 1px; color: var(--text-dim);
+}
+.ae-sidetab:hover .ae-sidetab__label, .ae-sidetab--open .ae-sidetab__label { color: var(--gold-light); }
+.ae-shop__flyouts { width: 252px; position: relative; }
 .ae-drawer {
-    margin-bottom: 8px;
-    background-color: rgba(6, 8, 30, 0.72);
-    border-width: 1px; border-color: var(--gold-dark); border-left-width: 3px; border-left-color: var(--gold-dark);
-    border-radius: 3px;
-    transition-property: border-color, background-color; transition-duration: 0.15s;
+    position: absolute; right: 2px; width: 248px;
+    background-image: url("project://database/Assets/UI/Textures/Aurora.png");
+    background-size: cover; background-position-y: top; background-position-x: center;
+    border-width: 2px; border-color: var(--gold-dark); border-top-color: var(--gold); border-left-color: var(--aurora-cyan);
+    border-top-left-radius: 6px; border-bottom-left-radius: 6px;
+    opacity: 0; translate: 40px 0;
+    transition-property: opacity, translate; transition-duration: 0.18s; transition-timing-function: ease-out-cubic;
 }
-.ae-drawer--open { border-left-color: var(--aurora-cyan); border-color: var(--gold); background-color: rgba(14, 16, 52, 0.92); }
+.ae-drawer--open { opacity: 1; translate: 0 0; }
 .ae-drawer__head {
-    background-color: rgba(150, 130, 255, 0.08); margin: 0;
-    color: var(--text-dim); font-size: 12px; -unity-font-style: bold; letter-spacing: 1px;
-    -unity-text-align: middle-left; height: 32px; padding: 0 10px;
+    margin: 0; padding: 0 12px; height: 34px;
+    color: var(--gold-light); font-size: 12px; -unity-font-style: bold; letter-spacing: 1px; -unity-text-align: middle-left;
+    background-color: rgba(92, 225, 255, 0.10);
+    border-bottom-width: 1px; border-bottom-color: rgba(150, 130, 255, 0.35);
 }
-.ae-drawer--open .ae-drawer__head { color: var(--gold-light); background-color: rgba(92, 225, 255, 0.10); }
-.ae-drawer__body { flex-direction: row; flex-wrap: wrap; padding: 4px 4px 6px 4px; }
+.ae-drawer__body { flex-direction: row; flex-wrap: wrap; padding: 6px 6px 8px 6px; }
 .ae-shop__owned { width: 50px; height: 50px; margin: 3px 3px; }
 .ae-shop__owned.ae-slot--selected { border-color: var(--gold-light); }
 /* center: the base panel */
