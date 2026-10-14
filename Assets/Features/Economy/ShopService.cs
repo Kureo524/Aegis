@@ -231,7 +231,7 @@ namespace Features.Economy {
             }
             else {
                 foreach (ItemDefinition item in _catalog.Items)
-                    if (item != null && item.Tier == _anvil.ItemTier && (_anvil.Role == ItemRole.None || (item.Roles & _anvil.Role) != 0)
+                    if (item != null && item.Tier == _anvil.ItemTier && !item.IsBoots && (_anvil.Role == ItemRole.None || (item.Roles & _anvil.Role) != 0)
                         && !_choices.Contains(item) && _inventory.CanAdd(item)) candidates.Add(item);
             }
             return candidates.Count == 0 ? null : candidates[Random.Range(0, candidates.Count)];

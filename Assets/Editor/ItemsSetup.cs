@@ -21,7 +21,7 @@ namespace EditorTools {
     public static class ItemsSetup {
         private const string Dir = "Assets/Data/Economy/Items";
         private const string IconsDir = "Assets/GraphicAssets/Sprites/Items";
-        private const string Boots = "Bottes", Spellblade = "Arme runique", Hydra = "Fendoir", Lifeline = "Dernier rempart";
+        private const string Boots = ItemDefinition.BootsGroup, Spellblade = "Arme runique", Hydra = "Fendoir", Lifeline = "Dernier rempart";
 
         private static StatBonus B(StatType s, float v, ModifierType t = ModifierType.Flat) => new(s, t, v);
         private static StatBonus AS(float v) => B(StatType.AttackSpeed, v, ModifierType.PercentAdd);
