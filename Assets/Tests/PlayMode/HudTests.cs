@@ -180,5 +180,21 @@ namespace Game.Tests.PlayMode {
             CollectionAssert.Contains(augments.Owned, second, "a click on the card picks it");
             Assert.AreEqual(Features.Events.AugmentDraftPhase.Closed, augments.Phase);
         }
+
+        [UnityTest]
+        public IEnumerator Hud_TheGoldOpensTheShop_StacksSitRightAboveThePanel() {
+            yield return GameFlowSmokeTests.LoadGameScene();
+            yield return null;
+            Assert.IsFalse(HudRoot.Query<Button>().ToList().Any(b => b.text == "Boutique"), "no Shop button: the gold is the button");
+            VisualElement gold = HudRoot.Q(className: "ae-goldbutton");
+            Assert.IsNotNull(gold);
+            Click(gold);
+            yield return null;
+            Assert.IsTrue(Object.FindFirstObjectByType<ShopPanel>().IsOpen, "a click on the gold opens the shop");
+
+            VisualElement buffs = HudRoot.Q(className: "ae-buffs");
+            VisualElement center = buffs.parent;
+            Assert.AreEqual(center.IndexOf(HudRoot.Q(className: "ae-hud__main")) - 1, center.IndexOf(buffs), "the stacks right above the panel");
+        }
     }
 }
