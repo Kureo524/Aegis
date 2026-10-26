@@ -68,6 +68,10 @@ namespace Containers {
             CharacterDefinition champion = playerDefinition;
             if (Parent != null && Parent.Container.TryResolve(out Features.Characters.ChampionSelection selection) && selection.Current != null)
                 champion = selection.Current;
+            // The stage picked in the menu; this scene's own one otherwise (tests, editor)
+            StageDefinition playedStage = stage;
+            if (Parent != null && Parent.Container.TryResolve(out StageSelection stages) && stages.Current != null)
+                playedStage = stages.Current;
 
             builder.RegisterComponent(mainCamera);
             builder.Register<PrefabPool>(Lifetime.Scoped);
@@ -89,7 +93,7 @@ namespace Containers {
             if (augmentPanel != null) builder.RegisterComponent(augmentPanel);
             if (bossHud != null) builder.RegisterComponent(bossHud);
             if (runEndPanel != null) builder.RegisterComponent(runEndPanel);
-            builder.RegisterInstance(stage);
+            builder.RegisterInstance(playedStage);
             builder.RegisterComponent(runStateMachine);
             // Meta progression of the run's champion (§9.7)
             builder.Register(r => new Features.Meta.RunModifiers(r.Resolve<Features.Meta.MetaProgress>(), champion), Lifetime.Singleton);

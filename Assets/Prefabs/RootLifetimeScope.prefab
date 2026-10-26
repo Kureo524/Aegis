@@ -83,3 +83,4 @@ MonoBehaviour:
   uiTheme: {fileID: 11400000, guid: 21824a93c8ea58f8f814fdfd2b17a474, type: 2}
   metaSettings: {fileID: 11400000, guid: da822a30ac8b4e64aa3ac1a3cfdb7d9f, type: 2}
   championRoster: {fileID: 11400000, guid: 688cb0dac7ae6ebb39ad44d7436d7e7d, type: 2}
+  stageCatalog: {fileID: 11400000, guid: 7f7e71e43e6ee5819bb43b33a7ff5cd1, type: 2}

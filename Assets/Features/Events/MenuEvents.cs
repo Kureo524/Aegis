@@ -28,4 +28,15 @@ namespace Features.Events {
 
     /// <summary>A UserOptions value changed (already saved).</summary>
     public readonly struct UserOptionsChangedEvent : IEvent { }
+
+    /// <summary>Play the next runs on this stage (champion select screen → StageSelection).</summary>
+    public readonly struct StagePickRequestedEvent : IEvent {
+        public readonly Run.StageDefinition Stage;
+        public StagePickRequestedEvent(Run.StageDefinition stage) => Stage = stage;
+    }
+    /// <summary>The stage of the next runs changed (StageSelection).</summary>
+    public readonly struct StageSelectedEvent : IEvent {
+        public readonly Run.StageDefinition Stage;
+        public StageSelectedEvent(Run.StageDefinition stage) => Stage = stage;
+    }
 }

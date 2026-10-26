@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Features.Characters;
+using Features.Run;
 using Features.Events;
 using Features.Spells;
 using Features.StateMachines;
@@ -15,25 +16,33 @@ namespace Features.UI.Panels {
     /// (ChampionSelectRequestedEvent), one card per champion of the roster (portrait, name, epithet,
     /// how they play, passive and Q W E R with their tooltips). A click picks the champion
     /// (ChampionPickRequestedEvent), "Play" or a double click starts the run (PlayRequestedEvent).
-    /// Reads the ChampionSelection, changes it only through the bus. Own UIDocument.
+    /// The mode button cycles through the stages of the StageCatalog (short run first); the shown
+    /// one is picked (StagePickRequestedEvent) when the run starts. Reads the ChampionSelection and
+    /// the StageSelection, changes them only through the bus. Own UIDocument.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class ChampionSelectPanel : MonoBehaviour {
         private IEventBus _eventBus;
         private ChampionSelection _selection;
+        private StageSelection _stages;
+        private StageDefinition _stage;
         private readonly DisposableBag _subscriptions = new();
         private UiTooltip _tooltip;
         private VisualElement _overlay, _cards;
-        private Button _play;
+        private Button _play, _mode;
         private bool _open;
         private readonly Dictionary<CharacterDefinition, VisualElement> _cardOf = new();
 
         public bool IsOpen => _open;
+        /// <summary>The stage the run will be played on (shown on the mode button).</summary>
+        public StageDefinition Stage => _stage;
 
         [Inject]
-        public void Construct(IEventBus eventBus, ChampionSelection selection) {
+        public void Construct(IEventBus eventBus, ChampionSelection selection, StageSelection stages) {
             _eventBus = eventBus;
             _selection = selection;
+            _stages = stages;
+            _stage = stages.Current ?? stages.Default;
             _subscriptions.Add(eventBus.Subscribe<ChampionSelectRequestedEvent>(_ => Show(true)));
             _subscriptions.Add(eventBus.Subscribe<UiCancelEvent>(_ => Show(false)));
             _subscriptions.Add(eventBus.Subscribe<ChampionSelectedEvent>(_ => RefreshSelection()));
@@ -60,6 +69,10 @@ namespace Features.UI.Panels {
             var spacer = new VisualElement();
             spacer.style.flexGrow = 1;
             footer.Add(spacer);
+            _mode = MenuStyles.Button("", NextStage);
+            _mode.style.width = 300;
+            _mode.style.marginRight = 12;
+            footer.Add(_mode);
             _play = MenuStyles.Button("Jouer ▶", Play);
             _play.AddToClassList("ae-button--primary");
             _play.AddToClassList("ae-champselect__play");
@@ -81,6 +94,7 @@ namespace Features.UI.Panels {
             if (open) {
                 _play.SetEnabled(true);
                 Build();
+                RefreshMode();
             }
             else _tooltip.Hide();
         }
@@ -90,7 +104,24 @@ namespace Features.UI.Panels {
 
         private void Play() {
             _play.SetEnabled(false);   // no double start
+            if (_stage != null) _eventBus.Publish(new StagePickRequestedEvent(_stage));
             _eventBus.Publish(new PlayRequestedEvent());
+        }
+
+        /// <summary>Shows the next stage of the catalog on the mode button (picked at "Play").</summary>
+        public void NextStage() {
+            IReadOnlyList<StageDefinition> stages = _stages.Stages;
+            if (stages.Count == 0) return;
+            int i = 0;
+            for (int k = 0; k < stages.Count; k++) if (stages[k] == _stage) i = k;
+            _stage = stages[(i + 1) % stages.Count];
+            RefreshMode();
+        }
+
+        private void RefreshMode() {
+            if (_mode == null) return;
+            _mode.style.display = _stages.Stages.Count > 1 ? DisplayStyle.Flex : DisplayStyle.None;
+            _mode.text = _stage != null ? $"Mode : {_stage.DisplayName}" : "";
         }
 
         private void Build() {

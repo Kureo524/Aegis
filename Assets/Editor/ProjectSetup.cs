@@ -109,6 +109,7 @@ namespace EditorTools {
             CharacterSpritesSetup.Run();   // animated sprites, creature names, ground shadows
             ArenaSetup.Run();   // forest clearing: rocks, trees, ruins, painted ground, light, fog, post-processing
             MigrateTestScene(playerPrefab, dummyPrefab, hordeSettings, stage, shopCatalog, augmentCatalog, lootSettings);
+            ShortRunSetup.Run(RootPrefabPath, TestScenePath, stage);   // score, short run (2 waves), stage catalog
 
             AssetDatabase.SaveAssets();
             Debug.Log("[ProjectSetup] Done.");

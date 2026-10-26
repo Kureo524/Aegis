@@ -28,6 +28,7 @@ namespace Containers {
         [SerializeField] private Features.UI.UiTheme uiTheme;
         [SerializeField] private Features.Meta.MetaSettings metaSettings;
         [SerializeField] private Features.Characters.ChampionRoster championRoster;
+        [SerializeField] private Features.Run.StageCatalog stageCatalog;
 
         protected override void Configure(IContainerBuilder builder) {
             // Infrastructure
@@ -48,6 +49,9 @@ namespace Containers {
             if (championRoster != null) builder.RegisterInstance(championRoster);
             else builder.RegisterInstance(ScriptableObject.CreateInstance<Features.Characters.ChampionRoster>());
             builder.RegisterEntryPoint<Features.Characters.ChampionSelection>().AsSelf();   // champion of the next runs
+            if (stageCatalog != null) builder.RegisterInstance(stageCatalog);
+            else builder.RegisterInstance(ScriptableObject.CreateInstance<Features.Run.StageCatalog>());
+            builder.RegisterEntryPoint<Features.Run.StageSelection>().AsSelf();   // stage of the next runs (short run by default)
 
             // Game flow
             builder.RegisterComponent(stateMachine);
