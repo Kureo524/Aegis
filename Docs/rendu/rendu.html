@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Aegis — Document de rendu</title>
+<!-- Source du PDF Docs/Rendu.pdf : Docs/rendu/build.sh (Chromium headless, Mermaid) -->
+<style>
+  :root {
+    --night: #0e1626;
+    --night-2: #16223a;
+    --ink: #1d2433;
+    --muted: #5b6577;
+    --line: #dfe3ea;
+    --paper: #ffffff;
+    --soft: #f5f2ea;
+    --gold: #b98d2c;
+    --gold-soft: #f3e6c4;
+    --teal: #1f8f96;
+    --teal-soft: #dff1f2;
+    --rose: #b4435a;
+    --rose-soft: #f6e1e5;
+    --violet: #5b4bb0;
+    --violet-soft: #e7e3f7;
+  }
+  @page {
+    size: A4;
+    margin: 18mm 17mm 20mm 17mm;
+    @bottom-left { content: "Aegis · B3 Workshop 1"; font: 8pt "Noto Sans"; color: #8a93a3; }
+    @bottom-right { content: counter(page) " / " counter(pages); font: 8pt "Noto Sans"; color: #8a93a3; }
+  }
+  @page cover { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font: 9.6pt/1.5 "Noto Sans", sans-serif; color: var(--ink); background: var(--paper); }
+  h1, h2, h3 { font-family: "Noto Serif", serif; color: var(--night); line-height: 1.2; }
+  h2 { font-size: 19pt; margin: 0 0 4mm; padding-bottom: 2.5mm; border-bottom: 1.5px solid var(--gold); break-after: avoid; }
+  h2 .num { color: var(--gold); margin-right: 3mm; }
+  h3 { font-size: 12pt; margin: 6mm 0 2mm; break-after: avoid; }
+  p { margin: 0 0 2.6mm; text-align: justify; hyphens: auto; }
+  code { font: 8.4pt "Noto Sans Mono", monospace; background: #eef1f5; padding: 0.2mm 1.2mm; border-radius: 1mm; color: #2a3550; }
+  strong { color: var(--night); }
+  ul { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin-bottom: 1.2mm; }
+  section { break-before: page; }
+  section.flow { break-before: auto; margin-top: 9mm; }
+  .keep { break-inside: avoid; }
+
+  /* ---------- cover ---------- */
+  .cover { page: cover; height: 297mm; position: relative; overflow: hidden; color: #f3ead8;
+           background: radial-gradient(120% 70% at 80% 0%, #24406a 0%, transparent 60%),
+                       radial-gradient(90% 60% at 0% 100%, #173b44 0%, transparent 60%), var(--night); }
+  .cover .aurora { position: absolute; inset: 0; opacity: .55;
+           background: linear-gradient(115deg, transparent 20%, rgba(63,193,201,.25) 35%, transparent 50%),
+                       linear-gradient(100deg, transparent 45%, rgba(120,90,220,.22) 58%, transparent 70%); }
+  .cover .inner { position: relative; padding: 26mm 20mm 0; }
+  .cover .kicker { font: 600 9pt "Noto Sans"; letter-spacing: .35em; text-transform: uppercase; color: #d9b45a; }
+  .cover h1 { color: #fbf4e4; font-size: 52pt; margin: 4mm 0 2mm; letter-spacing: .02em; }
+  .cover .subtitle { font: 400 15pt "Noto Serif"; color: #cfd7e6; max-width: 150mm; margin-bottom: 9mm; }
+  .cover .shot { width: 170mm; border-radius: 3mm; border: 1px solid rgba(217,180,90,.6);
+                 box-shadow: 0 6mm 16mm rgba(0,0,0,.5); display: block; }
+  .cover .icons { display: flex; gap: 2.5mm; margin: 8mm 0 0; }
+  .cover .icons img { width: 11mm; height: 11mm; border-radius: 1.5mm; border: 1px solid rgba(217,180,90,.7); }
+  .cover .meta { position: absolute; left: 20mm; right: 20mm; bottom: 18mm; display: grid;
+                 grid-template-columns: repeat(4, 1fr); gap: 6mm; border-top: 1px solid rgba(217,180,90,.45); padding-top: 5mm; }
+  .cover .meta div { font-size: 8.4pt; color: #aeb8ca; }
+  .cover .meta b { display: block; font: 600 10pt "Noto Sans"; color: #f3ead8; margin-top: 1mm; }
+
+  /* ---------- blocks ---------- */
+  .lead { font-size: 10.6pt; color: #33405a; }
+  .callout { break-inside: avoid; border-left: 3px solid var(--teal); background: var(--teal-soft); padding: 3mm 4mm; border-radius: 0 2mm 2mm 0; margin: 3mm 0 4mm; }
+  .callout.gold { border-color: var(--gold); background: var(--gold-soft); }
+  .callout.rose { border-color: var(--rose); background: var(--rose-soft); }
+  .callout .t { font: 700 8.2pt "Noto Sans"; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); display: block; margin-bottom: 1mm; }
+  .callout.gold .t { color: var(--gold); }
+  .callout.rose .t { color: var(--rose); }
+  .callout p:last-child, .callout ul:last-child { margin-bottom: 0; }
+
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 8.8pt; break-inside: avoid; }
+  th { text-align: left; font: 600 8pt "Noto Sans"; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--night-2); padding: 2mm 2.5mm; }
+  td { padding: 1.8mm 2.5mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafbfc; }
+  td.ok { color: var(--teal); font-weight: 700; white-space: nowrap; }
+  .win { background: var(--teal-soft) !important; font-weight: 600; }
+
+  .toc { columns: 2; column-gap: 10mm; margin: 2mm 0 6mm; padding: 0; list-style: none; }
+  .toc li { display: flex; gap: 3mm; padding: 1.4mm 0; border-bottom: 1px dotted #c9ced8; break-inside: avoid; }
+  .toc .n { color: var(--gold); font-weight: 700; width: 6mm; }
+
+  .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm;
+  } .shots figure:first-child { grid-column: 1 / -1; } .shots { margin: 3mm 0 4mm; }
+  figure { margin: 0; break-inside: avoid; }
+  figure img { width: 100%; display: block; border-radius: 2mm; border: 1px solid #c8ccd6; }
+  figcaption { font-size: 8pt; color: var(--muted); margin-top: 1.2mm; }
+  figcaption b { color: var(--night); }
+
+  .steps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2mm; margin: 3mm 0 5mm; }
+  .step { background: var(--soft); border-radius: 2mm; padding: 2.5mm; border-top: 3px solid var(--gold); font-size: 8pt; }
+  .step b { display: block; font: 700 9pt "Noto Serif"; color: var(--night); margin-bottom: 1mm; }
+  .step span { color: var(--teal); font-weight: 600; font-size: 7.4pt; display: block; margin-top: 1.5mm; }
+
+  /* layer diagram */
+  .layers { margin: 3mm 0 2mm; display: grid; gap: 2.2mm; }
+  .layer { display: grid; grid-template-columns: 42mm 1fr; border-radius: 2.5mm; overflow: hidden; border: 1px solid; break-inside: avoid; }
+  .layer .name { padding: 3mm; color: #fff; font-size: 8pt; }
+  .layer .name b { display: block; font: 700 10.5pt "Noto Serif"; margin-bottom: .8mm; }
+  .layer .mods { padding: 2.5mm 3mm; display: flex; flex-wrap: wrap; gap: 1.6mm; align-content: center; }
+  .chip { font-size: 7.8pt; padding: .9mm 2.2mm; border-radius: 10mm; background: #fff; border: 1px solid; white-space: nowrap; }
+  .l-c { border-color: #c7b37b; } .l-c .name { background: #8a6d22; } .l-c .mods { background: #fbf6e8; } .l-c .chip { border-color: #d7c48f; }
+  .l-p { border-color: #b7aee3; } .l-p .name { background: var(--violet); } .l-p .mods { background: #f4f2fc; } .l-p .chip { border-color: #c9c1ee; }
+  .l-f { border-color: #9fd0d3; } .l-f .name { background: var(--teal); } .l-f .mods { background: #eef8f8; } .l-f .chip { border-color: #a9d8db; }
+  .l-s { border-color: #aab6cc; } .l-s .name { background: #2c3b5c; } .l-s .mods { background: #f1f4f8; } .l-s .chip { border-color: #bcc6d8; }
+  .l-d { border-color: #e2b1bb; } .l-d .name { background: var(--rose); } .l-d .mods { background: #fcf2f4; } .l-d .chip { border-color: #e9c2ca; }
+  .dep { text-align: center; font-size: 7.6pt; color: var(--muted); margin: -1mm 0; }
+  .dep::before { content: "▼ "; color: var(--gold); }
+
+  .diagram { background: var(--soft); border-radius: 2.5mm; padding: 4mm; margin: 3mm 0 4mm; break-inside: avoid; text-align: center; }
+  .diagram .cap { font-size: 8pt; color: var(--muted); margin-top: 2mm; text-align: left; }
+  .mermaid { display: flex; justify-content: center; }
+  .mermaid svg { max-width: 100%; height: auto; }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+  .card { border: 1px solid var(--line); border-radius: 2.5mm; padding: 3.5mm 4mm; break-inside: avoid; background: #fff; }
+  .card h4 { margin: 0 0 1.5mm; font: 700 10pt "Noto Serif"; color: var(--night); }
+  .card.pro { border-top: 3px solid var(--teal); }
+  .card.con { border-top: 3px solid var(--rose); }
+  .card ul { margin: 0; }
+
+  .score { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2mm; margin: 2mm 0 4mm; }
+  .score div { text-align: center; background: var(--gold-soft); border-radius: 2mm; padding: 2.5mm 1mm; font-size: 7.6pt; color: #6b5420; }
+  .score b { display: block; font: 700 14pt "Noto Serif"; color: var(--night); }
+
+  .scopes { display: grid; grid-template-columns: 1fr 26mm 1fr; gap: 2mm; align-items: stretch; margin: 2mm 0 0; break-inside: avoid; }
+  .scope { border-radius: 2.5mm; border: 1.5px solid; overflow: hidden; }
+  .scope .sh { padding: 2.2mm 3mm; color: #fff; font: 700 10pt "Noto Serif"; }
+  .scope .sh span { display: block; font: 400 7.6pt "Noto Sans"; opacity: .85; }
+  .scope .chips { padding: 2.5mm; display: flex; flex-wrap: wrap; gap: 1.5mm; }
+  .scope.root { border-color: #c7b37b; } .scope.root .sh { background: #8a6d22; } .scope.root .chips { background: #fbf6e8; } .scope.root .chip { border-color: #d7c48f; }
+  .scope.game { border-color: #9fd0d3; } .scope.game .sh { background: var(--teal); } .scope.game .chips { background: #eef8f8; } .scope.game .chip { border-color: #a9d8db; }
+  .chip.bus { background: var(--night-2); color: #f3ead8; border-color: var(--night-2) !important; font-weight: 700; }
+  .link { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; font-size: 7.4pt; color: var(--muted); gap: 1mm; }
+  .link .arrow { font-size: 16pt; color: var(--gold); line-height: 1; }
+  .busband { margin-top: 2mm; background: var(--night-2); color: #cfd7e6; text-align: center; border-radius: 2mm; padding: 2mm; font-size: 8.4pt; }
+  .busband b { color: #e2c070; }
+  .grade { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 3mm 0 5mm; }
+  .grade div { background: var(--night-2); color: #cfd7e6; border-radius: 2.5mm; padding: 3mm; font-size: 8pt; }
+  .grade b { display: block; font: 700 18pt "Noto Serif"; color: #e2c070; }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <div class="aurora"></div>
+  <div class="inner">
+    <div class="kicker">B3 Workshop 1 · Document de rendu</div>
+    <h1>Aegis</h1>
+    <div class="subtitle">Une architecture modulaire et découplée pour un rogue-lite à vagues d'ennemis, sous Unity 6.3</div>
+    <img class="shot" src="../images/02_champion_select.jpg" alt="Aegis en combat">
+    <div class="icons">
+      <img src="../../Assets/GraphicAssets/Sprites/Spells/Vesna_Passive.png"><img src="../../Assets/GraphicAssets/Sprites/Spells/Vesna_Q.png">
+      <img src="../../Assets/GraphicAssets/Sprites/Spells/Vesna_W.png"><img src="../../Assets/GraphicAssets/Sprites/Spells/Vesna_E.png">
+      <img src="../../Assets/GraphicAssets/Sprites/Spells/Vesna_R.png"><img src="../../Assets/GraphicAssets/Sprites/Spells/Aldric_Passive.png">
+      <img src="../../Assets/GraphicAssets/Sprites/Spells/Aldric_Q.png"><img src="../../Assets/GraphicAssets/Sprites/Spells/Aldric_W.png">
+      <img src="../../Assets/GraphicAssets/Sprites/Spells/Aldric_E.png"><img src="../../Assets/GraphicAssets/Sprites/Spells/Aldric_R.png">
+    </div>
+  </div>
+  <div class="meta">
+    <div>Auteur<b>Kilian Monnier</b></div>
+    <div>Version<b>v0.4 · octobre 2026</b></div>
+    <div>Dépôt<b>github.com/Kureo524/Aegis</b></div>
+    <div>Build<b>Windows 64 bits · Linux</b></div>
+  </div>
+</div>
+
+<!-- ================= 1. SOMMAIRE + RUN ================= -->
+<section>
+  <h2>Sommaire</h2>
+  <ol class="toc">
+    <li><span class="n">1</span>Le projet et la run minimale</li>
+    <li><span class="n">2</span>Choix du moteur : Unity 6.3</li>
+    <li><span class="n">3</span>Architecture : couches et dépendances</li>
+    <li><span class="n">4</span>Scopes, événements et machines à états</li>
+    <li><span class="n">5</span>Choix techniques et limites assumées</li>
+    <li><span class="n">6</span>Découplage vérifié par les tests</li>
+    <li><span class="n">7</span>Limites connues et suites</li>
+    <li><span class="n">8</span>Correspondance avec le sujet, versionnement</li>
+  </ol>
+
+  <h2><span class="num">1</span>Le projet et la run minimale</h2>
+  <p class="lead">Aegis est un rogue-lite à vagues d'ennemis en 2.5D. Le joueur choisit un champion, tient une clairière assiégée, gagne de l'expérience, construit son personnage avec des objets et des augments, puis accumule des éclats qui débloquent des talents entre les runs. Le contenu sert de prétexte : ce document porte sur l'architecture qui le fait tourner.</p>
+
+  <p>Le mode par défaut est la <strong>Run courte</strong> : deux vagues, en 2 à 3 minutes, qui traversent tous les systèmes demandés. Le bouton <em>Mode</em> de l'écran de sélection du champion lance la partie complète (5 vagues, un boss, 2 vagues bonus).</p>
+
+  <div class="steps">
+    <div class="step"><b>Menu</b>Choix du champion et du mode<span>Machine à états · données</span></div>
+    <div class="step"><b>Vague 1</b>40 s, quota de kills ; XP, or, points<span>Event bus · XP · score</span></div>
+    <div class="step"><b>Augment</b>Un choix parmi trois, jeu en pause<span>Données de récompense</span></div>
+    <div class="step"><b>Pause</b>20 s, boutique ouverte<span>Machine de run</span></div>
+    <div class="step"><b>Vague 2</b>45 s, puis victoire<span>Données de vague</span></div>
+    <div class="step"><b>Fin</b>Score final, record, éclats sauvegardés<span>Méta-progression</span></div>
+  </div>
+
+</section>
+
+<section>
+  <h3>La run courte en images</h3>
+  <div class="shots">
+    <figure><img src="../images/04_combat.jpg"><figcaption><b>Vague 1.</b> HUD de run : vague, minuterie, quota, vies et score en direct.</figcaption></figure>
+    <figure><img src="../images/02_champion_select.jpg"><figcaption><b>Sélection du champion.</b> Le bouton Mode choisit le stage (données : <code>StageCatalog</code>).</figcaption></figure>
+    <figure><img src="../images/05_augment.jpg"><figcaption><b>Fin de vague 1.</b> Choix d'une amélioration, défini par <code>WaveRewardSchedule</code>.</figcaption></figure>
+    <figure><img src="../images/06_victory.jpg"><figcaption><b>Victoire.</b> Score final, record et éclats gagnés, écrits dans <code>meta.json</code>.</figcaption></figure>
+  </div>
+  <p style="font-size:8.6pt;color:var(--muted)">Commandes : clic droit pour se déplacer et attaquer, A Z E R (AZERTY) pour les sorts, Échap pour la pause. Lancement : extraire <code>Aegis-0.4.0-Windows.zip</code> puis ouvrir <code>Aegis/Aegis.exe</code>.</p>
+</section>
+
+<!-- ================= 2. MOTEUR ================= -->
+<section>
+  <h2><span class="num">2</span>Choix du moteur : Unity 6.3</h2>
+  <p class="lead">Unity est le moteur où les quatre exigences du sujet trouvent l'outillage le plus direct : les données externes, l'injection de dépendances, les tests automatisés et un build Windows produit depuis Linux.</p>
+
+  <table>
+    <tr><th style="width:24%">Critère</th><th>Unity</th><th>Unreal Engine</th><th>Godot</th></tr>
+    <tr><td>Données externes</td><td class="win">ScriptableObjects : assets typés, référençables entre eux, édités dans l'Inspector</td><td>DataAsset, DataTable</td><td>Resource</td></tr>
+    <tr><td>Injection de dépendances</td><td class="win">VContainer : mûr, rapide, scopes par scène</td><td>Pas de standard (subsystems)</td><td>Pas de standard (autoloads = singletons)</td></tr>
+    <tr><td>Tests automatisés</td><td class="win">Unity Test Framework, EditMode et PlayMode, en ligne de commande</td><td>Automation, plus lourd</td><td>GUT (communauté)</td></tr>
+    <tr><td>Jeu 2.5D à sprites</td><td class="win">Adapté (URP, sprites face caméra)</td><td>Surdimensionné</td><td>Adapté</td></tr>
+    <tr><td>Itération</td><td class="win">C#, compilé en quelques secondes</td><td>C++ long à compiler, ou Blueprints difficiles à relire et à versionner</td><td>Rapide</td></tr>
+    <tr><td>Build Windows depuis Linux</td><td class="win">Oui (module Windows Mono)</td><td>Difficile</td><td>Oui</td></tr>
+  </table>
+
+  <p>C# est aussi le langage que nous maîtrisons le mieux. Godot était le concurrent sérieux. Il lui manque un conteneur d'injection reconnu et un outil de tests aussi intégré : ce sont deux points centraux pour un sujet noté à 50 % sur l'architecture.</p>
+
+  <div class="callout rose"><span class="t">Limites assumées</span>
+    <ul>
+      <li>Moteur propriétaire, dont la politique de licence a déjà changé (épisode du <em>runtime fee</em>).</li>
+      <li>Éditeur lourd ; le rechargement du domaine ralentit chaque modification de code.</li>
+      <li>Sérialisation contraignante : pas de génériques ouverts, enums stockés en entiers (un nouvel état ne s'ajoute qu'en fin d'enum).</li>
+      <li>Les ScriptableObjects ne s'éditent que dans Unity, pas dans un tableur.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= 3. ARCHITECTURE ================= -->
+<section>
+  <h2><span class="num">3</span>Architecture : couches et dépendances</h2>
+  <p class="lead">Le code est découpé en quatre <em>assembly definitions</em>. Chaque couche ne dépend que de celles du dessous : le compilateur refuse toute dépendance à rebours, et un test le vérifie sur le code compilé.</p>
+
+  <div class="layers">
+    <div class="layer l-c"><div class="name"><b>Containers</b>Composition · <code style="background:none;color:#fff">Game.Containers</code></div>
+      <div class="mods"><span class="chip">RootLifetimeScope</span><span class="chip">MenuLifetimeScope</span><span class="chip">GameLifetimeScope</span><span class="chip">seul endroit qui connaît toutes les classes</span></div></div>
+    <div class="dep">dépend de</div>
+    <div class="layer l-p"><div class="name"><b>Presentation</b>UI · <code style="background:none;color:#fff">Game.Presentation</code></div>
+      <div class="mods"><span class="chip">HUD de run</span><span class="chip">PlayerHud</span><span class="chip">Boutique</span><span class="chip">Augments</span><span class="chip">Écran de fin</span><span class="chip">Menus</span><span class="chip">Barres de vie</span></div></div>
+    <div class="dep">dépend de</div>
+    <div class="layer l-f"><div class="name"><b>Features</b>Le jeu · <code style="background:none;color:#fff">Game.Features</code></div>
+      <div class="mods"><span class="chip">Flow</span><span class="chip">Run</span><span class="chip">Score</span><span class="chip">Meta</span><span class="chip">Characters</span><span class="chip">Combat</span><span class="chip">Spells</span><span class="chip">Enemies</span><span class="chip">Economy</span><span class="chip">Augments</span><span class="chip">Passives</span><span class="chip">Loot</span><span class="chip">Stats</span><span class="chip">Progression</span></div></div>
+    <div class="dep">dépend de</div>
+    <div class="layer l-s"><div class="name"><b>Systems</b>Infrastructure · <code style="background:none;color:#fff">Game.Systems</code></div>
+      <div class="mods"><span class="chip">IEventBus</span><span class="chip">GameStateMachine&lt;TId&gt;</span><span class="chip">PrefabPool</span><span class="chip">InputReader</span><span class="chip">PanelManager</span><span class="chip">IPointerOverUi</span></div></div>
+    <div class="dep">lit (lecture seule)</div>
+    <div class="layer l-d"><div class="name"><b>Data</b>Assets · <code style="background:none;color:#fff">Assets/Data</code></div>
+      <div class="mods"><span class="chip">368 ScriptableObjects</span><span class="chip">vagues, stages</span><span class="chip">ennemis, boss</span><span class="chip">sorts</span><span class="chip">68 objets</span><span class="chip">43 augments</span><span class="chip">talents</span><span class="chip">score</span><span class="chip">réglages</span></div></div>
+  </div>
+
+  <h3>Inversion de dépendance</h3>
+  <p>Le gameplay a parfois besoin de l'UI : savoir si un clic tombe sur le HUD (pour ne pas déplacer le personnage) ou mettre à jour la barre de vie d'un personnage. Il passe alors par une interface déclarée dans sa couche ou en dessous, et implémentée plus haut :</p>
+  <table>
+    <tr><th>Interface</th><th>Déclarée dans</th><th>Implémentée par</th><th>Obtenue par</th></tr>
+    <tr><td><code>IPointerOverUi</code></td><td>Systems</td><td><code>UiPicking</code> (Presentation)</td><td>injection (scope racine)</td></tr>
+    <tr><td><code>ICharacterOverlay</code></td><td>Features</td><td><code>HealthBarView</code> (Presentation)</td><td>composant enfant du prefab</td></tr>
+  </table>
+
+  <p style="margin-top:4mm">Hors de ces couches : <code>Assets/Editor</code> (génération des données, builds) et <code>Assets/Tests</code> (212 tests EditMode et PlayMode).</p>
+</section>
+
+<!-- ================= 4. SCOPES / EVENTS / FSM ================= -->
+<section>
+  <h2><span class="num">4</span>Scopes, événements et machines à états</h2>
+
+  <h3>Deux durées de vie</h3>
+  <div class="scopes">
+    <div class="scope root"><div class="sh">RootLifetimeScope<span>toute l'application</span></div>
+      <div class="chips"><span class="chip bus">IEventBus</span><span class="chip">GameFlowController</span><span class="chip">GameFlowStateMachine</span><span class="chip">TimeScaleService</span><span class="chip">InputMapSwitcher</span><span class="chip">MetaProgress · meta.json</span><span class="chip">UserOptions</span><span class="chip">ChampionSelection</span><span class="chip">StageSelection</span><span class="chip">IPointerOverUi</span></div></div>
+    <div class="link"><div>parent</div><div class="arrow">◀</div><div>l'enfant résout<br>les services du root</div></div>
+    <div class="scope game"><div class="sh">GameLifetimeScope<span>une run, détruite à la fin</span></div>
+      <div class="chips"><span class="chip">RunDirector</span><span class="chip">RunStateMachine</span><span class="chip">HordeSpawner</span><span class="chip">EnemyDirector</span><span class="chip">Wallet</span><span class="chip">Inventory</span><span class="chip">ShopService</span><span class="chip">ScoreService</span><span class="chip">AugmentController</span><span class="chip">LootService</span><span class="chip">HUD et panneaux</span></div></div>
+  </div>
+  <div class="busband">Tous ces services communiquent par <b>IEventBus</b> (publish / subscribe), sans référence directe entre eux</div>
+  <p style="font-size:8.6pt;color:var(--muted);margin-top:2mm">Détruire le scope de jeu (fin de run, « Rejouer ») remet à zéro tout l'état de la run. La méta-progression vit dans le scope racine et ne connaît aucun système de gameplay.</p>
+
+  <h3>Un ennemi meurt : l'exemple du sujet</h3>
+  <div class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    participant E as Ennemi
+    participant B as IEventBus
+    participant R as RunDirector
+    participant P as Joueur
+    participant W as Wallet
+    participant S as ScoreService
+    participant H as HUD
+    E->>B: EnemyKilledEvent(xp, or)
+    E->>B: WaveEnemyKilledEvent
+    B->>R: quota +1
+    R->>B: XpGrantedEvent
+    B->>P: + XP, niveau
+    B->>W: + or
+    B->>S: + 10 points
+    B->>H: XP, or, quota et score affichés
+</pre>
+    <div class="cap">Aucun de ces systèmes ne référence les autres. Retirer <code>ScoreService</code> ne change rien pour eux.</div>
+  </div>
+
+  <h3>Une machine à états générique</h3>
+  <div class="two">
+    <div class="diagram" style="margin:0">
+<pre class="mermaid">
+stateDiagram-v2
+    direction TB
+    [*] --> Menu
+    Menu --> Loading: Jouer
+    Loading --> Game
+    Game --> Pause: Échap
+    Pause --> Game
+    Game --> Win
+    Game --> GameOver
+    Win --> Loading: Rejouer
+    GameOver --> Loading: Rejouer
+    Pause --> Menu
+    Win --> Menu
+    GameOver --> Menu
+</pre>
+      <div class="cap"><code>GameState</code>, états globaux du jeu.</div>
+    </div>
+    <div>
+      <p><code>GameStateMachine&lt;TId&gt;</code> (couche Systems) sert pour deux enums : <code>GameState</code> et <code>RunState</code> (<em>PreWave → Combat → Overtime → Reward</em>). Les règles de transition sont des données sérialisées, et une transition interdite est refusée et journalisée.</p>
+      <p><strong>Pas de code dupliqué entre états.</strong> Les réactions sont <em>abonnées</em> au changement d'état au lieu d'être écrites dans chaque état :</p>
+      <ul>
+        <li><code>TimeScaleService</code> met le temps à 0 en Pause, Win, GameOver et Reward ;</li>
+        <li><code>InputMapSwitcher</code> bascule les commandes entre jeu et interface ;</li>
+        <li>chaque panneau s'ouvre de lui-même sur son état.</li>
+      </ul>
+      <p>Chaque scène déclare son état d'entrée (<code>SceneEntryPoint</code>) : n'importe quelle scène se lance directement dans l'éditeur.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. CHOIX TECHNIQUES ================= -->
+<section class="flow">
+  <h2><span class="num">5</span>Choix techniques et limites assumées</h2>
+
+  <h3>5.1 Event bus</h3>
+  <p><code>IEventBus</code> (<code>Publish&lt;T&gt;</code> / <code>Subscribe&lt;T&gt;</code>) est <strong>injecté, jamais statique</strong>. Les 88 types d'événements sont des <code>readonly struct</code> : publier n'alloue rien. <code>Subscribe</code> renvoie un <code>IDisposable</code>, et chaque composant libère ses abonnements dans <code>OnDestroy</code> ou <code>Dispose</code>. Les événements propres à un personnage (coup porté, dégâts subis) passent par des événements C# locaux : des centaines d'ennemis satureraient le bus global.</p>
+  <div class="two">
+    <div class="card pro"><h4>Pourquoi</h4><ul><li>Un émetteur ignore qui l'écoute : on ajoute un système sans toucher aux autres.</li><li>Typé et vérifié à la compilation.</li><li>Testable avec un bus neuf, sans scène.</li></ul></div>
+    <div class="card con"><h4>Limites assumées</h4><ul><li>Le flux est plus dur à suivre qu'un appel direct.</li><li>L'ordre des abonnés est l'ordre d'abonnement : l'écran de fin doit accepter le record avant le score.</li><li>Synchrone, sans file d'attente.</li></ul></div>
+  </div>
+
+  <h3>5.2 Services : injection de dépendances (VContainer)</h3>
+  <p>Les services sont enregistrés dans trois scopes. Les classes C# reçoivent leurs dépendances par constructeur, les <code>MonoBehaviour</code> par une méthode <code>[Inject] Construct(...)</code>. Le code de jeu ne contient <strong>aucun singleton, aucun champ statique modifiable, aucun <code>FindObjectOfType</code> ni <code>Camera.main</code></strong>.</p>
+  <div class="two">
+    <div class="card pro"><h4>Pourquoi pas un Singleton ni un Service Locator</h4><ul><li>Un singleton couple chaque système à une classe concrète et globale : impossible à remplacer en test.</li><li>Un Service Locator cache les dépendances dans le corps des méthodes.</li><li>Avec l'injection, les dépendances sont dans la signature et la durée de vie suit le scope.</li></ul></div>
+    <div class="card con"><h4>Limites assumées</h4><ul><li>Une dépendance manquante n'apparaît qu'à l'exécution, à la construction du scope.</li><li>Du code de câblage : <code>GameLifetimeScope</code> enregistre une trentaine de services.</li><li>Une vraie courbe d'apprentissage (instanciation via le conteneur, ordre des points d'entrée).</li></ul></div>
+  </div>
+
+  <h3>5.3 Conception orientée données</h3>
+  <p>Vagues (quota, durée, table d'apparition pondérée, multiplicateurs), stages, ennemis, boss, objets, augments, talents et réglages sont des <strong>ScriptableObjects</strong>. Le code ne contient aucune valeur d'équilibrage. Les assets sont en lecture seule à l'exécution, l'état vit dans des instances runtime, et ils sont injectés, jamais cherchés par leur nom. Des scripts d'éditeur idempotents (<em>Tools &gt; Project Setup</em>) génèrent et réparent les données sans écraser les réglages faits à la main.</p>
+  <div class="callout gold"><span class="t">La run courte n'est que de la donnée</span>
+    <p><code>Stage_Demo</code> reprend les deux premières vagues du stage complet avec des durées plus courtes, et <code>StageCatalog</code> la propose en premier. Le barème du score est lui aussi un asset (<code>ScoreRules</code>) :</p>
+    <div class="score"><div><b>10</b>par kill</div><div><b>200</b>par vague</div><div><b>500</b>par boss</div><div><b>1 000</b>bonus de victoire</div><div><b>250</b>par vie restante</div></div>
+  </div>
+  <p><strong>Limites :</strong> pas d'édition hors de Unity ; un asset supprimé laisse une référence vide, détectée seulement par les tests ou à l'exécution ; un comportement vraiment nouveau (un nouveau type d'effet) demande toujours du code, seules les combinaisons sont des données.</p>
+
+  <h3>5.4 Méta-progression persistante</h3>
+  <p style="text-align:left"><code>MetaProgress</code> (scope racine) écoute <code>RunEndedEvent</code> pour créditer des éclats et <code>RunScoredEvent</code> pour garder le meilleur score. Il sauvegarde en JSON (sous Windows : <code>AppData\LocalLow\DefaultCompany\Aegis\meta.json</code>). Les éclats achètent des talents par champion, appliqués au début de la run suivante (PV, or de départ, vies, relances d'augment). La run ne connaît pas la sauvegarde, et la sauvegarde ne connaît pas la run : seuls des événements les relient. En éditeur et en test, un fichier séparé protège la sauvegarde du joueur.</p>
+  <p><strong>Limites :</strong> ni versionnage du format, ni écriture atomique. Une coupure pendant l'écriture peut corrompre le fichier : il est alors ignoré avec un avertissement et la progression repart de zéro.</p>
+</section>
+
+<!-- ================= 6. TESTS ================= -->
+<section>
+  <h2><span class="num">6</span>Découplage vérifié par les tests</h2>
+  <p class="lead">Le découplage n'est pas seulement affirmé : il est vérifié automatiquement à chaque exécution des tests.</p>
+  <table>
+    <tr><th style="width:34%">Test</th><th>Ce qu'il garantit</th></tr>
+    <tr><td><code>NoStaticMutableField_NoSingleton</code></td><td>Par réflexion sur les assemblies compilées : aucun champ statique modifiable et aucune propriété <code>Instance</code> dans le jeu ni dans l'infrastructure.</td></tr>
+    <tr><td><code>Layers_Systems_Gameplay_Presentation_Containers</code></td><td>Systems ne référence pas le jeu ; le jeu ne référence ni l'UI ni le câblage ; l'UI est bien une couche à part.</td></tr>
+    <tr><td><code>NoSystem_DependsOnTheScore</code></td><td>Aucune classe n'a de champ ni de paramètre de type <code>ScoreService</code> : on peut le retirer sans rien casser.</td></tr>
+    <tr><td><code>TheShortRun_GoesThroughEverySystem</code></td><td>Dans la vraie scène : stage choisi, deux vagues, choix d'augment, XP, score, victoire, éclats et record écrits sur disque.</td></tr>
+  </table>
+
+  <div class="callout"><span class="t">Désactiver un système</span>
+    <p>Sans l'asset <code>ScoreRules</code> dans la scène, <code>ScoreService</code> n'est pas enregistré : la run se joue à l'identique, le HUD masque le score et l'écran de fin n'affiche pas la ligne de score.</p>
+  </div>
+
+  <div class="grade">
+    <div><b>122</b>tests EditMode réussis</div>
+    <div><b>96</b>tests PlayMode réussis</div>
+    <div><b>0</b>échec</div>
+    <div><b>1</b>bot d'équilibrage, lancé à la demande</div>
+  </div>
+  <p>Les tests EditMode couvrent les stats, les dégâts, les machines à états, le bus, la boutique, les augments, la méta-progression, le score et l'architecture. Les tests PlayMode tournent dans la vraie scène : vagues, victoire, défaite, boss, objets, run courte complète. Le bot d'équilibrage joue la partie entière avec les mêmes commandes qu'un joueur.</p>
+</section>
+
+<!-- ================= 7. LIMITES ================= -->
+<section>
+  <h2><span class="num">7</span>Limites connues et suites</h2>
+  <table>
+    <tr><th style="width:50%">Limite</th><th>Avec plus de temps</th></tr>
+    <tr><td>Certains panneaux lisent directement des services concrets du jeu (<code>ShopPanel</code> → <code>ShopService</code>). C'est autorisé, la présentation étant au-dessus, mais remplacer un service oblige à toucher son panneau.</td><td>Des interfaces en lecture seule (<code>IShopQuery</code>, <code>IMetaQuery</code>) entre les deux couches.</td></tr>
+    <tr><td>Quelques classes trop grosses : <code>ShopPanel</code> (700 lignes), <code>PlayerHud</code> (440 lignes).</td><td>Les découper en vues (onglets, info-bulles, grille).</td></tr>
+    <tr><td>Le jeu tient dans une seule assembly.</td><td>Une assembly par domaine, pour que le compilateur force aussi le découplage entre domaines.</td></tr>
+    <tr><td>Sauvegarde JSON simple.</td><td>Format versionné, écriture atomique (fichier temporaire puis renommage).</td></tr>
+    <tr><td>Bus synchrone sans outil de diagnostic.</td><td>Une fenêtre de debug listant les abonnés et les derniers événements.</td></tr>
+    <tr><td>Pas d'audio, effets visuels minimaux.</td><td>Un <code>AudioService</code> abonné au bus, sans toucher au gameplay.</td></tr>
+    <tr><td>Le contenu vient d'une spécification MOBA plus riche que le sujet.</td><td>Un choix de motivation : l'architecture n'en dépend pas, comme le montre la run courte.</td></tr>
+  </table>
+
+  <h3>Recul critique</h3>
+  <p>Les quatre règles (machine à états, données, injection, bus) ont été posées dès le début et appliquées à tout le code, y compris quand un raccourci aurait été plus rapide. Le coût est réel : davantage de fichiers, plus de câblage, et des bugs d'ordre d'événements qu'un appel direct n'aurait pas eus. En échange, on ajoute du contenu sans toucher au code : le deuxième champion, les élites et la run courte sont arrivés presque entièrement par des données. La séparation de l'UI en couche distincte, faite tard, a révélé deux dépendances cachées ; posée dès le départ, elle aurait évité de les corriger après coup.</p>
+</section>
+
+<!-- ================= 8. SUJET + GIT ================= -->
+<section>
+  <h2><span class="num">8</span>Correspondance avec le sujet</h2>
+  <table>
+    <tr><th style="width:32%">Exigence</th><th>Réalisation</th><th style="width:7%"></th></tr>
+    <tr><td>Machine à états (Menu, En jeu, Pause, Game Over)</td><td><code>GameStateMachine&lt;TId&gt;</code> : <code>GameState</code> (+ Loading, Win) et <code>RunState</code> ; réactions abonnées, sans duplication</td><td class="ok">✔</td></tr>
+    <tr><td>Event bus découplé</td><td><code>IEventBus</code> injecté, 88 événements ; ennemi tué → run, XP, or, score, HUD</td><td class="ok">✔</td></tr>
+    <tr><td>Managers et services, choix justifié</td><td>VContainer, 3 scopes ; justification et limites §5.2</td><td class="ok">✔</td></tr>
+    <tr><td>Vagues, ennemis, améliorations en données</td><td>368 ScriptableObjects : <code>WaveDefinition</code>, <code>StageDefinition</code>, <code>EnemyDefinition</code>, objets, augments</td><td class="ok">✔</td></tr>
+    <tr><td>Méta-progression persistante et découplée</td><td><code>MetaProgress</code> (JSON) : éclats, talents par champion, meilleur score</td><td class="ok">✔</td></tr>
+    <tr><td>Run minimale de 2-3 min</td><td>Run courte : 2 vagues, XP, augment, score final, sauvegarde</td><td class="ok">✔</td></tr>
+    <tr><td>Couches séparées (logique, présentation, données)</td><td>4 assemblies (<code>Systems</code>, <code>Features</code>, <code>Presentation</code>, <code>Containers</code>) et <code>Assets/Data</code></td><td class="ok">✔</td></tr>
+    <tr><td>Couplage minimal</td><td>Score retirable, testé par <code>ArchitectureTests</code></td><td class="ok">✔</td></tr>
+    <tr><td>Pas de singleton statique</td><td>Vérifié par réflexion sur le code compilé</td><td class="ok">✔</td></tr>
+    <tr><td>Git exploitable</td><td>Branches de fonctionnalité, PR, Conventional Commits, tags de jalons</td><td class="ok">✔</td></tr>
+    <tr><td>Build Windows</td><td>Release <code>v0.4</code> : <code>Aegis-0.4.0-Windows.zip</code></td><td class="ok">✔</td></tr>
+  </table>
+
+  <h3>Versionnement</h3>
+  <ul>
+    <li>Branches <code>feature/&lt;module&gt;-&lt;sujet&gt;</code> → pull request vers <code>dev</code> → <code>main</code> aux jalons, taggés <code>v0.1</code> à <code>v0.4</code>.</li>
+    <li>Commits atomiques au format <em>Conventional Commits</em>, en français (<code>feat(score): …</code>, <code>refactor(ui): …</code>, <code>test: …</code>).</li>
+    <li>Données et scènes sérialisées en texte. <code>Library/</code>, <code>Builds/</code> et les fichiers d'IDE sont ignorés.</li>
+    <li>Dépôt public à l'historique nettoyé ; les visuels sont originaux ou sous licence libre (Quaternius et Kenney en CC0, game-icons.net en CC BY 3.0, polices Noto en OFL).</li>
+  </ul>
+
+  <div class="callout gold"><span class="t">Pour aller plus loin</span>
+    <p>La spécification complète (environ 1 300 lignes, tenue à jour au fil du projet) est dans <code>Docs/CharacterSystem_Design.md</code>. La version Markdown de ce document est <code>Docs/Rendu.md</code>.</p>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true, theme: "base", securityLevel: "loose",
+    fontFamily: "Noto Sans",
+    flowchart: { curve: "basis", padding: 12, htmlLabels: true },
+    sequence: { mirrorActors: false, actorMargin: 22, width: 110, height: 40, boxMargin: 6, messageMargin: 30, messageFontSize: 15, actorFontSize: 14, wrap: false },
+    themeVariables: {
+      fontSize: "13px",
+      primaryColor: "#ffffff", primaryBorderColor: "#1f8f96", primaryTextColor: "#1d2433",
+      lineColor: "#6c7790", secondaryColor: "#f3e6c4", tertiaryColor: "#eef1f6",
+      clusterBkg: "#ffffff", clusterBorder: "#b98d2c",
+      actorBkg: "#16223a", actorTextColor: "#f3ead8", actorBorder: "#16223a",
+      signalColor: "#1d2433", signalTextColor: "#1d2433", noteBkgColor: "#f3e6c4",
+      labelBoxBkgColor: "#16223a", labelTextColor: "#f3ead8",
+      edgeLabelBackground: "#f5f2ea"
+    }
+  });
+</script>
+</body>
+</html>

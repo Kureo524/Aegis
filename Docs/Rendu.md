@@ -7,6 +7,7 @@ prétexte : ce document explique l'architecture qui le fait tourner, ses choix e
 |---|---|
 | Dépôt | <https://github.com/Kureo524/Aegis> (branche `main`, historique de développement sur `dev`) |
 | Build | page *Releases* du dépôt : `Aegis-<version>-Windows.zip`, extraire puis lancer `Aegis.exe` |
+| Version PDF mise en page | [`Docs/Rendu.pdf`](Rendu.pdf) |
 | Spécification détaillée | [`Docs/CharacterSystem_Design.md`](CharacterSystem_Design.md) (document de travail, ~1 300 lignes) |
 
 ## 1. La run minimale (2-3 minutes)
@@ -24,6 +25,11 @@ Menu principal → **Jouer** → choix du champion. Le bouton **Mode** affiche p
 | Vague 2 (45 s) | quota de kills, puis victoire | |
 | Fin | `GameState.Win` / `GameOver` : **score final**, record, éclats gagnés | score, méta-progression (sauvegarde JSON) |
 | Retour menu | les éclats sont dépensables dans l'arbre de talents (*Progression*) | méta-progression |
+
+| | |
+|---|---|
+| ![Sélection du champion et du mode](images/02_champion_select.jpg) | ![Vague 1 : HUD de run avec le score](images/04_combat.jpg) |
+| ![Choix d'un augment après la vague 1](images/05_augment.jpg) | ![Victoire : score final, record, éclats](images/06_victory.jpg) |
 
 Commandes essentielles : **clic droit** pour se déplacer et attaquer, **A Z E R** (AZERTY) pour les sorts,
 **Échap** pour la pause. Le tableau complet est dans le [README](../README.md).
