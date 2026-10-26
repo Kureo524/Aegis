@@ -41,6 +41,8 @@ namespace Containers {
         [Tooltip("The stage played in this scene: waves, bonus waves, lives (design doc §9.1).")]
         public StageDefinition stage;
         public RunStateMachine runStateMachine;
+        [Tooltip("Score of the run (design doc §9.9). Empty: no score system, the rest of the run is unchanged.")]
+        public Features.Score.ScoreRules scoreRules;
         [Tooltip("Elixirs, anvils, items and stat choices of the shops (design doc §9.3).")]
         public ShopCatalog shopCatalog;
         [Tooltip("Augments and draft rules (design doc §9.4).")]
@@ -66,6 +68,10 @@ namespace Containers {
             CharacterDefinition champion = playerDefinition;
             if (Parent != null && Parent.Container.TryResolve(out Features.Characters.ChampionSelection selection) && selection.Current != null)
                 champion = selection.Current;
+            // The stage picked in the menu; this scene's own one otherwise (tests, editor)
+            StageDefinition playedStage = stage;
+            if (Parent != null && Parent.Container.TryResolve(out StageSelection stages) && stages.Current != null)
+                playedStage = stages.Current;
 
             builder.RegisterComponent(mainCamera);
             builder.Register<PrefabPool>(Lifetime.Scoped);
@@ -87,13 +93,17 @@ namespace Containers {
             if (augmentPanel != null) builder.RegisterComponent(augmentPanel);
             if (bossHud != null) builder.RegisterComponent(bossHud);
             if (runEndPanel != null) builder.RegisterComponent(runEndPanel);
-            builder.RegisterInstance(stage);
+            builder.RegisterInstance(playedStage);
             builder.RegisterComponent(runStateMachine);
             // Meta progression of the run's champion (§9.7)
             builder.Register(r => new Features.Meta.RunModifiers(r.Resolve<Features.Meta.MetaProgress>(), champion), Lifetime.Singleton);
             builder.RegisterEntryPoint<Features.Meta.MetaApplier>();
             builder.RegisterEntryPoint<RunDirector>().AsSelf();
             builder.RegisterEntryPoint<RewardController>().AsSelf();
+            if (scoreRules != null) {
+                builder.RegisterInstance(scoreRules);
+                builder.RegisterEntryPoint<Features.Score.ScoreService>().AsSelf();
+            }
             builder.RegisterInstance(shopCatalog);
             builder.Register<PlayerUpgrades>(Lifetime.Scoped);
             builder.RegisterEntryPoint<Inventory>().AsSelf();

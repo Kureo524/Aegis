@@ -6,6 +6,7 @@ using Features.Spells;
 using Features.Stats;
 using Systems.EventBusses;
 using Systems.Inputs.Events;
+using Systems.UIManagement;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -44,9 +45,12 @@ namespace Features.Controls {
         private readonly RaycastHit[] _rayHits = new RaycastHit[16];
         private readonly Collider[] _overlapHits = new Collider[16];
 
+        private IPointerOverUi _ui;
+
         [Inject]
-        public void Construct(IEventBus eventBus, IObjectResolver resolver, Camera mainCamera) {
+        public void Construct(IEventBus eventBus, IObjectResolver resolver, Camera mainCamera, IPointerOverUi ui) {
             _eventBus = eventBus;
+            _ui = ui;
             _resolver = resolver;
             _camera = mainCamera;
         }
@@ -85,7 +89,7 @@ namespace Features.Controls {
 
         private void OnConfirm(ConfirmEvent evt) {
             if (!_aimingAttackMove || OrdersBlocked) return;
-            if (UI.UiPicking.IsPointerOverUi(evt.ScreenPosition)) return;
+            if (_ui.IsPointerOverUi(evt.ScreenPosition)) return;
             if (!TryGetGroundPoint(evt.ScreenPosition, out Ray _, out Vector3 point)) return;
 
             Character preferred = ClosestEnemy(point, attackMoveSelectRadius);
@@ -101,7 +105,7 @@ namespace Features.Controls {
         }
 
         private void OnPointerCommand(PointerCommandEvent evt) {
-            if (UI.UiPicking.IsPointerOverUi(evt.ScreenPosition)) return;   // a click on the UI is not an order
+            if (_ui.IsPointerOverUi(evt.ScreenPosition)) return;   // a click on the UI is not an order
 
             // Right click while aiming only cancels the aim (§4.6); during an R / F aim it belongs to it
             if (_aimingAttackMove) {

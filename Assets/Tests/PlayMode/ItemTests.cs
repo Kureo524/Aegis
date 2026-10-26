@@ -214,7 +214,8 @@ namespace Game.Tests.PlayMode {
             Assert.IsTrue(elite.IsElite);
             Assert.AreEqual(2, elite.CarriedItems.Count, "two different items");
             Assert.AreNotSame(elite.CarriedItems[0], elite.CarriedItems[1]);
-            Assert.Greater(elite.Health.Max, baseHp * 2f - 1f, "twice the health, plus its items");
+            float multiplier = Game.Resolve<HordeSettings>().EliteHealthMultiplier;   // data (1.7 today), items may add more
+            Assert.GreaterOrEqual(elite.Health.Max, baseHp * multiplier - 1f, "the elite health multiplier, plus its items");
             Assert.AreEqual(elite.Health.Max, elite.Health.Current, 0.5f, "spawned at full health");
             CollectionAssert.IsSubsetOf(elite.CarriedItems, Game.Resolve<HordeSettings>().EliteItems);
             foreach (ItemDefinition item in elite.CarriedItems)

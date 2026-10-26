@@ -1,4 +1,11 @@
-# Système de personnage modulaire — Design Doc (Unity 6.4, C#)
+# Système de personnage modulaire — Design Doc (Unity 6.3, C#)
+
+> **Document de travail** (spécification interne, tenue à jour au fil du projet). Le document de
+> rendu du B3 Workshop, court, est [`Docs/Rendu.md`](Rendu.md). Les encadrés datés gardent
+> l'historique des étapes : une phase de prototypage s'est inspirée de League of Legends (personnage,
+> objets et augments d'essai). Tout ce contenu a été **retiré le 14/10/2026** et remplacé par du
+> contenu original ou sous licence libre (§7). Les mécaniques MOBA (sorts à rangs, objets à passif,
+> touches par position) sont restées.
 
 > Objectif : un **seul système** réutilisable pour le joueur, les ennemis, les alliés, les boss… Un personnage = un **prefab générique** + une **définition de données** (ScriptableObject). On ne code pas un perso, on le *configure*.
 
@@ -99,7 +106,7 @@ Le prefab de base porte aussi `BasicAttacker` et une **barre de PV** (`HealthBar
 - Ce qui distingue deux persos d'un même type (**sprite**, **taille du corps** `BodySize`, stats…) vient de la `CharacterDefinition`, appliquée par `Character.Init` : jamais un variant par personnage.
 - **`CharacterVisual`** : billboard (copie la rotation de la caméra, donc le sprite est vu à plat, sans déformation de perspective) et `flipX` selon le déplacement horizontal **à l'écran**. Les sprites sont dessinés **tournés vers la droite**, pivot en bas au centre. *Pour les centaines d'ennemis : un `LateUpdate` par entité, à centraliser si le profiler le demande (200 ennemis tiennent aujourd'hui en ~1,6 ms par frame dans l'éditeur).*
 - Le joueur n'est **pas posé dans la scène** : `PlayerSpawner` (entry point du `GameLifetimeScope`) l'instancie via `IObjectResolver.Instantiate` au `PlayerSpawn`, appelle `Init` et publie `PlayerSpawnedEvent`, que la caméra écoute pour le suivre.
-- Sprites provisoires (64 × 128, 64 px/unité, `Assets/GraphicAssets/Sprites/Characters/`) : `Placeholder_Hero` (généré par *Project Setup*, aperçu du prefab de base) et **`Chibi_Explorer`**, utilisé par `Char_TestHero` : chibi pixel-art *inspiré* d'Ezreal (League of Legends). Placeholder de prototype uniquement : à remplacer par une art originale avant toute diffusion publique (propriété intellectuelle de Riot Games). Ennemis (originaux, provisoires) : `Enemy_Goblin`, `Enemy_SkeletonArcher` (64 × 128) et `Enemy_Brute` (96 × 160), et le boss `Boss_GoblinKing` (128 × 192).
+- Sprites (`Assets/GraphicAssets/Sprites/Characters/`) : `Placeholder_Hero` (généré par *Project Setup*, aperçu du prefab de base) ; les champions et les monstres sont des sprites animés rendus depuis des modèles 3D libres (Quaternius, CC0) par `Tools/SpriteBaking` (§3, *Sprites animés*). Le chibi d'essai inspiré d'un personnage de LoL a été supprimé du dépôt (26/10/2026).
 
 ---
 
@@ -854,6 +861,30 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 - **Audio** : pool d'`AudioSource` + limitation du nombre de sons simultanés.
 - **Sauvegarde** : JSON simple (`JsonUtility`) pour la méta-progression.
 
+### 9.9 Score et run courte (26/10/2026)
+
+**Score** (`Features/Score`) : `ScoreService` (entry point du `GameLifetimeScope`) se construit
+**uniquement depuis le bus** : `WaveEnemyKilledEvent` (+ `PointsPerKill`), `BossDefeatedEvent`
+(+ `PointsPerBoss`), `WaveRewardEvent` (+ `PointsPerWave`), `RunStatusEvent` (vies restantes), puis
+`RunEndedEvent` : la dernière vague (qui n'ouvre pas d'écran de récompense), le `VictoryBonus` et
+`PointsPerLifeLeft` × vies en cas de victoire. Il publie `ScoreChangedEvent` (HUD de run) à chaque
+changement et `RunScoredEvent` une seule fois. Barème : SO `ScoreRules` (`Assets/Data/Run`, 10 / 500
+/ 200 / 1000 / 250). `MetaProgress` garde le meilleur score (`bestScore` dans `meta.json`) et publie
+`BestScoreEvent` (record battu ou non) ; `RunEndPanel` affiche « Score : N » et « Nouveau record ! »
+ou « Record : N ». **Aucune classe ne dépend de `ScoreService`** (test `ArchitectureTests`) : sans
+`ScoreRules` dans le `GameLifetimeScope`, il n'est pas enregistré et la run tourne à l'identique,
+sans score affiché.
+
+**Run courte** : `Stage_Demo` (`Assets/Data/Run/DemoStage`) = les vagues 1 et 2 du stage de test
+copiées (`Demo_Wave_01/02` : 40 s et 45 s), compte à rebours 5 s, pause 20 s, même
+`WaveRewardSchedule` (augment après la vague 1), victoire à la fin de la vague 2 : ~2 min 30 de jeu.
+`StageCatalog` (`Assets/Data/Run`, run courte en premier = défaut, puis le stage complet) est
+injecté dans le root ; `StageSelection` (root) garde le stage des prochaines runs. L'écran de
+sélection du champion affiche le bouton **Mode** (cycle dans le catalogue) et envoie
+`StagePickRequestedEvent` au lancement. Le `GameLifetimeScope` joue `StageSelection.Current`, ou son
+propre `stage` si rien n'a été choisi (scène lancée directement, tests). Généré par
+`ShortRunSetup` (appelé par *Project Setup*, ou *Tools > Short Run and Score Setup*).
+
 ---
 
 ## 10. Arborescence du projet
@@ -1164,7 +1195,7 @@ Assets/
 │   ├── Run/                 RunDirector, RunStateMachine, RewardController, StageDefinition, WaveDefinition, WaveRewardSchedule (SO)
 │   ├── Controls/            PlayerCommandInput, ClickMarker, RangeIndicator
 │   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO), TimedModifiers…
-│   └── UI/                  PlayerHud, AbilityBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
+│   └── UI/                  Game.Presentation — PlayerHud, AbilityBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
 │                            Panels/ (MainMenuPanel, PauseMenu, OptionsPanel, OptionsView, RunEndPanel, ShopPanel, AnvilPanel, AugmentPanel, OfferCard),
 │                            RunHudView, InventoryView, AugmentsView, BossHudView, DebugTools/CharacterDebugPanel
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
@@ -1182,7 +1213,7 @@ Assets/
 ├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy, Enemy, Boss),
 │                            Combat/ (Projectile_ArcaneBolt, Projectile_Skillshot, Vfx_SpellShape)
 ├── GraphicAssets/           Sprites/ (Characters/…, Items/…, Augments/…, Spells/ (Flash, Vesna_*), Status/…, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
-├── Scenes/                  Releases/Menu, Tests/TestScene (+ Releases/Game : ancienne scène WASD, hors build)
+├── Scenes/                  Releases/Menu, Tests/TestScene (la scène de jeu)
 ├── Tests/                   EditMode/, PlayMode/
 └── UI Toolkit/   Settings/
 Docs/                        CharacterSystem_Design.md
@@ -1190,7 +1221,7 @@ Docs/                        CharacterSystem_Design.md
 
 Les nouveaux modules du §10 (Combat, Spells, Items, Run, AI…) vont dans `Features/<Module>/`, et leurs données dans `Data/<Domaine>/`.
 
-**Assembly definitions** : `Game.Input` ← `Game.Systems` ← `Game.Features` ← `Game.Containers` ← `Game.Editor` (éditeur seulement) ; `Game.Tests.EditMode` / `Game.Tests.PlayMode`. Règle : **`Systems` ne référence jamais `Features`**. Séparer `Features` en plusieurs asmdef par module quand le projet grossit.
+**Assembly definitions** : `Game.Input` ← `Game.Systems` ← `Game.Features` ← `Game.Presentation` (`Features/UI`, depuis le 26/10/2026) ← `Game.Containers` ← `Game.Editor` (éditeur seulement) ; `Game.Tests.EditMode` / `Game.Tests.PlayMode`. Règles : **`Systems` ne référence jamais `Features`**, **`Features` ne référence jamais l'UI** : quand le gameplay a besoin de l'UI, il passe par une interface déclarée plus bas et implémentée par la présentation (`IPointerOverUi` dans `Systems.UIManagement`, implémentée par `UiPicking` et enregistrée dans le root ; `ICharacterOverlay` dans `Features.Characters`, implémentée par `HealthBarView` et trouvée par `Character` dans ses enfants). Vérifié par `ArchitectureTests` (EditMode). Séparer `Features` en plusieurs asmdef par module quand le projet grossit.
 
 ### 14.7 Git
 
@@ -1239,7 +1270,7 @@ Les nouveaux modules du §10 (Combat, Spells, Items, Run, AI…) vont dans `Feat
 | Bouton Quit qui pouvait quitter seul au lancement (IMGUI réagit au bouton maintenu) | Clic lu via `ConfirmEvent` (appui), publie `QuitRequestedEvent` |
 
 Points restants (connus) :
-- `Releases/Game.unity` : ancienne scène WASD, scripts manquants, retirée du build. À supprimer ou à reconstruire quand le vrai stage arrivera.
+- `Releases/Game.unity` : ancienne scène WASD aux scripts manquants, supprimée le 26/10/2026.
 
 **Outillage**
 - *Tools > Project Setup* (`EditorTools.ProjectSetup.Run`) : crée / répare le prefab root, ses règles de transition, les SO de réglages, `VContainerSettings`, la liste de scènes du build. Idempotent.

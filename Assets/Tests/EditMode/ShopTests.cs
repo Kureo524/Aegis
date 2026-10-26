@@ -114,9 +114,11 @@ namespace Game.Tests.EditMode {
             Assert.IsTrue(_shop.TryBuy(_legendaryAnvil));
             CollectionAssert.DoesNotContain(_shop.AnvilChoices, _legendaries[0], "owned items are not offered");
 
+            ScriptableObject picked = _shop.AnvilChoices[0];   // random: never the item checked below
             _wallet.TrySpend(_wallet.Gold);
             _shop.Choose(0);
-            Assert.AreEqual("Pas assez d'or", _shop.RefusalReason(_legendaries[5]), "gold is the only limit");
+            ItemDefinition notOwned = _legendaries[5] != picked ? _legendaries[5] : _legendaries[4];
+            Assert.AreEqual("Pas assez d'or", _shop.RefusalReason(notOwned), "gold is the only limit");
         }
 
         [Test]

@@ -17,6 +17,15 @@ Les builds sont sur la page des [**releases**](https://github.com/Kureo524/Aegis
 Le jeu n'est pas signé : Windows SmartScreen peut afficher « Windows a protégé votre ordinateur », il
 suffit de cliquer sur *Informations complémentaires* puis *Exécuter quand même*.
 
+## Run courte (rendu B3 Workshop)
+
+Le mode par défaut, sur l'écran de sélection du champion, est la **Run courte** : 2 vagues, un choix
+d'augment, un **score final** et la sauvegarde des éclats de méta-progression, en 2 à 3 minutes. Le
+bouton **Mode** lance la partie complète.
+
+Le document de rendu (choix du moteur, schémas d'architecture, choix techniques et limites) :
+[**`Docs/Rendu.md`**](Docs/Rendu.md).
+
 ## Le jeu
 
 - **Deux champions**, choisis à l'écran de sélection :
@@ -52,8 +61,8 @@ Q W E R sur un QWERTY. La disposition du clavier se règle dans les options (AZE
 
 ## Architecture
 
-Quatre règles tenues sur tout le code (voir [`Docs/CharacterSystem_Design.md`](Docs/CharacterSystem_Design.md),
-la source de vérité) :
+Quatre règles tenues sur tout le code (résumé et schémas dans [`Docs/Rendu.md`](Docs/Rendu.md), détail dans
+[`Docs/CharacterSystem_Design.md`](Docs/CharacterSystem_Design.md), la spécification de travail) :
 
 1. **State machines** pour les états du jeu et de la run.
 2. **Data-driven** : personnages, sorts, objets, augments, vagues, arènes… sont des ScriptableObjects,
@@ -61,8 +70,9 @@ la source de vérité) :
 3. **Injection de dépendances** avec [VContainer](https://github.com/hadashiA/VContainer) : aucun singleton.
 4. **EventBus** : aucune référence directe entre systèmes.
 
-UI entièrement en **UI Toolkit**. Environ 200 tests (EditMode et PlayMode), plus un bot d'équilibrage
-qui joue la partie entière (`-testFilter BalanceSimulation`).
+UI entièrement en **UI Toolkit**. Plus de 200 tests (EditMode et PlayMode, dont des tests d'architecture
+qui vérifient l'absence d'état statique et les dépendances entre couches), plus un bot d'équilibrage qui
+joue la partie entière (`-testFilter BalanceSimulation`).
 
 ## Lancer le projet
 
