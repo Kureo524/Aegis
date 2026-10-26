@@ -11,9 +11,10 @@ namespace Features.UI {
     /// of them stay cheap. Same-prefab component: listens to its
     /// character's C# events directly. A shield shows as a white part after the HP (MOBA style);
     /// the strongest status (§5.7, StatusKind order) shows as an icon left of the bar, else the icon
-    /// of the spell whose mark the character carries (marking spells).
+    /// of the spell whose mark the character carries (marking spells). Found by its Character as an
+    /// ICharacterOverlay: the gameplay does not reference this class.
     /// </summary>
-    public class HealthBarView : MonoBehaviour {
+    public class HealthBarView : MonoBehaviour, ICharacterOverlay {
         [SerializeField] private SpriteRenderer background;
         [SerializeField] private SpriteRenderer fill;
         [SerializeField] private float width = 1f;

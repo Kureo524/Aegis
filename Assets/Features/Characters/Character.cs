@@ -6,7 +6,6 @@ using Features.Movement;
 using Features.Passives;
 using Features.Progression;
 using Features.Stats;
-using Features.UI;
 using Systems.EventBusses;
 using UnityEngine;
 using UnityEngine.AI;
@@ -31,7 +30,6 @@ namespace Features.Characters {
         [SerializeField] private BoxCollider body;
         [SerializeField] private NavMeshAgent agent;
         [SerializeField] private BasicAttacker attacker;
-        [SerializeField] private HealthBarView healthBar;
 
         private IEventBus _eventBus;
         private ExperienceCurve _experienceCurve;
@@ -103,7 +101,7 @@ namespace Features.Characters {
                     Stats.Get(StatType.MaxHealth)?.AddModifier(new StatModifier(healthMultiplier - 1f, ModifierType.PercentMult, _carriedItems));
                 if (visual != null) visual.SetElite(true);
             }
-            if (healthBar != null) healthBar.ShowItems(_carriedItems, IsElite);
+            foreach (ICharacterOverlay overlay in _overlays) overlay.ShowItems(_carriedItems, IsElite);
         }
         public Faction Faction => Definition != null ? Definition.Faction : Faction.Neutral;
         public float BodyRadius => Definition != null ? Definition.BodySize.x / 2f : 0.5f;
@@ -160,8 +158,11 @@ namespace Features.Characters {
         /// <summary>Where the adaptive force goes now (UI).</summary>
         public bool AdaptiveForceIsMagic => BonusStat(StatType.MagicAttack) > BonusStat(StatType.PhysicalAttack);
 
+        private ICharacterOverlay[] _overlays = System.Array.Empty<ICharacterOverlay>();
+
         private void Awake() {
             _rigidbody = GetComponent<Rigidbody>();
+            _overlays = GetComponentsInChildren<ICharacterOverlay>(true);   // HP bar (presentation layer)
             Status = new StatusEffects(Stats, Buffs, info => TakeDamage(info));
             Status.Changed += OnStatusChanged;
             Passives = new PassiveController(this);
@@ -201,7 +202,7 @@ namespace Features.Characters {
             Health.Died += OnDied;
             Mana = new ManaPool(Stats.Get(StatType.MaxMana));
             if (movement != null) movement.Init(Stats.Get(StatType.MoveSpeed));
-            if (healthBar != null) healthBar.Bind(this);
+            foreach (ICharacterOverlay overlay in _overlays) overlay.Bind(this);
             SetBodyActive(true);
 
             Level.LevelChanged += Events.RaiseLevelUp;

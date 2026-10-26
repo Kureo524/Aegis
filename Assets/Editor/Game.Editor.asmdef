@@ -4,6 +4,7 @@
     "references": [
         "Game.Systems",
         "Game.Features",
+        "Game.Presentation",
         "Game.Containers",
         "Unity.AI.Navigation",
         "VContainer",

@@ -34,6 +34,7 @@ namespace Containers {
             // Infrastructure
             builder.Register<EventBus>(Lifetime.Singleton).As<IEventBus>();
             builder.Register<PanelManager>(Lifetime.Singleton).As<IPanelManager>();
+            builder.Register<Features.UI.UiPicking>(Lifetime.Singleton).As<IPointerOverUi>();   // presentation, seen by the gameplay as an interface
             builder.RegisterEntryPoint<InputReader>().AsSelf();
 
             // Settings (ScriptableObjects)

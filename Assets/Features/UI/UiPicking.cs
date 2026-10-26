@@ -1,3 +1,4 @@
+using Systems.UIManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -5,11 +6,11 @@ namespace Features.UI {
     /// <summary>
     /// Is the pointer over the UI (UI Toolkit)? Gameplay clicks under an interactive element (a
     /// button, the shop, a panel) are ignored so they do not also move the character or cast.
-    /// Pure helper: picks in every active UIDocument; roots and elements set to PickingMode.Ignore
-    /// (the HUD's empty areas) let the click through.
+    /// Picks in every active UIDocument; roots and elements set to PickingMode.Ignore (the HUD's
+    /// empty areas) let the click through. Root scope service behind IPointerOverUi.
     /// </summary>
-    public static class UiPicking {
-        public static bool IsPointerOverUi(Vector2 screenPosition) {
+    public sealed class UiPicking : IPointerOverUi {
+        public bool IsPointerOverUi(Vector2 screenPosition) {
             foreach (UIDocument document in Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None)) {
                 if (!document.isActiveAndEnabled) continue;
                 VisualElement root = document.rootVisualElement;
