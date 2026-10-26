@@ -10,13 +10,15 @@ namespace Features.Meta {
     /// <summary>
     /// The player's persistent progression (design doc §9.7, MetaSave): currency and node levels,
     /// saved as JSON in persistentDataPath (meta.json; meta.editor.json in the editor, so tests
-    /// and the editor never touch the build's save). Earns the currency on RunEndedEvent.
+    /// and the editor never touch the build's save). Earns the currency on RunEndedEvent
+    /// and keeps the best score (RunScoredEvent).
     /// Root scope service.
     /// </summary>
     public sealed class MetaProgress : IDisposable {
         [Serializable]
         private class Data {
             public int currency;
+            public int bestScore;
             public List<string> nodes = new();
             public List<int> levels = new();
         }
@@ -24,10 +26,12 @@ namespace Features.Meta {
         private readonly MetaSettings _settings;
         private readonly IEventBus _eventBus;
         private readonly string _path;
-        private readonly IDisposable _subscription;
+        private readonly DisposableBag _subscriptions = new();
         private Data _data = new();
 
         public int Currency => _data.currency;
+        /// <summary>Best final score of all runs (ScoreService's RunScoredEvent).</summary>
+        public int BestScore => _data.bestScore;
         public MetaSettings Settings => _settings;
         /// <summary>Currency earned by the last finished run (end screen).</summary>
         public int LastReward { get; private set; }
@@ -41,7 +45,8 @@ namespace Features.Meta {
             _eventBus = eventBus;
             _path = path;
             Load();
-            _subscription = eventBus.Subscribe<RunEndedEvent>(e => Earn(_settings != null ? _settings.Reward(e.Won, e.WavesCleared) : 0));
+            _subscriptions.Add(eventBus.Subscribe<RunEndedEvent>(e => Earn(_settings != null ? _settings.Reward(e.Won, e.WavesCleared) : 0)));
+            _subscriptions.Add(eventBus.Subscribe<RunScoredEvent>(e => RecordScore(e.Score)));
         }
 
         public int Level(MetaNodeDefinition node) {
@@ -84,6 +89,16 @@ namespace Features.Meta {
             _eventBus.Publish(new MetaChangedEvent());
         }
 
+        /// <summary>Keeps <paramref name="score"/> if it beats the best one (saved at once).</summary>
+        public void RecordScore(int score) {
+            bool record = score > _data.bestScore;
+            if (record) {
+                _data.bestScore = score;
+                Save();
+            }
+            _eventBus.Publish(new BestScoreEvent(_data.bestScore, record));
+        }
+
         /// <summary>Forgets everything (tests, a "reset progression" option later).</summary>
         public void ResetAll() {
             _data = new Data();
@@ -111,6 +126,6 @@ namespace Features.Meta {
             }
         }
 
-        public void Dispose() => _subscription?.Dispose();
+        public void Dispose() => _subscriptions.Dispose();
     }
 }

@@ -129704,6 +129704,7 @@ MonoBehaviour:
   anvilPanel: {fileID: 173942654}
   stage: {fileID: 11400000, guid: 7631443c581c6e548a6464190d5ed109, type: 2}
   runStateMachine: {fileID: 733791880}
+  scoreRules: {fileID: 11400000, guid: 2079733c8ca21b51a8e9ab293a28c861, type: 2}
   shopCatalog: {fileID: 11400000, guid: 178f936aaa7ec007a928ee279a6c67b8, type: 2}
   augmentCatalog: {fileID: 11400000, guid: a937dbf21d1da907787a15507de607bb, type: 2}
   lootSettings: {fileID: 11400000, guid: be19f4ebdfeb825dc824af0ed64fc770, type: 2}

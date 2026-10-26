@@ -41,6 +41,8 @@ namespace Containers {
         [Tooltip("The stage played in this scene: waves, bonus waves, lives (design doc §9.1).")]
         public StageDefinition stage;
         public RunStateMachine runStateMachine;
+        [Tooltip("Score of the run (design doc §9.9). Empty: no score system, the rest of the run is unchanged.")]
+        public Features.Score.ScoreRules scoreRules;
         [Tooltip("Elixirs, anvils, items and stat choices of the shops (design doc §9.3).")]
         public ShopCatalog shopCatalog;
         [Tooltip("Augments and draft rules (design doc §9.4).")]
@@ -94,6 +96,10 @@ namespace Containers {
             builder.RegisterEntryPoint<Features.Meta.MetaApplier>();
             builder.RegisterEntryPoint<RunDirector>().AsSelf();
             builder.RegisterEntryPoint<RewardController>().AsSelf();
+            if (scoreRules != null) {
+                builder.RegisterInstance(scoreRules);
+                builder.RegisterEntryPoint<Features.Score.ScoreService>().AsSelf();
+            }
             builder.RegisterInstance(shopCatalog);
             builder.Register<PlayerUpgrades>(Lifetime.Scoped);
             builder.RegisterEntryPoint<Inventory>().AsSelf();
