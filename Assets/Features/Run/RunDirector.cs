@@ -134,7 +134,8 @@ namespace Features.Run {
             WaveDefinition wave = CurrentWave;
             _kills = 0;
             _timer = wave.TimeLimit;
-            _spawner.Configure(wave.SpawnTable, wave.SpawnInterval, wave.MaxAlive, wave.HealthMultiplier, wave.DamageMultiplier);
+            _spawner.Configure(wave.SpawnTable, wave.SpawnInterval, wave.MaxAlive, wave.HealthMultiplier, wave.DamageMultiplier,
+                               wave.EliteChance, wave.EliteItems);
             _spawner.SetSpawning(true);
             _bossAlive = false;
             if (wave.HasBoss && _spawner.SpawnNearPlayer(wave.BossPrefab, wave.Boss) != null) _bossAlive = true;

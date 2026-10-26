@@ -383,5 +383,96 @@
     1
    ]
   }
+ },
+ "Aldric": {
+  "src": "models/king.glb",
+  "height": 1.85,
+  "blade": {
+   "color": [
+    0.42,
+    0.82,
+    1.0
+   ],
+   "length": 0.5
+  },
+  "recolor": {
+   "Blue": [
+    0.13,
+    0.06,
+    0.34
+   ],
+   "Gold": [
+    0.35,
+    0.78,
+    0.98
+   ],
+   "Metal": [
+    0.3,
+    0.36,
+    0.5
+   ],
+   "Metal_Dark": [
+    0.1,
+    0.12,
+    0.22
+   ],
+   "DarkBrown": [
+    0.04,
+    0.05,
+    0.12
+   ],
+   "Beige": [
+    0.5,
+    0.62,
+    0.8
+   ]
+  },
+  "clips": {
+   "idle": [
+    "Idle_Sword",
+    16,
+    1
+   ],
+   "run": [
+    "Run",
+    12,
+    1
+   ],
+   "attack": [
+    "Sword_Slash",
+    10,
+    1
+   ],
+   "death": [
+    "Death",
+    14,
+    1
+   ],
+   "hit": [
+    "HitRecieve",
+    6,
+    1
+   ],
+   "cast_Q": [
+    "Sword_Slash",
+    10,
+    1
+   ],
+   "cast_W": [
+    "Punch_Left",
+    10,
+    1
+   ],
+   "cast_E": [
+    "Roll",
+    12,
+    1
+   ],
+   "cast_R": [
+    "Wave",
+    12,
+    1
+   ]
+  }
  }
 }

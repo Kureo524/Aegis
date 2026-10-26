@@ -224,6 +224,7 @@ namespace Features.Passives {
                 PassiveTrigger t = triggers[i];
                 if (t.On != happened || happened == PassiveEvent.Periodic) continue;
                 if (t.UltimateOnly && !IsUltimate(_castSpell)) continue;
+                if (t.EliteOnly && (target == null || !target.IsEliteOrBoss)) continue;
                 if (t.HealthBelow > 0f && (_owner.Health == null || _owner.Health.Ratio > t.HealthBelow)) continue;
                 if (Time.time < _readyAt[i]) continue;
                 if (t.ConsumesCharge && Time.time >= _chargedUntil) continue;
@@ -294,6 +295,9 @@ namespace Features.Passives {
                     break;
                 case PassiveEffectKind.Shield:
                     _owner.ReceiveShield(Amount(t), t.Duration, _owner);
+                    break;
+                case PassiveEffectKind.AddStack:
+                    AddStack();
                     break;
             }
         }

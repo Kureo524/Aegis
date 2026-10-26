@@ -34,3 +34,5 @@ MonoBehaviour:
   bossPrefab: {fileID: 0}
   healthMultiplier: 1.2
   damageMultiplier: 1.1
+  eliteChance: 0.06
+  eliteItems: 1

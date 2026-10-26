@@ -27,11 +27,14 @@ namespace Containers {
         [SerializeField] private SpellSettings spellSettings;
         [SerializeField] private Features.UI.UiTheme uiTheme;
         [SerializeField] private Features.Meta.MetaSettings metaSettings;
+        [SerializeField] private Features.Characters.ChampionRoster championRoster;
+        [SerializeField] private Features.Run.StageCatalog stageCatalog;
 
         protected override void Configure(IContainerBuilder builder) {
             // Infrastructure
             builder.Register<EventBus>(Lifetime.Singleton).As<IEventBus>();
             builder.Register<PanelManager>(Lifetime.Singleton).As<IPanelManager>();
+            builder.Register<Features.UI.UiPicking>(Lifetime.Singleton).As<IPointerOverUi>();   // presentation, seen by the gameplay as an interface
             builder.RegisterEntryPoint<InputReader>().AsSelf();
 
             // Settings (ScriptableObjects)
@@ -44,6 +47,12 @@ namespace Containers {
             builder.RegisterInstance(metaSettings);
             builder.Register<Features.Meta.MetaProgress>(Lifetime.Singleton);   // persistent currency and trees (JSON)
             builder.Register<UserOptions>(Lifetime.Singleton);   // player's choices (JSON) over the defaults
+            if (championRoster != null) builder.RegisterInstance(championRoster);
+            else builder.RegisterInstance(ScriptableObject.CreateInstance<Features.Characters.ChampionRoster>());
+            builder.RegisterEntryPoint<Features.Characters.ChampionSelection>().AsSelf();   // champion of the next runs
+            if (stageCatalog != null) builder.RegisterInstance(stageCatalog);
+            else builder.RegisterInstance(ScriptableObject.CreateInstance<Features.Run.StageCatalog>());
+            builder.RegisterEntryPoint<Features.Run.StageSelection>().AsSelf();   // stage of the next runs (short run by default)
 
             // Game flow
             builder.RegisterComponent(stateMachine);

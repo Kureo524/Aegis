@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
   displayName: Golem de pierre
   faction: 1
+  epithet: 
+  summary: 
   sprite: {fileID: -360325136, guid: 46dafcb30366c8f97882ca90d6f16da5, type: 3}
   animations: {fileID: 11400000, guid: a3038ae198cb28e0ebb735b7974ab0ef, type: 2}
   portrait: {fileID: 0}

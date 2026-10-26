@@ -1,4 +1,11 @@
-# Système de personnage modulaire — Design Doc (Unity 6.4, C#)
+# Système de personnage modulaire — Design Doc (Unity 6.3, C#)
+
+> **Document de travail** (spécification interne, tenue à jour au fil du projet). Le document de
+> rendu du B3 Workshop, court, est [`Docs/Rendu.md`](Rendu.md). Les encadrés datés gardent
+> l'historique des étapes : une phase de prototypage s'est inspirée de League of Legends (personnage,
+> objets et augments d'essai). Tout ce contenu a été **retiré le 14/10/2026** et remplacé par du
+> contenu original ou sous licence libre (§7). Les mécaniques MOBA (sorts à rangs, objets à passif,
+> touches par position) sont restées.
 
 > Objectif : un **seul système** réutilisable pour le joueur, les ennemis, les alliés, les boss… Un personnage = un **prefab générique** + une **définition de données** (ScriptableObject). On ne code pas un perso, on le *configure*.
 
@@ -99,7 +106,7 @@ Le prefab de base porte aussi `BasicAttacker` et une **barre de PV** (`HealthBar
 - Ce qui distingue deux persos d'un même type (**sprite**, **taille du corps** `BodySize`, stats…) vient de la `CharacterDefinition`, appliquée par `Character.Init` : jamais un variant par personnage.
 - **`CharacterVisual`** : billboard (copie la rotation de la caméra, donc le sprite est vu à plat, sans déformation de perspective) et `flipX` selon le déplacement horizontal **à l'écran**. Les sprites sont dessinés **tournés vers la droite**, pivot en bas au centre. *Pour les centaines d'ennemis : un `LateUpdate` par entité, à centraliser si le profiler le demande (200 ennemis tiennent aujourd'hui en ~1,6 ms par frame dans l'éditeur).*
 - Le joueur n'est **pas posé dans la scène** : `PlayerSpawner` (entry point du `GameLifetimeScope`) l'instancie via `IObjectResolver.Instantiate` au `PlayerSpawn`, appelle `Init` et publie `PlayerSpawnedEvent`, que la caméra écoute pour le suivre.
-- Sprites provisoires (64 × 128, 64 px/unité, `Assets/GraphicAssets/Sprites/Characters/`) : `Placeholder_Hero` (généré par *Project Setup*, aperçu du prefab de base) et **`Chibi_Explorer`**, utilisé par `Char_TestHero` : chibi pixel-art *inspiré* d'Ezreal (League of Legends). Placeholder de prototype uniquement : à remplacer par une art originale avant toute diffusion publique (propriété intellectuelle de Riot Games). Ennemis (originaux, provisoires) : `Enemy_Goblin`, `Enemy_SkeletonArcher` (64 × 128) et `Enemy_Brute` (96 × 160), et le boss `Boss_GoblinKing` (128 × 192).
+- Sprites (`Assets/GraphicAssets/Sprites/Characters/`) : `Placeholder_Hero` (généré par *Project Setup*, aperçu du prefab de base) ; les champions et les monstres sont des sprites animés rendus depuis des modèles 3D libres (Quaternius, CC0) par `Tools/SpriteBaking` (§3, *Sprites animés*). Le chibi d'essai inspiré d'un personnage de LoL a été supprimé du dépôt (26/10/2026).
 
 ---
 
@@ -494,11 +501,30 @@ Stats : 590 PV (+100), 360 mana (+65), 60 AD (+2,6), 0,66 AS (+2,5 %), portée 5
 
 Les briques `Mark` et `CooldownRefundOnHit` (marques, remboursement de délai) restent dans le moteur pour de futurs champions.
 
+### 7.10 Aldric, le Gardien de l'aurore, et la sélection du champion (14/10/2026)
+
+**Deuxième champion**, original : vieux chevalier du givre au **corps à corps** (combattant / tank), à l'opposé de Vesna. `AldricSetup` (réécrit à chaque setup ; données dans `Assets/Data/Characters/Aldric`, sorts dans `Assets/Data/Spells/Aldric`) ; attaque de base sans projectile (mêlée, windup 30 %).
+
+| Sort | Effet |
+|---|---|
+| **Passif — Givre mordant** | toutes les 3 attaques : 20 + 60 % AD physiques aux ennemis à moins de 2 m de la cible, qui est ralentie de 30 % 1 s (`Splash` + `ApplyStatus`, `EveryN` 3) |
+| **Q — Taille boréale** | cône large (3,6 m, 120°) : 45/75/105/135/165 + 110 % AD physiques, −20 % armure et RM 3 s (`Shred`) ; 6 → 4 s ; 20 → 28 mana |
+| **W — Rempart de givre** | sur lui : bouclier 80 (3 s), +20 armure et RM 3 s, onde de 3 m : 40/65/90/115/140 + 60 % AD bonus magiques, ralentit de 35 % 1,5 s ; 16 → 12 s ; 50 mana |
+| **E — Bond polaire** | saut de 6,5 m au point visé, impact de 2,2 m : 60/90/120/150/180 + 70 % AD bonus physiques, enracine 0,75 s ; 15 → 9 s ; 45 mana |
+| **R — Couronne d'aurore** | après 0,6 s, explosion de 5 m autour de lui : 250/400/550 + 120 % AD bonus magiques, étourdit 1 s, puis +50 % vitesse d'attaque 5 s ; 90/75/60 s ; 100 mana |
+| **F — Bond éclair** | comme Vesna |
+
+Stats : 640 PV (+105), 300 mana (+45), 64 AD (+3,2), 0,70 AS (+2,2 %), portée 1,8, 30 armure (+4,8), 30 RM (+1,8), vitesse 5,2. Bot d'équilibrage (`AEGIS_BALANCE_CHAMPION=Aldric`, mode mêlée) : stage gagné. Objets recommandés : bottes ferrées, sceau de la triade, fendoir de fer, cœur de titan, marteau de l'aube, gantelet du serment, hache-tonnerre, plaque glaciaire. Modèle : « King » de Quaternius (CC0) recoloré givre / violet, **épée de glace ajoutée au rendu** (option `blade` de `Tools/SpriteBaking/render_sprites.py`, attachée au poignet droit) ; icônes game-icons (sword-slice, ice-shield, jump-across, polar-star, snowflake-2).
+
+**Moteur** (génériques, pilotés par les données) : un sort `Self` qui inflige des dégâts touche tous les ennemis dans son rayon autour du lanceur (nova) ; un saut (`blink`) qui inflige des dégâts (sans `blinkBoltRadius`) touche les ennemis dans son rayon au point d'arrivée.
+
+**Sélection du champion** : `ChampionRoster` (SO du root scope, `Assets/Data/Settings/ChampionRoster.asset` : Vesna, Aldric ; le premier est le champion par défaut) et `ChampionSelection` (service du root scope : champion des prochaines runs, gardé pour la session, changé par `ChampionPickRequestedEvent` → `ChampionSelectedEvent`). « Jouer » du menu principal ouvre l'**écran de sélection** (`ChampionSelectPanel`, `ChampionSelectRequestedEvent`) : une carte par champion (portrait, nom, épithète `CharacterDefinition.Epithet`, résumé `Summary`, passif et Q W E R avec infobulles) ; un clic choisit, « Jouer ▶ » ou un double-clic lance la run (`PlayRequestedEvent`). Le `GameLifetimeScope` fait apparaître le champion choisi (son `playerDefinition` ne sert que si le roster est vide). **Méta-progression** : un arbre par champion (`MetaSetup`, arbre d'Aldric axé résistances, contrôle et PV), l'écran Progression a un onglet par champion et ouvre celui du champion choisi.
+
 ### 7.9 UI
 
 **UI façon LoL (13/10/2026)**, UI Toolkit :
 - **Thème** : `Assets/UI/AegisTheme.uss` (palette LoL : panneaux bleu nuit, cadres or, texte crème, accents turquoise ; classes `ae-panel`, `ae-button`, `ae-slot`, `ae-tooltip`, `ae-tab`, `ae-bar`… avec survols animés), branché sur **tous** les documents par `AegisTheme.tss` (thème Unity par défaut + le nôtre) sur le `PanelSettings` partagé (`UiSetup`). Polices Noto Sans / Noto Serif (OFL, `Assets/UI/Fonts`). `MenuStyles` et les cartes (`OfferCard`) n'ont plus de couleurs en dur.
-- **HUD bas** (`PlayerHud`) : à gauche, **un panneau à deux onglets**, *Statistiques* (12 stats avec icônes : AD, AP, armure, RM, vitesse d'attaque, accélération, critique, vitesse, vol de vie, pénétrations, ténacité ; liste et icônes dans le SO `UiTheme` du root) et *Augments* (slots, rareté en bordure) ; au centre, barre de **buffs** (stacks des passifs, lame enchantée prête : `PlayerBuffsEvent`), ligne de feedback, **portrait** du champion avec son niveau (`PlayerChampionEvent`), barre de sorts (`AbilityBarView` : passif, Q W E R avec touche, pastilles de rang, « + », voile tant que non appris, délais ; D F), barres PV (bouclier blanc) / mana / XP ; à droite, les **6 objets**, l'élixir actif et l'or.
+- **HUD bas** (`PlayerHud`) : à gauche, **un panneau à deux onglets**, *Statistiques* (12 stats avec icônes : AD, AP, armure, RM, vitesse d'attaque, accélération, critique, vitesse, vol de vie, pénétrations, ténacité ; liste et icônes dans le SO `UiTheme` du root) et *Augments* (slots, rareté en bordure) ; au centre, ligne de feedback puis, **juste au-dessus du panneau** (et de sa barre de vie), la barre de **buffs** (stacks des passifs, lame enchantée prête : `PlayerBuffsEvent`), **portrait** du champion avec son niveau (`PlayerChampionEvent`), barre de sorts (`AbilityBarView` : passif, Q W E R avec touche, pastilles de rang, « + », voile tant que non appris, délais ; D F), barres PV (bouclier blanc) / mana / XP ; à droite, les **6 objets**, l'élixir actif et l'or, qui est aussi **le bouton de la boutique** (clic, infobulle « Boutique · P » ; plus de bouton « Boutique »).
 - **Infobulles partout** (`UiTooltip`) : sorts (rang, coût et délai du rang, description), passif, stats, augments, objets (stats + passif), buffs.
 - **Boutique** (`ShopPanel`) : filtres par stat à gauche (Attaque, Critique, Vitesse d'attaque, Puissance magique, Mana, Santé, Armure, Résistance magique, Accélération, Bottes, Élixirs et enclumes), **grille d'icônes avec juste le prix** (grisée si refusé, prix rouge si trop cher), **fiche de l'objet sélectionné** à droite (stats, passif, groupe unique, raison du refus, Acheter), inventaire et Continuer en bas. Clic = sélection, **double-clic ou clic droit = achat** (comme LoL).
 - Enclumes et augments : cartes du thème, bordure à la couleur de la rareté, survol qui soulève la carte. HUD du haut et barre de boss au thème.
@@ -587,7 +613,7 @@ Une **run** est une partie sur un **stage**, **équivalent d'un niveau de BTD6**
    ▼
  Fin de vague = timer écoulé ET quota atteint
    ▼
- Événement de fin de vague selon le WaveRewardSchedule (§9.3) : augment, enclume prismatique gratuite ou rien, puis une pause de 30 s, boutique ouverte
+ Événement de fin de vague selon le WaveRewardSchedule (§9.3) : augment, enclume prismatique gratuite ou rien, puis une pause de 60 s, boutique ouverte
    ▼  (jeu en pause)
  fermeture ──► compte à rebours 10 s ──► vague suivante
 ```
@@ -667,7 +693,7 @@ public class ElixirDefinition : ScriptableObject {   // consommable acheté en b
 
 **Boutique toujours accessible (14/10/2026)** : la boutique s'ouvre **à tout moment** (touche **P**, bouton du HUD, et d'elle-même au début de chaque pause) ; on peut toujours la parcourir, mais **acheter et vendre ne se fait qu'entre les vagues** (`RunState.PreWave`). **Aucune limite par visite** : seul l'or limite. Un seul élixir actif à la fois (un nouveau remplace l'ancien). **Revente à 70 %** du prix (`ItemDefinition.SellValue`, 150 or pour un prismatique obtenu en enclume).
 
-**Pause entre les vagues** : après les récompenses de fin de vague, **30 s** (`StageDefinition.Intermission`) avant la vague suivante, boutique ouverte ; le bouton **« Lancer la vague »** (HUD du haut et pied de la boutique, `NextWaveRequestedEvent`) la démarre tout de suite. Avant la première vague : 10 s.
+**Pause entre les vagues** : après les récompenses de fin de vague, **60 s** (`StageDefinition.Intermission`, 30 s jusqu'au 15/10/2026) avant la vague suivante, boutique ouverte ; le bouton **« Lancer la vague »** (HUD du haut et pied de la boutique, `NextWaveRequestedEvent`) la démarre tout de suite. Avant la première vague : 10 s.
 
 **Récompenses de fin de vague** (`WaveRewardSchedule`, SO piloté par les données : un prélude, puis une boucle ; `None` = juste la pause) :
 
@@ -796,6 +822,10 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 >   - `SpellExecutor.Telegraph` : les skillshots ennemis sont télégraphiés par une ligne ; rouge pour ce qui fait mal, vert pour un soutien.
 > - *Reste : `WaveScaling` et vagues (phase 7), IA à fréquence réduite pour les ennemis lointains, boss (`PatternRunner`).*
 
+**Élites (15/10/2026)** : un ennemi de la horde peut apparaître en **élite** (`WaveDefinition.EliteChance`, 0 % aux vagues 1 et 2 → 6 / 7 % puis 4 % à la vague du boss, 12 / 15 % en vagues bonus) avec **1 à 3 objets** (`WaveDefinition.EliteItems` : 1 jusqu'à la vague du boss, puis 2 et 3 en vagues bonus) tirés de `HordeSettings.EliteItems` (objets dont le passif sert à un ennemi : épines, dégâts à l'impact, ralentissements, régénération, bouclier, auras…). Il en reçoit les stats et les passifs comme un boss (`Character.Carry`), a **×1,7 PV**, rapporte **×4 or et XP**, est **plus grand** (×1,2), teinté d'un violet froid, avec un **cadre violet** et **les icônes de ses objets au-dessus de sa barre de vie** (aussi pour le boss). `HordeSpawner.MakeElite`, `EliteSpawnedEvent` ; réglages dans `EliteSetup` (réécrits à chaque setup).
+
+**Objets qui grandissent (15/10/2026)** : effet de passif `AddStack` (un stack de plus du compteur du passif, permanent avec `ResetPolicy.Never`) et filtre `EliteOnly` (la cible ou la victime doit être une élite ou un boss). **Cœur de forge** (tank / combattant, 450 PV) : toutes les 6 s, une attaque inflige 50 + 6 % PV max et donne **+10 PV max** pour la partie, sans limite. **Trophée du conquérant** (50 AD) : **+4 AD par élite ou boss tué** (15 max). **Grimoire des âmes** (75 AP) : **+7 AP par élite ou boss tué** (15 max). Leurs stacks s'affichent dans la barre de buffs ; prix : stats + passif + 110 or (« croissance »).
+
 ### 9.7 Méta-progression (rogue-lite)
 
 - **Monnaie persistante** : gagnée **à la fin d'une partie si le stage est clear** (full clear, vagues bonus comprises).
@@ -830,6 +860,30 @@ Le cas **Argent** permet de **rétrograder** volontairement : un augment de rare
 - **UI** : HUD (PV, XP, timer de vague, quota, vies, icônes de sorts), écrans de boutique / enclumes / augments, damage numbers (TextMeshPro poolé ou rendu par particules).
 - **Audio** : pool d'`AudioSource` + limitation du nombre de sons simultanés.
 - **Sauvegarde** : JSON simple (`JsonUtility`) pour la méta-progression.
+
+### 9.9 Score et run courte (26/10/2026)
+
+**Score** (`Features/Score`) : `ScoreService` (entry point du `GameLifetimeScope`) se construit
+**uniquement depuis le bus** : `WaveEnemyKilledEvent` (+ `PointsPerKill`), `BossDefeatedEvent`
+(+ `PointsPerBoss`), `WaveRewardEvent` (+ `PointsPerWave`), `RunStatusEvent` (vies restantes), puis
+`RunEndedEvent` : la dernière vague (qui n'ouvre pas d'écran de récompense), le `VictoryBonus` et
+`PointsPerLifeLeft` × vies en cas de victoire. Il publie `ScoreChangedEvent` (HUD de run) à chaque
+changement et `RunScoredEvent` une seule fois. Barème : SO `ScoreRules` (`Assets/Data/Run`, 10 / 500
+/ 200 / 1000 / 250). `MetaProgress` garde le meilleur score (`bestScore` dans `meta.json`) et publie
+`BestScoreEvent` (record battu ou non) ; `RunEndPanel` affiche « Score : N » et « Nouveau record ! »
+ou « Record : N ». **Aucune classe ne dépend de `ScoreService`** (test `ArchitectureTests`) : sans
+`ScoreRules` dans le `GameLifetimeScope`, il n'est pas enregistré et la run tourne à l'identique,
+sans score affiché.
+
+**Run courte** : `Stage_Demo` (`Assets/Data/Run/DemoStage`) = les vagues 1 et 2 du stage de test
+copiées (`Demo_Wave_01/02` : 40 s et 45 s), compte à rebours 5 s, pause 20 s, même
+`WaveRewardSchedule` (augment après la vague 1), victoire à la fin de la vague 2 : ~2 min 30 de jeu.
+`StageCatalog` (`Assets/Data/Run`, run courte en premier = défaut, puis le stage complet) est
+injecté dans le root ; `StageSelection` (root) garde le stage des prochaines runs. L'écran de
+sélection du champion affiche le bouton **Mode** (cycle dans le catalogue) et envoie
+`StagePickRequestedEvent` au lancement. Le `GameLifetimeScope` joue `StageSelection.Current`, ou son
+propre `stage` si rien n'a été choisi (scène lancée directement, tests). Généré par
+`ShortRunSetup` (appelé par *Project Setup*, ou *Tools > Short Run and Score Setup*).
 
 ---
 
@@ -883,7 +937,7 @@ Utiliser des **Assembly Definitions** (`.asmdef`) par dossier majeur pour accél
 | **8** ✅ | `CharacterEvents`, passifs (briques génériques : stats, triggers, stacks, ennemis proches), capacités (`SpellCrit`), augments (4 → 6 slots, relances, relance dorée, slots pleins), passifs d'items, loot (enclume à stats, sorts d'invocateur) | Builds variés |
 | **9** 🟡 | Boss à patterns et items ✅ (9a). Statuts (stun, root, silence, ralentissement, saignement, brûlure, ténacité), soins et boucliers, statuts sur les sorts, +14 items, +7 augments ✅ (9b). 4 nouveaux ennemis (loup, mage squelette, chaman gobelin, golem de pierre) ✅ (9c). *Reste : nouveaux éléments et sorts (avec un deuxième personnage), équilibrage.* | Prototype riche |
 | **10** 🟡 | **Refonte LoL** : sorts par champion (Q W E R à rangs, D F), Ezreal, touches par position, dézoom de la caméra ✅. Objets de LoL (65, passif propre, force adaptative sur les prismatiques, groupes uniques) ✅. Rééquilibrage (bot `BalanceSimulation`) ✅. UI façon LoL ✅ (§7.9). *Reste : boutique complète plus tôt dans le calendrier des récompenses (à valider), boss encore dur.* | Ezreal jouable |
-| **11** 🟡 | Contenu 100 % original (Vesna, objets, augments, bestiaire, icônes) ✅. Méta-progression : monnaie persistante, arbre du champion, écran Progression, bonus appliqués en début de run ✅ (§9.7). *Reste : `RunSnapshot` (quitter/reprendre), polish, audio.* | Prototype solide |
+| **11** 🟡 | Contenu 100 % original (Vesna, objets, augments, bestiaire, icônes) ✅. Méta-progression : monnaie persistante, arbre du champion, écran Progression, bonus appliqués en début de run ✅ (§9.7). Deuxième champion (Aldric, mêlée) et écran de sélection du champion ✅ (§7.10). *Reste : `RunSnapshot` (quitter/reprendre), polish, audio.* | Prototype solide |
 
 ---
 
@@ -1141,7 +1195,7 @@ Assets/
 │   ├── Run/                 RunDirector, RunStateMachine, RewardController, StageDefinition, WaveDefinition, WaveRewardSchedule (SO)
 │   ├── Controls/            PlayerCommandInput, ClickMarker, RangeIndicator
 │   ├── Stats/               Stat, StatModifier, StatController, StatBlock (SO), TimedModifiers…
-│   └── UI/                  PlayerHud, AbilityBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
+│   └── UI/                  Game.Presentation — PlayerHud, AbilityBarView, UiStyles, DamageNumbersView, HealthBarView, GameHUD, QuitOverlay,
 │                            Panels/ (MainMenuPanel, PauseMenu, OptionsPanel, OptionsView, RunEndPanel, ShopPanel, AnvilPanel, AugmentPanel, OfferCard),
 │                            RunHudView, InventoryView, AugmentsView, BossHudView, DebugTools/CharacterDebugPanel
 ├── Containers/              Game.Containers — RootLifetimeScope, MenuLifetimeScope, GameLifetimeScope
@@ -1159,7 +1213,7 @@ Assets/
 ├── Prefabs/                 RootLifetimeScope, ClickMarker, Characters/ (Character, Player, TrainingDummy, Enemy, Boss),
 │                            Combat/ (Projectile_ArcaneBolt, Projectile_Skillshot, Vfx_SpellShape)
 ├── GraphicAssets/           Sprites/ (Characters/…, Items/…, Augments/…, Spells/ (Flash, Vesna_*), Status/…, UI/White, VFX/Arcane_Bolt), Materials/Unlit_Sprite
-├── Scenes/                  Releases/Menu, Tests/TestScene (+ Releases/Game : ancienne scène WASD, hors build)
+├── Scenes/                  Releases/Menu, Tests/TestScene (la scène de jeu)
 ├── Tests/                   EditMode/, PlayMode/
 └── UI Toolkit/   Settings/
 Docs/                        CharacterSystem_Design.md
@@ -1167,7 +1221,7 @@ Docs/                        CharacterSystem_Design.md
 
 Les nouveaux modules du §10 (Combat, Spells, Items, Run, AI…) vont dans `Features/<Module>/`, et leurs données dans `Data/<Domaine>/`.
 
-**Assembly definitions** : `Game.Input` ← `Game.Systems` ← `Game.Features` ← `Game.Containers` ← `Game.Editor` (éditeur seulement) ; `Game.Tests.EditMode` / `Game.Tests.PlayMode`. Règle : **`Systems` ne référence jamais `Features`**. Séparer `Features` en plusieurs asmdef par module quand le projet grossit.
+**Assembly definitions** : `Game.Input` ← `Game.Systems` ← `Game.Features` ← `Game.Presentation` (`Features/UI`, depuis le 26/10/2026) ← `Game.Containers` ← `Game.Editor` (éditeur seulement) ; `Game.Tests.EditMode` / `Game.Tests.PlayMode`. Règles : **`Systems` ne référence jamais `Features`**, **`Features` ne référence jamais l'UI** : quand le gameplay a besoin de l'UI, il passe par une interface déclarée plus bas et implémentée par la présentation (`IPointerOverUi` dans `Systems.UIManagement`, implémentée par `UiPicking` et enregistrée dans le root ; `ICharacterOverlay` dans `Features.Characters`, implémentée par `HealthBarView` et trouvée par `Character` dans ses enfants). Vérifié par `ArchitectureTests` (EditMode). Séparer `Features` en plusieurs asmdef par module quand le projet grossit.
 
 ### 14.7 Git
 
@@ -1216,7 +1270,7 @@ Les nouveaux modules du §10 (Combat, Spells, Items, Run, AI…) vont dans `Feat
 | Bouton Quit qui pouvait quitter seul au lancement (IMGUI réagit au bouton maintenu) | Clic lu via `ConfirmEvent` (appui), publie `QuitRequestedEvent` |
 
 Points restants (connus) :
-- `Releases/Game.unity` : ancienne scène WASD, scripts manquants, retirée du build. À supprimer ou à reconstruire quand le vrai stage arrivera.
+- `Releases/Game.unity` : ancienne scène WASD aux scripts manquants, supprimée le 26/10/2026.
 
 **Outillage**
 - *Tools > Project Setup* (`EditorTools.ProjectSetup.Run`) : crée / répare le prefab root, ses règles de transition, les SO de réglages, `VContainerSettings`, la liste de scènes du build. Idempotent.

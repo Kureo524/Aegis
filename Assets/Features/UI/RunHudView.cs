@@ -8,7 +8,8 @@ using VContainer;
 namespace Features.UI {
     /// <summary>
     /// Top-center run HUD (design doc §9.8), fed by RunStatusEvent only: wave number (bonus waves
-    /// flagged), timer or countdown, kill quota, stage lives. Overtime shows when the next life is lost.
+    /// flagged), timer or countdown, kill quota, stage lives, and the score (ScoreChangedEvent; hidden
+    /// when the game scope has no score system). Overtime shows when the next life is lost.
     /// During the break before a wave: "Start the wave" (NextWaveRequestedEvent) and the shop button.
     /// Shares the GameHud UIDocument.
     /// </summary>
@@ -18,17 +19,22 @@ namespace Features.UI {
         [SerializeField] private Color dangerColor = new(1f, 0.35f, 0.3f);
 
         private readonly DisposableBag _subscriptions = new();
-        private Label _wave, _timer, _quota, _lives, _banner;
+        private Label _wave, _timer, _quota, _lives, _score, _banner;
         private VisualElement _breakRow;
         private IEventBus _eventBus;
         private RunStatusEvent? _status;
         private float _bannerUntil;
+        private int? _points;
 
         [Inject]
         public void Construct(IEventBus eventBus) {
             _eventBus = eventBus;
             _subscriptions.Add(eventBus.Subscribe<RunStatusEvent>(e => {
                 _status = e;
+                Refresh();
+            }));
+            _subscriptions.Add(eventBus.Subscribe<ScoreChangedEvent>(e => {
+                _points = e.Score;
                 Refresh();
             }));
             _subscriptions.Add(eventBus.Subscribe<LifeLostEvent>(e => Banner(e.LivesLeft > 0 ? $"Vie perdue ! ({e.LivesLeft} restante{(e.LivesLeft > 1 ? "s" : "")})" : "Plus de vie…")));
@@ -58,6 +64,8 @@ namespace Features.UI {
             _timer.style.unityTextAlign = TextAnchor.MiddleCenter;
             _quota = Cell(row, 16, Color.white);
             _lives = Cell(row, 18, new Color(1f, 0.4f, 0.45f));
+            _score = Cell(row, 16, new Color(1f, 0.85f, 0.45f));
+            _score.style.display = DisplayStyle.None;
 
             _banner = UiStyles.Text("", 26, Color.white);
             _banner.AddToClassList("ae-banner");
@@ -103,6 +111,10 @@ namespace Features.UI {
         }
 
         private void Refresh() {
+            if (_score != null && _points.HasValue) {
+                _score.style.display = DisplayStyle.Flex;
+                _score.text = $"Score {_points.Value}";
+            }
             if (_wave == null || !_status.HasValue) return;
             RunStatusEvent s = _status.Value;
             _wave.text = s.IsBonusWave

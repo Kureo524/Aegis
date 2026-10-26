@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48ff19132256703f2a9bc8ec29fd1638, type: 3}
   m_Name: Stage_Test
   m_EditorClassIdentifier: Game.Features::Features.Run.StageDefinition
-  displayName: Plaine d'essai
+  displayName: "Partie compl\xE8te (5 vagues + 2 bonus)"
   waves:
   - {fileID: 11400000, guid: f200042afefefdded8e5223ebd938a63, type: 2}
   - {fileID: 11400000, guid: b0782ef9beb9308da808c83f696d6d2e, type: 2}
@@ -27,4 +27,4 @@ MonoBehaviour:
   lifeLossInterval: 30
   playerDeath: 0
   firstWaveCountdown: 10
-  intermission: 30
+  intermission: 60

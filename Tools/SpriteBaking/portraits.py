@@ -5,8 +5,10 @@ sys.path.insert(0, HERE)
 import common
 ROOT = os.environ.get('AEGIS_BAKE', '/tmp/aegis-bake')
 cfg = json.load(open(os.path.join(HERE, 'chars.json')))
-FRAME = {'Vesna': (0.8, 0.42), 'Grokk': (0.62, 0.6)}
+FRAME = {'Vesna': (0.8, 0.42), 'Grokk': (0.62, 0.6), 'Aldric': (0.8, 0.42)}
+ONLY = os.environ.get('ONLY', '')
 for name, (center, size) in FRAME.items():
+    if ONLY and name not in ONLY.split(','): continue
     c = cfg[name]
     common.reset()
     arm, meshes = common.import_glb(os.path.join(ROOT, c['src']))

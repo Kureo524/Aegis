@@ -26,6 +26,7 @@ namespace EditorTools {
         // sheet → (definitions using it, display name, null = keep)
         private static readonly (string sheet, string[] definitions, string displayName)[] Looks = {
             ("Vesna", new[] { ProjectSetup.TestHeroPath }, HeroSetup.HeroName),
+            ("Aldric", new[] { AldricSetup.DefinitionPath }, AldricSetup.Name),
             ("Goblin", new[] { $"{Enemies}/Enemy_Goblin.asset" }, "Gobelin"),
             ("SkeletonArcher", new[] { $"{Enemies}/Enemy_SkeletonArcher.asset" }, "Archer squelette"),
             ("Brute", new[] { $"{Enemies}/Enemy_Brute.asset" }, "Brute"),
@@ -37,13 +38,13 @@ namespace EditorTools {
             ("TrainingDummy", new[] { "Assets/Data/Characters/TrainingDummy/Enemy_TrainingDummy.asset" }, "Mannequin d'entraînement"),
         };
 
-        // The hero's own clip per spell
-        private static readonly (string clip, string spell)[] HeroSpells = {
-            ("cast_Q", "Assets/Data/Spells/Vesna/Spell_Vesna_Q.asset"),
-            ("cast_W", "Assets/Data/Spells/Vesna/Spell_Vesna_W.asset"),
-            ("cast_E", "Assets/Data/Spells/Vesna/Spell_Vesna_E.asset"),
-            ("cast_R", "Assets/Data/Spells/Vesna/Spell_Vesna_R.asset"),
-        };
+        // Champions' own clip per spell (cast_Q … cast_R of their sheet, Spell_<sheet>_Q … R)
+        private static readonly string[] Champions = { "Vesna", "Aldric" };
+
+        private static (string clip, string spell)[] ChampionSpells(string sheet) {
+            if (System.Array.IndexOf(Champions, sheet) < 0) return System.Array.Empty<(string, string)>();
+            return new[] { "Q", "W", "E", "R" }.Select(k => ($"cast_{k}", $"Assets/Data/Spells/{sheet}/Spell_{sheet}_{k}.asset")).ToArray();
+        }
 
         [System.Serializable] private class Frame { public string clip; public float[] rect; public float[] pivot; }
         [System.Serializable] private class Clip { public string name; public int first; public int count; public float duration; public bool loop; }
@@ -172,7 +173,7 @@ namespace EditorTools {
             Fill("dash", "dash");
             Fill("cast", "cast");
 
-            var spells = sheetName == "Vesna" ? HeroSpells : System.Array.Empty<(string, string)>();
+            var spells = ChampionSpells(sheetName);
             SerializedProperty list = so.FindProperty("spellClips");
             list.arraySize = 0;
             foreach (var (clip, spellPath) in spells) {

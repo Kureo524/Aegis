@@ -43,6 +43,16 @@ namespace Features.Enemies {
         [SerializeField, Min(0f)] private float minSpawnDistance = 16f;
         [SerializeField, Min(0f)] private float maxSpawnDistance = 22f;
 
+        [Header("Elites (design doc §9.6)")]
+        [Tooltip("Items elites of the horde may carry (stats + passive, like a boss).")]
+        [SerializeField] private Economy.ItemDefinition[] eliteItems = Array.Empty<Economy.ItemDefinition>();
+        [SerializeField, Min(1f)] private float eliteHealthMultiplier = 2f;
+        [Tooltip("Gold and XP of an elite × this.")]
+        [SerializeField, Min(1f)] private float eliteRewardMultiplier = 4f;
+
+        public Economy.ItemDefinition[] EliteItems => eliteItems;
+        public float EliteHealthMultiplier => eliteHealthMultiplier;
+        public float EliteRewardMultiplier => eliteRewardMultiplier;
         public Vector3 GridCenter => gridCenter;
         public Vector2 GridSize => gridSize;
         public float CellSize => cellSize;

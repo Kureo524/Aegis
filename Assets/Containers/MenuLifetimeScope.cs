@@ -10,11 +10,13 @@ namespace Containers {
         public MainMenuPanel mainMenu;
         public OptionsPanel optionsPanel;
         public MetaPanel metaPanel;
+        public ChampionSelectPanel championSelect;
 
         protected override void Configure(IContainerBuilder builder) {
             builder.RegisterComponent(mainMenu);
             if (optionsPanel != null) builder.RegisterComponent(optionsPanel);
             if (metaPanel != null) builder.RegisterComponent(metaPanel);
+            if (championSelect != null) builder.RegisterComponent(championSelect);
             builder.RegisterEntryPoint<SceneEntryPoint>().WithParameter(GameState.Menu);
         }
     }

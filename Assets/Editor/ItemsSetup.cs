@@ -36,6 +36,9 @@ namespace EditorTools {
                                             Color color, int everyN = 1, float cooldown = 0f) =>
             new() { On = on, EveryN = everyN, Chance = 1f, Cooldown = cooldown, Effect = PassiveEffectKind.Bolts, Count = count, Radius = radius,
                     Damage = damage, ScalingStat = stat, DamageRatio = ratio, DamageType = type, BoltColor = color };
+        // One more permanent stack of the passive (growing items)
+        private static PassiveTrigger Grow(PassiveEvent on, float cooldown = 0f, bool eliteOnly = false) =>
+            new() { On = on, EveryN = 1, Chance = 1f, Cooldown = cooldown, EliteOnly = eliteOnly, Effect = PassiveEffectKind.AddStack };
         private static PassiveTrigger Status(PassiveEvent on, StatusApplication status, int everyN = 1, float cooldown = 0f) =>
             new() { On = on, EveryN = everyN, Chance = 1f, Cooldown = cooldown, Effect = PassiveEffectKind.ApplyStatus, Status = status };
         private static PassiveTrigger Timed(PassiveEvent on, float duration, float cooldown, params StatBonus[] stats) =>
@@ -225,6 +228,20 @@ namespace EditorTools {
                 Passive = Pas("JuggernautPlate", "Charge écrasante", "Une attaque sur quatre inflige 40 (+100 % AD de base) dégâts physiques et ralentit de 50 % pendant 1 s.")
                     .With(OnHit(40f, StatType.PhysicalAttack, 1f, DamageType.Physical, everyN: 4), Status(PassiveEvent.BasicAttackHit, Slow(0.5f, 1f), everyN: 4)) },
 
+            // ---- Growing items: permanent stacks for the run (design doc §9.3) ----
+            new() { Id = "ForgeHeart", Name = "Cœur de forge", Cost = 0, Stats = new[] { B(StatType.MaxHealth, 450), B(StatType.HealthRegen, 1.5f) },
+                Passive = Pas("ForgeHeart", "Battement de forge", "Toutes les 6 s, une attaque inflige 50 (+6 % PV max) dégâts physiques en plus et donne +10 PV max pour le reste de la partie (sans limite).")
+                    .With(OnHit(50f, StatType.MaxHealth, 0.06f, DamageType.Physical, cooldown: 6f), Grow(PassiveEvent.BasicAttackHit, cooldown: 6f))
+                    .WithStacks(StackSource.None, ResetPolicy.Never, 0, 0f, B(StatType.MaxHealth, 10)) },
+            new() { Id = "ConquerorTrophy", Name = "Trophée du conquérant", Cost = 0, Stats = new[] { B(StatType.PhysicalAttack, 50), B(StatType.AbilityHaste, 10) },
+                Passive = Pas("ConquerorTrophy", "Gloire", "Chaque élite ou boss tué donne +4 attaque physique pour le reste de la partie (15 fois max).")
+                    .With(Grow(PassiveEvent.Kill, eliteOnly: true))
+                    .WithStacks(StackSource.None, ResetPolicy.Never, 15, 0f, B(StatType.PhysicalAttack, 4)) },
+            new() { Id = "SoulGrimoire", Name = "Grimoire des âmes", Cost = 0, Stats = new[] { B(StatType.MagicAttack, 75), B(StatType.MaxMana, 250) },
+                Passive = Pas("SoulGrimoire", "Moisson d'âmes", "Chaque élite ou boss tué donne +7 puissance magique pour le reste de la partie (15 fois max).")
+                    .With(Grow(PassiveEvent.Kill, eliteOnly: true))
+                    .WithStacks(StackSource.None, ResetPolicy.Never, 15, 0f, B(StatType.MagicAttack, 7)) },
+
             // ---- Boots (one pair) ----
             new() { Id = "DuelistGreaves", Name = "Grèves du bretteur", Cost = 110, Group = Boots, Stats = new[] { AS(0.35f), B(StatType.MoveSpeed, 0.7f) },
                 Passive = Pas("DuelistGreaves", "Rythme", "+5 % vitesse d'attaque en plus.").With(stats: new[] { AS(0.05f) }) },
@@ -407,7 +424,8 @@ namespace EditorTools {
             return StatValue(b.Stat) * b.Value * typical;
         }
 
-        private const float PassiveValue = 50f;     // a passive that does something (triggers, aura, stacks…)
+        private const float PassiveValue = 50f;
+        private const float GrowingValue = 110f;   // permanent stacks for the run     // a passive that does something (triggers, aura, stacks…)
         private const float StatShare = 1f;         // items are a bit more efficient than raw stats
 
         /// <summary>Price from the stats (and the passive's own stats), plus the value of its effect.</summary>
@@ -421,6 +439,8 @@ namespace EditorTools {
                          || passive.Aura.Radius > 0f || passive.Conversions.Length > 0;
             }
             float price = value * StatShare + (effect ? PassiveValue : 0f);
+            // Growing items (permanent stacks) are worth more the longer they are kept
+            if (passive != null && System.Array.Exists(passive.Triggers, t => t.Effect == PassiveEffectKind.AddStack)) price += GrowingValue;
             price = boots ? Mathf.Clamp(price, 90f, 160f) : Mathf.Clamp(price, 260f, 420f);
             return Mathf.RoundToInt(price / 5f) * 5;
         }
@@ -434,6 +454,8 @@ namespace EditorTools {
             { "TriadSigil", ItemRole.Fighter | ItemRole.Marksman }, { "IronCleaver", ItemRole.Fighter | ItemRole.Tank },
             { "OathGauntlet", ItemRole.Fighter | ItemRole.Tank }, { "TitanHeart", ItemRole.Tank | ItemRole.Fighter },
             { "SoulLocket", ItemRole.Tank | ItemRole.Fighter },
+            { "ForgeHeart", ItemRole.Tank | ItemRole.Fighter }, { "ConquerorTrophy", ItemRole.Fighter | ItemRole.Assassin | ItemRole.Marksman },
+            { "SoulGrimoire", ItemRole.Mage },
         };
 
         // Role of the table section, unless overridden

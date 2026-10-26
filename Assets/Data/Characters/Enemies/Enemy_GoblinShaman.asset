@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.EnemyDefinition
   displayName: "Chaman masqu\xE9"
   faction: 1
+  epithet: 
+  summary: 
   sprite: {fileID: -3665226, guid: b42a18126dfd676ca89b3c1896e022a8, type: 3}
   animations: {fileID: 11400000, guid: ce47d4ada95548302a1993f6351aea61, type: 2}
   portrait: {fileID: 0}

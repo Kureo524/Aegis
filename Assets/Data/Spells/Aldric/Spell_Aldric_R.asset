@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d74a24719d55623ab623cedd4c54378, type: 3}
+  m_Name: Spell_Aldric_R
+  m_EditorClassIdentifier: Game.Features::Features.Spells.SpellDefinition
+  displayName: Couronne d'aurore
+  description: "Apr\xE8s 0,6 s, l'aurore \xE9clate autour d'Aldric : 250/400/550
+    (+120 % AD bonus) d\xE9g\xE2ts magiques aux ennemis \xE0 moins de 5 m, \xE9tourdis
+    1 s ; Aldric gagne ensuite +50 % de vitesse d'attaque pendant 5 s."
+  icon: {fileID: 21300000, guid: 6879c173528c118fdb62897aef23e7e0, type: 3}
+  color: {r: 0.6, g: 0.5, b: 1, a: 1}
+  rankUnlockLevels: 060000000b00000010000000
+  baseDamage:
+  - 250
+  - 400
+  - 550
+  cooldowns:
+  - 90
+  - 75
+  - 60
+  manaCosts:
+  - 100
+  targeting: 0
+  range: 8
+  radius: 5
+  coneAngle: 60
+  castTime: 0.6
+  canMoveWhileCasting: 0
+  kind: 0
+  adRatio: 0
+  bonusAdRatio: 1.2
+  apRatio: 0
+  buffs:
+  - Stat: 6
+    Type: 1
+    Value: 0.5
+    Duration: 5
+  statuses:
+  - Kind: 0
+    Duration: 1
+    Power: 0
+    ScalingStat: 0
+    Ratio: 0
+    TargetMaxHealthRatio: 0
+    MaxStacks: 1
+  selfSustain:
+    Heal: 0
+    Shield: 0
+    PowerRatio: 0
+    ShieldDuration: 0
+  affectsAllies: 0
+  projectileSpeed: 18
+  pierce: 0
+  blink: 0
+  fixedRange: 0
+  appliesOnHit: 0
+  cooldownRefundOnHit: 0
+  mark:
+    Enabled: 0
+    Duration: 0
+    ManaRefund: []
+  blinkBoltRadius: 0

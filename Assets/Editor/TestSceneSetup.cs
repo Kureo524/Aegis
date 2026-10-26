@@ -457,8 +457,9 @@ namespace EditorTools {
                 if (scope.playerPrefab != null) {
                     Character prefab = scope.playerPrefab;
                     var characterSo = new SerializedObject(prefab);
-                    foreach (string field in new[] { "movement", "visual", "body", "agent", "attacker", "healthBar" })
+                    foreach (string field in new[] { "movement", "visual", "body", "agent", "attacker" })
                         Check(characterSo.FindProperty(field).objectReferenceValue != null, $"Player prefab: character.{field} wired");
+                    Check(prefab.GetComponentInChildren<HealthBarView>(true) != null, "Player prefab has a HealthBarView");
 
                     var input = prefab.GetComponent<PlayerCommandInput>();
                     Check(input != null, "Player prefab has a PlayerCommandInput");

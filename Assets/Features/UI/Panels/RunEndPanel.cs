@@ -8,7 +8,8 @@ using VContainer;
 namespace Features.UI.Panels {
     /// <summary>
     /// Victory / defeat screen (design doc §9.1), shown in GameState.Win / GameOver: replay the
-    /// stage from wave 1 (PlayRequestedEvent → Loading) or back to the main menu. Own UIDocument.
+    /// stage from wave 1 (PlayRequestedEvent → Loading) or back to the main menu. Shows the final
+    /// score and the best one (RunScoredEvent, BestScoreEvent) when the run has a score system. Own UIDocument.
     /// Victory or defeat comes from the game state itself: the state changes while RunEndedEvent is
     /// being handled, before this panel receives it, so the summary is refreshed when it does.
     /// </summary>
@@ -17,8 +18,10 @@ namespace Features.UI.Panels {
         private IEventBus _eventBus;
         private readonly DisposableBag _subscriptions = new();
         private VisualElement _overlay;
-        private Label _title, _summary, _reward;
-        private string _rewardText = "";
+        private Label _title, _score, _summary, _reward;
+        private string _rewardText = "", _scoreText = "";
+        private int? _finalScore;
+        private BestScoreEvent? _best;
         private bool _won;
         private int _waves, _level, _gold;
 
@@ -26,6 +29,8 @@ namespace Features.UI.Panels {
         public string Title => _title != null ? _title.text : "";
         /// <summary>The meta currency line ("+N éclats" or how to earn some).</summary>
         public string Reward => _rewardText;
+        /// <summary>The score lines ("Score : N" and the record), empty without a score system.</summary>
+        public string ScoreText => _scoreText;
 
         [Inject]
         public void Construct(IEventBus eventBus) {
@@ -37,6 +42,15 @@ namespace Features.UI.Panels {
             _subscriptions.Add(eventBus.Subscribe<MetaRewardEvent>(e => {
                 _rewardText = e.Amount > 0 ? $"+{e.Amount} {e.Currency}" : $"Termine le stage pour gagner des {e.Currency}";
                 if (IsOpen) Show(true);
+            }));
+            // MetaProgress handles RunScoredEvent first: the best score may come before the score
+            _subscriptions.Add(eventBus.Subscribe<RunScoredEvent>(e => {
+                _finalScore = e.Score;
+                RefreshScore();
+            }));
+            _subscriptions.Add(eventBus.Subscribe<BestScoreEvent>(e => {
+                _best = e;
+                RefreshScore();
             }));
             _subscriptions.Add(eventBus.Subscribe<LevelUpEvent>(e => _level = e.Level));
             _subscriptions.Add(eventBus.Subscribe<XpChangedEvent>(e => _level = e.Level));
@@ -52,6 +66,12 @@ namespace Features.UI.Panels {
             _title = MenuStyles.Title("");
             _title.style.fontSize = 34;
             box.Add(_title);
+            _score = MenuStyles.Hint("");
+            _score.style.fontSize = 22;
+            _score.style.color = new Color(1f, 0.85f, 0.45f);
+            _score.style.unityTextAlign = TextAnchor.MiddleCenter;
+            _score.style.marginBottom = 8;
+            box.Add(_score);
             _summary = MenuStyles.Hint("");
             _summary.style.fontSize = 16;
             _summary.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -69,6 +89,13 @@ namespace Features.UI.Panels {
 
         private void OnDestroy() => _subscriptions.Dispose();
 
+        private void RefreshScore() {
+            if (!_finalScore.HasValue) return;
+            _scoreText = $"Score : {_finalScore.Value}";
+            if (_best.HasValue) _scoreText += _best.Value.NewRecord ? "\nNouveau record !" : $"\nRecord : {_best.Value.Best}";
+            if (IsOpen) Show(true);
+        }
+
         private void Show(bool open) {
             IsOpen = open;
             if (_overlay == null) return;
@@ -76,6 +103,8 @@ namespace Features.UI.Panels {
             if (!open) return;
             _title.text = _won ? "Victoire !" : "Défaite";
             _title.style.color = _won ? new Color(0.6f, 0.9f, 1f) : new Color(1f, 0.4f, 0.5f);
+            _score.text = _scoreText;
+            _score.style.display = _scoreText.Length > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             _summary.text = $"Vagues terminées : {_waves}\nNiveau {_level}  ·  {_gold} or";
             _reward.text = _rewardText;
         }

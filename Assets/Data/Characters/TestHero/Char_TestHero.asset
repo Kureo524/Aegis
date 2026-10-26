@@ -14,6 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Features::Features.Characters.CharacterDefinition
   displayName: Vesna
   faction: 0
+  epithet: la Lanceuse de braises
+  summary: "Lanceuse de sorts \xE0 distance : encha\xEEne un sort puis une attaque
+    pour faire exploser sa Surchauffe, br\xFBle les groupes et roule hors de port\xE9e.
+    Fragile mais redoutable de loin."
   sprite: {fileID: 934678258, guid: 966cf3fd8191862848bfc6b52f2624b4, type: 3}
   animations: {fileID: 11400000, guid: f642ca77f3fd9a95e9217a2de32d27a2, type: 2}
   portrait: {fileID: -6577837168843260694, guid: 9ff9e06c57cefbcd398c1922cdca37f2, type: 3}

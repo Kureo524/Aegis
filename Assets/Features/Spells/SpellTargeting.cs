@@ -7,6 +7,7 @@ using Features.Options;
 using Systems.EventBusses;
 using Systems.Inputs;
 using Systems.Inputs.Events;
+using Systems.UIManagement;
 using UnityEngine;
 using VContainer;
 
@@ -47,9 +48,12 @@ namespace Features.Spells {
         public int Slot => _spell != null ? _slot : -1;
         public SpellDefinition Spell => _spell;
 
+        private IPointerOverUi _ui;
+
         [Inject]
-        public void Construct(IEventBus eventBus, UserOptions options, Camera mainCamera) {
+        public void Construct(IEventBus eventBus, UserOptions options, Camera mainCamera, IPointerOverUi ui) {
             _eventBus = eventBus;
+            _ui = ui;
             _options = options;
             _camera = mainCamera;
         }
@@ -164,7 +168,7 @@ namespace Features.Spells {
 
         private void OnConfirm(ConfirmEvent e) {
             if (!IsAiming) return;
-            if (UI.UiPicking.IsPointerOverUi(e.ScreenPosition)) return;   // clicking the HUD does not cast
+            if (_ui.IsPointerOverUi(e.ScreenPosition)) return;   // clicking the HUD does not cast
             _pointer = e.ScreenPosition;
             if (!TryBuildContext(_spell, out CastContext ctx)) return;   // keep aiming
 

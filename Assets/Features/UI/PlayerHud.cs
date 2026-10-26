@@ -223,13 +223,14 @@ namespace Features.UI {
             var center = new VisualElement { pickingMode = PickingMode.Ignore };
             center.AddToClassList("ae-hud__center");
 
-            _buffs = new VisualElement { pickingMode = PickingMode.Ignore };
-            _buffs.AddToClassList("ae-buffs");
-            center.Add(_buffs);
-
             _feedback = new Label { pickingMode = PickingMode.Ignore };
             _feedback.AddToClassList("ae-feedback");
             center.Add(_feedback);
+
+            // Stacks and timed effects right above the panel (and its health bar)
+            _buffs = new VisualElement { pickingMode = PickingMode.Ignore };
+            _buffs.AddToClassList("ae-buffs");
+            center.Add(_buffs);
 
             var main = new VisualElement { pickingMode = PickingMode.Ignore };
             main.AddToClassList("ae-dock-panel");
@@ -349,18 +350,18 @@ namespace Features.UI {
             _elixir = new Label { pickingMode = PickingMode.Ignore };
             _elixir.AddToClassList("ae-elixir");
             panel.Add(_elixir);
-            var goldRow = new VisualElement { pickingMode = PickingMode.Ignore };
+            // The gold is the shop button
+            var goldRow = new VisualElement();
             goldRow.AddToClassList("ae-goldrow");
+            goldRow.AddToClassList("ae-goldbutton");
+            goldRow.RegisterCallback<ClickEvent>(_ => _eventBus.Publish(new ShopToggleRequestedEvent()));
+            _tooltip.Attach(goldRow, () => ("Boutique", "P", "Ouverte à tout moment ; achats et ventes entre les vagues."));
             var coin = new VisualElement { pickingMode = PickingMode.Ignore };
             coin.AddToClassList("ae-coin");
             goldRow.Add(coin);
             _gold = new Label { pickingMode = PickingMode.Ignore };
             _gold.AddToClassList("ae-gold");
             goldRow.Add(_gold);
-            var shop = new Button(() => _eventBus.Publish(new ShopToggleRequestedEvent())) { text = "Boutique" };
-            shop.AddToClassList("ae-hud__shop");
-            _tooltip.Attach(shop, () => ("Boutique", "P", "Ouverte à tout moment ; achats et ventes entre les vagues."));
-            goldRow.Add(shop);
             panel.Add(goldRow);
             return panel;
         }

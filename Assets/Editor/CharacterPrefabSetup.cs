@@ -175,7 +175,6 @@ namespace EditorTools {
 
                 var characterSo = new SerializedObject(character);
                 characterSo.FindProperty("attacker").objectReferenceValue = attacker;
-                characterSo.FindProperty("healthBar").objectReferenceValue = bar;
                 characterSo.ApplyModifiedPropertiesWithoutUndo();
             });
         }

@@ -36,6 +36,8 @@ namespace Features.Passives {
         Nova,
         /// <summary>The hit also counts as a basic attack hit: on-hit effects apply (Ethereal Weapon).</summary>
         ProcOnHit,
+        /// <summary>One more stack of the passive's stack counter (Stacks): growing items (forge heart, conqueror's trophy). Appended: serialized index.</summary>
+        AddStack,
     }
 
     /// <summary>Loot that a passive can drop (design doc §9.5).</summary>
@@ -62,6 +64,8 @@ namespace Features.Passives {
         public bool ConsumesCharge;
         [Tooltip("SpellCast / SpellHit: only the ultimate (R).")]
         public bool UltimateOnly;
+        [Tooltip("Only on elite enemies (they carry items) and bosses: the target of the hit, the victim of the kill.")]
+        public bool EliteOnly;
         public PassiveEffectKind Effect;
         [Header("TimedStats")]
         public StatBonus[] Stats;

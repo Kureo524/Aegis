@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71d7d5afee4f01c37b65fdec95d44665, type: 3}
+  m_Name: ScoreRules
+  m_EditorClassIdentifier: Game.Features::Features.Score.ScoreRules
+  pointsPerKill: 10
+  pointsPerBoss: 500
+  pointsPerWave: 200
+  victoryBonus: 1000
+  pointsPerLifeLeft: 250

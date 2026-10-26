@@ -141,6 +141,13 @@ namespace Features.Characters {
             _actionInterruptible = interruptible;
         }
 
+        private bool _elite;
+        private const float EliteScale = 1.2f;
+        private static readonly Color EliteTint = new(0.86f, 0.82f, 1f);
+
+        /// <summary>Elites of the horde (they carry items): bigger, a cold aurora tint.</summary>
+        public void SetElite(bool elite) => _elite = elite;
+
         /// <summary>Tint of the strongest status, white when none.</summary>
         public void SetStatus(StatusEffects status) {
             _stunned = status.IsStunned;
@@ -226,10 +233,12 @@ namespace Features.Characters {
                 _hitTime = -1f;
                 hit = 0f;
             }
-            _renderer.color = Color.Lerp(_statusColor, hitTint, hit);
+            Color baseColor = _elite && _statusColor == Color.white ? EliteTint : _statusColor;
+            _renderer.color = Color.Lerp(baseColor, hitTint, hit);
             squash -= 0.12f * hit;   // squashed by the blow
             transform.rotation = _camera.rotation * Quaternion.Euler(0f, 0f, tilt);
-            transform.localScale = new Vector3(_baseScale.x * (1f - squash), _baseScale.y * (1f + squash * 0.75f), _baseScale.z);
+            float size = _elite ? EliteScale : 1f;
+            transform.localScale = new Vector3(_baseScale.x * size * (1f - squash), _baseScale.y * size * (1f + squash * 0.75f), _baseScale.z * size);
             transform.position = transform.parent.TransformPoint(_basePosition) + _camera.right * lunge;
         }
     }

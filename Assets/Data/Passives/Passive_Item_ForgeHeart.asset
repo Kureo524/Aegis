@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb268d7b3b865bd4fa4aca45803ef906, type: 3}
+  m_Name: Passive_Item_ForgeHeart
+  m_EditorClassIdentifier: Game.Features::Features.Passives.PassiveDefinition
+  displayName: Battement de forge
+  description: "Toutes les 6 s, une attaque inflige 50 (+6 % PV max) d\xE9g\xE2ts
+    physiques en plus et donne +10 PV max pour le reste de la partie (sans limite)."
+  icon: {fileID: 21300000, guid: ee5f7ae95196ce9e3adbf4366011d023, type: 3}
+  stats: []
+  capabilities: 
+  triggers:
+  - On: 0
+    EveryN: 1
+    Chance: 1
+    HealthBelow: 0
+    Cooldown: 6
+    ConsumesCharge: 0
+    UltimateOnly: 0
+    EliteOnly: 0
+    Effect: 1
+    Stats: []
+    Duration: 0
+    Damage: 50
+    ScalingStat: 0
+    DamageRatio: 0.06
+    TargetMaxHealthRatio: 0
+    TargetCurrentHealthRatio: 0
+    DamageDealtRatio: 0
+    DamageType: 0
+    Count: 0
+    Radius: 0
+    BoltColor: {r: 0, g: 0, b: 0, a: 0}
+    Loot: 0
+    Status:
+      Kind: 0
+      Duration: 0
+      Power: 0
+      ScalingStat: 0
+      Ratio: 0
+      TargetMaxHealthRatio: 0
+      MaxStacks: 0
+    Amount: 0
+    AmountStat: 0
+    AmountRatio: 0
+  - On: 0
+    EveryN: 1
+    Chance: 1
+    HealthBelow: 0
+    Cooldown: 6
+    ConsumesCharge: 0
+    UltimateOnly: 0
+    EliteOnly: 0
+    Effect: 12
+    Stats: []
+    Duration: 0
+    Damage: 0
+    ScalingStat: 0
+    DamageRatio: 0
+    TargetMaxHealthRatio: 0
+    TargetCurrentHealthRatio: 0
+    DamageDealtRatio: 0
+    DamageType: 0
+    Count: 0
+    Radius: 0
+    BoltColor: {r: 0, g: 0, b: 0, a: 0}
+    Loot: 0
+    Status:
+      Kind: 0
+      Duration: 0
+      Power: 0
+      ScalingStat: 0
+      Ratio: 0
+      TargetMaxHealthRatio: 0
+      MaxStacks: 0
+    Amount: 0
+    AmountStat: 0
+    AmountRatio: 0
+  stacks:
+    Source: 0
+    Reset: 0
+    Max: 0
+    Duration: 0
+    PerStack:
+    - Stat: 0
+      Type: 0
+      Value: 10
+  nearbyEnemies:
+    Radius: 0
+    Max: 0
+    PerEnemy: []
+  aura:
+    Radius: 0
+    Interval: 0
+    Damage: 0
+    ScalingStat: 0
+    Ratio: 0
+    DamageType: 0
+    HealPerEnemy: 0
+  conversions: []
+  damage:
+    OutgoingPercent: 0
+    TargetHealthBelow: 0
+    AppliesTo: 0
+    IncomingPercent: 0
+  abilityHaste: []

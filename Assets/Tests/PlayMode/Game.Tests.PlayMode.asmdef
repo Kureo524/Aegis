@@ -6,6 +6,7 @@
         "UnityEditor.TestRunner",
         "Game.Systems",
         "Game.Features",
+        "Game.Presentation",
         "Game.Containers",
         "VContainer"
     ],

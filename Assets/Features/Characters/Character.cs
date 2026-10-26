@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using Features.Combat;
 using Features.Events;
 using Features.Movement;
 using Features.Passives;
 using Features.Progression;
 using Features.Stats;
-using Features.UI;
 using Systems.EventBusses;
 using UnityEngine;
 using UnityEngine.AI;
@@ -30,7 +30,6 @@ namespace Features.Characters {
         [SerializeField] private BoxCollider body;
         [SerializeField] private NavMeshAgent agent;
         [SerializeField] private BasicAttacker attacker;
-        [SerializeField] private HealthBarView healthBar;
 
         private IEventBus _eventBus;
         private ExperienceCurve _experienceCurve;
@@ -74,6 +73,36 @@ namespace Features.Characters {
             return Stats.Value(type) - baseValue;
         }
         public bool IsPlayer => Definition != null && Definition.Faction == Faction.Player;
+
+        // ---- elites (design doc §9.6): enemies that carry items ----
+        private readonly List<Economy.ItemDefinition> _carriedItems = new();
+        private float _rewardMultiplier = 1f;
+        /// <summary>Items this enemy carries (elites, bosses): their stats and passives are on it.</summary>
+        public IReadOnlyList<Economy.ItemDefinition> CarriedItems => _carriedItems;
+        public bool IsElite { get; private set; }
+        public bool IsEliteOrBoss => IsElite || Definition is Enemies.BossDefinition;
+
+        /// <summary>
+        /// Gives the character items (stats + passive), like a boss. With <paramref name="elite"/>: an
+        /// elite of the horde, tougher (health ×), worth more (gold and XP ×), bigger and marked.
+        /// Undone by the next Init (pool reuse).
+        /// </summary>
+        public void Carry(IReadOnlyList<Economy.ItemDefinition> items, bool elite = false, float healthMultiplier = 1f, float rewardMultiplier = 1f) {
+            foreach (Economy.ItemDefinition item in items) {
+                if (item == null) continue;
+                _carriedItems.Add(item);
+                foreach (Economy.StatBonus bonus in item.Stats) Stats.Get(bonus.Stat)?.AddModifier(bonus.ToModifier(item));
+                Passives.Add(item.Passive, item);
+            }
+            if (elite) {
+                IsElite = true;
+                _rewardMultiplier = rewardMultiplier;
+                if (!Mathf.Approximately(healthMultiplier, 1f))
+                    Stats.Get(StatType.MaxHealth)?.AddModifier(new StatModifier(healthMultiplier - 1f, ModifierType.PercentMult, _carriedItems));
+                if (visual != null) visual.SetElite(true);
+            }
+            foreach (ICharacterOverlay overlay in _overlays) overlay.ShowItems(_carriedItems, IsElite);
+        }
         public Faction Faction => Definition != null ? Definition.Faction : Faction.Neutral;
         public float BodyRadius => Definition != null ? Definition.BodySize.x / 2f : 0.5f;
         public Vector3 HeadPosition => transform.position + Vector3.up * (Definition != null ? Definition.BodySize.y : 2f);
@@ -129,8 +158,11 @@ namespace Features.Characters {
         /// <summary>Where the adaptive force goes now (UI).</summary>
         public bool AdaptiveForceIsMagic => BonusStat(StatType.MagicAttack) > BonusStat(StatType.PhysicalAttack);
 
+        private ICharacterOverlay[] _overlays = System.Array.Empty<ICharacterOverlay>();
+
         private void Awake() {
             _rigidbody = GetComponent<Rigidbody>();
+            _overlays = GetComponentsInChildren<ICharacterOverlay>(true);   // HP bar (presentation layer)
             Status = new StatusEffects(Stats, Buffs, info => TakeDamage(info));
             Status.Changed += OnStatusChanged;
             Passives = new PassiveController(this);
@@ -152,6 +184,10 @@ namespace Features.Characters {
             Mana?.Detach();
 
             Definition = definition;
+            _carriedItems.Clear();
+            IsElite = false;
+            _rewardMultiplier = 1f;
+            if (visual != null) visual.SetElite(false);
             Passives.Clear();
             Capabilities.Clear();
             Buffs.Clear();
@@ -166,7 +202,7 @@ namespace Features.Characters {
             Health.Died += OnDied;
             Mana = new ManaPool(Stats.Get(StatType.MaxMana));
             if (movement != null) movement.Init(Stats.Get(StatType.MoveSpeed));
-            if (healthBar != null) healthBar.Bind(this);
+            foreach (ICharacterOverlay overlay in _overlays) overlay.Bind(this);
             SetBodyActive(true);
 
             Level.LevelChanged += Events.RaiseLevelUp;
@@ -272,7 +308,8 @@ namespace Features.Characters {
             SetBodyActive(false);
 
             if (Definition is EnemyDefinition enemy)
-                _eventBus.Publish(new EnemyKilledEvent(enemy.XpReward, enemy.GoldReward, transform.position));
+                _eventBus.Publish(new EnemyKilledEvent(Mathf.RoundToInt(enemy.XpReward * _rewardMultiplier),
+                                                       Mathf.RoundToInt(enemy.GoldReward * _rewardMultiplier), transform.position));
             if (IsPlayer) _eventBus.Publish(new PlayerDiedEvent());
 
             Died?.Invoke(this);

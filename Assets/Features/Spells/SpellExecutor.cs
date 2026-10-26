@@ -113,6 +113,8 @@ namespace Features.Spells {
 
             switch (spell.Targeting) {
                 case TargetingType.Self:
+                    // A damaging self spell hits every enemy within Radius of the caster (nova)
+                    if (spell.DealsDamage) HitAll(damage, InCircle(caster, origin, spell.Radius), onHit);
                     Ring(origin, Mathf.Max(spell.Radius, 1f), spell.Color);
                     break;
 
@@ -132,6 +134,11 @@ namespace Features.Spells {
                             caster.Events.RaiseBlink(origin, destination);   // passives (Earthwake, Shadow Runner…)
                             Ring(destination, 0.8f, spell.Color);
                             if (spell.BlinkBoltRadius > 0f) FireBlinkBolt(caster, spell, destination, BuildDamage(caster, spell, rank), onHit);
+                            // A damaging leap hits every enemy within Radius of where it lands
+                            else if (spell.DealsDamage) {
+                                HitAll(damage, InCircle(caster, destination, spell.Radius), onHit);
+                                Ring(destination, spell.Radius, spell.Color);
+                            }
                         }
                         break;
                     }

@@ -13,6 +13,7 @@ P = {
  'brown': [(150, 105, 60), (45, 28, 12), (222, 182, 122)], 'prism': [(175, 82, 225), (42, 10, 72), (242, 172, 255)],
  'silver': [(130, 146, 168), (30, 36, 48), (222, 230, 242)], 'gold': [(205, 160, 60), (62, 40, 10), (255, 222, 122)],
  'fire': [(232, 112, 32), (72, 15, 5), (255, 192, 112)], 'grey': [(110, 110, 120), (28, 28, 34), (200, 200, 210)],
+ 'ice': [(70, 160, 225), (8, 20, 58), (170, 232, 255)], 'aurora': [(120, 90, 230), (16, 10, 52), (150, 235, 255)],
 }
 def pick(*cands):
     for c in cands:
@@ -30,6 +31,11 @@ T('Spells/Vesna_W', 'fire', 'fire-bomb', 'sparky-bomb', 'unlit-bomb')
 T('Spells/Vesna_E', 'fire', 'dodge', 'rolling-energy', 'sprint')
 T('Spells/Vesna_R', 'fire', 'meteor-impact', 'burning-meteor', 'fire-rain')
 T('Spells/Vesna_Passive', 'fire', 'burning-embers', 'ember-shot', 'fire')
+T('Spells/Aldric_Q', 'ice', 'sword-slice', 'sword-wound', 'slash')
+T('Spells/Aldric_W', 'ice', 'ice-shield', 'magic-shield', 'shield-reflect')
+T('Spells/Aldric_E', 'aurora', 'jump-across', 'leapfrog', 'sprint')
+T('Spells/Aldric_R', 'aurora', 'polar-star', 'ice-spell-cast', 'crown')
+T('Spells/Aldric_Passive', 'ice', 'snowflake-2', 'frozen-orb', 'ice-cube')
 T('Spells/Spell_Flash', 'teal', 'teleport', 'lightning-trio', 'sprint')
 T('Augments/Spell_Ghost', 'teal', 'wind-slap', 'run', 'sprint')
 T('Augments/Spell_Ignite', 'fire', 'small-fire', 'fire')
@@ -59,6 +65,8 @@ I = {
  'StormSpire': ('prism', 'lightning-tower', 'lightning-spanner', 'lightning-bolt'), 'BloomBlade': ('prism', 'flower-twirl', 'lotus-flower', 'rose'), 'MirrorMask': ('prism', 'domino-mask', 'mask'),
  'BindingChain': ('prism', 'chained-arrow-heads', 'wavy-chains', 'chain'), 'MagmaShield': ('prism', 'lava', 'shield'),
 }
+I.update({'ForgeHeart': ('crimson', 'heart-tower', 'heart-organ', 'hearts'), 'ConquerorTrophy': ('gold', 'trophy-cup', 'podium-winner', 'trophy'),
+          'SoulGrimoire': ('purple', 'book-aura', 'evil-book', 'book-cover')})
 for k, (pal, *c) in I.items(): T(f'Items/Item_{k}', pal, *c)
 T('Items/Elixir_Iron', 'green', 'potion-ball', 'round-bottom-flask')
 T('Items/Elixir_Sorcery', 'blue', 'magic-potion', 'potion-ball')
