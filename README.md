@@ -24,7 +24,7 @@ d'augment, un **score final** et la sauvegarde des éclats de méta-progression,
 bouton **Mode** lance la partie complète.
 
 Le document de rendu (choix du moteur, schémas d'architecture, choix techniques et limites) :
-[**`Docs/Rendu.md`**](Docs/Rendu.md).
+[**`Docs/Rendu.pdf`**](Docs/Rendu.pdf) (version Markdown : [`Docs/Rendu.md`](Docs/Rendu.md)).
 
 ## Le jeu
 
